@@ -59,16 +59,14 @@ const GridPrestation = () => {
     }
 
     const PageGoBack = () => {
-        if (pageActuel > 1)
-        {
+        if (pageActuel > 1) {
             setPageActuel(pageActuel - 1)
         }
 
     }
 
     const PageGoForth = () => {
-        if(pageActuel * numRow < Prestations.length)
-        {
+        if (pageActuel * numRow < Prestations.length) {
             setPageActuel(pageActuel + 1)
 
         }
@@ -163,10 +161,10 @@ const GridPrestation = () => {
 
                     <div className="d-flex  me-2  mx-auto ">
 
-                        <Button variant='' className="mx-auto mb-3" onClick={()=> PageGoBack()} >&lt;</Button>
+                        <Button variant='' className="mx-auto mb-3" onClick={() => PageGoBack()} >&lt;</Button>
                         <p className='mx-auto mt-1'>
                             {pageActuel}
-                            </p>
+                        </p>
                         <Button variant='' className="mx-auto mb-3" onClick={() => PageGoForth()}>&gt;</Button>
 
                     </div>
