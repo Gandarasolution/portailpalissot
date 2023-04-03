@@ -12,88 +12,92 @@ import Collapse from 'react-bootstrap/Collapse';
 
 import { NavLink } from 'react-router-dom';
 
-const Sidebar = () => {
+const Sidebar = ({ vue }) => {
 
   const [openMaintenance, setOpenMaintenance] = useState(false);
   const [openDepannage, setOpenDepannage] = useState(false);
 
   return (
-    // <div style={{ display: 'flex', height: '100vh', overflow: 'scroll initial' }}>
-      <CDBSidebar textColor="#333" backgroundColor="#fff" >
-        <CDBSidebarHeader prefix={<i className="fa fa-bars fa-large"></i>}>
-          <a href="/" className="text-decoration-none" style={{ color: 'primary' }}>
-            GANDARA - DEMO
-          </a>
-        </CDBSidebarHeader>
+    <div style={{display: "flex", direction: "row"}}>
+        <CDBSidebar textColor="#333" backgroundColor="#fff"  >
+          <CDBSidebarHeader prefix={<i className="fa fa-bars fa-large"></i>}>
+            <a href="/" className="text-decoration-none" style={{ color: 'primary' }}>
+              GANDARA - DEMO
+            </a>
+          </CDBSidebarHeader>
 
-        <CDBSidebarContent className="sidebar-content">
-          <CDBSidebarMenu>
+          <CDBSidebarContent className="sidebar-content">
+            <CDBSidebarMenu>
 
-          <Button variant='btCollapseMenu' onClick={() => setOpenMaintenance(!openMaintenance)} aria-controls="collapse-maintenance"  aria-expanded={openMaintenance}>
-            
-                     <CDBSidebarMenuItem icon="cog">
-          Maintenance
-         
-         </CDBSidebarMenuItem>
-            </Button>
+              <Button variant='btCollapseMenu' onClick={() => setOpenMaintenance(!openMaintenance)} aria-controls="collapse-maintenance" aria-expanded={openMaintenance}>
+
+                <CDBSidebarMenuItem icon="cog">
+                  Maintenance
+
+                </CDBSidebarMenuItem>
+              </Button>
 
 
-         <Collapse in={openMaintenance}>
-        <div id="collapse-maintenance" className='container' >
-          <NavLink exact to="/maintenance/contrat" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="file-alt">Contrat</CDBSidebarMenuItem>
-              </NavLink>
-              <NavLink exact to="/maintenance/documents" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="folder">Documents</CDBSidebarMenuItem>
-              </NavLink>
-              <NavLink exact to="/maintenance/appareils" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="mobile-alt">Appareils</CDBSidebarMenuItem>
-              </NavLink>
-              <NavLink exact to="/maintenance/prestations" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="chart-bar">Suivi des prestations</CDBSidebarMenuItem>
-              </NavLink>
-              <NavLink exact to="/maintenance/factures" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="list-alt">Factures</CDBSidebarMenuItem>
-              </NavLink>
-          </div>
-      </Collapse>
+              <Collapse in={openMaintenance}>
+                <div id="collapse-maintenance" className='container' >
+                  <NavLink exact="true" to="/maintenance/contrat" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="file-alt">Contrat</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact="true" to="/maintenance/contrat/2755" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="file-alt">MockContrat</CDBSidebarMenuItem>
+                  </NavLink>
 
-              
-                
-              <Button variant='btCollapseMenu' onClick={() => setOpenDepannage(!openDepannage)} aria-controls="collapse-depannage"  aria-expanded={openDepannage}>
+                  <NavLink exact="true" to="/maintenance/documents" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="folder">Documents</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact="true" to="/maintenance/appareils" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="mobile-alt">Appareils</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact="true" to="/maintenance/prestations" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="chart-bar">Suivi des prestations</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact="true" to="/maintenance/factures" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="list-alt">Factures</CDBSidebarMenuItem>
+                  </NavLink>
+                </div>
+              </Collapse>
+
+
+
+              <Button variant='btCollapseMenu' onClick={() => setOpenDepannage(!openDepannage)} aria-controls="collapse-depannage" aria-expanded={openDepannage}>
                 <CDBSidebarMenuItem icon="wrench">Dépannage              </CDBSidebarMenuItem>
 
-                
-                
-                </Button>
-            
+
+
+              </Button>
+
               <Collapse in={openDepannage}>
-        <div id="collapse-depannage" className='container' >
-          <NavLink exact to="/depannage/demandes" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="phone">Demandes</CDBSidebarMenuItem>
-              </NavLink>
-              <NavLink exact to="/depannage/interventions" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="truck">Interventions</CDBSidebarMenuItem>
-              </NavLink>
-              <NavLink exact to="/depannage/appareils" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="mobile-alt">Appareils</CDBSidebarMenuItem>
-              </NavLink>
-              <NavLink exact to="/depannage/devis" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="clock">Devis en attente</CDBSidebarMenuItem>
-              </NavLink>
-              <NavLink exact to="/depannage/factures" activeClassName="activeClicked">
-                <CDBSidebarMenuItem icon="list-alt">Factures</CDBSidebarMenuItem>
-              </NavLink>
-          </div>
-      </Collapse>
-
-      
+                <div id="collapse-depannage" className='container' >
+                  <NavLink exact="true" to="/depannage/demandes" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="phone">Demandes</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact="true" to="/depannage/interventions" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="truck">Interventions</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact="true" to="/depannage/appareils" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="mobile-alt">Appareils</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact="true" to="/depannage/devis" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="clock">Devis en attente</CDBSidebarMenuItem>
+                  </NavLink>
+                  <NavLink exact="true" to="/depannage/factures" activeclassname="activeClicked">
+                    <CDBSidebarMenuItem icon="list-alt">Factures</CDBSidebarMenuItem>
+                  </NavLink>
+                </div>
+              </Collapse>
 
 
-          </CDBSidebarMenu>
-        </CDBSidebarContent>
 
-        {/* <CDBSidebarFooter style={{ textAlign: 'center' }}>
+
+            </CDBSidebarMenu>
+          </CDBSidebarContent>
+
+          {/* <CDBSidebarFooter style={{ textAlign: 'center' }}>
           <div
             style={{
               padding: '20px 5px',
@@ -102,8 +106,13 @@ const Sidebar = () => {
             powered by Gandarasolution
           </div>
         </CDBSidebarFooter> */}
-      </CDBSidebar>
-    // </div>
+        </CDBSidebar>
+        {vue}
+
+
+      </div>
+
+
   );
 };
 
