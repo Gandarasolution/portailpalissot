@@ -1,15 +1,25 @@
+//#region Imports
 import './App.css';
 
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+//#region Bootstrap
+
+//#endregion
+
+//#region Components
+import Sidebar from './components/menu/SidebarMenu';
 import LoginPage from './Views/Login/login';
 import HomePage from './Views/Home/HomePage';
-import Sidebar from './components/menu/SidebarMenu';
 import ContratPage from './Views/Maintenance/Contrat/ContratPage';
+//#endregion
+
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faFileAlt,faSearch, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faFileAlt, faSearch, faClock, faYinYang } from '@fortawesome/free-solid-svg-icons';
+
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+//#endregion
 
 
-library.add(faFileAlt,faSearch,faClock)
+library.add(faFileAlt, faSearch, faClock, faYinYang)
 
 
 function App() {
@@ -18,22 +28,22 @@ function App() {
     <Router>
       <div className='App'>
 
+        <Sidebar>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/maintenance/contrat" element={<ContratPage />} />
 
 
-        <Routes>
+          </Routes>
+        </Sidebar>
 
 
-          <Route path="/" element={<Sidebar vue={<HomePage />} />} />
-          
-          <Route path="/maintenance/contrat" element={<Sidebar vue={<ContratPage/>}/>} />
-
-          {/* <Route path="/maintenance/contrat/:idContrat" element={<Sidebar vue={<ContratPage/>}/>} /> */}
-          <Route path="/login" element={<LoginPage />} />
 
 
-        </Routes>
       </div>
     </Router>
+
+
 
 
 

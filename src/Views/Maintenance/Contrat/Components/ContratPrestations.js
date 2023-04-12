@@ -1,28 +1,30 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+//#region Imports
+
+//#region Bootstrap
+
+//#endregion
+
+//#region Components
 import GridPrestation from './GridPrestation';
+import WhiteShadowCard from '../../../../components/commun/WhiteShadowCard';
+//#endregion
+
+import React from 'react';
+
+//#endregion
 
 
+const ContratPrestation = ({ Prestations }) => {
 
-const ContratPrestation = ({Prestations}) => {
+    return (
 
-return (
-    <div className='p-2'>
-    <div className='mx-1 pb-4 bg-white rounded p-4 shadow-lg'>
-        <div className="d-flex flex-wrap align-items-center">
-            <div style={{ width: "50px", height: "50px", top: "-25px", left: "10px" }} className="shadow text-white bg-danger ps-2 d-flex justify-content-center align-items-center rounded position-relative ">
-                <FontAwesomeIcon size="xl" icon="clock" />
-            </div>
+        <WhiteShadowCard icon="clock" title="Prestations :" >
 
-            <h5 className="ms-4">Prestations : </h5>
-        </div>
-            <GridPrestation />
+            <GridPrestation Prestations={Prestations} />
 
+        </WhiteShadowCard>
 
-    </div>
-</div>
-
-)
+    )
 
 };
 
