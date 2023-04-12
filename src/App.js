@@ -25,9 +25,9 @@ function App() {
 
           <Route path="/" element={<Sidebar vue={<HomePage />} />} />
           
-          <Route path="/maintenance/contrats" element={<Sidebar vue={<ContratPage/>}/>} />
+          <Route path="/maintenance/contrat" element={<Sidebar vue={<ContratPage/>}/>} />
 
-          <Route path="/maintenance/contrat/:idContrat" element={<Sidebar vue={<ContratPage/>}/>} />
+          {/* <Route path="/maintenance/contrat/:idContrat" element={<Sidebar vue={<ContratPage/>}/>} /> */}
           <Route path="/login" element={<LoginPage />} />
 
 
