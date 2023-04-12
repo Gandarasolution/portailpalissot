@@ -1,10 +1,11 @@
-import { useParams, NavLink } from 'react-router-dom';
+import { useParams, NavLink, useFetcher } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Button from 'react-bootstrap/Button';
+import { useEffect } from 'react';
 
 
 const GridPrestation = () => {
@@ -38,42 +39,6 @@ const GridPrestation = () => {
 
     ]
 
-
-    let { idContrat } = useParams();
-    const [numRow, setNumRow] = useState(10);
-    const [nbAfficher, setNbAfficher] = useState((Prestations.length < 10 ? Prestations.length : 10));
-    const [pageActuel, setPageActuel] = useState(1);
-
-
-
-
-
-
-
-
-
-    const DropdownNumRowChanged = (e) => {
-        setNumRow(e);
-        setPageActuel(1)
-        setNbAfficher((Prestations.length < e ? Prestations.length : e))
-    }
-
-    const PageGoBack = () => {
-        if (pageActuel > 1) {
-            setPageActuel(pageActuel - 1)
-        }
-
-    }
-
-    const PageGoForth = () => {
-        if (pageActuel * numRow < Prestations.length) {
-            setPageActuel(pageActuel + 1)
-
-        }
-
-    }
-
-
     function MoisIcone(_parametre) {
         switch (_parametre) {
             case 1:
@@ -85,6 +50,60 @@ const GridPrestation = () => {
 
         }
     }
+
+
+
+
+
+
+    const [lignesParPage, setLignesParPage] = useState(10);
+    const [nbPremier, setNbPremier] = useState(1);
+    const [nbDernier, setNbDernier] = useState(Prestations.length > lignesParPage ? lignesParPage : Prestations.length);
+    const [pageActuel, setPageActuel] = useState(1);
+
+
+
+
+    const DropdownLignesParPageChanged = (e) => {
+
+        setLignesParPage(e);
+        setPageActuel(1);
+        setNbPremier(1);
+        setNbDernier(Prestations.length > e ? e : Prestations.length);
+    }
+
+
+    const PageActuelGoForth = (e) => {
+
+        if (nbDernier !== Prestations.length) {
+            let _pageActuel = pageActuel + 1
+            setPageActuel(_pageActuel);
+            let _nbPremier = Number(nbPremier) + Number(lignesParPage)
+            setNbPremier(_nbPremier);
+            let _nbDernier = Prestations.length > nbDernier + lignesParPage ? nbDernier + lignesParPage : Prestations.length
+            setNbDernier(_nbDernier);
+        }
+
+
+    }
+
+
+    const PageActuelGoBack = (e) => {
+        if (pageActuel > 1) {
+            setPageActuel(pageActuel - 1);
+            setNbPremier(nbPremier - lignesParPage);
+            setNbDernier((pageActuel - 1) * lignesParPage);
+        }
+    }
+
+
+    useEffect(() => {
+    //    console.log(`nbPremier : ${nbPremier}`)
+    //    console.log(`nbDernier : ${nbDernier}`)
+    //    console.log(`pageActule : ${pageActuel}`)
+    //    console.log(`ligneparpage : ${lignesParPage}`)
+    //     console.log("--------------------------------------------")
+    })
 
 
     return (
@@ -113,9 +132,13 @@ const GridPrestation = () => {
                 <tbody>
 
                     {
-                        Prestations.slice(0, numRow).map((presta) => {
+                        // Prestations.slice(((nbPremier - 1)), (lignesParPage)).map((presta) => {
+                        Prestations.slice(((nbPremier - 1)), (nbDernier)).map((presta) => {
+
+
+
                             return (<tr key={presta.id}>
-                                <td><NavLink style={{ textDecoration: 'none' }} to={`/maintenance/contrat/${idContrat}/${presta.id}`}>
+                                <td><NavLink style={{ textDecoration: 'none' }} to={`/maintenance/contrat/prestation/${presta.id}`}>
                                     <FontAwesomeIcon icon="search" />
                                 </NavLink></td>
                                 <td>{presta.secteur}</td>
@@ -144,8 +167,8 @@ const GridPrestation = () => {
                         </p>
                         <DropdownButton
                             variant=''
-                            title={numRow}
-                            onSelect={(e) => DropdownNumRowChanged(e)}
+                            title={lignesParPage}
+                            onSelect={(e) => DropdownLignesParPageChanged(e)}
                             id="dropdown-NumRow"
 
                         >
@@ -155,17 +178,17 @@ const GridPrestation = () => {
                         </DropdownButton>
                     </div>
                     <div className="d-flex  me-4">
-                        <p className=" m-2">1-{nbAfficher} sur {Prestations.length}</p>
+                        <p className=" m-2">{nbPremier} - {nbDernier} sur {Prestations.length}</p>
                     </div>
 
 
                     <div className="d-flex  me-2  mx-auto ">
 
-                        <Button variant='' className="mx-auto mb-3" onClick={() => PageGoBack()} >&lt;</Button>
+                        <Button variant='' className="mx-auto mb-3" onClick={(e) => PageActuelGoBack(e)} >&lt;</Button>
                         <p className='mx-auto mt-1'>
                             {pageActuel}
                         </p>
-                        <Button variant='' className="mx-auto mb-3" onClick={() => PageGoForth()}>&gt;</Button>
+                        <Button variant='' className="mx-auto mb-3" onClick={(e) => PageActuelGoForth(e)}>&gt;</Button>
 
                     </div>
 

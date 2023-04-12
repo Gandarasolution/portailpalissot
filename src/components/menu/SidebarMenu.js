@@ -9,10 +9,18 @@ import {
 } from 'cdbreact';
 import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
-
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import { NavLink } from 'react-router-dom';
 
 const Sidebar = ({ vue }) => {
+const Sites = [{"id":1, "nom":"Agence"},{"id":2, "nom":"Immeuble"},{"id":3,"nom":"Maison"}];
+const [siteSelect,setSiteSelect] = useState(Sites.at(0));
+
+const OnDropdownSiteChanged =(e) => {
+  setSiteSelect(Sites.find(s => s.id === e));
+};
+
 
   const [openMaintenance, setOpenMaintenance] = useState(false);
   const [openDepannage, setOpenDepannage] = useState(false);
@@ -29,6 +37,20 @@ const Sidebar = ({ vue }) => {
           <CDBSidebarContent className="sidebar-content">
             <CDBSidebarMenu>
 
+            <DropdownButton
+                            variant=''
+                            title={`Site : ${siteSelect.nom}`}
+                            id="dropdown-Site"
+                            onSelect={(e)=> OnDropdownSiteChanged(e)}
+                        >
+                          {Sites.map((site)=> {
+                            return(
+                              <Dropdown.Item key={site.id} eventKey={site.id}>{site.nom}</Dropdown.Item>
+                            )
+                          })}
+                            
+                        </DropdownButton>
+
               <Button variant='btCollapseMenu' onClick={() => setOpenMaintenance(!openMaintenance)} aria-controls="collapse-maintenance" aria-expanded={openMaintenance}>
 
                 <CDBSidebarMenuItem icon="cog">
@@ -42,9 +64,6 @@ const Sidebar = ({ vue }) => {
                 <div id="collapse-maintenance" className='container' >
                   <NavLink exact="true" to="/maintenance/contrat" activeclassname="activeClicked">
                     <CDBSidebarMenuItem icon="file-alt">Contrat</CDBSidebarMenuItem>
-                  </NavLink>
-                  <NavLink exact="true" to="/maintenance/contrat/2755" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="file-alt">MockContrat</CDBSidebarMenuItem>
                   </NavLink>
 
                   <NavLink exact="true" to="/maintenance/documents" activeclassname="activeClicked">
