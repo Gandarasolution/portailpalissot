@@ -1,10 +1,9 @@
+//#region Imports
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+//#endregion
 
 const WhiteShadowCard = (props) => {
-
-
 
 return (
     <div className='pt-4 mt-2'>

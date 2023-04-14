@@ -53,7 +53,7 @@ const ContratInfo = ({ Contrat }) => {
             </div>
 
 
-            <div className="w-25 px-3 mb-3">
+            <div className="w-50 px-3 mb-3">
                 <div className="border-bottom ">
                     <p style={{ fontSize: "12px" }} className="m-0 p-0">Type de facturation</p>
                     <p className="m-0 my-1 p-0">{Contrat.TypeFacturation}</p>

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-
+import {useContext} from "react"; 
+import { SiteContext } from '../../App';
 //#region cdb React
 import {
   CDBSidebar,
@@ -22,22 +23,26 @@ import Collapse from 'react-bootstrap/Collapse';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 //#endregion
-
 //#endregion
 
 const Sidebar = (props) => {
 
-  //#region Mokup
+  
+//#region Mokup
 
-  const Sites = [{ "id": 1, "nom": "Agence" }, { "id": 2, "nom": "Immeuble" }, { "id": 3, "nom": "Maison" }];
+const Sites = [{ "id": 1, "nom": "Agence" }, { "id": 2, "nom": "Immeuble" }, { "id": 3, "nom": "Maison" }];
 
-  //#endregion
-
-
+//#endregion
   //#region States
 
-  const [siteSelect, setSiteSelect] = useState(Sites.at(0));
   
+const [itemSelected, setItemSelected] = useState(null);
+
+
+  const [siteSelect, setSiteSelect] = useState(Sites.at(0));
+
+  
+
   const [openMaintenance, setOpenMaintenance] = useState(false);
   const [openDepannage, setOpenDepannage] = useState(false);
   
@@ -54,8 +59,11 @@ const Sidebar = (props) => {
   //#region Evenements
   const OnDropdownSiteChanged = (e) => {
     setSiteSelect(Sites.find(s => s.id === Number(e)));
+    
+
   };
 //#endregion
+
 
 
 
@@ -65,7 +73,7 @@ const Sidebar = (props) => {
 
         <CDBSidebar textColor="#333" backgroundColor="#fff"  >
           <CDBSidebarHeader prefix={<i className="fa fa-bars fa-large"></i>}>
-            <a href="/" className="text-decoration-none" style={{ color: 'primary' }}>
+            <a href="/" className="text-decoration-none" style={{ color: 'primary' }} onClick={()=> setItemSelected(null)} >
               GANDARA - DEMO
             </a>
           </CDBSidebarHeader>
@@ -98,7 +106,7 @@ const Sidebar = (props) => {
 
               <Collapse in={openMaintenance}>
                 <div id="collapse-maintenance" className='container' >
-                  <NavLink exact="true" to="/maintenance/contrat" activeclassname="activeClicked">
+                  <NavLink exact="true" to="/maintenance/contrat" activeclassname="activeClicked" onClick={()=>  setItemSelected(1) }  >
                     <CDBSidebarMenuItem icon="file-alt">Contrat</CDBSidebarMenuItem>
                   </NavLink>
 

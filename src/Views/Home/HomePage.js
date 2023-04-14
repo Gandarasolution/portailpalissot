@@ -17,14 +17,15 @@ import React from "react";
 
 
 const HomePage = () => {
-    
-      
-    return(
-<Container fluid>
+
+
+    return (
+        <Container fluid>
             <WhiteShadowCard icon="yin-yang" title="Portail GMAO" >
-                
+
             </WhiteShadowCard>
-</Container>
+
+        </Container>
 
     );
 }
