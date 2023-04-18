@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import {useContext} from "react"; 
-import { SiteContext } from '../../App';
+
 //#region cdb React
 import {
   CDBSidebar,
@@ -36,7 +35,7 @@ const Sites = [{ "id": 1, "nom": "Agence" }, { "id": 2, "nom": "Immeuble" }, { "
   //#region States
 
   
-const [itemSelected, setItemSelected] = useState(null);
+// const [itemSelected, setItemSelected] = useState(null);
 
 
   const [siteSelect, setSiteSelect] = useState(Sites.at(0));
@@ -73,7 +72,7 @@ const [itemSelected, setItemSelected] = useState(null);
 
         <CDBSidebar textColor="#333" backgroundColor="#fff"  >
           <CDBSidebarHeader prefix={<i className="fa fa-bars fa-large"></i>}>
-            <a href="/" className="text-decoration-none" style={{ color: 'primary' }} onClick={()=> setItemSelected(null)} >
+            <a href="/" className="text-decoration-none" style={{ color: 'primary' }}  >
               GANDARA - DEMO
             </a>
           </CDBSidebarHeader>
@@ -106,7 +105,7 @@ const [itemSelected, setItemSelected] = useState(null);
 
               <Collapse in={openMaintenance}>
                 <div id="collapse-maintenance" className='container' >
-                  <NavLink exact="true" to="/maintenance/contrat" activeclassname="activeClicked" onClick={()=>  setItemSelected(1) }  >
+                  <NavLink exact="true" to="/maintenance/contrat" activeclassname="activeClicked"   >
                     <CDBSidebarMenuItem icon="file-alt">Contrat</CDBSidebarMenuItem>
                   </NavLink>
 
