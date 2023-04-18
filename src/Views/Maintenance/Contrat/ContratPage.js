@@ -1,21 +1,22 @@
 //#region Imports
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import dateFormat from "dateformat";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
+import Button from "react-bootstrap/Button";
+
+
 //#endregion
 
 //#region Components
 import ContratPrestation from "./Components/ContratPrestations";
 import ContratInfo from "./Components/ContratInformation";
-import Button from "react-bootstrap/Button";
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
- 
 //#endregion
 
 const ContratPage = () => {
@@ -106,39 +107,56 @@ const ContratPage = () => {
     },
   ];
 
-const [Prestations, SetPrestations] = useState(_Prestations);
+  const [Prestations, SetPrestations] = useState(_Prestations);
 
   const MockupDataPrestation = () => {
-  let _prestas = []; 
+    let _prestas = [];
     for (let index = 0; index < 12; index++) {
       let _presta = {
-        id : index + 1,
-        libelle : loremIpsum({ avgSentencesPerParagraph: 1, startWithLoremIpsum: false, random: "false"}),
-        secteur: loremIpsum({ avgSentencesPerParagraph: 1, startWithLoremIpsum: false, random: "false", avgWordsPerSentence: 2}),
-        mois :[getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),]
-      }
+        id: index + 1,
+        libelle: loremIpsum({
+          avgSentencesPerParagraph: 1,
+          startWithLoremIpsum: false,
+          random: "false",
+        }).join(),
+        secteur: loremIpsum({
+          avgSentencesPerParagraph: 1,
+          startWithLoremIpsum: false,
+          random: "false",
+          avgWordsPerSentence: 2,
+        }).join(),
+        mois: [
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+          getRandomInt(0, 4),
+        ],
+      };
       _prestas.push(_presta);
     }
 
     SetPrestations(_prestas);
-
-  }
+  };
 
   function getRandomInt(min, max) {
-
     min = Math.ceil(min);
-    
-    max = Math.floor(max);
-    
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-    
-    }
 
+    max = Math.floor(max);
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 
   //#endregion
 
   //#region States
-
 
   const _dateContrat = new Date(
     dateFormat(new Date(Contrat.DateSouscrit), "dd/mm/yyyy")
@@ -179,15 +197,9 @@ const [Prestations, SetPrestations] = useState(_Prestations);
     let _datePrestation = new Date(_dateTmp);
     SetDatePrestation(_datePrestation);
     MockupDataPrestation();
-
   };
 
-
-
-  useEffect(()=> {
-
-  },[datePrestation])
-
+  useEffect(() => {}, [datePrestation]);
 
   //#endregion
 
@@ -195,10 +207,17 @@ const [Prestations, SetPrestations] = useState(_Prestations);
     <Container fluid>
       <ContratInfo Contrat={Contrat} />
 
-      <Button variant="primary" onClick={() => SoustraireUnAnPeriode()}><FontAwesomeIcon icon={faArrowLeft} /></Button>
-      {`Période : ${datePrestation.getFullYear()}  / ${datePrestation.getFullYear() + 1}`}
+      <Button variant="primary" onClick={() => SoustraireUnAnPeriode()}>
+        <FontAwesomeIcon icon={faArrowLeft} />
+      </Button>
+      {`Période : ${datePrestation.getFullYear()}  / ${
+        datePrestation.getFullYear() + 1
+      }`}
 
-      <Button variant="primary" onClick={() => AjouterUnAnPeriode()}> <FontAwesomeIcon icon={faArrowRight} /> </Button>
+      <Button variant="primary" onClick={() => AjouterUnAnPeriode()}>
+        {" "}
+        <FontAwesomeIcon icon={faArrowRight} />{" "}
+      </Button>
       <ContratPrestation
         Prestations={Prestations}
         datePrestation={datePrestation}

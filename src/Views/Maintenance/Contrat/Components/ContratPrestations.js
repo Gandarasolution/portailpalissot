@@ -12,6 +12,7 @@ import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+
 //#endregion
 
 //#region FontAwsome
@@ -23,9 +24,11 @@ import {
   faCaretUp,
   faCheck,
   faClock,
+  faFileImage,
+  faFilePdf,
 } from "@fortawesome/free-solid-svg-icons";
 import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
-import { Container } from "react-bootstrap";
+import { Container, Form } from "react-bootstrap";
 //#endregion
 
 //#region Components
@@ -37,6 +40,7 @@ import { Container } from "react-bootstrap";
 const ContratPrestation = ({ Prestations, datePrestation }) => {
   //#region States
 
+  //#region Collapses
   const [open1, setOpen1] = useState(true);
   const [open2, setOpen2] = useState(true);
   const [open3, setOpen3] = useState(true);
@@ -49,6 +53,23 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   const [open10, setOpen10] = useState(true);
   const [open11, setOpen11] = useState(true);
   const [open12, setOpen12] = useState(true);
+  //#endregion
+
+  const [search, setSearch] = useState("");
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
+
+  const GetPrestationSearched = () => {
+    if (search.length > 0) {
+      return Prestations.filter(
+        (item) => item.libelle.includes(search) || item.secteur.includes(search)
+      );
+    } else {
+      return Prestations;
+    }
+  };
 
   //#endregion
 
@@ -227,7 +248,8 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
     if (_numMois > 12) {
       _numMois -= 12;
     }
-    let _lPrestation = Prestations.filter(
+
+    let _lPrestation = GetPrestationSearched().filter(
       (item) => item.mois.at(_numMois - 1) > 0
     );
 
@@ -236,7 +258,7 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
         {_lPrestation.length > 0 ? (
           <tr>
             <td colSpan={4} onClick={() => GroupClickedCollapse(_numMois)}>
-              <div className="shadow border rounded-pill bg-ligth">
+              <div className="shadow border rounded-pill bg-ligth border-secondary">
                 <Row>
                   <Col>
                     {GetNomMois(_numMois)}{" "}
@@ -297,9 +319,10 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   };
 
   const CardedPrestations = () => {
-    return Prestations.map((presta) => {
+    // return Prestations.map((presta) => {
+    return GetPrestationSearched().map((presta) => {
       return (
-        <Card key={presta.id} className="m-2 p-2">
+        <Card key={presta.id} className="m-2 p-2 shadow border-secondary">
           <Card.Title>{presta.libelle}</Card.Title>
           <Card.Subtitle>{`Secteur : ${presta.secteur}`}</Card.Subtitle>
           <Card.Body>
@@ -357,15 +380,48 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   return (
     <BreakpointProvider>
       <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>
-        <Container fluid>
-          <Breakpoint large up>
-            {TableGroupedMonth()}
-          </Breakpoint>
+        <Form.Control
+          type="search"
+          placeholder="Rechercher"
+          className="mx-4"
+          aria-label="Search"
+          onChange={handleSearch}
+        />
 
-          <Breakpoint medium down>
-            {CardedPrestations()}
-          </Breakpoint>
-        </Container>
+        <Row>
+          <Col>
+            <Container fluid>
+              <Breakpoint large up>
+                {TableGroupedMonth()}
+              </Breakpoint>
+
+              <Breakpoint medium down>
+                {CardedPrestations()}
+              </Breakpoint>
+            </Container>
+          </Col>
+          <Col sm={2}>
+            <Container fluid>
+              <WhiteShadowCard icon="calendar-plus" title={`Liste des tâches`}>
+                Releve Controle blabla blabla
+              </WhiteShadowCard>
+
+              <WhiteShadowCard icon="folder" title={`Documents`}>
+                <Button variant="success" className="m-1"> 
+                  <FontAwesomeIcon icon={faFilePdf} /> Rapport
+                </Button>
+
+                <Button variant="success" className="m-1">
+                  <FontAwesomeIcon icon={faFilePdf} /> Extranet
+                </Button>
+
+                <Button variant="success" className="m-1">
+                  <FontAwesomeIcon icon={faFileImage} /> Images
+                </Button>
+              </WhiteShadowCard>
+            </Container>
+          </Col>
+        </Row>
       </WhiteShadowCard>
     </BreakpointProvider>
   );

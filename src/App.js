@@ -13,14 +13,14 @@ import ContratPage from './Views/Maintenance/Contrat/ContratPage';
 //#endregion
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang } from '@fortawesome/free-solid-svg-icons';
+import { faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder } from '@fortawesome/free-solid-svg-icons';
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 //#endregion
 
 
-library.add(faFileAlt, faSearch, faClock,faCalendarPlus, faYinYang)
+library.add(faFileAlt, faSearch, faClock,faCalendarPlus, faYinYang, faFolder)
 
 export const SiteContext = React.createContext(null);
 
