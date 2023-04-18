@@ -1,5 +1,5 @@
 //#region Imports
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import dateFormat from "dateformat";
 
 //#region Bootstrap
@@ -9,10 +9,13 @@ import Container from "react-bootstrap/Container";
 //#region Components
 import ContratPrestation from "./Components/ContratPrestations";
 import ContratInfo from "./Components/ContratInformation";
-import { Button } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 
 //#endregion
-
+import { loremIpsum } from "react-lorem-ipsum";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+ 
 //#endregion
 
 const ContratPage = () => {
@@ -28,7 +31,7 @@ const ContratPage = () => {
     LibelleContrat: "Entretien annuel",
   };
 
-  let Prestations = [
+  let _Prestations = [
     {
       id: 1,
       libelle: "	Entretien annuel de la ventilation",
@@ -51,7 +54,7 @@ const ContratPage = () => {
       id: 4,
       libelle: "Entretien annuel de la sous Station N°1",
       secteur: "Batiment 2",
-      mois: [0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0],
+      mois: [0, 0, 0, 3, 0, 0, 4, 0, 2, 0, 0, 0],
     },
     {
       id: 5,
@@ -102,6 +105,36 @@ const ContratPage = () => {
       mois: [0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0],
     },
   ];
+
+const [Prestations, SetPrestations] = useState(_Prestations);
+
+  const MockupDataPrestation = () => {
+  let _prestas = []; 
+    for (let index = 0; index < 12; index++) {
+      let _presta = {
+        id : index + 1,
+        libelle : loremIpsum({ avgSentencesPerParagraph: 1, startWithLoremIpsum: false, random: "false"}),
+        secteur: loremIpsum({ avgSentencesPerParagraph: 1, startWithLoremIpsum: false, random: "false", avgWordsPerSentence: 2}),
+        mois :[getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),getRandomInt(0,3),]
+      }
+      _prestas.push(_presta);
+    }
+
+    SetPrestations(_prestas);
+
+  }
+
+  function getRandomInt(min, max) {
+
+    min = Math.ceil(min);
+    
+    max = Math.floor(max);
+    
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+    
+    }
+
+
   //#endregion
 
   //#region States
@@ -137,6 +170,7 @@ const ContratPage = () => {
     _dateTmp = addOneYear(_dateTmp);
     let _datePrestation = new Date(_dateTmp);
     SetDatePrestation(_datePrestation);
+    MockupDataPrestation();
   };
 
   const SoustraireUnAnPeriode = () => {
@@ -144,7 +178,16 @@ const ContratPage = () => {
     _dateTmp = subOneYear(_dateTmp);
     let _datePrestation = new Date(_dateTmp);
     SetDatePrestation(_datePrestation);
+    MockupDataPrestation();
+
   };
+
+
+
+  useEffect(()=> {
+
+  },[datePrestation])
+
 
   //#endregion
 
@@ -152,10 +195,10 @@ const ContratPage = () => {
     <Container fluid>
       <ContratInfo Contrat={Contrat} />
 
-      <Button onClick={() => SoustraireUnAnPeriode()}>prev</Button>
+      <Button variant="primary" onClick={() => SoustraireUnAnPeriode()}><FontAwesomeIcon icon={faArrowLeft} /></Button>
       {`Période : ${datePrestation.getFullYear()}  / ${datePrestation.getFullYear() + 1}`}
 
-      <Button onClick={() => AjouterUnAnPeriode()}> next </Button>
+      <Button variant="primary" onClick={() => AjouterUnAnPeriode()}> <FontAwesomeIcon icon={faArrowRight} /> </Button>
       <ContratPrestation
         Prestations={Prestations}
         datePrestation={datePrestation}

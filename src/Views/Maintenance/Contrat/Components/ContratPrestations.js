@@ -1,5 +1,6 @@
 //#region Imports
 import { useState } from "react";
+import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
@@ -7,11 +8,24 @@ import Table from "react-bootstrap/Table";
 import Collapse from "react-bootstrap/Collapse";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Card from "react-bootstrap/Card";
+import Badge from "react-bootstrap/Badge";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 //#endregion
 
 //#region FontAwsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBookmark,
+  faCalendar,
+  faCaretDown,
+  faCaretUp,
+  faCheck,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
+import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
+import { Container } from "react-bootstrap";
 //#endregion
 
 //#region Components
@@ -39,36 +53,36 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   //#endregion
 
   //#region Fonctions
-  function GetNomMois(num) {
+  function GetNomMois(num, short = false) {
     // console.log(num)
     if (num > 12) {
       num = num - 12;
     }
     switch (num) {
       case 1:
-        return "Janvier";
+        return short ? "Jan." : "Janvier";
       case 2:
-        return "Février";
+        return short ? "Fév." : "Février";
       case 3:
         return "Mars";
       case 4:
-        return "Avril";
+        return short ? "Avr." : "Avril";
       case 5:
         return "Mai";
       case 6:
         return "Juin";
       case 7:
-        return "Juillet";
+        return short ? "Juil." : "Juillet";
       case 8:
         return "Août";
       case 9:
-        return "Septembre";
+        return short ? "Sept." : "Septembre";
       case 10:
-        return "Octobre";
+        return short ? "Oct." : "Octobre";
       case 11:
-        return "Novembre";
+        return short ? "Nov." : "Novembre";
       case 12:
-        return "Décembre";
+        return short ? "Déc." : "Décembre";
       default:
         return null;
     }
@@ -153,6 +167,21 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
     }
   }
 
+  function GetBadgeBgColor(e) {
+    switch (e) {
+      case 1:
+        return "secondary";
+      case 2:
+        return "warning";
+      case 3:
+        return "warning";
+      case 4:
+        return "success";
+      default:
+        return "Non planifiée";
+    }
+  }
+
   //#endregion
 
   //#region Evenements
@@ -207,7 +236,7 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
         {_lPrestation.length > 0 ? (
           <tr>
             <td colSpan={4} onClick={() => GroupClickedCollapse(_numMois)}>
-              <div className="shadow border rounded-pill bg-ligth" >
+              <div className="shadow border rounded-pill bg-ligth">
                 <Row>
                   <Col>
                     {GetNomMois(_numMois)}{" "}
@@ -230,7 +259,16 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
                 <td>{presta.secteur}</td>
                 <td>{presta.id}</td>
                 <td>{presta.libelle}</td>
-                <td>{GetLibEtat(presta.mois.at(_numMois - 1))}</td>
+                <td>
+                  {" "}
+                  <Badge
+                    pill
+                    bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
+                  >
+                    {" "}
+                    {GetLibEtat(presta.mois.at(_numMois - 1))}{" "}
+                  </Badge>{" "}
+                </td>
               </tr>
             </Collapse>
           );
@@ -258,9 +296,79 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
     );
   };
 
+  const CardedPrestations = () => {
+    return Prestations.map((presta) => {
+      return (
+        <Card key={presta.id} className="m-2 p-2">
+          <Card.Title>{presta.libelle}</Card.Title>
+          <Card.Subtitle>{`Secteur : ${presta.secteur}`}</Card.Subtitle>
+          <Card.Body>
+            <Row>
+              {presta.mois.map((value, index) => {
+                return value > 0 ? (
+                  <Col key={index}>{Plannification(index, value)}</Col>
+                ) : null;
+              })}
+            </Row>
+          </Card.Body>
+        </Card>
+      );
+    });
+  };
+
+  const Plannification = (indexMois, valeurMois) => {
+    let _numMois = Number(indexMois) + 1;
+
+    return (
+      <span className="m-1">
+        {`${GetNomMois(_numMois, true)} 
+      `}
+        <OverlayTrigger
+          delay={{ show: 250, hide: 400 }}
+          overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
+        >
+          <Badge pill bg={GetBadgeBgColor(valeurMois)}>
+            {GetBadgeIcon(valeurMois)}
+          </Badge>
+        </OverlayTrigger>
+
+        {}
+      </span>
+    );
+  };
+
+  const GetBadgeIcon = (e) => {
+    switch (e) {
+      case 1:
+        return <FontAwesomeIcon icon={faBookmark} />;
+      case 2:
+        return <FontAwesomeIcon icon={faCalendar} />;
+      case 3:
+        return <FontAwesomeIcon icon={faClock} />;
+      case 4:
+        return <FontAwesomeIcon icon={faCheck} />;
+      default:
+        break;
+    }
+  };
+
   //#endregion
 
-  return <div>{TableGroupedMonth()}</div>;
+  return (
+    <BreakpointProvider>
+      <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>
+        <Container fluid>
+          <Breakpoint large up>
+            {TableGroupedMonth()}
+          </Breakpoint>
+
+          <Breakpoint medium down>
+            {CardedPrestations()}
+          </Breakpoint>
+        </Container>
+      </WhiteShadowCard>
+    </BreakpointProvider>
+  );
 };
 
 export default ContratPrestation;
