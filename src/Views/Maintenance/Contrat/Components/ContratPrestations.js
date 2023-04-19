@@ -41,10 +41,9 @@ import { Container, Form, Popover } from "react-bootstrap";
 import { loremIpsum } from "react-lorem-ipsum";
 
 const ContratPrestation = ({ Prestations, datePrestation }) => {
-
   //#region Mockup
 
-  const [listeTaches, setListeTaches]= useState([]);
+  const [listeTaches, setListeTaches] = useState([]);
 
   function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -55,20 +54,23 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   }
 
   const MockupListeTache = () => {
-    
-    let _listeTaches = []
+    let _listeTaches = [];
 
-    let _limit = getRandomInt(1,8);
+    let _limit = getRandomInt(1, 20);
     for (let index = 0; index < _limit; index++) {
-      _listeTaches.push({id: index + 1, description: loremIpsum({avgSentencesPerParagraph: 1 , startWithLoremIpsum: false,random: "false",}).join()});
+      _listeTaches.push({
+        id: index + 1,
+        description: loremIpsum({
+          avgSentencesPerParagraph: 1,
+          startWithLoremIpsum: false,
+          random: "false",
+        }).join(),
+      });
     }
     setListeTaches(_listeTaches);
-  }
-
-
+  };
 
   //#endregion
-
 
   //#region States
 
@@ -85,6 +87,9 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   const [open10, setOpen10] = useState(true);
   const [open11, setOpen11] = useState(true);
   const [open12, setOpen12] = useState(true);
+
+  const [openTaches, setOpenTaches] = useState(true);
+  const [openDocuments, setOpenDocuments] = useState(true);
   //#endregion
 
   const [search, setSearch] = useState("");
@@ -224,7 +229,9 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   const GetPrestationSearched = () => {
     if (search.length > 0) {
       return Prestations.filter(
-        (item) => item.libelle.includes(search) || item.secteur.includes(search)
+        (item) =>
+          item.libelle.toUpperCase().includes(search.toUpperCase()) ||
+          item.secteur.toUpperCase().includes(search.toUpperCase())
       );
     } else {
       return Prestations;
@@ -251,28 +258,39 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   const ButtonDownloadDocuments = () => {
     return (
       <Container p={2}>
-      <Button className="m-1">
-        {" "}
-        <FontAwesomeIcon icon={faFile} /> Extranet{" "}
-      </Button>
-      <Button className="m-1">            {" "}
-        <FontAwesomeIcon icon={faFileContract} /> CERFA{" "}
-      </Button>
-      <Button className="m-1">            {" "}
-        <FontAwesomeIcon icon={faFileImage} /> Fiche rammonage{" "}
-      </Button>
-      <Button className="m-1">            {" "}
-        <FontAwesomeIcon icon={faFilePdf} /> Rapport technicien{" "}
-      </Button>
-    </Container>
-  
-    )
-  }
-  
-  
-    //#endregion
-  
+        <Button className="m-1">
+          {" "}
+          <FontAwesomeIcon icon={faFile} /> Extranet{" "}
+        </Button>
+        <Button className="m-1">
+          {" "}
+          <FontAwesomeIcon icon={faFileContract} /> CERFA{" "}
+        </Button>
+        <Button className="m-1">
+          {" "}
+          <FontAwesomeIcon icon={faFileImage} /> Fiche rammonage{" "}
+        </Button>
+        <Button className="m-1">
+          {" "}
+          <FontAwesomeIcon icon={faFilePdf} /> Rapport technicien{" "}
+        </Button>
+      </Container>
+    );
+  };
 
+  const SearchPrestation = () => {
+    return (
+      <Form.Control
+        type="search"
+        placeholder="Rechercher"
+        className="mx-4"
+        aria-label="Search"
+        onChange={handleSearch}
+      />
+    );
+  };
+
+  //#endregion
 
   //#region large
 
@@ -356,8 +374,11 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
               overlay={PopoverDocs}
               key={presta.id}
             >
-              <Collapse onClick={()=>MockupListeTache()} in={GetStateOpen(_numMois)}>
-                <tr >
+              <Collapse
+                onClick={() => MockupListeTache()}
+                in={GetStateOpen(_numMois)}
+              >
+                <tr>
                   <td>{presta.secteur}</td>
                   <td>{presta.id}</td>
                   <td>{presta.libelle}</td>
@@ -406,19 +427,55 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
 
   const PopoverDocs = (
     <Popover id="popover-basic">
-      <Popover.Header as="h3" className="m-2">Liste des tâches</Popover.Header>
+      <Popover.Header as="h3" className="m-2">
+        Liste des tâches ({listeTaches.length})
+        <Button
+          variant="contained"
+          aria-controls={`collapse-listeTaches`}
+          aria-expanded={openTaches}
+          onClick={() => setOpenTaches(!openTaches)}
+        >
+          {openTaches ? (
+            <FontAwesomeIcon icon={faCaretUp} />
+          ) : (
+            <FontAwesomeIcon icon={faCaretDown} />
+          )}
+        </Button>{" "}
+      </Popover.Header>
       <Popover.Body>
-       {listeTaches.map((tache)=> {
-        return(
-          <p key={tache.id}>{tache.description}</p>
-        )
-       })}
+        <Collapse in={openTaches}>
+          <div id="collapse-listeTaches" style={{height: "50vh", overflowY: "scroll"}}>
+            {listeTaches.map((tache) => {
+              return <p key={tache.id}>{tache.description}</p>;
+            })}
+          </div>
+        </Collapse>
       </Popover.Body>
 
-      <Popover.Header as="h3" className="m-2">Liste des documents</Popover.Header>
+      <Popover.Header as="h3" className="m-2">
+        Liste des documents
+         <Button
+          variant="contained"
+          aria-controls={`collapse-listeDocuments`}
+          aria-expanded={openTaches}
+          onClick={() => setOpenDocuments(!openDocuments)}
+        >
+          {openDocuments ? (
+            <FontAwesomeIcon icon={faCaretUp} />
+          ) : (
+            <FontAwesomeIcon icon={faCaretDown} />
+          )}
+        </Button>{" "}
+      </Popover.Header>
       <Popover.Body>
-       {ButtonDownloadDocuments()}
-      </Popover.Body>
+      <Collapse in={openDocuments}>
+      <div id="collapse-listeDocuments" >
+
+
+          {ButtonDownloadDocuments()}
+      </div>
+          </Collapse>
+        </Popover.Body>
     </Popover>
   );
 
@@ -499,28 +556,18 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
 
   //#endregion
 
-
-
-
   //#endregion
 
   return (
     <BreakpointProvider>
       <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>
-        <Form.Control
-          type="search"
-          placeholder="Rechercher"
-          className="mx-4"
-          aria-label="Search"
-          onChange={handleSearch}
-        />
-
+        {SearchPrestation()}
         <Container fluid>
           <Breakpoint large up>
             <Row>
               <Col md={10}>{TableGroupedMonth()}</Col>
 
-              <Col md={2}></Col>
+              <Col md={4}></Col>
             </Row>
           </Breakpoint>
 
