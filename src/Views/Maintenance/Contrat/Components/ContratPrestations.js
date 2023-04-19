@@ -24,11 +24,13 @@ import {
   faCaretUp,
   faCheck,
   faClock,
+  faFile,
+  faFileContract,
   faFileImage,
   faFilePdf,
 } from "@fortawesome/free-solid-svg-icons";
 import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
-import { Container, Form } from "react-bootstrap";
+import { Container, Form, Popover } from "react-bootstrap";
 //#endregion
 
 //#region Components
@@ -36,8 +38,38 @@ import { Container, Form } from "react-bootstrap";
 //#endregion
 
 //#endregion
+import { loremIpsum } from "react-lorem-ipsum";
 
 const ContratPrestation = ({ Prestations, datePrestation }) => {
+
+  //#region Mockup
+
+  const [listeTaches, setListeTaches]= useState([]);
+
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+
+    max = Math.floor(max);
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const MockupListeTache = () => {
+    
+    let _listeTaches = []
+
+    let _limit = getRandomInt(1,8);
+    for (let index = 0; index < _limit; index++) {
+      _listeTaches.push({id: index + 1, description: loremIpsum({avgSentencesPerParagraph: 1 , startWithLoremIpsum: false,random: "false",}).join()});
+    }
+    setListeTaches(_listeTaches);
+  }
+
+
+
+  //#endregion
+
+
   //#region States
 
   //#region Collapses
@@ -56,20 +88,6 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   //#endregion
 
   const [search, setSearch] = useState("");
-
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
-  };
-
-  const GetPrestationSearched = () => {
-    if (search.length > 0) {
-      return Prestations.filter(
-        (item) => item.libelle.includes(search) || item.secteur.includes(search)
-      );
-    } else {
-      return Prestations;
-    }
-  };
 
   //#endregion
 
@@ -203,9 +221,23 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
     }
   }
 
+  const GetPrestationSearched = () => {
+    if (search.length > 0) {
+      return Prestations.filter(
+        (item) => item.libelle.includes(search) || item.secteur.includes(search)
+      );
+    } else {
+      return Prestations;
+    }
+  };
+
   //#endregion
 
   //#region Evenements
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
 
   const GroupClickedCollapse = (e) => {
     GetSetStateOpen(e)(!GetStateOpen(e));
@@ -214,6 +246,40 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   //#endregion
 
   //#region Composants
+
+  //#region commun
+  const ButtonDownloadDocuments = () => {
+    return (
+      <Container p={2}>
+      <Button className="m-1">
+        {" "}
+        <FontAwesomeIcon icon={faFile} /> Extranet{" "}
+      </Button>
+      <Button className="m-1">            {" "}
+        <FontAwesomeIcon icon={faFileContract} /> CERFA{" "}
+      </Button>
+      <Button className="m-1">            {" "}
+        <FontAwesomeIcon icon={faFileImage} /> Fiche rammonage{" "}
+      </Button>
+      <Button className="m-1">            {" "}
+        <FontAwesomeIcon icon={faFilePdf} /> Rapport technicien{" "}
+      </Button>
+    </Container>
+  
+    )
+  }
+  
+  
+    //#endregion
+  
+
+
+  //#region large
+
+  /**
+   *
+   * @returns Le tableau des prestations, groupés par mois.
+   */
   const TableGroupedMonth = () => {
     const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
     return (
@@ -243,12 +309,19 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
     );
   };
 
-  const RowGroupMois = (e) => {
-    let _numMois = Number(e);
+  /**
+   *
+   * @param {* Le numéro du mois (janvier = 1, décmebre = 12) } numeroDuMois
+   * @returns Une ligne groupant toutes les prestations du mois et une ligne par prestation de ce mois
+   */
+  const RowGroupMois = (numeroDuMois) => {
+    //Cast du parametre
+    let _numMois = Number(numeroDuMois);
+    //Le numéro ne peut être supérieur à 12
     if (_numMois > 12) {
       _numMois -= 12;
     }
-
+    //Les prestations sont filtrés par le 'search'
     let _lPrestation = GetPrestationSearched().filter(
       (item) => item.mois.at(_numMois - 1) > 0
     );
@@ -262,7 +335,7 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
                 <Row>
                   <Col>
                     {GetNomMois(_numMois)}{" "}
-                    {Number(e) > 12
+                    {_numMois > 12
                       ? datePrestation.getFullYear() + 1
                       : datePrestation.getFullYear()}{" "}
                     ({_lPrestation.length}) :
@@ -276,39 +349,52 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
 
         {_lPrestation.map((presta) => {
           return (
-            <Collapse in={GetStateOpen(_numMois)} key={presta.id}>
-              <tr>
-                <td>{presta.secteur}</td>
-                <td>{presta.id}</td>
-                <td>{presta.libelle}</td>
-                <td>
-                  {" "}
-                  <Badge
-                    pill
-                    bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
-                  >
+            <OverlayTrigger
+              trigger={"click"}
+              rootClose
+              placement="right"
+              overlay={PopoverDocs}
+              key={presta.id}
+            >
+              <Collapse onClick={()=>MockupListeTache()} in={GetStateOpen(_numMois)}>
+                <tr >
+                  <td>{presta.secteur}</td>
+                  <td>{presta.id}</td>
+                  <td>{presta.libelle}</td>
+                  <td>
                     {" "}
-                    {GetLibEtat(presta.mois.at(_numMois - 1))}{" "}
-                  </Badge>{" "}
-                </td>
-              </tr>
-            </Collapse>
+                    <Badge
+                      pill
+                      bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
+                    >
+                      {" "}
+                      {GetLibEtat(presta.mois.at(_numMois - 1))}{" "}
+                    </Badge>{" "}
+                  </td>
+                </tr>
+              </Collapse>
+            </OverlayTrigger>
           );
         })}
       </tbody>
     );
   };
 
-  const ButtonAreaControl = (e) => {
+  /**
+   *
+   * @param {* Le numéro du mois} numMois
+   * @returns un bouton controllant le collapse
+   */
+  const ButtonAreaControl = (numMois) => {
     return (
       <span className="align-right">
         <Button
           variant="contained"
-          aria-controls={`collapse-row-${e}`}
+          aria-controls={`collapse-row-${numMois}`}
           aria-expanded={open1}
-          onClick={() => GetSetStateOpen(e)(!GetStateOpen(e))}
+          onClick={() => GetSetStateOpen(numMois)(!GetStateOpen(numMois))}
         >
-          {GetStateOpen(e) ? (
+          {GetStateOpen(numMois) ? (
             <FontAwesomeIcon icon={faCaretUp} />
           ) : (
             <FontAwesomeIcon icon={faCaretDown} />
@@ -318,8 +404,33 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
     );
   };
 
+  const PopoverDocs = (
+    <Popover id="popover-basic">
+      <Popover.Header as="h3" className="m-2">Liste des tâches</Popover.Header>
+      <Popover.Body>
+       {listeTaches.map((tache)=> {
+        return(
+          <p key={tache.id}>{tache.description}</p>
+        )
+       })}
+      </Popover.Body>
+
+      <Popover.Header as="h3" className="m-2">Liste des documents</Popover.Header>
+      <Popover.Body>
+       {ButtonDownloadDocuments()}
+      </Popover.Body>
+    </Popover>
+  );
+
+  //#endregion
+
+  //#region small
+
+  /**
+   *
+   * @returns Les listes de toutes les prestations sous forme de card
+   */
   const CardedPrestations = () => {
-    // return Prestations.map((presta) => {
     return GetPrestationSearched().map((presta) => {
       return (
         <Card key={presta.id} className="m-2 p-2 shadow border-secondary">
@@ -339,13 +450,19 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
     });
   };
 
+  /**
+   *
+   * @param {* l'index du mois indexé à 0 (0= janvier, 11=décembre)} indexMois
+   * @param {* La valeur de l'état de la prestation } valeurMois
+   * @returns Une liste des planification de cette préstation
+   */
   const Plannification = (indexMois, valeurMois) => {
     let _numMois = Number(indexMois) + 1;
 
     return (
       <span className="m-1">
         {`${GetNomMois(_numMois, true)} 
-      `}
+    `}
         <OverlayTrigger
           delay={{ show: 250, hide: 400 }}
           overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
@@ -360,6 +477,11 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
     );
   };
 
+  /**
+   *
+   * @param {* La valeur de l'état du mois} e
+   * @returns Un badge indiquant l'état de la prestation du mois
+   */
   const GetBadgeIcon = (e) => {
     switch (e) {
       case 1:
@@ -377,6 +499,11 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
 
   //#endregion
 
+
+
+
+  //#endregion
+
   return (
     <BreakpointProvider>
       <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>
@@ -388,40 +515,19 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
           onChange={handleSearch}
         />
 
-        <Row>
-          <Col>
-            <Container fluid>
-              <Breakpoint large up>
-                {TableGroupedMonth()}
-              </Breakpoint>
+        <Container fluid>
+          <Breakpoint large up>
+            <Row>
+              <Col md={10}>{TableGroupedMonth()}</Col>
 
-              <Breakpoint medium down>
-                {CardedPrestations()}
-              </Breakpoint>
-            </Container>
-          </Col>
-          <Col sm={2}>
-            <Container fluid>
-              <WhiteShadowCard icon="calendar-plus" title={`Liste des tâches`}>
-                Releve Controle blabla blabla
-              </WhiteShadowCard>
+              <Col md={2}></Col>
+            </Row>
+          </Breakpoint>
 
-              <WhiteShadowCard icon="folder" title={`Documents`}>
-                <Button variant="success" className="m-1"> 
-                  <FontAwesomeIcon icon={faFilePdf} /> Rapport
-                </Button>
-
-                <Button variant="success" className="m-1">
-                  <FontAwesomeIcon icon={faFilePdf} /> Extranet
-                </Button>
-
-                <Button variant="success" className="m-1">
-                  <FontAwesomeIcon icon={faFileImage} /> Images
-                </Button>
-              </WhiteShadowCard>
-            </Container>
-          </Col>
-        </Row>
+          <Breakpoint medium down>
+            {CardedPrestations()}
+          </Breakpoint>
+        </Container>
       </WhiteShadowCard>
     </BreakpointProvider>
   );

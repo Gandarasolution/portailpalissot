@@ -6,7 +6,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 //#endregion
 
 //#region Components
-import Sidebar from './components/menu/SidebarMenu';
+// import SidebarMenu from 'react-bootstrap-sidebar-menu';
+import NavbarMenu from './components/menu/navbarMenu';
 // import LoginPage from './Views/Login/login';
 import HomePage from './Views/Home/HomePage';
 import ContratPage from './Views/Maintenance/Contrat/ContratPage';
@@ -39,16 +40,16 @@ function App() {
 
     <Router>
       <div className='App'>
+          <NavbarMenu/>
 
 
-        <Sidebar   >
+
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/maintenance/contrat" element={<ContratPage />} />
 
 
           </Routes>
-        </Sidebar>
 
 
 
