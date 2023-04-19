@@ -12,6 +12,9 @@ import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+import Modal from 'react-bootstrap/Modal';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 
 //#endregion
 
@@ -91,6 +94,9 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   const [openTaches, setOpenTaches] = useState(true);
   const [openDocuments, setOpenDocuments] = useState(true);
   //#endregion
+
+const [modaleShow, setModalShow] = useState(false);
+const [prestaSelected, setPrestaSelected] = useState(null);
 
   const [search, setSearch] = useState("");
 
@@ -490,7 +496,7 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   const CardedPrestations = () => {
     return GetPrestationSearched().map((presta) => {
       return (
-        <Card key={presta.id} className="m-2 p-2 shadow border-secondary">
+        <Card key={presta.id} className="m-2 p-2 shadow border-secondary" onClick={() => handleCardClicked(presta)} >
           <Card.Title>{presta.libelle}</Card.Title>
           <Card.Subtitle>{`Secteur : ${presta.secteur}`}</Card.Subtitle>
           <Card.Body>
@@ -525,7 +531,7 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
           overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
         >
           <Badge pill bg={GetBadgeBgColor(valeurMois)}>
-            {GetBadgeIcon(valeurMois)}
+            {GetBadgeIcon(valeurMois)}  {GetLibEtat(valeurMois)}
           </Badge>
         </OverlayTrigger>
 
@@ -554,6 +560,103 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
     }
   };
 
+
+
+const handleCardClicked = (presta) => {
+  MockupListeTache()
+setPrestaSelected(presta)
+  setModalShow(true);
+}
+
+const ModalDocuments = () => {
+
+let _tabs = null;
+let _title = null;
+
+if(prestaSelected !== null)
+{
+  _title = prestaSelected.libelle;
+  _tabs =
+  <Tabs variant="pills" fill>
+
+{  
+  prestaSelected.mois.map((mois,index)=>{
+    return mois > 0 ? (
+      <Tab
+        eventKey={GetNomMois(Number(index) + 1, true)}
+        title={GetNomMois(Number(index) + 1, true)}
+        key={index}
+      >
+        <Badge pill bg={GetBadgeBgColor(mois)}>
+          {GetBadgeIcon(mois)} {GetLibEtat(mois)}
+        </Badge>
+        <Container fluid >
+          <p className="h2">Liste des documents</p>
+          <span>{ButtonDownloadDocuments()}</span>
+        </Container>
+
+        <Container>
+          <p className="h2">Liste des tâches
+         
+          <Button
+          variant="contained"
+          aria-controls={`collapse-listeTaches`}
+          aria-expanded={openTaches}
+          onClick={() => setOpenTaches(!openTaches)}
+        >
+          {openTaches ? (
+            <FontAwesomeIcon icon={faCaretUp} />
+          ) : (
+            <FontAwesomeIcon icon={faCaretDown} />
+          )}
+        </Button>{" "} </p>
+      
+        <Collapse in={openTaches}>
+          <div id="collapse-listeTaches" style={{height: "50vh", overflowY: "scroll"}}>
+            {listeTaches.map((tache) => {
+              return <p key={tache.id}>{tache.description}</p>;
+            })}
+          </div>
+        </Collapse>
+        </Container>
+      </Tab>
+    ) : null;
+    })
+}
+
+
+    </Tabs>
+
+
+
+
+
+}
+
+
+return (
+
+    <Modal
+    show={modaleShow}
+    onHide={()=>setModalShow(false)}
+    backdrop="static"
+    keyboard={false}
+  >
+    <Modal.Header closeButton>
+      <Modal.Title>{_title}</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+     
+{_tabs}
+
+    </Modal.Body>
+    
+  </Modal>
+
+)
+}
+
+
   //#endregion
 
   //#endregion
@@ -573,6 +676,7 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
 
           <Breakpoint medium down>
             {CardedPrestations()}
+            {ModalDocuments()}
           </Breakpoint>
         </Container>
       </WhiteShadowCard>
