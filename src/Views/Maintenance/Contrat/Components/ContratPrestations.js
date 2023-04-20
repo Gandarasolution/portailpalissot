@@ -12,9 +12,9 @@ import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
-import Modal from 'react-bootstrap/Modal';
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
+import Modal from "react-bootstrap/Modal";
+import Tab from "react-bootstrap/Tab";
+import Tabs from "react-bootstrap/Tabs";
 
 //#endregion
 
@@ -95,8 +95,8 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
   const [openDocuments, setOpenDocuments] = useState(true);
   //#endregion
 
-const [modaleShow, setModalShow] = useState(false);
-const [prestaSelected, setPrestaSelected] = useState(null);
+  const [modaleShow, setModalShow] = useState(false);
+  const [prestaSelected, setPrestaSelected] = useState(null);
 
   const [search, setSearch] = useState("");
 
@@ -244,6 +244,24 @@ const [prestaSelected, setPrestaSelected] = useState(null);
     }
   };
 
+  const reactStringReplace = require("react-string-replace");
+  function HighlightTextIfSearch(text) {
+    if (
+      search.length > 0 &&
+      text.toUpperCase().includes(search.toUpperCase())
+    ) {
+      return (
+        <span>
+          {reactStringReplace(text, search, (match, i) => (
+            <mark key={i}>{match}</mark>
+          ))}
+        </span>
+      );
+    } else {
+      return text;
+    }
+  }
+
   //#endregion
 
   //#region Evenements
@@ -254,6 +272,12 @@ const [prestaSelected, setPrestaSelected] = useState(null);
 
   const GroupClickedCollapse = (e) => {
     GetSetStateOpen(e)(!GetStateOpen(e));
+  };
+
+  const handleCardClicked = (presta) => {
+    MockupListeTache();
+    setPrestaSelected(presta);
+    setModalShow(true);
   };
 
   //#endregion
@@ -385,9 +409,9 @@ const [prestaSelected, setPrestaSelected] = useState(null);
                 in={GetStateOpen(_numMois)}
               >
                 <tr>
-                  <td>{presta.secteur}</td>
+                  <td>{HighlightTextIfSearch(presta.secteur)}</td>
                   <td>{presta.id}</td>
-                  <td>{presta.libelle}</td>
+                  <td>{HighlightTextIfSearch(presta.libelle)}</td>
                   <td>
                     {" "}
                     <Badge
@@ -450,7 +474,10 @@ const [prestaSelected, setPrestaSelected] = useState(null);
       </Popover.Header>
       <Popover.Body>
         <Collapse in={openTaches}>
-          <div id="collapse-listeTaches" style={{height: "50vh", overflowY: "scroll"}}>
+          <div
+            id="collapse-listeTaches"
+            style={{ height: "50vh", overflowY: "scroll" }}
+          >
             {listeTaches.map((tache) => {
               return <p key={tache.id}>{tache.description}</p>;
             })}
@@ -460,7 +487,7 @@ const [prestaSelected, setPrestaSelected] = useState(null);
 
       <Popover.Header as="h3" className="m-2">
         Liste des documents
-         <Button
+        <Button
           variant="contained"
           aria-controls={`collapse-listeDocuments`}
           aria-expanded={openTaches}
@@ -474,14 +501,10 @@ const [prestaSelected, setPrestaSelected] = useState(null);
         </Button>{" "}
       </Popover.Header>
       <Popover.Body>
-      <Collapse in={openDocuments}>
-      <div id="collapse-listeDocuments" >
-
-
-          {ButtonDownloadDocuments()}
-      </div>
-          </Collapse>
-        </Popover.Body>
+        <Collapse in={openDocuments}>
+          <div id="collapse-listeDocuments">{ButtonDownloadDocuments()}</div>
+        </Collapse>
+      </Popover.Body>
     </Popover>
   );
 
@@ -496,9 +519,15 @@ const [prestaSelected, setPrestaSelected] = useState(null);
   const CardedPrestations = () => {
     return GetPrestationSearched().map((presta) => {
       return (
-        <Card key={presta.id} className="m-2 p-2 shadow border-secondary" onClick={() => handleCardClicked(presta)} >
-          <Card.Title>{presta.libelle}</Card.Title>
-          <Card.Subtitle>{`Secteur : ${presta.secteur}`}</Card.Subtitle>
+        <Card
+          key={presta.id}
+          className="m-2 p-2 shadow border-secondary"
+          onClick={() => handleCardClicked(presta)}
+        >
+          <Card.Title>{HighlightTextIfSearch(presta.libelle)}</Card.Title>
+          <Card.Subtitle>
+            Secteur : {HighlightTextIfSearch(presta.secteur)}
+          </Card.Subtitle>
           <Card.Body>
             <Row>
               {presta.mois.map((value, index) => {
@@ -524,14 +553,14 @@ const [prestaSelected, setPrestaSelected] = useState(null);
 
     return (
       <span className="m-1">
-        {`${GetNomMois(_numMois, true)} 
-    `}
+        {GetNomMois(_numMois, true)}
+
         <OverlayTrigger
           delay={{ show: 250, hide: 400 }}
           overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
         >
           <Badge pill bg={GetBadgeBgColor(valeurMois)}>
-            {GetBadgeIcon(valeurMois)}  {GetLibEtat(valeurMois)}
+            {GetBadgeIcon(valeurMois)} {GetLibEtat(valeurMois)}
           </Badge>
         </OverlayTrigger>
 
@@ -560,102 +589,89 @@ const [prestaSelected, setPrestaSelected] = useState(null);
     }
   };
 
+  /**
+   *
+   * @returns La liste des taches et des documents à télécharger sous forme de fenêtre modal
+   */
+  const ModalDocuments = () => {
+    let _tabs = null;
+    let _title = null;
 
+    if (prestaSelected !== null) {
+      _title = prestaSelected.libelle;
+      _tabs = (
+        <Tabs variant="pills" fill>
+          {prestaSelected.mois.map((mois, index) => {
+            return mois > 0 ? (
+              <Tab
+                eventKey={GetNomMois(Number(index) + 1, true)}
+                title={
+                  <span>
+                    {GetBadgeIcon(mois)} {GetNomMois(Number(index) + 1, true)}
+                  </span>
+                }
+                key={index}
+                tabClassName={`bg- border border-${GetBadgeBgColor(
+                  mois
+                )} text-${GetBadgeBgColor(mois)}`}
+              >
+                <Badge pill bg={GetBadgeBgColor(mois)}>
+                  {GetBadgeIcon(mois)} {GetLibEtat(mois)}
+                </Badge>
+                <Container fluid>
+                  <p className="h2">Liste des documents</p>
+                  <span>{ButtonDownloadDocuments()}</span>
+                </Container>
 
-const handleCardClicked = (presta) => {
-  MockupListeTache()
-setPrestaSelected(presta)
-  setModalShow(true);
-}
+                <Container>
+                  <p className="h2">
+                    Liste des tâches
+                    <Button
+                      variant="contained"
+                      aria-controls={`collapse-listeTaches`}
+                      aria-expanded={openTaches}
+                      onClick={() => setOpenTaches(!openTaches)}
+                    >
+                      {openTaches ? (
+                        <FontAwesomeIcon icon={faCaretUp} />
+                      ) : (
+                        <FontAwesomeIcon icon={faCaretDown} />
+                      )}
+                    </Button>{" "}
+                  </p>
 
-const ModalDocuments = () => {
+                  <Collapse in={openTaches}>
+                    <div
+                      id="collapse-listeTaches"
+                      style={{ height: "50vh", overflowY: "scroll" }}
+                    >
+                      {listeTaches.map((tache) => {
+                        return <p key={tache.id}>{tache.description}</p>;
+                      })}
+                    </div>
+                  </Collapse>
+                </Container>
+              </Tab>
+            ) : null;
+          })}
+        </Tabs>
+      );
+    }
 
-let _tabs = null;
-let _title = null;
-
-if(prestaSelected !== null)
-{
-  _title = prestaSelected.libelle;
-  _tabs =
-  <Tabs variant="pills" fill>
-
-{  
-  prestaSelected.mois.map((mois,index)=>{
-    return mois > 0 ? (
-      <Tab
-        eventKey={GetNomMois(Number(index) + 1, true)}
-        title={GetNomMois(Number(index) + 1, true)}
-        key={index}
+    return (
+      <Modal
+        show={modaleShow}
+        onHide={() => setModalShow(false)}
+        backdrop="static"
+        keyboard={false}
       >
-        <Badge pill bg={GetBadgeBgColor(mois)}>
-          {GetBadgeIcon(mois)} {GetLibEtat(mois)}
-        </Badge>
-        <Container fluid >
-          <p className="h2">Liste des documents</p>
-          <span>{ButtonDownloadDocuments()}</span>
-        </Container>
-
-        <Container>
-          <p className="h2">Liste des tâches
-         
-          <Button
-          variant="contained"
-          aria-controls={`collapse-listeTaches`}
-          aria-expanded={openTaches}
-          onClick={() => setOpenTaches(!openTaches)}
-        >
-          {openTaches ? (
-            <FontAwesomeIcon icon={faCaretUp} />
-          ) : (
-            <FontAwesomeIcon icon={faCaretDown} />
-          )}
-        </Button>{" "} </p>
-      
-        <Collapse in={openTaches}>
-          <div id="collapse-listeTaches" style={{height: "50vh", overflowY: "scroll"}}>
-            {listeTaches.map((tache) => {
-              return <p key={tache.id}>{tache.description}</p>;
-            })}
-          </div>
-        </Collapse>
-        </Container>
-      </Tab>
-    ) : null;
-    })
-}
-
-
-    </Tabs>
-
-
-
-
-
-}
-
-
-return (
-
-    <Modal
-    show={modaleShow}
-    onHide={()=>setModalShow(false)}
-    backdrop="static"
-    keyboard={false}
-  >
-    <Modal.Header closeButton>
-      <Modal.Title>{_title}</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-     
-{_tabs}
-
-    </Modal.Body>
-    
-  </Modal>
-
-)
-}
-
+        <Modal.Header closeButton>
+          <Modal.Title>{_title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{_tabs}</Modal.Body>
+      </Modal>
+    );
+  };
 
   //#endregion
 
