@@ -5,7 +5,9 @@ import dateFormat from "dateformat";
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Stack from "react-bootstrap/Stack";
 
 //#endregion
 
@@ -199,28 +201,79 @@ const ContratPage = () => {
     MockupDataPrestation();
   };
 
+  const HandleDropdownPeriodeSelect = (year) => {
+    
+    let _dateTemp = new Date();
+    _dateTemp.setFullYear(Number(year));
+    
+    SetDatePrestation(_dateTemp);
+    MockupDataPrestation();
+  };
+
   useEffect(() => {}, [datePrestation]);
 
   //#endregion
+
+
+  const DropDownYears = () => {
+    let _arrayPeriodes = [
+      {
+        yearStart: new Date(Contrat.DateSouscrit).getFullYear(),
+        yearEnd: new Date(Contrat.DateSouscrit).getFullYear() + 1,
+      },
+    ];
+
+    for (let index = 0; index < 10; index++) {
+      let _yearStart = _arrayPeriodes[index].yearStart + 1;
+      let _yearEnd = _arrayPeriodes[index].yearEnd + 1;
+      _arrayPeriodes.push({ yearStart: _yearStart, yearEnd: _yearEnd });
+    }
+
+    return (
+      <DropdownButton
+        id="dropdown-datePeriode"
+        title={`Période : ${datePrestation.getFullYear()}  / ${
+          datePrestation.getFullYear() + 1
+        }`}
+        onSelect={(e) => {
+          HandleDropdownPeriodeSelect(e);
+        }}
+      >
+        {_arrayPeriodes.map((periode, index) => {
+          return (
+            <Dropdown.Item
+              eventKey={periode.yearStart}
+              key={index}
+            >{`${periode.yearStart} / ${periode.yearEnd}`}</Dropdown.Item>
+          );
+        })}
+      </DropdownButton>
+    );
+  };
+
+
 
   return (
     <Container fluid>
       <ContratInfo Contrat={Contrat} />
 
-      <Button variant="primary" onClick={() => SoustraireUnAnPeriode()}>
-        <FontAwesomeIcon icon={faArrowLeft} />
-      </Button>
-      {`Période : ${datePrestation.getFullYear()}  / ${
-        datePrestation.getFullYear() + 1
-      }`}
+       
 
-      <Button variant="primary" onClick={() => AjouterUnAnPeriode()}>
-        {" "}
-        <FontAwesomeIcon icon={faArrowRight} />{" "}
-      </Button>
+
       <ContratPrestation
         Prestations={Prestations}
         datePrestation={datePrestation}
+        ParentComponentPeriodeSelect={ <Stack direction="horizontal" className="centerStack" gap={3}>
+        <Button variant="primary" onClick={() => SoustraireUnAnPeriode()}>
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </Button>
+
+        {DropDownYears()}
+        <Button variant="primary" onClick={() => AjouterUnAnPeriode()}>
+          {" "}
+          <FontAwesomeIcon icon={faArrowRight} />{" "}
+        </Button>
+      </Stack>}
       />
     </Container>
   );

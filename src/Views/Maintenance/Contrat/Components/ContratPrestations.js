@@ -43,7 +43,7 @@ import { Container, Form, Popover } from "react-bootstrap";
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 
-const ContratPrestation = ({ Prestations, datePrestation }) => {
+const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriodeSelect }) => {
   //#region Mockup
 
   const [listeTaches, setListeTaches] = useState([]);
@@ -679,8 +679,10 @@ const ContratPrestation = ({ Prestations, datePrestation }) => {
 
   return (
     <BreakpointProvider>
-      <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>
-        {SearchPrestation()}
+      <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>  
+   {SearchPrestation()}
+   { ParentComponentPeriodeSelect}   
+
         <Container fluid>
           <Breakpoint large up>
             <Row>
