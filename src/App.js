@@ -18,6 +18,7 @@ import { faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder } fro
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import AppareilsPage from './Views/Maintenance/Appareils/AppareilsPage';
 //#endregion
 
 
@@ -47,6 +48,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/maintenance/contrat" element={<ContratPage />} />
+            <Route path="/maintenance/appareils" element={<AppareilsPage />} />
 
 
           </Routes>
