@@ -1,43 +1,28 @@
-import { useParams, NavLink, useFetcher } from 'react-router-dom';
+//#region Imports
+
+//#region Bootstrap
+import { Container } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Button from 'react-bootstrap/Button';
+//#endregion
+
+//#region Components
+
+//#endregion
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
 import { useEffect } from 'react';
 
+//#endregion
 
-const GridPrestation = () => {
 
-    const Prestations = [
-        {
-            id: 1, libelle: "	Entretien annuel de la ventilation", secteur: "toiture", mois: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        }, {
-            id: 2, libelle: "Contrôle mensuel des températures par échantillonage", secteur: "Ensemble", mois: [1, 1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 0]
-        }, {
-            id: 3, libelle: "Entretien annuel de la sous Station N°2", secteur: "Batiment 2", mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0]
-        }, {
-            id: 4, libelle: "Entretien annuel de la sous Station N°1", secteur: "Batiment 2", mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0]
-        }, {
-            id: 5, libelle: "eeeee", secteur: "Batiment 2", mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0]
-        }, {
-            id: 6, libelle: "fgb", secteur: "Batiment 2", mois: [0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0]
-        }, {
-            id: 7, libelle: "Eefefef", secteur: "Batiment 2", mois: [0, 0, 0, 0, 0, 1, 0, 1, 2, 0, 0, 0]
-        }, {
-            id: 8, libelle: "Eneffff", secteur: "Batiment 2", mois: [0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0]
-        }, {
-            id: 9, libelle: "Ezzzz2", secteur: "Batiment 2", mois: [0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0]
-        }, {
-            id: 10, libelle: "efzefzef", secteur: "Batiment 2", mois: [0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0]
-        }, {
-            id: 11, libelle: "Entretien zefzf", secteur: "Batiment 2", mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1]
-        }, {
-            id: 12, libelle: "Entresdsddfdff", secteur: "Batiment 2", mois: [0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0]
-        }
+const GridPrestation = ({ Prestations }) => {
 
-    ]
+
+    //#region Fonctions
 
     function MoisIcone(_parametre) {
         switch (_parametre) {
@@ -51,19 +36,19 @@ const GridPrestation = () => {
         }
     }
 
+    //#endregion
 
 
-
-
-
+    //#region States
     const [lignesParPage, setLignesParPage] = useState(10);
     const [nbPremier, setNbPremier] = useState(1);
     const [nbDernier, setNbDernier] = useState(Prestations.length > lignesParPage ? lignesParPage : Prestations.length);
     const [pageActuel, setPageActuel] = useState(1);
 
+    //#endregion
 
 
-
+    //#region Evenements
     const DropdownLignesParPageChanged = (e) => {
 
         setLignesParPage(e);
@@ -72,9 +57,7 @@ const GridPrestation = () => {
         setNbDernier(Prestations.length > e ? e : Prestations.length);
     }
 
-
     const PageActuelGoForth = (e) => {
-
         if (nbDernier !== Prestations.length) {
             let _pageActuel = pageActuel + 1
             setPageActuel(_pageActuel);
@@ -83,10 +66,7 @@ const GridPrestation = () => {
             let _nbDernier = Prestations.length > nbDernier + lignesParPage ? nbDernier + lignesParPage : Prestations.length
             setNbDernier(_nbDernier);
         }
-
-
     }
-
 
     const PageActuelGoBack = (e) => {
         if (pageActuel > 1) {
@@ -95,19 +75,19 @@ const GridPrestation = () => {
             setNbDernier((pageActuel - 1) * lignesParPage);
         }
     }
-
+    //#endregion
 
     useEffect(() => {
-    //    console.log(`nbPremier : ${nbPremier}`)
-    //    console.log(`nbDernier : ${nbDernier}`)
-    //    console.log(`pageActule : ${pageActuel}`)
-    //    console.log(`ligneparpage : ${lignesParPage}`)
-    //     console.log("--------------------------------------------")
+        //    console.log(`nbPremier : ${nbPremier}`)
+        //    console.log(`nbDernier : ${nbDernier}`)
+        //    console.log(`pageActule : ${pageActuel}`)
+        //    console.log(`ligneparpage : ${lignesParPage}`)
+        //     console.log("--------------------------------------------")
     })
 
 
     return (
-        <div>
+        <Container fluid>
 
             <Table striped hover responsive>
                 <thead>
@@ -158,7 +138,6 @@ const GridPrestation = () => {
                 </tbody>
             </Table>
 
-
             <div className='w-100 d-flex justify-content-end  '>
                 <div className='d-flex'>
                     <div className='d-flex me-4'>
@@ -195,9 +174,7 @@ const GridPrestation = () => {
                 </div>
             </div>
 
-
-
-        </div>
+        </Container>
 
     );
 }

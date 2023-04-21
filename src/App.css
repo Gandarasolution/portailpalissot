@@ -38,3 +38,29 @@
 }
 
 
+.align-left {
+  display: flex !important;
+  justify-content: left !important;
+}
+
+
+.align-right {
+  display: flex !important;
+  justify-content: right !important;
+}
+
+
+.nav-link.active {
+  /* color: red !important; */
+  background-color: whitesmoke !important;
+}
+
+
+
+.centerStack {
+  display: flex;
+  width: 100%;
+  max-width: 60%;
+  margin: 0 auto;
+  justify-content: center;
+}

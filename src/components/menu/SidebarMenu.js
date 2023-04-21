@@ -1,4 +1,9 @@
+//#region Imports
+
 import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+
+//#region cdb React
 import {
   CDBSidebar,
   CDBSidebarContent,
@@ -7,29 +12,67 @@ import {
   CDBSidebarMenu,
   CDBSidebarMenuItem,
 } from 'cdbreact';
+
+//#endregion
+
+//#region React bootstrap
+import { Container } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-import { NavLink } from 'react-router-dom';
+//#endregion
+//#endregion
 
-const Sidebar = ({ vue }) => {
-const Sites = [{"id":1, "nom":"Agence"},{"id":2, "nom":"Immeuble"},{"id":3,"nom":"Maison"}];
-const [siteSelect,setSiteSelect] = useState(Sites.at(0));
+const Sidebar = (props) => {
 
-const OnDropdownSiteChanged =(e) => {
-  setSiteSelect(Sites.find(s => s.id === e));
-};
+  
+//#region Mokup
 
+const Sites = [{ "id": 1, "nom": "Agence" }, { "id": 2, "nom": "Immeuble" }, { "id": 3, "nom": "Maison" }];
+
+//#endregion
+  //#region States
+
+  
+// const [itemSelected, setItemSelected] = useState(null);
+
+
+  const [siteSelect, setSiteSelect] = useState(Sites.at(0));
+
+  
 
   const [openMaintenance, setOpenMaintenance] = useState(false);
   const [openDepannage, setOpenDepannage] = useState(false);
+  
+
+  //#endregion
+
+
+
+  //#region Fonction
+
+
+  //#endregion
+
+  //#region Evenements
+  const OnDropdownSiteChanged = (e) => {
+    setSiteSelect(Sites.find(s => s.id === Number(e)));
+    
+
+  };
+//#endregion
+
+
+
 
   return (
-    <div style={{display: "flex", direction: "row"}}>
+    <div style={{ display: "flex", direction: "row" }} >
+      <div>
+
         <CDBSidebar textColor="#333" backgroundColor="#fff"  >
           <CDBSidebarHeader prefix={<i className="fa fa-bars fa-large"></i>}>
-            <a href="/" className="text-decoration-none" style={{ color: 'primary' }}>
+            <a href="/" className="text-decoration-none" style={{ color: 'primary' }}  >
               GANDARA - DEMO
             </a>
           </CDBSidebarHeader>
@@ -37,19 +80,19 @@ const OnDropdownSiteChanged =(e) => {
           <CDBSidebarContent className="sidebar-content">
             <CDBSidebarMenu>
 
-            <DropdownButton
-                            variant=''
-                            title={`Site : ${siteSelect.nom}`}
-                            id="dropdown-Site"
-                            onSelect={(e)=> OnDropdownSiteChanged(e)}
-                        >
-                          {Sites.map((site)=> {
-                            return(
-                              <Dropdown.Item key={site.id} eventKey={site.id}>{site.nom}</Dropdown.Item>
-                            )
-                          })}
-                            
-                        </DropdownButton>
+              <DropdownButton
+                variant=''
+                title={`Site : ${siteSelect.nom}`}
+                id="dropdown-Site"
+                onSelect={(e) => OnDropdownSiteChanged(e)}
+              >
+                {Sites.map((site) => {
+                  return (
+                    <Dropdown.Item key={site.id} eventKey={site.id}>{site.nom}</Dropdown.Item>
+                  )
+                })}
+
+              </DropdownButton>
 
               <Button variant='btCollapseMenu' onClick={() => setOpenMaintenance(!openMaintenance)} aria-controls="collapse-maintenance" aria-expanded={openMaintenance}>
 
@@ -62,7 +105,7 @@ const OnDropdownSiteChanged =(e) => {
 
               <Collapse in={openMaintenance}>
                 <div id="collapse-maintenance" className='container' >
-                  <NavLink exact="true" to="/maintenance/contrat" activeclassname="activeClicked">
+                  <NavLink exact="true" to="/maintenance/contrat" activeclassname="activeClicked"   >
                     <CDBSidebarMenuItem icon="file-alt">Contrat</CDBSidebarMenuItem>
                   </NavLink>
 
@@ -118,18 +161,23 @@ const OnDropdownSiteChanged =(e) => {
 
           {/* <CDBSidebarFooter style={{ textAlign: 'center' }}>
           <div
-            style={{
-              padding: '20px 5px',
-            }}
+          style={{
+            padding: '20px 5px',
+          }}
           >
-            powered by Gandarasolution
+          powered by Gandarasolution
           </div>
         </CDBSidebarFooter> */}
         </CDBSidebar>
-        {vue}
-
-
       </div>
+      <Container fluid>
+
+
+        {props.children}
+      </Container>
+
+    </div>
+
 
 
   );
