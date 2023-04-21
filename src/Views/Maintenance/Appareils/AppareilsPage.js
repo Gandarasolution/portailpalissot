@@ -1,30 +1,39 @@
 //#region Imports
-
-import { Button, Container, Form, Table } from "react-bootstrap";
-import WhiteShadowCard from "../../../components/commun/WhiteShadowCard";
+import { useState, useEffect } from "react";
+//#region FontAwsome icones
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMobileAlt,
   faSort,
   faSortDown,
   faSortUp,
 } from "@fortawesome/free-solid-svg-icons";
-import { loremIpsum } from "react-lorem-ipsum";
-import { useState } from "react";
-import { useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-//#region Bootstrap
 
 //#endregion
 
+//#region Bootstrap
+import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Placeholder from "react-bootstrap/Placeholder";
+import Table from "react-bootstrap/Table";
+//#endregion
+
 //#region Components
+import WhiteShadowCard from "../../../components/commun/WhiteShadowCard";
+
+//#endregion
+
+//#region DEV
+import { loremIpsum } from "react-lorem-ipsum";
 
 //#endregion
 
 //#endregion
 
 const AppareilsPage = () => {
-  //#region States
+  //#region Mockup
+
   const [listeAppareils, setListeAppareils] = useState([
     {
       Id: 1,
@@ -34,18 +43,6 @@ const AppareilsPage = () => {
       LibelleEtat: "Accepté",
     },
   ]);
-
-  const [search, setSearch] = useState("");
-
-  const [filterActif, SetFilterActif] = useState(true);
-  const [filterHorscontrat, SetFilterHorscontrat] = useState(true);
-  const [filterDetruit, SetFilterDetruit] = useState(true);
-
-  const [orderBy, setOrderBy] = useState({ col: "etat", order: "ASC" });
-
-  //#endregion
-
-  //#region Mockup
 
   const MockupListeappareils = () => {
     let _listeAppareil = [];
@@ -99,13 +96,35 @@ const AppareilsPage = () => {
 
   //#endregion
 
+  //#region States
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  //#region filter/search/sort
+  const [search, setSearch] = useState("");
+
+  const [filterActif, SetFilterActif] = useState(true);
+  const [filterHorscontrat, SetFilterHorscontrat] = useState(true);
+  const [filterDetruit, SetFilterDetruit] = useState(true);
+
+  const [orderBy, setOrderBy] = useState({ col: "etat", order: "ASC" });
+  //#endregion
+
+  //#endregion
+
   //#region Fonctions
   const reactStringReplace = require("react-string-replace");
+  /**
+   *
+   * @param {*Le texte qui peut éventuellement contenir 'search'} text
+   * @returns Le même texte mais avec le 'search' balisé par <mark></mark>
+   */
   function HighlightTextIfSearch(text) {
+    //L'utilisateur à recherché quelque chose et le texte contient ce qu'il à rechercher
     if (
       search.length > 0 &&
       text.toUpperCase().includes(search.toUpperCase())
     ) {
+      //on remplace le 'search' dans le 'text' par <mark>'match'</mark>
       return (
         <span>
           {reactStringReplace(text, search, (match, i) => (
@@ -118,6 +137,10 @@ const AppareilsPage = () => {
     }
   }
 
+  /**
+   * Retourne la liste des appareils filtrée
+   * @returns La liste des appareils à laquelle on a appliqué les filtres, le search et l'order by
+   */
   const GetAppareilsSearched = () => {
     let _listeAppareil = listeAppareils;
 
@@ -147,10 +170,13 @@ const AppareilsPage = () => {
     }
   };
 
+  /**
+   * Ordonne la liste selon le state orderBy
+   * @param {La liste des appareils que l'on veut ordonné} liste
+   * @returns La liste ordonnée selon le $orderBy ({col: ["libelle","etat","secteur"] , order: ["ASC","DESC"]})
+   */
   function ListeAppareilOrderBy(liste) {
     switch (orderBy.col) {
-      // _listeAppareil =_listeAppareil.sort((a,b) =>  a.Libelle.localeCompare(b.Libelle))  ;
-
       case "libelle":
         return orderBy.order === "ASC"
           ? liste.sort((a, b) => a.Libelle.localeCompare(b.Libelle))
@@ -165,11 +191,6 @@ const AppareilsPage = () => {
         return orderBy.order === "ASC"
           ? liste.sort((a, b) => a.Secteur.localeCompare(b.Secteur))
           : liste.sort((a, b) => b.Secteur.localeCompare(a.Secteur));
-      // case "code":
-      //   return orderBy.order === "ASC"
-      //     ? liste.sort((a, b) => a.Id - b.Id)
-      //     : liste.sort((a, b) => b.Id - a.Id);
-
       default:
         return liste;
     }
@@ -193,9 +214,17 @@ const AppareilsPage = () => {
     setOrderBy({ col: colonne, order: _order });
   };
 
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   useEffect(() => {
-    MockupListeappareils();
+    async function makeRequest() {
+      await delay(1000);
+      MockupListeappareils();
+
+      setIsLoaded(true);
+    }
+    makeRequest();
   }, []);
+
   //#endregion
 
   //#region Component
@@ -212,98 +241,114 @@ const AppareilsPage = () => {
     );
   };
 
+  const ButtonFilter = (props) => {
+    return (
+      <Button
+        onClick={() => props.methodState(!props.state)}
+        variant={props.state ? "primary" : "secondary"}
+      >
+        {props.title} ({props.number}){" "}
+      </Button>
+    );
+  };
+
+  const ButtonOrder = (orderName) => {
+    return (
+      <FontAwesomeIcon
+        onClick={() => handleOrderby(orderName)}
+        icon={
+          orderBy.col === orderName
+            ? orderBy.order === "ASC"
+              ? faSortUp
+              : faSortDown
+            : faSort
+        }
+      />
+    );
+  };
+
+  const PlaceHolder = (numberOfLines) => {
+    let _arrayLoading = [];
+    for (let index = 0; index < numberOfLines; index++) {
+      _arrayLoading.push(index + 1);
+    }
+    return _arrayLoading.map((i) => {
+      return (
+        <tr key={i}>
+          <td colSpan={4}>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={12} />
+            </Placeholder>
+          </td>
+        </tr>
+      );
+    });
+  };
+
+  const TableHead = () => {
+    return (
+      <thead>
+        <tr>
+          <th>Secteur {ButtonOrder("secteur")}</th>
+          <th>Code</th>
+          <th>Libellé de l'appareil {ButtonOrder("libelle")}</th>
+          <th>État {ButtonOrder("etat")}</th>
+        </tr>
+      </thead>
+    );
+  };
+
+  const TableBody = () => {
+    if (isLoaded) {
+      return GetAppareilsSearched().map((appareil) => {
+        return (
+          <tr key={appareil.Id}>
+            <td>{HighlightTextIfSearch(appareil.Secteur)} </td>
+            <td>{appareil.Id}</td>
+            <td>{HighlightTextIfSearch(appareil.Libelle)}</td>
+            <td>{appareil.LibelleEtat}</td>
+          </tr>
+        );
+      });
+    } else {
+      return PlaceHolder(5);
+    }
+  };
+
   //#endregion
 
   return (
     <Container fluid>
       <WhiteShadowCard icon={faMobileAlt} title="Liste des appareils :">
         <Container>
-          <Button
-            onClick={() => SetFilterActif(!filterActif)}
-            variant={filterActif ? "primary" : "secondary"}
-          >
-            Actif ({listeAppareils.filter((appar) => appar.IdEtat === 2).length}
-            ){" "}
-          </Button>
+          {ButtonFilter({
+            title: "Actif",
+            methodState: SetFilterActif,
+            state: filterActif,
+            number: listeAppareils.filter((appar) => appar.IdEtat === 2).length,
+          })}
 
-          <Button
-            onClick={() => SetFilterHorscontrat(!filterHorscontrat)}
-            variant={filterHorscontrat ? "primary" : "secondary"}
-          >
-            Hors contrat(
-            {listeAppareils.filter((appar) => appar.IdEtat === 1).length}){" "}
-          </Button>
+          {ButtonFilter({
+            title: "Hors contrat",
+            methodState: SetFilterHorscontrat,
+            state: filterHorscontrat,
+            number: listeAppareils.filter((appar) => appar.IdEtat === 1).length,
+          })}
 
-          <Button
-            onClick={() => SetFilterDetruit(!filterDetruit)}
-            variant={filterDetruit ? "primary" : "secondary"}
-          >
-            Détruit(
-            {listeAppareils.filter((appar) => appar.IdEtat === 3).length}){" "}
-          </Button>
+          {ButtonFilter({
+            title: "Détruit",
+            methodState: SetFilterDetruit,
+            state: filterDetruit,
+            number: listeAppareils.filter((appar) => appar.IdEtat === 3).length,
+          })}
         </Container>
         <Container fluid>
           <Container>
             {SearchAppareil()}
 
             <Table>
-              <thead>
-                <tr>
-                  <th>
-                    Secteur{"  "}
-                    <FontAwesomeIcon
-                      onClick={() => handleOrderby("secteur")}
-                      icon={
-                        orderBy.col === "secteur"
-                          ? orderBy.order === "ASC"
-                            ? faSortUp
-                            : faSortDown
-                          : faSort
-                      }
-                    />
-                  </th>
-                  <th>Code</th>
-                  <th>
-                    Libellé de l'appareil{"  "}
-                    <FontAwesomeIcon
-                      onClick={() => handleOrderby("libelle")}
-                      icon={
-                        orderBy.col === "libelle"
-                          ? orderBy.order === "ASC"
-                            ? faSortUp
-                            : faSortDown
-                          : faSort
-                      }
-                    />
-                  </th>
-                  <th>
-                    État {"  "}
-                    <FontAwesomeIcon
-                      onClick={() => handleOrderby("etat")}
-                      icon={
-                        orderBy.col === "etat"
-                          ? orderBy.order === "ASC"
-                            ? faSortUp
-                            : faSortDown
-                          : faSort
-                      }
-                    />
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {GetAppareilsSearched().map((appareil) => {
-                  return (
-                    <tr key={appareil.Id}>
-                      <td>{HighlightTextIfSearch(appareil.Secteur)} </td>
-                      <td>{appareil.Id}</td>
-                      <td>{HighlightTextIfSearch(appareil.Libelle)}</td>
-                      <td>{appareil.LibelleEtat}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
+              {TableHead()}
+              <tbody>{TableBody()}</tbody>
             </Table>
           </Container>
         </Container>
