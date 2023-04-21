@@ -26,6 +26,8 @@ import WhiteShadowCard from "../../../components/commun/WhiteShadowCard";
 
 //#region DEV
 import { loremIpsum } from "react-lorem-ipsum";
+import { Badge, Card, Image } from "react-bootstrap";
+import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#endregion
 
@@ -196,6 +198,19 @@ const AppareilsPage = () => {
     }
   }
 
+  function GetBGColorAppareilEtat(IdEtat) {
+    switch (IdEtat) {
+      case 1:
+        return "secondary";
+      case 2:
+        return "primary";
+      case 3:
+        return "danger";
+      default:
+        break;
+    }
+  }
+
   //#endregion
 
   //#region Evenements
@@ -229,6 +244,11 @@ const AppareilsPage = () => {
 
   //#region Component
 
+  //#region commun
+  const AppareilBlue = require("../../../image/bottle.png");
+  const AppareilGrey = require("../../../image/bottleGrey.png");
+  const AppareilRed = require("../../../image/bottleRed.png");
+
   const SearchAppareil = () => {
     return (
       <Form.Control
@@ -246,28 +266,134 @@ const AppareilsPage = () => {
       <Button
         onClick={() => props.methodState(!props.state)}
         variant={props.state ? "primary" : "secondary"}
+        className="m-1"
       >
         {props.title} ({props.number}){" "}
       </Button>
     );
   };
 
-  const ButtonOrder = (orderName) => {
+  const FilterFindPanel = () => {
     return (
-      <FontAwesomeIcon
-        onClick={() => handleOrderby(orderName)}
-        icon={
-          orderBy.col === orderName
-            ? orderBy.order === "ASC"
-              ? faSortUp
-              : faSortDown
-            : faSort
+      <Container>
+        {ButtonFilter({
+          title: "Actif",
+          methodState: SetFilterActif,
+          state: filterActif,
+          number: listeAppareils.filter((appar) => appar.IdEtat === 2).length,
+        })}
+
+        {ButtonFilter({
+          title: "Hors contrat",
+          methodState: SetFilterHorscontrat,
+          state: filterHorscontrat,
+          number: listeAppareils.filter((appar) => appar.IdEtat === 1).length,
+        })}
+
+        {ButtonFilter({
+          title: "Détruit",
+          methodState: SetFilterDetruit,
+          state: filterDetruit,
+          number: listeAppareils.filter((appar) => appar.IdEtat === 3).length,
+        })}
+        {SearchAppareil()}
+      </Container>
+    );
+  };
+
+  //#endregion
+
+  //#region large
+
+  const AppareilsTable = () => {
+    return (
+      <Table>
+        {TableHead()}
+        <tbody>{TableBody()}</tbody>
+      </Table>
+    );
+  };
+
+  const TableHead = () => {
+    return (
+      <thead>
+        <tr>
+          <th>Secteur {ButtonOrder("secteur")}</th>
+          <th>Code</th>
+          <th>Libellé de l'appareil {ButtonOrder("libelle")}</th>
+          <th></th>
+          <th>État {ButtonOrder("etat")}</th>
+        </tr>
+      </thead>
+    );
+  };
+
+  const TableBody = () => {
+    if (isLoaded) {
+      return GetAppareilsSearched().map((appareil) => {
+        return (
+          <tr key={appareil.Id}>
+            <td>{HighlightTextIfSearch(appareil.Secteur)} </td>
+            <td>{appareil.Id}</td>
+            <td>{HighlightTextIfSearch(appareil.Libelle)}</td>
+            <td>{GetImageAppareilEtat(appareil.IdEtat)}</td>
+            <td>
+              {" "}
+              <Badge bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
+                {" "}
+                {appareil.LibelleEtat}{" "}
+              </Badge>{" "}
+            </td>
+          </tr>
+        );
+      });
+    } else {
+      return PlaceHolderTableLine(5);
+    }
+  };
+
+  const GetImageAppareilEtat = (IdEtat) => {
+    return (
+      <Image
+        src={
+          IdEtat === 1
+            ? AppareilGrey
+            : IdEtat === 2
+            ? AppareilBlue
+            : AppareilRed
         }
       />
     );
   };
+  const AppareilsCards = () => {
+    return GetAppareilsSearched().map((appareil) => {
+      return (
+        <Card
+          key={appareil.Id}
+          className={`m-2 border border-${GetBGColorAppareilEtat(
+            appareil.IdEtat
+          )} `}
+        >
+          <Card.Body>
+            <Card.Title>
+              {appareil.Id} - {HighlightTextIfSearch(appareil.Libelle)}
+            </Card.Title>
+            <Card.Subtitle className="mb-2 text-muted">
+              Secteur : {HighlightTextIfSearch(appareil.Secteur)}
+            </Card.Subtitle>
+            <Card.Text>
+              {GetImageAppareilEtat(appareil.IdEtat)}
+              <Badge pill bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
+                {appareil.LibelleEtat}
+              </Badge>
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      );
+    });
+  };
 
-  const PlaceHolder = (numberOfLines) => {
+  const PlaceHolderTableLine = (numberOfLines) => {
     let _arrayLoading = [];
     for (let index = 0; index < numberOfLines; index++) {
       _arrayLoading.push(index + 1);
@@ -285,72 +411,42 @@ const AppareilsPage = () => {
     });
   };
 
-  const TableHead = () => {
+  const ButtonOrder = (orderName) => {
     return (
-      <thead>
-        <tr>
-          <th>Secteur {ButtonOrder("secteur")}</th>
-          <th>Code</th>
-          <th>Libellé de l'appareil {ButtonOrder("libelle")}</th>
-          <th>État {ButtonOrder("etat")}</th>
-        </tr>
-      </thead>
+      <FontAwesomeIcon
+        onClick={() => handleOrderby(orderName)}
+        icon={
+          orderBy.col === orderName
+            ? orderBy.order === "ASC"
+              ? faSortUp
+              : faSortDown
+            : faSort
+        }
+      />
     );
   };
 
-  const TableBody = () => {
-    if (isLoaded) {
-      return GetAppareilsSearched().map((appareil) => {
-        return (
-          <tr key={appareil.Id}>
-            <td>{HighlightTextIfSearch(appareil.Secteur)} </td>
-            <td>{appareil.Id}</td>
-            <td>{HighlightTextIfSearch(appareil.Libelle)}</td>
-            <td>{appareil.LibelleEtat}</td>
-          </tr>
-        );
-      });
-    } else {
-      return PlaceHolder(5);
-    }
-  };
+  //#endregion
+
+  //#region small
+
+  //#endregion
 
   //#endregion
 
   return (
     <Container fluid>
       <WhiteShadowCard icon={faMobileAlt} title="Liste des appareils :">
-        <Container>
-          {ButtonFilter({
-            title: "Actif",
-            methodState: SetFilterActif,
-            state: filterActif,
-            number: listeAppareils.filter((appar) => appar.IdEtat === 2).length,
-          })}
-
-          {ButtonFilter({
-            title: "Hors contrat",
-            methodState: SetFilterHorscontrat,
-            state: filterHorscontrat,
-            number: listeAppareils.filter((appar) => appar.IdEtat === 1).length,
-          })}
-
-          {ButtonFilter({
-            title: "Détruit",
-            methodState: SetFilterDetruit,
-            state: filterDetruit,
-            number: listeAppareils.filter((appar) => appar.IdEtat === 3).length,
-          })}
-        </Container>
+        {FilterFindPanel()}
         <Container fluid>
-          <Container>
-            {SearchAppareil()}
-
-            <Table>
-              {TableHead()}
-              <tbody>{TableBody()}</tbody>
-            </Table>
-          </Container>
+          <BreakpointProvider>
+            <Breakpoint large up>
+              {AppareilsTable()}
+            </Breakpoint>
+            <Breakpoint medium down>
+              {AppareilsCards()}
+            </Breakpoint>
+          </BreakpointProvider>
         </Container>
       </WhiteShadowCard>
     </Container>
