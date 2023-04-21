@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 //#region FontAwsome icones
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faFilter,
   faMobileAlt,
   faSort,
   faSortDown,
@@ -265,10 +266,10 @@ const AppareilsPage = () => {
     return (
       <Button
         onClick={() => props.methodState(!props.state)}
-        variant={props.state ? "primary" : "secondary"}
-        className="m-1"
+        variant={props.state ? GetBGColorAppareilEtat(props.IdEtat) : "light"}
+        className={`m-1 border-${GetBGColorAppareilEtat(props.IdEtat)}`}
       >
-        {props.title} ({props.number}){" "}
+        <FontAwesomeIcon icon={faFilter} /> {props.title} ({props.number})
       </Button>
     );
   };
@@ -276,31 +277,50 @@ const AppareilsPage = () => {
   const FilterFindPanel = () => {
     return (
       <Container>
-        {ButtonFilter({
-          title: "Actif",
-          methodState: SetFilterActif,
-          state: filterActif,
-          number: listeAppareils.filter((appar) => appar.IdEtat === 2).length,
-        })}
+        {listeAppareils.filter((appar) => appar.IdEtat === 2).length > 0 &&
+          ButtonFilter({
+            title: "Actif",
+            methodState: SetFilterActif,
+            state: filterActif,
+            number: listeAppareils.filter((appar) => appar.IdEtat === 2).length,
+            IdEtat: 2,
+          })}
 
-        {ButtonFilter({
-          title: "Hors contrat",
-          methodState: SetFilterHorscontrat,
-          state: filterHorscontrat,
-          number: listeAppareils.filter((appar) => appar.IdEtat === 1).length,
-        })}
+        {listeAppareils.filter((appar) => appar.IdEtat === 1).length > 0 &&
+          ButtonFilter({
+            title: "Hors contrat",
+            methodState: SetFilterHorscontrat,
+            state: filterHorscontrat,
+            number: listeAppareils.filter((appar) => appar.IdEtat === 1).length,
+            IdEtat: 1,
+          })}
 
-        {ButtonFilter({
-          title: "Détruit",
-          methodState: SetFilterDetruit,
-          state: filterDetruit,
-          number: listeAppareils.filter((appar) => appar.IdEtat === 3).length,
-        })}
+        {listeAppareils.filter((appar) => appar.IdEtat === 3).length > 0 &&
+          ButtonFilter({
+            title: "Détruit",
+            methodState: SetFilterDetruit,
+            state: filterDetruit,
+            number: listeAppareils.filter((appar) => appar.IdEtat === 3).length,
+            IdEtat: 3,
+          })}
         {SearchAppareil()}
       </Container>
     );
   };
 
+  const GetImageAppareilEtat = (IdEtat) => {
+    return (
+      <Image
+        src={
+          IdEtat === 1
+            ? AppareilGrey
+            : IdEtat === 2
+            ? AppareilBlue
+            : AppareilRed
+        }
+      />
+    );
+  };
   //#endregion
 
   //#region large
@@ -352,47 +372,6 @@ const AppareilsPage = () => {
     }
   };
 
-  const GetImageAppareilEtat = (IdEtat) => {
-    return (
-      <Image
-        src={
-          IdEtat === 1
-            ? AppareilGrey
-            : IdEtat === 2
-            ? AppareilBlue
-            : AppareilRed
-        }
-      />
-    );
-  };
-  const AppareilsCards = () => {
-    return GetAppareilsSearched().map((appareil) => {
-      return (
-        <Card
-          key={appareil.Id}
-          className={`m-2 border border-${GetBGColorAppareilEtat(
-            appareil.IdEtat
-          )} `}
-        >
-          <Card.Body>
-            <Card.Title>
-              {appareil.Id} - {HighlightTextIfSearch(appareil.Libelle)}
-            </Card.Title>
-            <Card.Subtitle className="mb-2 text-muted">
-              Secteur : {HighlightTextIfSearch(appareil.Secteur)}
-            </Card.Subtitle>
-            <Card.Text>
-              {GetImageAppareilEtat(appareil.IdEtat)}
-              <Badge pill bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
-                {appareil.LibelleEtat}
-              </Badge>
-            </Card.Text>
-          </Card.Body>
-        </Card>
-      );
-    });
-  };
-
   const PlaceHolderTableLine = (numberOfLines) => {
     let _arrayLoading = [];
     for (let index = 0; index < numberOfLines; index++) {
@@ -429,6 +408,69 @@ const AppareilsPage = () => {
   //#endregion
 
   //#region small
+  const AppareilsCards = () => {
+    if (!isLoaded) {
+      return <div>{PlaceHolderCards(3)}</div>;
+    }
+
+    return GetAppareilsSearched().map((appareil) => {
+      return (
+        <Card
+          key={appareil.Id}
+          className={`m-2 border border-${GetBGColorAppareilEtat(
+            appareil.IdEtat
+          )} `}
+        >
+          <Card.Body>
+            <Card.Title>
+              {appareil.Id} - {HighlightTextIfSearch(appareil.Libelle)}
+            </Card.Title>
+            <Card.Subtitle className="mb-2 text-muted">
+              Secteur : {HighlightTextIfSearch(appareil.Secteur)}
+            </Card.Subtitle>
+            <Card.Text>
+              {GetImageAppareilEtat(appareil.IdEtat)}
+              <Badge pill bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
+                {appareil.LibelleEtat}
+              </Badge>
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      );
+    });
+  };
+
+  const PlaceHolderCards = (numberOfLines) => {
+    let _arrayLoading = [];
+    for (let index = 0; index < numberOfLines; index++) {
+      _arrayLoading.push(index + 1);
+    }
+    return _arrayLoading.map((i) => {
+      return (
+        <Card key={i} className="m-2 border border-secondary">
+          <Card.Body>
+            <Card.Title>
+              <Placeholder as="p" animation="glow">
+                <Placeholder xs={6} />
+              </Placeholder>
+            </Card.Title>
+
+            <Card.Subtitle className="mb-2 text-muted">
+              <Placeholder as="p" animation="glow">
+                Secteur : <Placeholder xs={3} />
+              </Placeholder>
+            </Card.Subtitle>
+
+            <div>
+              <Placeholder as="p" animation="glow">
+                <Placeholder xs={1} />
+              </Placeholder>
+            </div>
+          </Card.Body>
+        </Card>
+      );
+    });
+  };
 
   //#endregion
 
