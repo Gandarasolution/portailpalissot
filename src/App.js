@@ -19,6 +19,7 @@ import { faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder } fro
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AppareilsPage from './Views/Maintenance/Appareils/AppareilsPage';
+import SidebarMenu from 'react-bootstrap-sidebar-menu';
 //#endregion
 
 
@@ -42,7 +43,7 @@ function App() {
     <Router>
       <div className='App'>
           <NavbarMenu/>
-
+<SidebarMenu></SidebarMenu>
 
 
           <Routes>

@@ -57,10 +57,27 @@
 
 
 
+
 .centerStack {
   display: flex;
   width: 100%;
   max-width: 60%;
   margin: 0 auto;
   justify-content: center;
+}
+
+.btn-filter{
+  background-color: white !important;
+  color: #282c34 !important;
+}
+
+.btn-filter-active{
+  background-color: white !important;
+  color: cornflowerblue !important;
+  border: black !important;
+}
+
+.btn-filter:hover{
+  background-color: whitesmoke !important;
+  color: cornflowerblue !important;
 }

@@ -33,7 +33,7 @@ import {
   faFilePdf,
 } from "@fortawesome/free-solid-svg-icons";
 import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
-import { Container, Form, Popover } from "react-bootstrap";
+import { ButtonGroup, Container, Form, Popover, Stack } from "react-bootstrap";
 //#endregion
 
 //#region Components
@@ -43,7 +43,11 @@ import { Container, Form, Popover } from "react-bootstrap";
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 
-const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriodeSelect }) => {
+const ContratPrestation = ({
+  Prestations,
+  datePrestation,
+  ParentComponentPeriodeSelect,
+}) => {
   //#region Mockup
 
   const [listeTaches, setListeTaches] = useState([]);
@@ -93,6 +97,16 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
 
   const [openTaches, setOpenTaches] = useState(true);
   const [openDocuments, setOpenDocuments] = useState(true);
+  //#endregion
+
+  //#region Filters
+
+  const [filterTous, setFilterTous] = useState(true);
+  const [filterNP, setFilterNP] = useState(false);
+  const [filterP, setFilterP] = useState(false);
+  const [filterEC, setFilterEC] = useState(false);
+  const [filterT, setFilterT] = useState(false);
+
   //#endregion
 
   const [modaleShow, setModalShow] = useState(false);
@@ -212,6 +226,8 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
         return "En cours";
       case 4:
         return "Terminée";
+      case -1:
+        return "Tous";
       default:
         return "Non planifiée";
     }
@@ -233,15 +249,17 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
   }
 
   const GetPrestationSearched = () => {
+    let _lPrestation = Prestations;
+
     if (search.length > 0) {
-      return Prestations.filter(
+      _lPrestation = _lPrestation.filter(
         (item) =>
           item.libelle.toUpperCase().includes(search.toUpperCase()) ||
           item.secteur.toUpperCase().includes(search.toUpperCase())
       );
-    } else {
-      return Prestations;
     }
+
+    return _lPrestation;
   };
 
   const reactStringReplace = require("react-string-replace");
@@ -259,6 +277,36 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
       );
     } else {
       return text;
+    }
+  }
+
+  function GetFilterState(idEtat) {
+    switch (idEtat) {
+      case 1:
+        return filterNP;
+      case 2:
+        return filterP;
+      case 3:
+        return filterEC;
+      case 4:
+        return filterT;
+      default:
+        return filterTous;
+    }
+  }
+
+  function GetFilterSetState(idEtat) {
+    switch (idEtat) {
+      case 1:
+        return setFilterNP;
+      case 2:
+        return setFilterP;
+      case 3:
+        return setFilterEC;
+      case 4:
+        return setFilterT;
+      default:
+        return setFilterTous;
     }
   }
 
@@ -308,15 +356,59 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
     );
   };
 
+  const ButtonFilter = (IdEtat) => {
+    return (
+      <Button
+        className={
+          GetFilterState(IdEtat)
+            ? "btn-filter-active border"
+            : "btn-filter border"
+        }
+        onClick={() =>
+          handleFilter(GetFilterState(IdEtat), GetFilterSetState(IdEtat))
+        }
+      >
+        {GetLibEtat(IdEtat)} 
+      </Button>
+    );
+  };
+
+  const handleFilter = (value, setState) => {
+    setFilterNP(false);
+    setFilterEC(false);
+    setFilterP(false);
+    setFilterT(false);
+    setFilterTous(false);
+
+    setState(!value);
+  };
+
   const SearchPrestation = () => {
     return (
-      <Form.Control
-        type="search"
-        placeholder="Rechercher"
-        className="mx-4"
-        aria-label="Search"
-        onChange={handleSearch}
-      />
+      <Container fluid>
+        <Stack direction="horizontal">
+          <Container>
+            <ButtonGroup className="">
+              {ButtonFilter(-1)}
+              {ButtonFilter(1)}
+              {ButtonFilter(2)}
+              {ButtonFilter(3)}
+              {ButtonFilter(4)}
+            </ButtonGroup>
+          </Container>
+
+          <Container>
+            <Form.Control
+              type="search"
+              placeholder="Rechercher"
+              className="m-2"
+              aria-label="Search"
+              onChange={handleSearch}
+            />
+          </Container>
+          <Container>{ParentComponentPeriodeSelect}</Container>
+        </Stack>
+      </Container>
     );
   };
 
@@ -332,7 +424,7 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
     const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
     return (
       <Table>
-        <thead>
+        <thead style={{ backgroundColor: "whitesmoke" }}>
           <tr>
             <th>Secteur</th>
             <th>N° de prestation</th>
@@ -374,6 +466,25 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
       (item) => item.mois.at(_numMois - 1) > 0
     );
 
+    if (!filterTous) {
+      if (filterNP)
+        _lPrestation = _lPrestation.filter(
+          (item) => item.mois.at(_numMois - 1) === 1
+        );
+      if (filterP)
+        _lPrestation = _lPrestation.filter(
+          (item) => item.mois.at(_numMois - 1) === 2
+        );
+      if (filterEC)
+        _lPrestation = _lPrestation.filter(
+          (item) => item.mois.at(_numMois - 1) === 3
+        );
+      if (filterT)
+        _lPrestation = _lPrestation.filter(
+          (item) => item.mois.at(_numMois - 1) === 4
+        );
+    }
+
     return (
       <tbody>
         {_lPrestation.length > 0 ? (
@@ -383,7 +494,7 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
                 <Row>
                   <Col>
                     {GetNomMois(_numMois)}{" "}
-                    {_numMois > 12
+                    {numeroDuMois > 12
                       ? datePrestation.getFullYear() + 1
                       : datePrestation.getFullYear()}{" "}
                     ({_lPrestation.length}) :
@@ -409,7 +520,7 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
                 in={GetStateOpen(_numMois)}
               >
                 <tr>
-                  <td>{HighlightTextIfSearch(presta.secteur)}</td>
+                  <td>{HighlightTextIfSearch(presta.secteur)} </td>
                   <td>{presta.id}</td>
                   <td>{HighlightTextIfSearch(presta.libelle)}</td>
                   <td>
@@ -679,9 +790,8 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
 
   return (
     <BreakpointProvider>
-      <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>  
-   {SearchPrestation()}
-   { ParentComponentPeriodeSelect}   
+      <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>
+        {SearchPrestation()}
 
         <Container fluid>
           <Breakpoint large up>

@@ -231,6 +231,8 @@ const ContratPage = () => {
 
     return (
       <DropdownButton
+      variant=""
+      className="border"
         id="dropdown-datePeriode"
         title={`Période : ${datePrestation.getFullYear()}  / ${
           datePrestation.getFullYear() + 1
@@ -264,12 +266,12 @@ const ContratPage = () => {
         Prestations={Prestations}
         datePrestation={datePrestation}
         ParentComponentPeriodeSelect={ <Stack direction="horizontal" className="centerStack" gap={3}>
-        <Button variant="primary" onClick={() => SoustraireUnAnPeriode()}>
+        <Button variant="" className="border" onClick={() => SoustraireUnAnPeriode()}>
           <FontAwesomeIcon icon={faArrowLeft} />
         </Button>
 
         {DropDownYears()}
-        <Button variant="primary" onClick={() => AjouterUnAnPeriode()}>
+        <Button variant="" className="border" onClick={() => AjouterUnAnPeriode()}>
           {" "}
           <FontAwesomeIcon icon={faArrowRight} />{" "}
         </Button>
