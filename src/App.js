@@ -1,6 +1,5 @@
 //#region Imports
 import './App.css';
-
 //#region Bootstrap
 import "bootstrap/dist/css/bootstrap.min.css";
 //#endregion
@@ -19,7 +18,7 @@ import { faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder } fro
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AppareilsPage from './Views/Maintenance/Appareils/AppareilsPage';
-import SidebarMenu from 'react-bootstrap-sidebar-menu';
+// import Sidebar from './components/menu/SidebarMenuV2';
 //#endregion
 
 
@@ -42,11 +41,13 @@ function App() {
 
     <Router>
       <div className='App'>
+
+
+
+        
           <NavbarMenu/>
-<SidebarMenu></SidebarMenu>
-
-
-          <Routes>
+  
+  <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/maintenance/contrat" element={<ContratPage />} />
             <Route path="/maintenance/appareils" element={<AppareilsPage />} />
@@ -54,6 +55,9 @@ function App() {
 
           </Routes>
 
+
+
+        
 
 
 

@@ -181,6 +181,42 @@ const ContratPage = () => {
     return date;
   }
 
+
+  function GetNomMois(num, short = false) {
+    // console.log(num)
+    if (num > 12) {
+      num = num - 12;
+    }
+    switch (num) {
+      case 1:
+        return short ? "Jan." : "Janvier";
+      case 2:
+        return short ? "Fév." : "Février";
+      case 3:
+        return "Mars";
+      case 4:
+        return short ? "Avr." : "Avril";
+      case 5:
+        return "Mai";
+      case 6:
+        return "Juin";
+      case 7:
+        return short ? "Juil." : "Juillet";
+      case 8:
+        return "Août";
+      case 9:
+        return short ? "Sept." : "Septembre";
+      case 10:
+        return short ? "Oct." : "Octobre";
+      case 11:
+        return short ? "Nov." : "Novembre";
+      case 12:
+        return short ? "Déc." : "Décembre";
+      default:
+        return null;
+    }
+  }
+
   //#endregion
 
   //#region Evenement
@@ -213,8 +249,7 @@ const ContratPage = () => {
   useEffect(() => {}, [datePrestation]);
 
   //#endregion
-
-
+ 
   const DropDownYears = () => {
     let _arrayPeriodes = [
       {
@@ -222,7 +257,7 @@ const ContratPage = () => {
         yearEnd: new Date(Contrat.DateSouscrit).getFullYear() + 1,
       },
     ];
-
+    let _month = new Date(new Date(Contrat.DateSouscrit).toLocaleDateString("fr-FR")).getMonth() + 1
     for (let index = 0; index < 10; index++) {
       let _yearStart = _arrayPeriodes[index].yearStart + 1;
       let _yearEnd = _arrayPeriodes[index].yearEnd + 1;
@@ -234,7 +269,9 @@ const ContratPage = () => {
       variant=""
       className="border"
         id="dropdown-datePeriode"
-        title={`Période : ${datePrestation.getFullYear()}  / ${
+        title={`Période : de ${GetNomMois(_month)} ${datePrestation.getFullYear()}  
+        à ${GetNomMois(_month)}
+        ${
           datePrestation.getFullYear() + 1
         }`}
         onSelect={(e) => {
@@ -246,7 +283,7 @@ const ContratPage = () => {
             <Dropdown.Item
               eventKey={periode.yearStart}
               key={index}
-            >{`${periode.yearStart} / ${periode.yearEnd}`}</Dropdown.Item>
+            >{` de ${GetNomMois(_month)} ${periode.yearStart} à ${GetNomMois(_month)} ${periode.yearEnd}`}</Dropdown.Item>
           );
         })}
       </DropdownButton>
@@ -265,7 +302,7 @@ const ContratPage = () => {
       <ContratPrestation
         Prestations={Prestations}
         datePrestation={datePrestation}
-        ParentComponentPeriodeSelect={ <Stack direction="horizontal" className="centerStack" gap={3}>
+        ParentComponentPeriodeSelect={ <Stack direction="horizontal" className="centerStack" gap={1}>
         <Button variant="" className="border" onClick={() => SoustraireUnAnPeriode()}>
           <FontAwesomeIcon icon={faArrowLeft} />
         </Button>

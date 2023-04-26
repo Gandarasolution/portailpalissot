@@ -263,7 +263,7 @@ const AppareilsPage = () => {
   };
 
   const ButtonFilter = (props) => {
-    return (
+    return ( 
       <Button
         onClick={() => props.methodState(!props.state)}
         variant={props.state ? GetBGColorAppareilEtat(props.IdEtat) : "light"}

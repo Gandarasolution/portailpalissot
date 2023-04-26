@@ -328,6 +328,16 @@ const ContratPrestation = ({
     setModalShow(true);
   };
 
+  const handleFilter = (value, setState) => {
+    setFilterNP(false);
+    setFilterEC(false);
+    setFilterP(false);
+    setFilterT(false);
+    setFilterTous(false);
+
+    setState(value);
+  };
+
   //#endregion
 
   //#region Composants
@@ -364,50 +374,42 @@ const ContratPrestation = ({
             ? "btn-filter-active border"
             : "btn-filter border"
         }
-        onClick={() =>
-          handleFilter(GetFilterState(IdEtat), GetFilterSetState(IdEtat))
-        }
+        onClick={() => handleFilter(true, GetFilterSetState(IdEtat))}
       >
-        {GetLibEtat(IdEtat)} 
+        {GetLibEtat(IdEtat)}
       </Button>
     );
   };
 
-  const handleFilter = (value, setState) => {
-    setFilterNP(false);
-    setFilterEC(false);
-    setFilterP(false);
-    setFilterT(false);
-    setFilterTous(false);
-
-    setState(!value);
-  };
-
   const SearchPrestation = () => {
     return (
-      <Container fluid>
-        <Stack direction="horizontal">
-          <Container>
-            <ButtonGroup className="">
-              {ButtonFilter(-1)}
-              {ButtonFilter(1)}
-              {ButtonFilter(2)}
-              {ButtonFilter(3)}
-              {ButtonFilter(4)}
-            </ButtonGroup>
-          </Container>
+      <Container fluid className="d-flex flex-column">
+        <Container fluid className="d-flex flex-row">
+          <BreakpointProvider>
+            <Breakpoint large up>
+              <Container fluid className="m-2" style={{ flex: "1" }}>
+                <ButtonGroup>
+                  {ButtonFilter(-1)}
+                  {ButtonFilter(1)}
+                  {ButtonFilter(2)}
+                  {ButtonFilter(3)}
+                  {ButtonFilter(4)}
+                </ButtonGroup>
+              </Container>
+            </Breakpoint>
+          </BreakpointProvider>
 
-          <Container>
+          <Container className="m-2" style={{ flex: "2" }}>
             <Form.Control
               type="search"
               placeholder="Rechercher"
-              className="m-2"
               aria-label="Search"
               onChange={handleSearch}
             />
           </Container>
-          <Container>{ParentComponentPeriodeSelect}</Container>
-        </Stack>
+        </Container>
+
+        <div className="m-2">{ParentComponentPeriodeSelect}</div>
       </Container>
     );
   };
@@ -423,8 +425,8 @@ const ContratPrestation = ({
   const TableGroupedMonth = () => {
     const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
     return (
-      <Table>
-        <thead style={{ backgroundColor: "whitesmoke" }}>
+      <Table className="table table-radius m-2">
+        <thead className="table-header">
           <tr>
             <th>Secteur</th>
             <th>N° de prestation</th>
