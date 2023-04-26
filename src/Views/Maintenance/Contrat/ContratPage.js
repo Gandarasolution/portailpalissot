@@ -18,7 +18,11 @@ import ContratInfo from "./Components/ContratInformation";
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faArrowRight,
+  faCommentsDollar,
+} from "@fortawesome/free-solid-svg-icons";
 //#endregion
 
 const ContratPage = () => {
@@ -26,7 +30,7 @@ const ContratPage = () => {
 
   const Contrat = {
     IdContrat: 2557,
-    DateSouscrit: "12/04/2018",
+    DateSouscrit: "12/01/2018",
     TypeContrat: "Classique : Du Lundi au Vendredi aux horaires de bureau",
     Indice: "Taux fixe",
     TypeFacturation: "A date d'anniversaire du contrat",
@@ -158,19 +162,32 @@ const ContratPage = () => {
 
   //#endregion
 
-  //#region States
+  //#region Données
 
   const _dateContrat = new Date(
     dateFormat(new Date(Contrat.DateSouscrit), "dd/mm/yyyy")
   );
 
-  const [datePrestation, SetDatePrestation] = useState(
-    new Date(new Date().getFullYear(), _dateContrat.getMonth(), 1)
+  const dateFinPeriode = () => {
+    let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
+    return new Date(
+      _dateEndTmp.setMonth(_dateEndTmp.getMonth() + 11)
+    );
+  };
+
+  //#endregion
+
+  //#region States
+
+  const [dateDebutPeriode, setDateDebutPeriode] = useState(
+    GetDatePeriodeInitial()
   );
 
   //#endregion
 
   //#region Fonctions
+
+
   function addOneYear(date) {
     date.setFullYear(date.getFullYear() + 1);
     return date;
@@ -180,7 +197,6 @@ const ContratPage = () => {
     date.setFullYear(date.getFullYear() - 1);
     return date;
   }
-
 
   function GetNomMois(num, short = false) {
     // console.log(num)
@@ -217,102 +233,134 @@ const ContratPage = () => {
     }
   }
 
+  /**
+   * Construit la date de début des preriodes initial
+   * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
+   */
+  function GetDatePeriodeInitial() {
+    let _day = 1;
+    let _monthI = _dateContrat.getMonth();
+    let _year = new Date().getFullYear();
+    let _DateRetour = new Date(_year, _monthI, _day);
+
+    return _DateRetour;
+  }
+
   //#endregion
 
   //#region Evenement
 
   const AjouterUnAnPeriode = () => {
-    let _dateTmp = datePrestation;
-    _dateTmp = addOneYear(_dateTmp);
-    let _datePrestation = new Date(_dateTmp);
-    SetDatePrestation(_datePrestation);
+
+    let _dateTMP = dateDebutPeriode;
+    _dateTMP = addOneYear(_dateTMP);
+    let _dateDebutPeriode = new Date(_dateTMP);
+    setDateDebutPeriode(_dateDebutPeriode);
+
     MockupDataPrestation();
   };
 
   const SoustraireUnAnPeriode = () => {
-    let _dateTmp = datePrestation;
-    _dateTmp = subOneYear(_dateTmp);
-    let _datePrestation = new Date(_dateTmp);
-    SetDatePrestation(_datePrestation);
+
+    let _dateTMP = dateDebutPeriode;
+    _dateTMP = subOneYear(_dateTMP);
+    let _dateDebutPeriode = new Date(_dateTMP);
+    setDateDebutPeriode(_dateDebutPeriode);
+
     MockupDataPrestation();
   };
 
-  const HandleDropdownPeriodeSelect = (year) => {
-    
-    let _dateTemp = new Date();
-    _dateTemp.setFullYear(Number(year));
-    
-    SetDatePrestation(_dateTemp);
+  const HandleDropdownPeriodeSelect = (dateStart) => {
+
+    let _dateTemp = new Date(dateStart);
+
+    setDateDebutPeriode(_dateTemp);
+
     MockupDataPrestation();
   };
 
-  useEffect(() => {}, [datePrestation]);
+  useEffect(() => {}, [dateDebutPeriode]);
 
   //#endregion
- 
+
   const DropDownYears = () => {
+
+
+    let _dateDebut = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
+    let _dateEnd = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
     let _arrayPeriodes = [
       {
-        yearStart: new Date(Contrat.DateSouscrit).getFullYear(),
-        yearEnd: new Date(Contrat.DateSouscrit).getFullYear() + 1,
-      },
+        dateStart: new Date(_dateDebut),
+        dateEnd : new Date(_dateEnd.setMonth(_dateDebut.getMonth() + 11))
+      }
+
     ];
-    let _month = new Date(new Date(Contrat.DateSouscrit).toLocaleDateString("fr-FR")).getMonth() + 1
+
+
     for (let index = 0; index < 10; index++) {
-      let _yearStart = _arrayPeriodes[index].yearStart + 1;
-      let _yearEnd = _arrayPeriodes[index].yearEnd + 1;
-      _arrayPeriodes.push({ yearStart: _yearStart, yearEnd: _yearEnd });
+
+      let _dateStart = addOneYear(new Date(_arrayPeriodes[index].dateStart));
+      let _dateEnd = addOneYear(new Date(_arrayPeriodes[index].dateEnd));
+
+      _arrayPeriodes.push({dateStart: _dateStart, dateEnd: _dateEnd})
     }
 
     return (
       <DropdownButton
-      variant=""
-      className="border"
+        variant=""
+        className="border  "
+        drop="down-centered"
+        style={{ borderRadius: "15px" }}
         id="dropdown-datePeriode"
-        title={`Période : de ${GetNomMois(_month)} ${datePrestation.getFullYear()}  
-        à ${GetNomMois(_month)}
-        ${
-          datePrestation.getFullYear() + 1
-        }`}
+        title={`Période: de ${GetNomMois(dateDebutPeriode.getMonth() + 1)} ${dateDebutPeriode.getFullYear()} à ${GetNomMois(dateFinPeriode().getMonth() + 1)} ${dateFinPeriode().getFullYear()} `}
+
         onSelect={(e) => {
           HandleDropdownPeriodeSelect(e);
         }}
       >
         {_arrayPeriodes.map((periode, index) => {
           return (
-            <Dropdown.Item
-              eventKey={periode.yearStart}
+            <Dropdown.Item 
               key={index}
-            >{` de ${GetNomMois(_month)} ${periode.yearStart} à ${GetNomMois(_month)} ${periode.yearEnd}`}</Dropdown.Item>
+              eventKey={periode.dateStart}
+            >{`de ${GetNomMois(periode.dateStart.getMonth() + 1)} ${periode.dateStart.getFullYear()} à ${GetNomMois(periode.dateEnd.getMonth() + 1)} ${periode.dateEnd.getFullYear()}` }
+            </Dropdown.Item>
+            
           );
         })}
       </DropdownButton>
     );
   };
 
-
-
   return (
     <Container fluid>
       <ContratInfo Contrat={Contrat} />
 
-       
-
-
       <ContratPrestation
         Prestations={Prestations}
-        datePrestation={datePrestation}
-        ParentComponentPeriodeSelect={ <Stack direction="horizontal" className="centerStack" gap={1}>
-        <Button variant="" className="border" onClick={() => SoustraireUnAnPeriode()}>
-          <FontAwesomeIcon icon={faArrowLeft} />
-        </Button>
+        // datePrestation={datePrestation}
+        datePrestation={dateDebutPeriode}
+        ParentComponentPeriodeSelect={
+          <Stack direction="horizontal" className="centerStack" gap={1}>
+            <Button
+              variant=""
+              className="border"
+              onClick={() => SoustraireUnAnPeriode()}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </Button>
 
-        {DropDownYears()}
-        <Button variant="" className="border" onClick={() => AjouterUnAnPeriode()}>
-          {" "}
-          <FontAwesomeIcon icon={faArrowRight} />{" "}
-        </Button>
-      </Stack>}
+            {DropDownYears()}
+            <Button
+              variant=""
+              className="border"
+              onClick={() => AjouterUnAnPeriode()}
+            >
+              {" "}
+              <FontAwesomeIcon icon={faArrowRight} />{" "}
+            </Button>
+          </Stack>
+        }
       />
     </Container>
   );
