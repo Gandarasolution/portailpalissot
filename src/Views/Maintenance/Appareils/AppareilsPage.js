@@ -231,16 +231,7 @@ const AppareilsPage = () => {
   };
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  useEffect(() => {
-    async function makeRequest() {
-      await delay(1000);
-      MockupListeappareils();
-
-      setIsLoaded(true);
-    }
-    makeRequest();
-  }, []);
-
+  
   //#endregion
 
   //#region Component
@@ -475,6 +466,18 @@ const AppareilsPage = () => {
   //#endregion
 
   //#endregion
+
+
+
+  useEffect(() => {
+    async function makeRequest() {
+      await delay(1000);
+      
+      setIsLoaded(true);
+    }
+    makeRequest();
+    MockupListeappareils();
+  },[isLoaded]);
 
   return (
     <Container fluid>

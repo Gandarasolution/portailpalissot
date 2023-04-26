@@ -8,7 +8,11 @@ import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Stack from "react-bootstrap/Stack";
+//#endregion
 
+//#region FontAwesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 //#endregion
 
 //#region Components
@@ -17,12 +21,8 @@ import ContratInfo from "./Components/ContratInformation";
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowLeft,
-  faArrowRight,
-  faCommentsDollar,
-} from "@fortawesome/free-solid-svg-icons";
+import { Breakpoint, BreakpointProvider } from "react-socks";
+
 //#endregion
 
 const ContratPage = () => {
@@ -113,8 +113,6 @@ const ContratPage = () => {
     },
   ];
 
-  const [Prestations, SetPrestations] = useState(_Prestations);
-
   const MockupDataPrestation = () => {
     let _prestas = [];
     for (let index = 0; index < 12; index++) {
@@ -160,6 +158,8 @@ const ContratPage = () => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   //#endregion
 
   //#region Données
@@ -170,14 +170,15 @@ const ContratPage = () => {
 
   const dateFinPeriode = () => {
     let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-    return new Date(
-      _dateEndTmp.setMonth(_dateEndTmp.getMonth() + 11)
-    );
+    return new Date(_dateEndTmp.setMonth(_dateEndTmp.getMonth() + 11));
   };
 
   //#endregion
 
   //#region States
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const [Prestations, SetPrestations] = useState(_Prestations);
 
   const [dateDebutPeriode, setDateDebutPeriode] = useState(
     GetDatePeriodeInitial()
@@ -186,7 +187,6 @@ const ContratPage = () => {
   //#endregion
 
   //#region Fonctions
-
 
   function addOneYear(date) {
     date.setFullYear(date.getFullYear() + 1);
@@ -251,7 +251,6 @@ const ContratPage = () => {
   //#region Evenement
 
   const AjouterUnAnPeriode = () => {
-
     let _dateTMP = dateDebutPeriode;
     _dateTMP = addOneYear(_dateTMP);
     let _dateDebutPeriode = new Date(_dateTMP);
@@ -261,7 +260,6 @@ const ContratPage = () => {
   };
 
   const SoustraireUnAnPeriode = () => {
-
     let _dateTMP = dateDebutPeriode;
     _dateTMP = subOneYear(_dateTMP);
     let _dateDebutPeriode = new Date(_dateTMP);
@@ -271,7 +269,6 @@ const ContratPage = () => {
   };
 
   const HandleDropdownPeriodeSelect = (dateStart) => {
-
     let _dateTemp = new Date(dateStart);
 
     setDateDebutPeriode(_dateTemp);
@@ -279,30 +276,25 @@ const ContratPage = () => {
     MockupDataPrestation();
   };
 
-  useEffect(() => {}, [dateDebutPeriode]);
-
   //#endregion
 
+
+
   const DropDownYears = () => {
-
-
     let _dateDebut = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
     let _dateEnd = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
     let _arrayPeriodes = [
       {
         dateStart: new Date(_dateDebut),
-        dateEnd : new Date(_dateEnd.setMonth(_dateDebut.getMonth() + 11))
-      }
-
+        dateEnd: new Date(_dateEnd.setMonth(_dateDebut.getMonth() + 11)),
+      },
     ];
 
-
     for (let index = 0; index < 10; index++) {
-
       let _dateStart = addOneYear(new Date(_arrayPeriodes[index].dateStart));
       let _dateEnd = addOneYear(new Date(_arrayPeriodes[index].dateEnd));
 
-      _arrayPeriodes.push({dateStart: _dateStart, dateEnd: _dateEnd})
+      _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
     }
 
     return (
@@ -312,54 +304,102 @@ const ContratPage = () => {
         drop="down-centered"
         style={{ borderRadius: "15px" }}
         id="dropdown-datePeriode"
-        title={`Période: de ${GetNomMois(dateDebutPeriode.getMonth() + 1)} ${dateDebutPeriode.getFullYear()} à ${GetNomMois(dateFinPeriode().getMonth() + 1)} ${dateFinPeriode().getFullYear()} `}
+        title={
+          <BreakpointProvider>
+            <Breakpoint medium down>
+              Période: de {GetNomMois(dateDebutPeriode.getMonth() + 1, true)}{" "}
+              {dateDebutPeriode.getFullYear()} à{" "}
+              {GetNomMois(dateFinPeriode().getMonth() + 1, true)}{" "}
+              {dateFinPeriode().getFullYear()}
+            </Breakpoint>
 
+            <Breakpoint large up>
+              Période: de {GetNomMois(dateDebutPeriode.getMonth() + 1)}{" "}
+              {dateDebutPeriode.getFullYear()} à{" "}
+              {GetNomMois(dateFinPeriode().getMonth() + 1)}{" "}
+              {dateFinPeriode().getFullYear()}
+            </Breakpoint>
+          </BreakpointProvider>
+        }
         onSelect={(e) => {
           HandleDropdownPeriodeSelect(e);
         }}
       >
         {_arrayPeriodes.map((periode, index) => {
           return (
-            <Dropdown.Item 
-              key={index}
-              eventKey={periode.dateStart}
-            >{`de ${GetNomMois(periode.dateStart.getMonth() + 1)} ${periode.dateStart.getFullYear()} à ${GetNomMois(periode.dateEnd.getMonth() + 1)} ${periode.dateEnd.getFullYear()}` }
+            <Dropdown.Item key={index} eventKey={periode.dateStart}>
+              {`de ${GetNomMois(
+                periode.dateStart.getMonth() + 1
+              )} ${periode.dateStart.getFullYear()} à ${GetNomMois(
+                periode.dateEnd.getMonth() + 1
+              )} ${periode.dateEnd.getFullYear()}`}
             </Dropdown.Item>
-            
           );
         })}
       </DropdownButton>
     );
   };
 
+
+  useEffect(() => {
+    async function makeRequest() {
+      await delay(1000);
+
+      setIsLoaded(true);
+    }
+    makeRequest();
+  }, [isLoaded]);
+
   return (
     <Container fluid>
-      <ContratInfo Contrat={Contrat} />
+      <ContratInfo Contrat={Contrat} IsLoaded={isLoaded} />
 
       <ContratPrestation
+        IsLoaded={isLoaded}
         Prestations={Prestations}
-        // datePrestation={datePrestation}
         datePrestation={dateDebutPeriode}
         ParentComponentPeriodeSelect={
-          <Stack direction="horizontal" className="centerStack" gap={1}>
-            <Button
-              variant=""
-              className="border"
-              onClick={() => SoustraireUnAnPeriode()}
-            >
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </Button>
+          <BreakpointProvider>
+            <Breakpoint large up>
+              <Stack direction="horizontal" className="centerStack " gap={1}>
+                <Button
+                  variant=""
+                  className="border"
+                  onClick={() => SoustraireUnAnPeriode()}
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </Button>
 
-            {DropDownYears()}
-            <Button
-              variant=""
-              className="border"
-              onClick={() => AjouterUnAnPeriode()}
-            >
-              {" "}
-              <FontAwesomeIcon icon={faArrowRight} />{" "}
-            </Button>
-          </Stack>
+                {DropDownYears()}
+                <Button
+                  variant=""
+                  className="border"
+                  onClick={() => AjouterUnAnPeriode()}
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Button>
+              </Stack>
+            </Breakpoint>
+            <Breakpoint medium down>
+              {DropDownYears()}
+              <Stack direction="horizontal" className="centerStack" gap={1}>
+                <Button
+                  variant=""
+                  className="border"
+                  onClick={() => SoustraireUnAnPeriode()}
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </Button>
+                <Button
+                  variant=""
+                  className="border"
+                  onClick={() => AjouterUnAnPeriode()}
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Button>
+              </Stack>
+            </Breakpoint>
+          </BreakpointProvider>
         }
       />
     </Container>

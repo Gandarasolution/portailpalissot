@@ -15,7 +15,11 @@ import Tooltip from "react-bootstrap/Tooltip";
 import Modal from "react-bootstrap/Modal";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
-
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Placeholder from "react-bootstrap/Placeholder";
+import Popover from "react-bootstrap/Popover";
 //#endregion
 
 //#region FontAwsome
@@ -32,11 +36,11 @@ import {
   faFileImage,
   faFilePdf,
 } from "@fortawesome/free-solid-svg-icons";
-import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
-import { ButtonGroup, Container, Form, Popover, Stack } from "react-bootstrap";
+
 //#endregion
 
 //#region Components
+import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
 
 //#endregion
 
@@ -47,6 +51,7 @@ const ContratPrestation = ({
   Prestations,
   datePrestation,
   ParentComponentPeriodeSelect,
+  IsLoaded,
 }) => {
   //#region Mockup
 
@@ -418,6 +423,26 @@ const ContratPrestation = ({
 
   //#region large
 
+  const PlaceHolderTableLine = (numberOfLines) => {
+    let _arrayLoading = [];
+    for (let index = 0; index < numberOfLines; index++) {
+      _arrayLoading.push(index + 1);
+    }
+    return _arrayLoading.map((i) => {
+      return (
+        <tbody key={i}>
+          <tr>
+            <td colSpan={4}>
+              <Placeholder as="p" animation="glow">
+                <Placeholder xs={12} />
+              </Placeholder>
+            </td>
+          </tr>
+        </tbody>
+      );
+    });
+  };
+
   /**
    *
    * @returns Le tableau des prestations, groupés par mois.
@@ -426,14 +451,7 @@ const ContratPrestation = ({
     const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
     return (
       <Table className="table table-radius m-2">
-        <thead className="table-header">
-          <tr>
-            <th>Secteur</th>
-            <th>N° de prestation</th>
-            <th>Libellé</th>
-            <th>Etat</th>
-          </tr>
-        </thead>
+        {TableHead()}
 
         {RowGroupMois(_numMoisDebutPrestation)}
         {RowGroupMois(_numMoisDebutPrestation + 1)}
@@ -451,97 +469,114 @@ const ContratPrestation = ({
     );
   };
 
+  const TableHead = () => {
+    return (
+      <thead className="table-header">
+        <tr>
+          <th>Secteur</th>
+          <th>N° de prestation</th>
+          <th>Libellé</th>
+          <th>Etat</th>
+        </tr>
+      </thead>
+    );
+  };
+
   /**
    *
    * @param {* Le numéro du mois (janvier = 1, décmebre = 12) } numeroDuMois
    * @returns Une ligne groupant toutes les prestations du mois et une ligne par prestation de ce mois
    */
   const RowGroupMois = (numeroDuMois) => {
-    //Cast du parametre
-    let _numMois = Number(numeroDuMois);
-    //Le numéro ne peut être supérieur à 12
-    if (_numMois > 12) {
-      _numMois -= 12;
-    }
-    //Les prestations sont filtrés par le 'search'
-    let _lPrestation = GetPrestationSearched().filter(
-      (item) => item.mois.at(_numMois - 1) > 0
-    );
+    if (IsLoaded) {
+      //Cast du parametre
+      let _numMois = Number(numeroDuMois);
+      //Le numéro ne peut être supérieur à 12
+      if (_numMois > 12) {
+        _numMois -= 12;
+      }
+      //Les prestations sont filtrés par le 'search'
+      let _lPrestation = GetPrestationSearched().filter(
+        (item) => item.mois.at(_numMois - 1) > 0
+      );
 
-    if (!filterTous) {
-      if (filterNP)
-        _lPrestation = _lPrestation.filter(
-          (item) => item.mois.at(_numMois - 1) === 1
-        );
-      if (filterP)
-        _lPrestation = _lPrestation.filter(
-          (item) => item.mois.at(_numMois - 1) === 2
-        );
-      if (filterEC)
-        _lPrestation = _lPrestation.filter(
-          (item) => item.mois.at(_numMois - 1) === 3
-        );
-      if (filterT)
-        _lPrestation = _lPrestation.filter(
-          (item) => item.mois.at(_numMois - 1) === 4
-        );
-    }
-
-    return (
-      <tbody>
-        {_lPrestation.length > 0 ? (
-          <tr>
-            <td colSpan={4} onClick={() => GroupClickedCollapse(_numMois)}>
-              <div className="shadow border rounded-pill bg-ligth border-secondary">
-                <Row>
-                  <Col>
-                    {GetNomMois(_numMois)}{" "}
-                    {numeroDuMois > 12
-                      ? datePrestation.getFullYear() + 1
-                      : datePrestation.getFullYear()}{" "}
-                    ({_lPrestation.length}) :
-                  </Col>
-                  <Col>{ButtonAreaControl(_numMois)}</Col>
-                </Row>
-              </div>
-            </td>
-          </tr>
-        ) : null}
-
-        {_lPrestation.map((presta) => {
-          return (
-            <OverlayTrigger
-              trigger={"click"}
-              rootClose
-              placement="right"
-              overlay={PopoverDocs}
-              key={presta.id}
-            >
-              <Collapse
-                onClick={() => MockupListeTache()}
-                in={GetStateOpen(_numMois)}
-              >
-                <tr>
-                  <td>{HighlightTextIfSearch(presta.secteur)} </td>
-                  <td>{presta.id}</td>
-                  <td>{HighlightTextIfSearch(presta.libelle)}</td>
-                  <td>
-                    {" "}
-                    <Badge
-                      pill
-                      bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
-                    >
-                      {" "}
-                      {GetLibEtat(presta.mois.at(_numMois - 1))}{" "}
-                    </Badge>{" "}
-                  </td>
-                </tr>
-              </Collapse>
-            </OverlayTrigger>
+      if (!filterTous) {
+        if (filterNP)
+          _lPrestation = _lPrestation.filter(
+            (item) => item.mois.at(_numMois - 1) === 1
           );
-        })}
-      </tbody>
-    );
+        if (filterP)
+          _lPrestation = _lPrestation.filter(
+            (item) => item.mois.at(_numMois - 1) === 2
+          );
+        if (filterEC)
+          _lPrestation = _lPrestation.filter(
+            (item) => item.mois.at(_numMois - 1) === 3
+          );
+        if (filterT)
+          _lPrestation = _lPrestation.filter(
+            (item) => item.mois.at(_numMois - 1) === 4
+          );
+      }
+
+      return (
+        <tbody>
+          {_lPrestation.length > 0 ? (
+            <tr>
+              <td colSpan={4} onClick={() => GroupClickedCollapse(_numMois)}>
+                <div className="shadow border rounded-pill bg-ligth border-secondary">
+                  <Row>
+                    <Col>
+                      {GetNomMois(_numMois)}{" "}
+                      {numeroDuMois > 12
+                        ? datePrestation.getFullYear() + 1
+                        : datePrestation.getFullYear()}{" "}
+                      ({_lPrestation.length}) :
+                    </Col>
+                    <Col>{ButtonAreaControl(_numMois)}</Col>
+                  </Row>
+                </div>
+              </td>
+            </tr>
+          ) : null}
+
+          {_lPrestation.map((presta) => {
+            return (
+              <OverlayTrigger
+                trigger={"click"}
+                rootClose
+                placement="right"
+                overlay={PopoverDocs}
+                key={presta.id}
+              >
+                <Collapse
+                  onClick={() => MockupListeTache()}
+                  in={GetStateOpen(_numMois)}
+                >
+                  <tr>
+                    <td>{HighlightTextIfSearch(presta.secteur)} </td>
+                    <td>{presta.id}</td>
+                    <td>{HighlightTextIfSearch(presta.libelle)}</td>
+                    <td>
+                      {" "}
+                      <Badge
+                        pill
+                        bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
+                      >
+                        {" "}
+                        {GetLibEtat(presta.mois.at(_numMois - 1))}{" "}
+                      </Badge>{" "}
+                    </td>
+                  </tr>
+                </Collapse>
+              </OverlayTrigger>
+            );
+          })}
+        </tbody>
+      );
+    } else {
+      return PlaceHolderTableLine(5);
+    }
   };
 
   /**
@@ -637,7 +672,7 @@ const ContratPrestation = ({
           className="m-2 p-2 shadow border-secondary"
           onClick={() => handleCardClicked(presta)}
         >
-          <Card.Title>{HighlightTextIfSearch(presta.libelle)}</Card.Title>
+          <Card.Title>{presta.id} - {HighlightTextIfSearch(presta.libelle)}</Card.Title>
           <Card.Subtitle>
             Secteur : {HighlightTextIfSearch(presta.secteur)}
           </Card.Subtitle>
@@ -645,7 +680,9 @@ const ContratPrestation = ({
             <Row>
               {presta.mois.map((value, index) => {
                 return value > 0 ? (
-                  <Col key={index}>{Plannification(index, value)}</Col>
+                  <Col xs={12} key={index}>
+                    {Plannification(index, value)}
+                  </Col>
                 ) : null;
               })}
             </Row>
@@ -665,19 +702,22 @@ const ContratPrestation = ({
     let _numMois = Number(indexMois) + 1;
 
     return (
-      <span className="m-1">
-        {GetNomMois(_numMois, true)}
+      <span className="">
+        <Row>
+          <Col xs={6}>{GetNomMois(_numMois)} : </Col>
 
-        <OverlayTrigger
-          delay={{ show: 250, hide: 400 }}
-          overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
-        >
-          <Badge pill bg={GetBadgeBgColor(valeurMois)}>
-            {GetBadgeIcon(valeurMois)} {GetLibEtat(valeurMois)}
-          </Badge>
-        </OverlayTrigger>
-
-        {}
+          <Col xs={6}>
+            <OverlayTrigger
+              delay={{ show: 250, hide: 400 }}
+              overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
+            >
+              <Badge pill bg={GetBadgeBgColor(valeurMois)}>
+                {GetBadgeIcon(valeurMois)} {GetLibEtat(valeurMois)}
+              </Badge>
+            </OverlayTrigger>
+          </Col>
+        </Row>
+        <hr/>
       </span>
     );
   };
@@ -759,7 +799,11 @@ const ContratPrestation = ({
                       style={{ height: "50vh", overflowY: "scroll" }}
                     >
                       {listeTaches.map((tache) => {
-                        return <p key={tache.id}>{tache.description}</p>;
+                        return (
+                          <span key={tache.id}>
+                            <p>{tache.description}</p> <hr />{" "}
+                          </span>
+                        );
                       })}
                     </div>
                   </Collapse>
