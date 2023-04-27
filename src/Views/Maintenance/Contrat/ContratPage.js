@@ -113,7 +113,8 @@ const ContratPage = () => {
     },
   ];
 
-  const MockupDataPrestation = () => {
+  const MockupDataPrestation = async () => {
+    console.log("Mockup data Prestations !");
     let _prestas = [];
     for (let index = 0; index < 12; index++) {
       let _presta = {
@@ -250,37 +251,39 @@ const ContratPage = () => {
 
   //#region Evenement
 
-  const AjouterUnAnPeriode = () => {
+  const AjouterUnAnPeriode = async () => {
     let _dateTMP = dateDebutPeriode;
     _dateTMP = addOneYear(_dateTMP);
     let _dateDebutPeriode = new Date(_dateTMP);
     setDateDebutPeriode(_dateDebutPeriode);
 
-    MockupDataPrestation();
+    setIsLoaded(false);
+    await MockupDataPrestation();
+    // setIsLoaded(true);
   };
 
-  const SoustraireUnAnPeriode = () => {
+  const SoustraireUnAnPeriode = async () => {
     let _dateTMP = dateDebutPeriode;
     _dateTMP = subOneYear(_dateTMP);
     let _dateDebutPeriode = new Date(_dateTMP);
     setDateDebutPeriode(_dateDebutPeriode);
+    setIsLoaded(false);
 
-    MockupDataPrestation();
+    await MockupDataPrestation();
   };
 
-  const HandleDropdownPeriodeSelect = (dateStart) => {
+  const HandleDropdownPeriodeSelect = async (dateStart) => {
     let _dateTemp = new Date(dateStart);
 
     setDateDebutPeriode(_dateTemp);
+    setIsLoaded(false);
 
-    MockupDataPrestation();
+    await MockupDataPrestation();
   };
 
   //#endregion
 
-
-
-  const DropDownYears = () => {
+  const DropDownYears = (small) => {
     let _dateDebut = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
     let _dateEnd = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
     let _arrayPeriodes = [
@@ -300,27 +303,17 @@ const ContratPage = () => {
     return (
       <DropdownButton
         variant=""
-        className="border  "
+        className="border "
         drop="down-centered"
-        style={{ borderRadius: "15px" }}
+        style={{ borderRadius: "10px" }}
         id="dropdown-datePeriode"
-        title={
-          <BreakpointProvider>
-            <Breakpoint medium down>
-              Période: de {GetNomMois(dateDebutPeriode.getMonth() + 1, true)}{" "}
-              {dateDebutPeriode.getFullYear()} à{" "}
-              {GetNomMois(dateFinPeriode().getMonth() + 1, true)}{" "}
-              {dateFinPeriode().getFullYear()}
-            </Breakpoint>
-
-            <Breakpoint large up>
-              Période: de {GetNomMois(dateDebutPeriode.getMonth() + 1)}{" "}
-              {dateDebutPeriode.getFullYear()} à{" "}
-              {GetNomMois(dateFinPeriode().getMonth() + 1)}{" "}
-              {dateFinPeriode().getFullYear()}
-            </Breakpoint>
-          </BreakpointProvider>
-        }
+        title={`Période : de ${GetNomMois(
+          dateDebutPeriode.getMonth() + 1,
+          small
+        )}
+              ${dateDebutPeriode.getFullYear()} à
+              ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
+              ${dateFinPeriode().getFullYear()}`}
         onSelect={(e) => {
           HandleDropdownPeriodeSelect(e);
         }}
@@ -339,7 +332,6 @@ const ContratPage = () => {
       </DropdownButton>
     );
   };
-
 
   useEffect(() => {
     async function makeRequest() {
@@ -370,7 +362,8 @@ const ContratPage = () => {
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </Button>
 
-                {DropDownYears()}
+                {DropDownYears(false)}
+
                 <Button
                   variant=""
                   className="border"
@@ -381,7 +374,7 @@ const ContratPage = () => {
               </Stack>
             </Breakpoint>
             <Breakpoint medium down>
-              {DropDownYears()}
+              {DropDownYears(true)}
               <Stack direction="horizontal" className="centerStack" gap={1}>
                 <Button
                   variant=""

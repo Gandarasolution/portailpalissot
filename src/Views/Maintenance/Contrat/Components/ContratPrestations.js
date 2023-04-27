@@ -46,6 +46,7 @@ import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
+import { Accordion } from "react-bootstrap";
 
 const ContratPrestation = ({
   Prestations,
@@ -443,6 +444,7 @@ const ContratPrestation = ({
     });
   };
 
+ 
   /**
    *
    * @returns Le tableau des prestations, groupés par mois.
@@ -665,31 +667,50 @@ const ContratPrestation = ({
    * @returns Les listes de toutes les prestations sous forme de card
    */
   const CardedPrestations = () => {
-    return GetPrestationSearched().map((presta) => {
-      return (
-        <Card
-          key={presta.id}
-          className="m-2 p-2 shadow border-secondary"
-          onClick={() => handleCardClicked(presta)}
-        >
-          <Card.Title>{presta.id} - {HighlightTextIfSearch(presta.libelle)}</Card.Title>
-          <Card.Subtitle>
-            Secteur : {HighlightTextIfSearch(presta.secteur)}
-          </Card.Subtitle>
-          <Card.Body>
-            <Row>
-              {presta.mois.map((value, index) => {
-                return value > 0 ? (
-                  <Col xs={12} key={index}>
-                    {Plannification(index, value)}
-                  </Col>
-                ) : null;
-              })}
-            </Row>
-          </Card.Body>
-        </Card>
-      );
-    });
+    return IsLoaded ? (
+      <Container>
+        <div>
+          {GetPrestationSearched().map((presta, index) => {
+            return (
+              <Card
+                key={presta.id}
+                className="m-2 p-2 shadow border-secondary"
+                // onClick={() => handleCardClicked(presta)}
+              >
+                <Accordion defaultActiveKey={index}>
+                  <Accordion.Item eventKey={index}>
+                    <Accordion.Header>
+                      <Card.Title>
+                        {presta.id} - {HighlightTextIfSearch(presta.libelle)}
+                      </Card.Title>
+                    </Accordion.Header>
+
+                    <Accordion.Body>
+                      <Card.Subtitle>
+                        Secteur : {HighlightTextIfSearch(presta.secteur)}
+                      </Card.Subtitle>
+                      <Card.Body onClick={() => handleCardClicked(presta)}>
+                        <Row>
+                          {presta.mois.map((value, index) => {
+                            return value > 0 ? (
+                              <Col xs={12} key={index}>
+                                {Plannification(index, value)}
+                              </Col>
+                            ) : null;
+                          })}
+                        </Row>
+                      </Card.Body>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
+              </Card>
+            );
+          })}
+        </div>
+      </Container>
+    ) : (
+      <div> {PlaceHolderCard(5)}</div>
+    );
   };
 
   /**
@@ -717,7 +738,7 @@ const ContratPrestation = ({
             </OverlayTrigger>
           </Col>
         </Row>
-        <hr/>
+        <hr />
       </span>
     );
   };
@@ -829,6 +850,47 @@ const ContratPrestation = ({
       </Modal>
     );
   };
+
+
+  const PlaceHolderCard = (numberOfCards) => {
+    let _arrayLoading = [];
+    for (let index = 0; index < numberOfCards; index++) {
+      _arrayLoading.push(index + 1);
+    }
+
+    return _arrayLoading.map((i) => {
+      return (
+        <Card key={i}>
+          <Card.Title>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={10} />
+            </Placeholder>
+          </Card.Title>
+          <Card.Subtitle>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={6} />
+            </Placeholder>
+          </Card.Subtitle>
+
+          <Card.Body>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={2} /> <Placeholder xs={4} />
+            </Placeholder>
+            <hr />
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={2} /> <Placeholder xs={4} />
+            </Placeholder>
+            <hr />
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={2} /> <Placeholder xs={4} />
+            </Placeholder>
+            <hr />
+          </Card.Body>
+        </Card>
+      );
+    });
+  };
+
 
   //#endregion
 

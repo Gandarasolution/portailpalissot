@@ -49,7 +49,6 @@ const AppareilsPage = () => {
 
   const MockupListeappareils = () => {
     let _listeAppareil = [];
-
     for (
       let index = 0;
       index < getRandomInt(getRandomInt(0, 4), getRandomInt(15, 26));
@@ -74,6 +73,7 @@ const AppareilsPage = () => {
       _listeAppareil.push(_app);
     }
     setListeAppareils(_listeAppareil);
+
   };
 
   function GetLibEtatById(idEtat) {
