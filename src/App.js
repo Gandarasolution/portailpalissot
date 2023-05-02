@@ -18,6 +18,7 @@ import { faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder } fro
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AppareilsPage from './Views/Maintenance/Appareils/AppareilsPage';
+import InterventionPage from './Views/Depannage/Interventions/InterventionsPage';
 // import Sidebar from './components/menu/SidebarMenuV2';
 //#endregion
 
@@ -34,13 +35,13 @@ function App() {
 
 
 
-
+//Joste font family
 
 
   return (
 
     <Router>
-      <div className='App'>
+      <div className='App font-link'>
 
 
 
@@ -51,7 +52,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/maintenance/contrat" element={<ContratPage />} />
             <Route path="/maintenance/appareils" element={<AppareilsPage />} />
-
+            <Route path="/depannage/interventions" element={<InterventionPage />} />
 
           </Routes>
 

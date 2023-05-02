@@ -1,5 +1,5 @@
 //#region Imports
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#region Bootstrap
@@ -20,6 +20,11 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
 import Popover from "react-bootstrap/Popover";
+import Accordion from "react-bootstrap/Accordion";
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+
+
 //#endregion
 
 //#region FontAwsome
@@ -40,13 +45,13 @@ import {
 //#endregion
 
 //#region Components
-import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
+// import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
 
 //#endregion
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
-import { Accordion } from "react-bootstrap";
+import { Pagination, Stack } from "react-bootstrap";
 
 const ContratPrestation = ({
   Prestations,
@@ -113,11 +118,15 @@ const ContratPrestation = ({
   const [filterEC, setFilterEC] = useState(false);
   const [filterT, setFilterT] = useState(false);
 
+  const [nbParPages, setNbParPages] = useState(10);
+  const [pageActuelle, setPageActuelle] = useState(1);
+
   //#endregion
 
   const [modaleShow, setModalShow] = useState(false);
   const [prestaSelected, setPrestaSelected] = useState(null);
-
+  const [prestaMoisSelected, setPrestaMoisSelected] = useState(null);
+  const [gridColMDValue, setGridColMDValue] = useState(12);
   const [search, setSearch] = useState("");
 
   //#endregion
@@ -225,15 +234,15 @@ const ContratPrestation = ({
   function GetLibEtat(e) {
     switch (e) {
       case 1:
-        return "Non plannifiée";
+        return "Non planifiée";
       case 2:
-        return "Planifiée";
+        return "Planifiée    ";
       case 3:
-        return "En cours";
+        return "En cours     ";
       case 4:
-        return "Terminée";
+        return "Terminée     ";
       case -1:
-        return "Tous";
+        return "Tous         ";
       default:
         return "Non planifiée";
     }
@@ -297,7 +306,7 @@ const ContratPrestation = ({
       case 4:
         return filterT;
       default:
-        return filterTous;
+        return null;
     }
   }
 
@@ -312,7 +321,7 @@ const ContratPrestation = ({
       case 4:
         return setFilterT;
       default:
-        return setFilterTous;
+        return null;
     }
   }
 
@@ -324,24 +333,77 @@ const ContratPrestation = ({
     setSearch(event.target.value);
   };
 
+  const handleTousFilter = () => {
+    let _valueStart = JSON.parse(JSON.stringify(filterTous));
+
+    if (_valueStart) {
+      //on décoche la case tous : vérification qu'il y a au moins 1 filtre actif
+      if (filterEC || filterNP || filterP || filterT) {
+        setFilterTous(false);
+      }
+    } else {
+      //on coche la case tous : on décoche tous les filtres
+
+      setFilterEC(false);
+      setFilterNP(false);
+      setFilterP(false);
+      setFilterT(false);
+
+      setFilterTous(true);
+    }
+  };
+
+  const handleEtatsFilter = (props) => {
+    let _valueStart = JSON.parse(JSON.stringify(props.state));
+
+    if (_valueStart) {
+      //on décoche la case d'un filtre : vérification qu'il y a au moins un autre filtre sinon on coche la case tous
+      props.setState(false);
+    } else {
+      //on coche la case d'un filtre : on décoche la case Tous
+      setFilterTous(false);
+      props.setState(true);
+    }
+  };
+
   const GroupClickedCollapse = (e) => {
+    //change la valeur du state gérant le collapse
     GetSetStateOpen(e)(!GetStateOpen(e));
+
+    //Annule l'affichage des documents/tâches
+    setPrestaSelected(null);
+    setPrestaMoisSelected(null);
+    //La table prend toute la place
+    setGridColMDValue(12);
   };
 
   const handleCardClicked = (presta) => {
+    //Récupère les données
     MockupListeTache();
+
     setPrestaSelected(presta);
+
+    //Affiche la modale
     setModalShow(true);
   };
 
-  const handleFilter = (value, setState) => {
-    setFilterNP(false);
-    setFilterEC(false);
-    setFilterP(false);
-    setFilterT(false);
-    setFilterTous(false);
-
-    setState(value);
+  const handleRowClicked = (presta, mois) => {
+    if (
+      prestaSelected !== null &&
+      prestaSelected.id === presta.id &&
+      prestaMoisSelected !== null &&
+      prestaMoisSelected === mois
+    ) {
+      //Même sélection (déselection)
+      setGridColMDValue(12);
+      setPrestaSelected(null);
+      setPrestaMoisSelected(null);
+    } else {
+      setGridColMDValue(10);
+      setPrestaSelected(presta);
+      setPrestaMoisSelected(mois);
+      MockupListeTache();
+    }
   };
 
   //#endregion
@@ -373,18 +435,36 @@ const ContratPrestation = ({
   };
 
   const ButtonFilter = (IdEtat) => {
-    return (
-      <Button
-        className={
-          GetFilterState(IdEtat)
-            ? "btn-filter-active border"
-            : "btn-filter border"
-        }
-        onClick={() => handleFilter(true, GetFilterSetState(IdEtat))}
-      >
-        {GetLibEtat(IdEtat)}
-      </Button>
-    );
+    if (IdEtat === -1) {
+      return (
+        <Button
+          className={
+            filterTous ? "btn-filter-active border" : "btn-filter border"
+          }
+          onClick={() => handleTousFilter()}
+        >
+          {GetLibEtat(IdEtat)}
+        </Button>
+      );
+    } else {
+      return (
+        <Button
+          className={
+            GetFilterState(IdEtat)
+              ? "btn-filter-active border"
+              : "btn-filter border"
+          }
+          onClick={() =>
+            handleEtatsFilter({
+              state: GetFilterState(IdEtat),
+              setState: GetFilterSetState(IdEtat),
+            })
+          }
+        >
+          {GetLibEtat(IdEtat)}
+        </Button>
+      );
+    }
   };
 
   const SearchPrestation = () => {
@@ -413,12 +493,69 @@ const ContratPrestation = ({
               onChange={handleSearch}
             />
           </Container>
-        </Container>
 
-        <div className="m-2">{ParentComponentPeriodeSelect}</div>
+          <div className="m-2" style={{ flex: "1" }}>
+            {ParentComponentPeriodeSelect}
+          </div>
+        </Container>
       </Container>
     );
   };
+
+  const PaginationPrestations = () => {
+    let _items = [];
+    
+    let _limiter = 0;
+    
+    Prestations.forEach((presta) => {
+      for (let index = 0; index < 12; index++) {
+        if (presta.mois[index] > 0) {
+          _limiter += 1;
+        }
+      }
+    });
+    
+    _items.push(<Pagination.Prev key={0} onClick={()=> pageActuelle <= 1 ? null : setPageActuelle(pageActuelle - 1) } />);
+    for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
+      _items.push(
+        <Pagination.Item
+          key={number}
+          active={number === pageActuelle}
+          onClick={() => setPageActuelle(number)}
+        >
+          {number}
+        </Pagination.Item>
+      );
+    }
+    _items.push(<Pagination.Next key={_items.length + 1} onClick={()=> pageActuelle >=  _limiter / nbParPages ? null : setPageActuelle(pageActuelle + 1) } />);
+
+    return <Stack direction="horizontal">
+      <Pagination className="m-2">{_items}</Pagination>
+      {DrodpdownNbPages()}
+      </Stack>
+  };
+
+
+  const DrodpdownNbPages = () => {
+
+    return(
+      <DropdownButton       variant=""
+      className="border button-periode"
+      drop="down-centered"
+      style={{ borderRadius: "10px" }}
+      title={`${nbParPages} / page`}
+      
+      >
+
+        <Dropdown.Item onClick={()=> {setNbParPages(10); setPageActuelle(1)}}>10 / page</Dropdown.Item>
+        <Dropdown.Item onClick={()=> {setNbParPages(20); setPageActuelle(1)}}>20 / page</Dropdown.Item>
+        <Dropdown.Item onClick={()=> {setNbParPages(50); setPageActuelle(1)}}>50 / page</Dropdown.Item>
+        <Dropdown.Item onClick={()=> {setNbParPages(100); setPageActuelle(1)}}>100 / page</Dropdown.Item>
+ 
+    </DropdownButton>
+    )
+  }
+
 
   //#endregion
 
@@ -444,7 +581,6 @@ const ContratPrestation = ({
     });
   };
 
- 
   /**
    *
    * @returns Le tableau des prestations, groupés par mois.
@@ -452,7 +588,7 @@ const ContratPrestation = ({
   const TableGroupedMonth = () => {
     const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
     return (
-      <Table className="table table-radius m-2">
+      <Table className="table-basic ">
         {TableHead()}
 
         {RowGroupMois(_numMoisDebutPrestation)}
@@ -473,17 +609,27 @@ const ContratPrestation = ({
 
   const TableHead = () => {
     return (
-      <thead className="table-header">
+      <thead className="m-2 table-basic-header">
         <tr>
-          <th>Secteur</th>
-          <th>N° de prestation</th>
-          <th>Libellé</th>
-          <th>Etat</th>
+          <th className="table-basic-header-cell-first table-basic-header-cell-text">
+            Secteur
+          </th>
+          <th className="table-basic-header-cell table-basic-header-cell-text">
+            N° de prestation
+          </th>
+          <th className="table-basic-header-cell table-basic-header-cell-text">
+            Libellé
+          </th>
+          <th className="table-basic-header-cell-last table-basic-header-cell-text">
+            Etat
+          </th>
         </tr>
       </thead>
     );
   };
 
+  let nombreAffiche = nbParPages * -1 * (pageActuelle - 1);
+  // let nombreAffiche =  0;
   /**
    *
    * @param {* Le numéro du mois (janvier = 1, décmebre = 12) } numeroDuMois
@@ -503,56 +649,60 @@ const ContratPrestation = ({
       );
 
       if (!filterTous) {
-        if (filterNP)
-          _lPrestation = _lPrestation.filter(
-            (item) => item.mois.at(_numMois - 1) === 1
-          );
-        if (filterP)
-          _lPrestation = _lPrestation.filter(
-            (item) => item.mois.at(_numMois - 1) === 2
-          );
-        if (filterEC)
-          _lPrestation = _lPrestation.filter(
-            (item) => item.mois.at(_numMois - 1) === 3
-          );
-        if (filterT)
-          _lPrestation = _lPrestation.filter(
-            (item) => item.mois.at(_numMois - 1) === 4
-          );
+        let _arrayFilterIdEtat = [];
+        if (filterNP) _arrayFilterIdEtat.push(1);
+        if (filterP) _arrayFilterIdEtat.push(2);
+        if (filterEC) _arrayFilterIdEtat.push(3);
+        if (filterT) _arrayFilterIdEtat.push(4);
+
+        _lPrestation = _lPrestation.filter((item) =>
+          _arrayFilterIdEtat.includes(item.mois.at(_numMois - 1))
+        );
       }
 
       return (
         <tbody>
           {_lPrestation.length > 0 ? (
-            <tr>
-              <td colSpan={4} onClick={() => GroupClickedCollapse(_numMois)}>
-                <div className="shadow border rounded-pill bg-ligth border-secondary">
-                  <Row>
-                    <Col>
-                      {GetNomMois(_numMois)}{" "}
-                      {numeroDuMois > 12
-                        ? datePrestation.getFullYear() + 1
-                        : datePrestation.getFullYear()}{" "}
-                      ({_lPrestation.length}) :
-                    </Col>
-                    <Col>{ButtonAreaControl(_numMois)}</Col>
-                  </Row>
-                </div>
-              </td>
-            </tr>
+            nombreAffiche > nbParPages ||
+            nombreAffiche + _lPrestation.length < 0 ? null : (
+              <tr>
+                <td colSpan={4} onClick={() => GroupClickedCollapse(_numMois)}>
+                  <div className=" rounded-pill bg-ligth border-secondary table-basic-row-group">
+                    <Row>
+                      <Col>
+                        <strong>
+                          {GetNomMois(_numMois)}{" "}
+                          {numeroDuMois > 12
+                            ? datePrestation.getFullYear() + 1
+                            : datePrestation.getFullYear()}{" "}
+                          ({_lPrestation.length}) :
+                        </strong>
+                      </Col>
+                      <Col>{ButtonAreaControl(_numMois)}</Col>
+                    </Row>
+                  </div>
+                </td>
+              </tr>
+            )
           ) : null}
 
           {_lPrestation.map((presta) => {
+            if (nombreAffiche >= nbParPages || nombreAffiche < 0) {
+              nombreAffiche += 1;
+              return null;
+            }
+            nombreAffiche += 1;
             return (
               <OverlayTrigger
                 trigger={"click"}
-                rootClose
+                rootClosed
                 placement="right"
                 overlay={PopoverDocs}
                 key={presta.id}
               >
                 <Collapse
-                  onClick={() => MockupListeTache()}
+                  // key={presta.id}
+                  onClick={() => handleRowClicked(presta, _numMois)}
                   in={GetStateOpen(_numMois)}
                 >
                   <tr>
@@ -560,14 +710,12 @@ const ContratPrestation = ({
                     <td>{presta.id}</td>
                     <td>{HighlightTextIfSearch(presta.libelle)}</td>
                     <td>
-                      {" "}
                       <Badge
                         pill
                         bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
                       >
-                        {" "}
-                        {GetLibEtat(presta.mois.at(_numMois - 1))}{" "}
-                      </Badge>{" "}
+                        {GetLibEtat(presta.mois.at(_numMois - 1))}
+                      </Badge>
                     </td>
                   </tr>
                 </Collapse>
@@ -607,7 +755,7 @@ const ContratPrestation = ({
 
   const PopoverDocs = (
     <Popover id="popover-basic">
-      <Popover.Header as="h3" className="m-2">
+      <Popover.Header as="h3" className="m-2 popover-liste">
         Liste des tâches ({listeTaches.length})
         <Button
           variant="contained"
@@ -635,7 +783,7 @@ const ContratPrestation = ({
         </Collapse>
       </Popover.Body>
 
-      <Popover.Header as="h3" className="m-2">
+      <Popover.Header as="h3" className="m-2 popover-liste">
         Liste des documents
         <Button
           variant="contained"
@@ -674,7 +822,7 @@ const ContratPrestation = ({
             return (
               <Card
                 key={presta.id}
-                className="m-2 p-2 shadow border-secondary"
+                className="m-2 p-2  border-secondary"
                 // onClick={() => handleCardClicked(presta)}
               >
                 <Accordion defaultActiveKey={index}>
@@ -851,7 +999,6 @@ const ContratPrestation = ({
     );
   };
 
-
   const PlaceHolderCard = (numberOfCards) => {
     let _arrayLoading = [];
     for (let index = 0; index < numberOfCards; index++) {
@@ -891,22 +1038,32 @@ const ContratPrestation = ({
     });
   };
 
-
   //#endregion
 
   //#endregion
+
+  useEffect(() => {});
 
   return (
     <BreakpointProvider>
-      <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>
+      {/* <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}> */}
+
+      <Container fluid className="background">
+        <Col md={2}>
+          <span className="title">Plannification </span>|{" "}
+          <span className="subtitle"> {Prestations.length} prestations </span>
+        </Col>
         {SearchPrestation()}
 
-        <Container fluid>
+        <Container fluid className="container-table">
           <Breakpoint large up>
             <Row>
-              <Col md={10}>{TableGroupedMonth()}</Col>
-
-              <Col md={4}></Col>
+              <Col md={gridColMDValue}>
+                {TableGroupedMonth()} {PaginationPrestations()} 
+              </Col>
+              {gridColMDValue !== 12 ? (
+                <Col md={gridColMDValue === 12 ? 0 : 12 - gridColMDValue}></Col>
+              ) : null}
             </Row>
           </Breakpoint>
 
@@ -915,7 +1072,8 @@ const ContratPrestation = ({
             {ModalDocuments()}
           </Breakpoint>
         </Container>
-      </WhiteShadowCard>
+      </Container>
+      {/* </WhiteShadowCard> */}
     </BreakpointProvider>
   );
 };

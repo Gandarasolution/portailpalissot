@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 //#region FontAwsome icones
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faFilter,
   faMobileAlt,
   faSort,
   faSortDown,
@@ -18,6 +17,11 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
 import Table from "react-bootstrap/Table";
+import Image from "react-bootstrap/Image";
+import Badge from "react-bootstrap/Badge";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Card from "react-bootstrap/Card";
+
 //#endregion
 
 //#region Components
@@ -27,7 +31,6 @@ import WhiteShadowCard from "../../../components/commun/WhiteShadowCard";
 
 //#region DEV
 import { loremIpsum } from "react-lorem-ipsum";
-import { Badge, Card, Image } from "react-bootstrap";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#endregion
@@ -73,7 +76,6 @@ const AppareilsPage = () => {
       _listeAppareil.push(_app);
     }
     setListeAppareils(_listeAppareil);
-
   };
 
   function GetLibEtatById(idEtat) {
@@ -231,7 +233,7 @@ const AppareilsPage = () => {
   };
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  
+
   //#endregion
 
   //#region Component
@@ -254,54 +256,79 @@ const AppareilsPage = () => {
   };
 
   const ButtonFilter = (props) => {
-    return ( 
+    return (
       <Button
         onClick={() => props.methodState(!props.state)}
-        variant={props.state ? GetBGColorAppareilEtat(props.IdEtat) : "light"}
-        className={`m-1 border-${GetBGColorAppareilEtat(props.IdEtat)}`}
+        variant=""
+        className={
+          props.state ? "btn-filter-active border" : "btn-filter border"
+        }
       >
-        <FontAwesomeIcon icon={faFilter} /> {props.title} ({props.number})
+        {GetImageAppareilEtat(props.IdEtat, "img-bt-filter")}
+        {props.title} ({props.number})
       </Button>
     );
   };
 
   const FilterFindPanel = () => {
     return (
-      <Container>
-        {listeAppareils.filter((appar) => appar.IdEtat === 2).length > 0 &&
-          ButtonFilter({
-            title: "Actif",
-            methodState: SetFilterActif,
-            state: filterActif,
-            number: listeAppareils.filter((appar) => appar.IdEtat === 2).length,
-            IdEtat: 2,
-          })}
+      <Container fluid className="d-flex flex-column">
+        <Container fluid className="d-flex flex-row" style={{flex: "2"}}>
 
-        {listeAppareils.filter((appar) => appar.IdEtat === 1).length > 0 &&
-          ButtonFilter({
-            title: "Hors contrat",
-            methodState: SetFilterHorscontrat,
-            state: filterHorscontrat,
-            number: listeAppareils.filter((appar) => appar.IdEtat === 1).length,
-            IdEtat: 1,
-          })}
+          <Container fluid className="m-2" style={{ flex: "1" }}>
+            <ButtonGroup>
+              {listeAppareils.filter((appar) => appar.IdEtat === 2).length >
+                0 &&
+                ButtonFilter({
+                  title: "Actif",
+                  methodState: SetFilterActif,
+                  state: filterActif,
+                  number: listeAppareils.filter((appar) => appar.IdEtat === 2)
+                    .length,
+                  IdEtat: 2,
+                })}
 
-        {listeAppareils.filter((appar) => appar.IdEtat === 3).length > 0 &&
-          ButtonFilter({
-            title: "Détruit",
-            methodState: SetFilterDetruit,
-            state: filterDetruit,
-            number: listeAppareils.filter((appar) => appar.IdEtat === 3).length,
-            IdEtat: 3,
-          })}
-        {SearchAppareil()}
-      </Container>
+              {listeAppareils.filter((appar) => appar.IdEtat === 1).length >
+                0 &&
+                ButtonFilter({
+                  title: "Hors contrat",
+                  methodState: SetFilterHorscontrat,
+                  state: filterHorscontrat,
+                  number: listeAppareils.filter((appar) => appar.IdEtat === 1)
+                    .length,
+                  IdEtat: 1,
+                })}
+
+              {listeAppareils.filter((appar) => appar.IdEtat === 3).length >
+                0 &&
+                ButtonFilter({
+                  title: "Détruit",
+                  methodState: SetFilterDetruit,
+                  state: filterDetruit,
+                  number: listeAppareils.filter((appar) => appar.IdEtat === 3)
+                    .length,
+                  IdEtat: 3,
+                })}
+            </ButtonGroup>
+          </Container>
+
+          <Container className="m-2" style={{ flex: "2" }}>
+            <Form.Control
+              type="search"
+              placeholder="Rechercher"
+              aria-label="Search"
+              onChange={handleSearch}
+            />
+          </Container>
+        </Container>
+       </Container>
     );
   };
 
-  const GetImageAppareilEtat = (IdEtat) => {
+  const GetImageAppareilEtat = (IdEtat, className) => {
     return (
       <Image
+        className={className}
         src={
           IdEtat === 1
             ? AppareilGrey
@@ -467,17 +494,15 @@ const AppareilsPage = () => {
 
   //#endregion
 
-
-
   useEffect(() => {
     async function makeRequest() {
       await delay(1000);
-      
+
       setIsLoaded(true);
     }
     makeRequest();
     MockupListeappareils();
-  },[isLoaded]);
+  }, [isLoaded]);
 
   return (
     <Container fluid>

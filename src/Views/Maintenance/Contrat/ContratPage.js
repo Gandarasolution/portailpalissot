@@ -30,7 +30,7 @@ const ContratPage = () => {
 
   const Contrat = {
     IdContrat: 2557,
-    DateSouscrit: "12/01/2018",
+    DateSouscrit: "12/04/2018",
     TypeContrat: "Classique : Du Lundi au Vendredi aux horaires de bureau",
     Indice: "Taux fixe",
     TypeFacturation: "A date d'anniversaire du contrat",
@@ -43,7 +43,7 @@ const ContratPage = () => {
       id: 1,
       libelle: "	Entretien annuel de la ventilation",
       secteur: "toiture",
-      mois: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      mois: [1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0],
     },
     {
       id: 2,
@@ -177,7 +177,8 @@ const ContratPage = () => {
   //#endregion
 
   //#region States
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoadedContrat, setIsLoadedContrat] = useState(false);
+  const [isLoadedPresta, setIsLoadedPresta] = useState(false);
 
   const [Prestations, SetPrestations] = useState(_Prestations);
 
@@ -257,7 +258,7 @@ const ContratPage = () => {
     let _dateDebutPeriode = new Date(_dateTMP);
     setDateDebutPeriode(_dateDebutPeriode);
 
-    setIsLoaded(false);
+    setIsLoadedPresta(false);
     await MockupDataPrestation();
     // setIsLoaded(true);
   };
@@ -267,7 +268,7 @@ const ContratPage = () => {
     _dateTMP = subOneYear(_dateTMP);
     let _dateDebutPeriode = new Date(_dateTMP);
     setDateDebutPeriode(_dateDebutPeriode);
-    setIsLoaded(false);
+    setIsLoadedPresta(false);
 
     await MockupDataPrestation();
   };
@@ -276,7 +277,7 @@ const ContratPage = () => {
     let _dateTemp = new Date(dateStart);
 
     setDateDebutPeriode(_dateTemp);
-    setIsLoaded(false);
+    setIsLoadedPresta(false);
 
     await MockupDataPrestation();
   };
@@ -303,7 +304,7 @@ const ContratPage = () => {
     return (
       <DropdownButton
         variant=""
-        className="border "
+        className="border button-periode"
         drop="down-centered"
         style={{ borderRadius: "10px" }}
         id="dropdown-datePeriode"
@@ -337,17 +338,18 @@ const ContratPage = () => {
     async function makeRequest() {
       await delay(1000);
 
-      setIsLoaded(true);
+      setIsLoadedContrat(true);
+      setIsLoadedPresta(true);
     }
     makeRequest();
-  }, [isLoaded]);
+  }, [isLoadedPresta]);
 
   return (
     <Container fluid>
-      <ContratInfo Contrat={Contrat} IsLoaded={isLoaded} />
+      {/* <ContratInfo Contrat={Contrat} IsLoaded={isLoadedContrat} /> */}
 
       <ContratPrestation
-        IsLoaded={isLoaded}
+        IsLoaded={isLoadedPresta}
         Prestations={Prestations}
         datePrestation={dateDebutPeriode}
         ParentComponentPeriodeSelect={
@@ -356,7 +358,7 @@ const ContratPage = () => {
               <Stack direction="horizontal" className="centerStack " gap={1}>
                 <Button
                   variant=""
-                  className="border"
+                  className="border button-periode"
                   onClick={() => SoustraireUnAnPeriode()}
                 >
                   <FontAwesomeIcon icon={faArrowLeft} />
@@ -366,7 +368,7 @@ const ContratPage = () => {
 
                 <Button
                   variant=""
-                  className="border"
+                  className="border button-periode"
                   onClick={() => AjouterUnAnPeriode()}
                 >
                   <FontAwesomeIcon icon={faArrowRight} />
@@ -378,14 +380,14 @@ const ContratPage = () => {
               <Stack direction="horizontal" className="centerStack" gap={1}>
                 <Button
                   variant=""
-                  className="border"
+                  className="border button-periode"
                   onClick={() => SoustraireUnAnPeriode()}
                 >
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </Button>
                 <Button
                   variant=""
-                  className="border"
+                  className="border button-periode"
                   onClick={() => AjouterUnAnPeriode()}
                 >
                   <FontAwesomeIcon icon={faArrowRight} />
