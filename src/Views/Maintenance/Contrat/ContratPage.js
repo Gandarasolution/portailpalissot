@@ -345,7 +345,7 @@ const ContratPage = () => {
   }, [isLoadedPresta]);
 
   return (
-    <Container fluid>
+    <Container fluid > 
       {/* <ContratInfo Contrat={Contrat} IsLoaded={isLoadedContrat} /> */}
 
       <ContratPrestation

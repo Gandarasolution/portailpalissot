@@ -19,11 +19,15 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
-import Popover from "react-bootstrap/Popover";
+// import Popover from "react-bootstrap/Popover";
 import Accordion from "react-bootstrap/Accordion";
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Image from "react-bootstrap/Image";
+import Pagination from "react-bootstrap/Pagination";
+import Stack from "react-bootstrap/Stack";
 
+// import { Image, Pagination, Stack } from "react-bootstrap";
 
 //#endregion
 
@@ -48,10 +52,10 @@ import {
 // import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
 
 //#endregion
+import { loremIpsum } from "react-lorem-ipsum";
+import { Link } from "react-router-dom";
 
 //#endregion
-import { loremIpsum } from "react-lorem-ipsum";
-import { Pagination, Stack } from "react-bootstrap";
 
 const ContratPrestation = ({
   Prestations,
@@ -59,6 +63,11 @@ const ContratPrestation = ({
   ParentComponentPeriodeSelect,
   IsLoaded,
 }) => {
+  const ImgJPG = require("../../../../image/jpg.png");
+  const ImgPDF = require("../../../../image/pdf.png");
+  const ImgPNG = require("../../../../image/png.png");
+  const ImgDOC = require("../../../../image/doc.png");
+
   //#region Mockup
 
   const [listeTaches, setListeTaches] = useState([]);
@@ -325,6 +334,19 @@ const ContratPrestation = ({
     }
   }
 
+  function GetImageExtension(extension) {
+    switch (extension.toUpperCase()) {
+      case "JPG":
+        return ImgJPG;
+      case "PDF":
+        return ImgPDF;
+      case "PNG":
+        return ImgPNG;
+      default:
+        return ImgDOC;
+    }
+  }
+
   //#endregion
 
   //#region Evenements
@@ -502,64 +524,169 @@ const ContratPrestation = ({
     );
   };
 
+  const handlePagePrev = () => {
+    if (pageActuelle > 1) {
+      setPageActuelle(pageActuelle - 1);
+
+      //Annule l'affichage des documents/tâches
+      setPrestaSelected(null);
+      setPrestaMoisSelected(null);
+      //La table prend toute la place
+      setGridColMDValue(12);
+    }
+  };
+
+  const handlePageChange = (number) => {
+    setPageActuelle(number);
+    //Annule l'affichage des documents/tâches
+    setPrestaSelected(null);
+    setPrestaMoisSelected(null);
+    //La table prend toute la place
+    setGridColMDValue(12);
+  };
+
+  const handlePageNext = (number) => {
+    if (pageActuelle < number) {
+      setPageActuelle(pageActuelle + 1);
+      //Annule l'affichage des documents/tâches
+      setPrestaSelected(null);
+      setPrestaMoisSelected(null);
+      //La table prend toute la place
+      setGridColMDValue(12);
+    }
+  };
+
   const PaginationPrestations = () => {
     let _items = [];
-    
+
     let _limiter = 0;
-    
-    Prestations.forEach((presta) => {
+
+    let _lPrestation = GetPrestationSearched();
+
+    _lPrestation.forEach((presta) => {
       for (let index = 0; index < 12; index++) {
         if (presta.mois[index] > 0) {
           _limiter += 1;
         }
       }
     });
-    
-    _items.push(<Pagination.Prev key={0} onClick={()=> pageActuelle <= 1 ? null : setPageActuelle(pageActuelle - 1) } />);
+
+    _items.push(
+      <Pagination.Prev
+        key={0}
+        onClick={() => handlePagePrev()}
+        className="m-1"
+      />
+    );
     for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
       _items.push(
         <Pagination.Item
           key={number}
           active={number === pageActuelle}
-          onClick={() => setPageActuelle(number)}
+          onClick={() => handlePageChange(number)}
+          className="m-1"
         >
           {number}
         </Pagination.Item>
       );
     }
-    _items.push(<Pagination.Next key={_items.length + 1} onClick={()=> pageActuelle >=  _limiter / nbParPages ? null : setPageActuelle(pageActuelle + 1) } />);
+    _items.push(
+      <Pagination.Next
+        key={_items.length + 1}
+        // onClick={() =>
+        //   pageActuelle >= _limiter / nbParPages
+        //     ? null
+        //     : setPageActuelle(pageActuelle + 1)
+        // }
+        onClick={() => handlePageNext(_limiter / nbParPages)}
+        className="m-1"
+      />
+    );
 
-    return <Stack direction="horizontal">
-      <Pagination className="m-2">{_items}</Pagination>
-      {DrodpdownNbPages()}
+    return (
+      <Stack direction="horizontal">
+        <Pagination className="m-2">{_items}</Pagination>
+        {DrodpdownNbPages()}
       </Stack>
+    );
   };
 
-
   const DrodpdownNbPages = () => {
-
-    return(
-      <DropdownButton       variant=""
-      className="border button-periode"
-      drop="down-centered"
-      style={{ borderRadius: "10px" }}
-      title={`${nbParPages} / page`}
-      
+    return (
+      <DropdownButton
+        variant=""
+        className="border button-periode"
+        drop="down-centered"
+        style={{ borderRadius: "10px" }}
+        title={`${nbParPages} / page`}
       >
-
-        <Dropdown.Item onClick={()=> {setNbParPages(10); setPageActuelle(1)}}>10 / page</Dropdown.Item>
-        <Dropdown.Item onClick={()=> {setNbParPages(20); setPageActuelle(1)}}>20 / page</Dropdown.Item>
-        <Dropdown.Item onClick={()=> {setNbParPages(50); setPageActuelle(1)}}>50 / page</Dropdown.Item>
-        <Dropdown.Item onClick={()=> {setNbParPages(100); setPageActuelle(1)}}>100 / page</Dropdown.Item>
- 
-    </DropdownButton>
-    )
-  }
-
+        <Dropdown.Item
+          onClick={() => {
+            setNbParPages(10);
+            setPageActuelle(1);
+          }}
+        >
+          10 / page
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={() => {
+            setNbParPages(20);
+            setPageActuelle(1);
+          }}
+        >
+          20 / page
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={() => {
+            setNbParPages(50);
+            setPageActuelle(1);
+          }}
+        >
+          50 / page
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={() => {
+            setNbParPages(100);
+            setPageActuelle(1);
+          }}
+        >
+          100 / page
+        </Dropdown.Item>
+      </DropdownButton>
+    );
+  };
 
   //#endregion
 
   //#region large
+
+  const RowDocument = (props) => {
+    return (
+      <Row className="mb-1">
+        <Col md={3}>{ImageExtension(props.extension)}</Col>
+        <Col md={9}>
+          <Row>
+            <p className="mb-0 document-title">{`${props.title}.${props.extension}`}</p>
+            <span className="document-size">
+              {`${props.size}`}
+              <Link className="document-links">Voir</Link>
+              <Link className="document-links">Télécharger</Link>
+            </span>
+          </Row>
+        </Col>
+      </Row>
+    );
+  };
+
+  const ImageExtension = (extension) => {
+    return (
+      <Image
+        src={GetImageExtension(extension)}
+        height={42}
+        alt={`Icone ${extension} Crédit Dimitriy Morilubov`}
+      />
+    );
+  };
 
   const PlaceHolderTableLine = (numberOfLines) => {
     let _arrayLoading = [];
@@ -588,7 +715,7 @@ const ContratPrestation = ({
   const TableGroupedMonth = () => {
     const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
     return (
-      <Table className="table-basic ">
+      <Table className="table-presta ">
         {TableHead()}
 
         {RowGroupMois(_numMoisDebutPrestation)}
@@ -609,19 +736,19 @@ const ContratPrestation = ({
 
   const TableHead = () => {
     return (
-      <thead className="m-2 table-basic-header">
+      <thead className="m-2">
         <tr>
-          <th className="table-basic-header-cell-first table-basic-header-cell-text">
-            Secteur
+          <th>
+            <div className="table-presta-header-first">Secteur</div>
           </th>
-          <th className="table-basic-header-cell table-basic-header-cell-text">
-            N° de prestation
+          <th>
+            <div className="table-presta-header">N°</div>
           </th>
-          <th className="table-basic-header-cell table-basic-header-cell-text">
-            Libellé
+          <th>
+            <div className="table-presta-header">Libellé</div>
           </th>
-          <th className="table-basic-header-cell-last table-basic-header-cell-text">
-            Etat
+          <th>
+            <div className="table-presta-header-last">Etat</div>
           </th>
         </tr>
       </thead>
@@ -629,7 +756,6 @@ const ContratPrestation = ({
   };
 
   let nombreAffiche = nbParPages * -1 * (pageActuelle - 1);
-  // let nombreAffiche =  0;
   /**
    *
    * @param {* Le numéro du mois (janvier = 1, décmebre = 12) } numeroDuMois
@@ -662,7 +788,7 @@ const ContratPrestation = ({
 
       return (
         <tbody>
-          {_lPrestation.length > 0 ? (
+          {_lPrestation.length > 0 && 1 === 2 ? (
             nombreAffiche > nbParPages ||
             nombreAffiche + _lPrestation.length < 0 ? null : (
               <tr>
@@ -693,33 +819,43 @@ const ContratPrestation = ({
             }
             nombreAffiche += 1;
             return (
-              <OverlayTrigger
-                trigger={"click"}
-                rootClosed
-                placement="right"
-                overlay={PopoverDocs}
+              // <OverlayTrigger
+              //   trigger={"click"}
+              //   // rootClosed
+              //   placement="right"
+              //   overlay={PopoverDocs}
+              //   key={presta.id}
+              // >
+              <Collapse
                 key={presta.id}
+                onClick={() => handleRowClicked(presta, _numMois)}
+                in={GetStateOpen(_numMois)}
+                // className={presta.id === prestaSelected.id ? "table-presta-row-selected" : ""}
               >
-                <Collapse
-                  // key={presta.id}
-                  onClick={() => handleRowClicked(presta, _numMois)}
-                  in={GetStateOpen(_numMois)}
+                <tr
+                  className={
+                    prestaMoisSelected !== null &&
+                    prestaSelected !== null &&
+                    prestaSelected.id === presta.id &&
+                    prestaMoisSelected === _numMois
+                      ? "table-presta-row-selected"
+                      : ""
+                  }
                 >
-                  <tr>
-                    <td>{HighlightTextIfSearch(presta.secteur)} </td>
-                    <td>{presta.id}</td>
-                    <td>{HighlightTextIfSearch(presta.libelle)}</td>
-                    <td>
-                      <Badge
-                        pill
-                        bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
-                      >
-                        {GetLibEtat(presta.mois.at(_numMois - 1))}
-                      </Badge>
-                    </td>
-                  </tr>
-                </Collapse>
-              </OverlayTrigger>
+                  <td>{HighlightTextIfSearch(presta.secteur)} </td>
+                  <td>{presta.id}</td>
+                  <td>{HighlightTextIfSearch(presta.libelle)}</td>
+                  <td>
+                    <Badge
+                      pill
+                      bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
+                    >
+                      {GetLibEtat(presta.mois.at(_numMois - 1))}
+                    </Badge>
+                  </td>
+                </tr>
+              </Collapse>
+              // </OverlayTrigger>
             );
           })}
         </tbody>
@@ -753,58 +889,138 @@ const ContratPrestation = ({
     );
   };
 
-  const PopoverDocs = (
-    <Popover id="popover-basic">
-      <Popover.Header as="h3" className="m-2 popover-liste">
-        Liste des tâches ({listeTaches.length})
-        <Button
-          variant="contained"
-          aria-controls={`collapse-listeTaches`}
-          aria-expanded={openTaches}
-          onClick={() => setOpenTaches(!openTaches)}
-        >
-          {openTaches ? (
-            <FontAwesomeIcon icon={faCaretUp} />
-          ) : (
-            <FontAwesomeIcon icon={faCaretDown} />
-          )}
-        </Button>{" "}
-      </Popover.Header>
-      <Popover.Body>
-        <Collapse in={openTaches}>
-          <div
-            id="collapse-listeTaches"
-            style={{ height: "50vh", overflowY: "scroll" }}
+  const CardDocs = () => {
+    return (
+      <Card className="mb-2">
+        <Card.Header className="card-document">
+          Documents
+          <Button
+            variant="contained"
+            aria-controls={`collapse-listeDocuments`}
+            aria-expanded={openTaches}
+            onClick={() => setOpenDocuments(!openDocuments)}
           >
-            {listeTaches.map((tache) => {
-              return <p key={tache.id}>{tache.description}</p>;
-            })}
-          </div>
-        </Collapse>
-      </Popover.Body>
+            {openDocuments ? (
+              <FontAwesomeIcon icon={faCaretUp} />
+            ) : (
+              <FontAwesomeIcon icon={faCaretDown} />
+            )}
+          </Button>
+        </Card.Header>
+        <Card.Body>
+          <Collapse in={openDocuments}>
+            <div id="collapse-listeDocuments">
+              {RowDocument({
+                title: "Photo extranet",
+                extension: "jpg",
+                size: "32 MO",
+              })}
+              {RowDocument({ title: "CERFA", extension: "pdf", size: "18 MO" })}
+              {RowDocument({
+                title: "Fiche rammonage",
+                extension: "pdf",
+                size: "12 MO",
+              })}
+              {RowDocument({
+                title: "Rapport d'intervention",
+                extension: "pdf",
+                size: "46 MO",
+              })}
+            </div>
+          </Collapse>
+        </Card.Body>
+      </Card>
+    );
+  };
 
-      <Popover.Header as="h3" className="m-2 popover-liste">
-        Liste des documents
-        <Button
-          variant="contained"
-          aria-controls={`collapse-listeDocuments`}
-          aria-expanded={openTaches}
-          onClick={() => setOpenDocuments(!openDocuments)}
-        >
-          {openDocuments ? (
-            <FontAwesomeIcon icon={faCaretUp} />
-          ) : (
-            <FontAwesomeIcon icon={faCaretDown} />
-          )}
-        </Button>{" "}
-      </Popover.Header>
-      <Popover.Body>
-        <Collapse in={openDocuments}>
-          <div id="collapse-listeDocuments">{ButtonDownloadDocuments()}</div>
-        </Collapse>
-      </Popover.Body>
-    </Popover>
-  );
+  const CardListeTaches = () => {
+    if (listeTaches.length === 0) return null;
+    return (
+      <Card className="mb-2">
+        <Card.Header className="card-document ">
+          Liste des tâches
+          <Button
+            variant="contained"
+            aria-controls={`collapse-listeTaches`}
+            aria-expanded={openTaches}
+            onClick={() => setOpenTaches(!openTaches)}
+          >
+            {openTaches ? (
+              <FontAwesomeIcon icon={faCaretUp} />
+            ) : (
+              <FontAwesomeIcon icon={faCaretDown} />
+            )}
+          </Button>
+        </Card.Header>
+        <Card.Body>
+          <Collapse in={openTaches}>
+            <div
+              id="collapse-listeTaches"
+              style={{ height: "50vh", overflowY: "scroll" }}
+            >
+              {listeTaches.map((tache) => {
+                return <p key={tache.id}>{tache.description}</p>;
+              })}
+            </div>
+          </Collapse>
+        </Card.Body>
+      </Card>
+    );
+  };
+
+  // const PopoverDocs = (
+  //   // <Popover id="popover-basic">
+  //   //   <Popover.Header as="h3" className="m-2 popover-liste">
+  //   //     Liste des tâches ({listeTaches.length})
+  //   //     <Button
+  //   //       variant="contained"
+  //   //       aria-controls={`collapse-listeTaches`}
+  //   //       aria-expanded={openTaches}
+  //   //       onClick={() => setOpenTaches(!openTaches)}
+  //   //     >
+  //   //       {openTaches ? (
+  //   //         <FontAwesomeIcon icon={faCaretUp} />
+  //   //       ) : (
+  //   //         <FontAwesomeIcon icon={faCaretDown} />
+  //   //       )}
+  //   //     </Button>{" "}
+  //   //   </Popover.Header>
+  //   //   <Popover.Body>
+  //   //     <Collapse in={openTaches}>
+  //   //       <div
+  //   //         id="collapse-listeTaches"
+  //   //         style={{ height: "50vh", overflowY: "scroll" }}
+  //   //       >
+  //   //         {listeTaches.map((tache) => {
+  //   //           return <p key={tache.id}>{tache.description}</p>;
+  //   //         })}
+  //   //       </div>
+  //   //     </Collapse>
+  //   //   </Popover.Body>
+
+  //   //   <Popover.Header as="h3" className="m-2 popover-liste">
+  //   //     Liste des documents
+  //   //     <Button
+  //   //       variant="contained"
+  //   //       aria-controls={`collapse-listeDocuments`}
+  //   //       aria-expanded={openTaches}
+  //   //       onClick={() => setOpenDocuments(!openDocuments)}
+  //   //     >
+  //   //       {openDocuments ? (
+  //   //         <FontAwesomeIcon icon={faCaretUp} />
+  //   //       ) : (
+  //   //         <FontAwesomeIcon icon={faCaretDown} />
+  //   //       )}
+  //   //     </Button>{" "}
+  //   //   </Popover.Header>
+  //   //   <Popover.Body>
+  //   //     <Collapse in={openDocuments}>
+  //   //       <div id="collapse-listeDocuments">{ButtonDownloadDocuments()}</div>
+  //   //     </Collapse>
+  //   //   </Popover.Body>
+  //   // </Popover>
+
+  // );
 
   //#endregion
 
@@ -1048,9 +1264,9 @@ const ContratPrestation = ({
     <BreakpointProvider>
       {/* <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}> */}
 
-      <Container fluid className="background">
-        <Col md={2}>
-          <span className="title">Plannification </span>|{" "}
+      <Container fluid>
+        <Col md={12} style={{ textAlign: "start" }}>
+          <span className="title">Plannification </span>|
           <span className="subtitle"> {Prestations.length} prestations </span>
         </Col>
         {SearchPrestation()}
@@ -1059,10 +1275,13 @@ const ContratPrestation = ({
           <Breakpoint large up>
             <Row>
               <Col md={gridColMDValue}>
-                {TableGroupedMonth()} {PaginationPrestations()} 
+                {TableGroupedMonth()} {PaginationPrestations()}
               </Col>
+
               {gridColMDValue !== 12 ? (
-                <Col md={gridColMDValue === 12 ? 0 : 12 - gridColMDValue}></Col>
+                <Col md={gridColMDValue === 12 ? 0 : 12 - gridColMDValue}>
+                  {CardDocs()} {CardListeTaches()}
+                </Col>
               ) : null}
             </Row>
           </Breakpoint>
