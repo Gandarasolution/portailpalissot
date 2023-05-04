@@ -19,7 +19,6 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
-// import Popover from "react-bootstrap/Popover";
 import Accordion from "react-bootstrap/Accordion";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
@@ -667,10 +666,18 @@ const ContratPrestation = ({
         <Col md={9}>
           <Row>
             <p className="mb-0 document-title">{`${props.title}.${props.extension}`}</p>
-            <span className="document-size">
-              {`${props.size}`}
-              <Link className="document-links">Voir</Link>
-              <Link className="document-links">Télécharger</Link>
+            <span className="document-size">{`${props.size}`}</span>
+            <span className="document-links">
+              <Link to={ImgDOC} target="_blank">
+                Voir
+              </Link>
+              <Link
+                to={ImgDOC}
+                target="_blank"
+                download={`${props.title}_${prestaSelected.libelle}`}
+              >
+                Télécharger
+              </Link>
             </span>
           </Row>
         </Col>
@@ -819,18 +826,10 @@ const ContratPrestation = ({
             }
             nombreAffiche += 1;
             return (
-              // <OverlayTrigger
-              //   trigger={"click"}
-              //   // rootClosed
-              //   placement="right"
-              //   overlay={PopoverDocs}
-              //   key={presta.id}
-              // >
               <Collapse
                 key={presta.id}
                 onClick={() => handleRowClicked(presta, _numMois)}
                 in={GetStateOpen(_numMois)}
-                // className={presta.id === prestaSelected.id ? "table-presta-row-selected" : ""}
               >
                 <tr
                   className={
@@ -842,12 +841,20 @@ const ContratPrestation = ({
                       : ""
                   }
                 >
-                  <td>{HighlightTextIfSearch(presta.secteur)} </td>
-                  <td>{presta.id}</td>
-                  <td>{HighlightTextIfSearch(presta.libelle)}</td>
+                  <td>
+                    <span>{HighlightTextIfSearch(presta.secteur)} </span>
+                  </td>
+
+                  <td>
+                    <span> {presta.id}</span>
+                  </td>
+                  <td>
+                    <h1>{HighlightTextIfSearch(presta.libelle)}</h1>
+                  </td>
                   <td>
                     <Badge
-                      pill
+                     
+                    
                       bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
                     >
                       {GetLibEtat(presta.mois.at(_numMois - 1))}
@@ -855,7 +862,6 @@ const ContratPrestation = ({
                   </td>
                 </tr>
               </Collapse>
-              // </OverlayTrigger>
             );
           })}
         </tbody>
@@ -956,6 +962,7 @@ const ContratPrestation = ({
           <Collapse in={openTaches}>
             <div
               id="collapse-listeTaches"
+              className="body-taches"
               style={{ height: "50vh", overflowY: "scroll" }}
             >
               {listeTaches.map((tache) => {
@@ -1270,11 +1277,10 @@ const ContratPrestation = ({
           <span className="subtitle"> {Prestations.length} prestations </span>
         </Col>
         {SearchPrestation()}
-
-        <Container fluid className="container-table">
+        <Container fluid className="container-table p-4">
           <Breakpoint large up>
             <Row>
-              <Col md={gridColMDValue}>
+              <Col md={gridColMDValue} >
                 {TableGroupedMonth()} {PaginationPrestations()}
               </Col>
 

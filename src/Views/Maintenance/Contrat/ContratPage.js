@@ -336,7 +336,7 @@ const ContratPage = () => {
 
   useEffect(() => {
     async function makeRequest() {
-      await delay(1000);
+      await delay(1);
 
       setIsLoadedContrat(true);
       setIsLoadedPresta(true);
@@ -345,7 +345,7 @@ const ContratPage = () => {
   }, [isLoadedPresta]);
 
   return (
-    <Container fluid > 
+    <Container fluid className="h-100" > 
       {/* <ContratInfo Contrat={Contrat} IsLoaded={isLoadedContrat} /> */}
 
       <ContratPrestation
