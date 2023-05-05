@@ -39,6 +39,7 @@
 }
 
 
+
 .font-link {
   font-family: 'Jost', sans-serif;
 }
@@ -64,9 +65,7 @@
   min-height: 100vh !important;
 }
 
-.body-taches {
-  height: 25vh !important;
-}
+
 
 .centerStack {
   display: flex;
@@ -123,7 +122,9 @@
   text-align: start;
 }
 
-.table-presta-header-first {
+
+
+.table-presta th:first-child div{
   border: 1px solid #ccc;
   border-radius: 10px 0 0 10px;
   border-right: transparent;
@@ -131,10 +132,7 @@
   padding: 10px 5px;
 }
 
-
-
-
-.table-presta-header {
+.table-presta th div {
   border: 1px solid #ccc;
   border-right: transparent;
   border-left: transparent;
@@ -142,15 +140,13 @@
   padding: 10px 5px;
 }
 
-.table-presta-header-last {
+.table-presta th:last-child div{
   border: 1px solid #ccc;
   border-radius: 0 10px 10px 0;
   border-left: transparent;
   background-color: #f8f9fb !important;
   padding: 10px 5px;
-
 }
-
 
 .table-presta td {
   text-align: start;
@@ -173,6 +169,9 @@
 .table-presta th:hover{
   cursor: default;
 }
+
+
+
 
 .table-presta-row-selected{
   background-color: whitesmoke ;
@@ -240,5 +239,21 @@
   margin-right: 10px;
 }
 
+.badge-termine{
+  background-color: #01B81A !important;
+}
 
+.badge-nonPlannifie{
+  background-color: #FA8B0C !important;
+
+}
+
+.badge-plannifie{
+  background-color: var(--bs-primary) !important;
+
+}
+
+.badge-enCours{
+  background-color: #FF4D4F !important;
+}
 

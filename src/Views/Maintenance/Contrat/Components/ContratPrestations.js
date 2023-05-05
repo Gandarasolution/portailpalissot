@@ -66,10 +66,12 @@ const ContratPrestation = ({
   const ImgPDF = require("../../../../image/pdf.png");
   const ImgPNG = require("../../../../image/png.png");
   const ImgDOC = require("../../../../image/doc.png");
+  const ImgZIP = require("../../../../image/zip.png");
 
   //#region Mockup
 
   const [listeTaches, setListeTaches] = useState([]);
+  const [isListeTacheAffiche, setIsListeTacheAffiche] = useState(true);
 
   function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -136,12 +138,12 @@ const ContratPrestation = ({
   const [prestaMoisSelected, setPrestaMoisSelected] = useState(null);
   const [gridColMDValue, setGridColMDValue] = useState(12);
   const [search, setSearch] = useState("");
+  const [modalLargeShow, setModalLargeShow] = useState(false);
 
   //#endregion
 
   //#region Fonctions
   function GetNomMois(num, short = false) {
-    // console.log(num)
     if (num > 12) {
       num = num - 12;
     }
@@ -259,13 +261,13 @@ const ContratPrestation = ({
   function GetBadgeBgColor(e) {
     switch (e) {
       case 1:
-        return "secondary";
+        return "nonPlannifie";
       case 2:
-        return "warning";
+        return "plannifie";
       case 3:
-        return "warning";
+        return "enCours";
       case 4:
-        return "success";
+        return "termine";
       default:
         return "Non planifiée";
     }
@@ -341,6 +343,8 @@ const ContratPrestation = ({
         return ImgPDF;
       case "PNG":
         return ImgPNG;
+      case "ZIP":
+        return ImgZIP;
       default:
         return ImgDOC;
     }
@@ -659,18 +663,24 @@ const ContratPrestation = ({
 
   //#region large
 
-  const RowDocument = (props) => {
+  const RowDocument = (props, index) => {
     return (
-      <Row className="mb-1">
+      <Row className="mb-1" key={index}>
         <Col md={3}>{ImageExtension(props.extension)}</Col>
         <Col md={9}>
           <Row>
-            <p className="mb-0 document-title">{`${props.title}.${props.extension}`}</p>
+            <p className="mb-0 document-title">{`${props.title}${
+              props.extension.toUpperCase() === "ZIP"
+                ? ""
+                : `.${props.extension}`
+            }`}</p>
             <span className="document-size">{`${props.size}`}</span>
             <span className="document-links">
-              <Link to={ImgDOC} target="_blank">
-                Voir
-              </Link>
+              {props.extension.toUpperCase() !== "ZIP" && (
+                <Link to={ImgDOC} target="_blank">
+                  Voir
+                </Link>
+              )}
               <Link
                 to={ImgDOC}
                 target="_blank"
@@ -746,17 +756,25 @@ const ContratPrestation = ({
       <thead className="m-2">
         <tr>
           <th>
-            <div className="table-presta-header-first">Secteur</div>
+            <div>Secteur</div>
           </th>
           <th>
-            <div className="table-presta-header">N°</div>
+            <div>N°</div>
           </th>
           <th>
-            <div className="table-presta-header">Libellé</div>
+            <div>Libellé</div>
           </th>
           <th>
-            <div className="table-presta-header-last">Etat</div>
+            <div>Mois</div>
           </th>
+          <th>
+            <div>Etat</div>
+          </th>
+          {isListeTacheAffiche && (
+            <th>
+              <div>Liste des tâches</div>
+            </th>
+          )}
         </tr>
       </thead>
     );
@@ -826,11 +844,7 @@ const ContratPrestation = ({
             }
             nombreAffiche += 1;
             return (
-              <Collapse
-                key={presta.id}
-                onClick={() => handleRowClicked(presta, _numMois)}
-                in={GetStateOpen(_numMois)}
-              >
+              <Collapse key={presta.id} in={GetStateOpen(_numMois)}>
                 <tr
                   className={
                     prestaMoisSelected !== null &&
@@ -841,25 +855,40 @@ const ContratPrestation = ({
                       : ""
                   }
                 >
-                  <td>
+                  <td onClick={() => handleRowClicked(presta, _numMois)}>
                     <span>{HighlightTextIfSearch(presta.secteur)} </span>
                   </td>
 
-                  <td>
+                  <td onClick={() => handleRowClicked(presta, _numMois)}>
                     <span> {presta.id}</span>
                   </td>
-                  <td>
+                  <td onClick={() => handleRowClicked(presta, _numMois)}>
                     <h1>{HighlightTextIfSearch(presta.libelle)}</h1>
                   </td>
-                  <td>
-                    <Badge
-                     
-                    
-                      bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
+                  <td onClick={() => handleRowClicked(presta, _numMois)}>
+                    <h1>
+                      {HighlightTextIfSearch(GetNomMois(_numMois))}{" "}
+                      {numeroDuMois > 12
+                        ? datePrestation.getFullYear() + 1
+                        : datePrestation.getFullYear()}
+                    </h1>
+                  </td>
+                  <td onClick={() => handleRowClicked(presta, _numMois)}>
+                    <span
+                      className={`badge badge-${GetBadgeBgColor(
+                        presta.mois.at(_numMois - 1)
+                      )}`}
                     >
                       {GetLibEtat(presta.mois.at(_numMois - 1))}
-                    </Badge>
+                    </span>
                   </td>
+                  {isListeTacheAffiche && (
+                    <td>
+                      <Button onClick={() => handleAfficherListeTache()}>
+                        Afficher
+                      </Button>
+                    </td>
+                  )}
                 </tr>
               </Collapse>
             );
@@ -871,6 +900,9 @@ const ContratPrestation = ({
     }
   };
 
+  const handleAfficherListeTache = () => {
+    setModalLargeShow(!modalLargeShow);
+  };
   /**
    *
    * @param {* Le numéro du mois} numMois
@@ -896,10 +928,34 @@ const ContratPrestation = ({
   };
 
   const CardDocs = () => {
+    let _arrayDocs = [
+      { title: "CERFA", extension: "pdf", size: "18 MO" },
+      {
+        title: "Fiche rammonage",
+        extension: "pdf",
+        size: "12 MO",
+      },
+      {
+        title: "Photo extranet",
+        extension: "jpg",
+        size: "32 MO",
+      },
+      {
+        title: "Rapport d'intervention",
+        extension: "pdf",
+        size: "46 MO",
+      },
+    ];
+
+    let _DocZIP = {
+      title: "Tous les documents",
+      extension: "zip",
+      size: "90 MO",
+    };
     return (
       <Card className="mb-2">
         <Card.Header className="card-document">
-          Documents
+          Documents ({_arrayDocs.length})
           <Button
             variant="contained"
             aria-controls={`collapse-listeDocuments`}
@@ -916,21 +972,10 @@ const ContratPrestation = ({
         <Card.Body>
           <Collapse in={openDocuments}>
             <div id="collapse-listeDocuments">
-              {RowDocument({
-                title: "Photo extranet",
-                extension: "jpg",
-                size: "32 MO",
-              })}
-              {RowDocument({ title: "CERFA", extension: "pdf", size: "18 MO" })}
-              {RowDocument({
-                title: "Fiche rammonage",
-                extension: "pdf",
-                size: "12 MO",
-              })}
-              {RowDocument({
-                title: "Rapport d'intervention",
-                extension: "pdf",
-                size: "46 MO",
+              {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
+
+              {_arrayDocs.map((doc, index) => {
+                return RowDocument(doc, index);
               })}
             </div>
           </Collapse>
@@ -941,37 +986,27 @@ const ContratPrestation = ({
 
   const CardListeTaches = () => {
     if (listeTaches.length === 0) return null;
+
+    let _body = (
+      <div>
+        {listeTaches.map((tache) => {
+          return <p key={tache.id}>{`\u25CF ${tache.description}`}</p>;
+        })}
+      </div>
+    );
+
     return (
-      <Card className="mb-2">
-        <Card.Header className="card-document ">
-          Liste des tâches
-          <Button
-            variant="contained"
-            aria-controls={`collapse-listeTaches`}
-            aria-expanded={openTaches}
-            onClick={() => setOpenTaches(!openTaches)}
-          >
-            {openTaches ? (
-              <FontAwesomeIcon icon={faCaretUp} />
-            ) : (
-              <FontAwesomeIcon icon={faCaretDown} />
-            )}
-          </Button>
-        </Card.Header>
-        <Card.Body>
-          <Collapse in={openTaches}>
-            <div
-              id="collapse-listeTaches"
-              className="body-taches"
-              style={{ height: "50vh", overflowY: "scroll" }}
-            >
-              {listeTaches.map((tache) => {
-                return <p key={tache.id}>{tache.description}</p>;
-              })}
-            </div>
-          </Collapse>
-        </Card.Body>
-      </Card>
+      <Modal
+        show={modalLargeShow}
+        onHide={() => setModalLargeShow(false)}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title> Liste des tâches</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{_body}</Modal.Body>
+      </Modal>
     );
   };
 
@@ -1280,15 +1315,19 @@ const ContratPrestation = ({
         <Container fluid className="container-table p-4">
           <Breakpoint large up>
             <Row>
-              <Col md={gridColMDValue} >
+              <Col md={gridColMDValue}>
                 {TableGroupedMonth()} {PaginationPrestations()}
+                {isListeTacheAffiche && CardListeTaches()}
               </Col>
 
-              {gridColMDValue !== 12 ? (
+              {gridColMDValue !== 12 && (
+                <Col md={12 - gridColMDValue}>{CardDocs()}</Col>
+              )}
+              {/* {gridColMDValue !== 12 ? (
                 <Col md={gridColMDValue === 12 ? 0 : 12 - gridColMDValue}>
-                  {CardDocs()} {CardListeTaches()}
+                  {CardDocs()} 
                 </Col>
-              ) : null}
+              ) : null} */}
             </Row>
           </Breakpoint>
 
