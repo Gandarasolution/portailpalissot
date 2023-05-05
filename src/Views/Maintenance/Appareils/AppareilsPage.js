@@ -243,17 +243,6 @@ const AppareilsPage = () => {
   const AppareilGrey = require("../../../image/bottleGrey.png");
   const AppareilRed = require("../../../image/bottleRed.png");
 
-  const SearchAppareil = () => {
-    return (
-      <Form.Control
-        type="search"
-        placeholder="Rechercher"
-        className="mx-4"
-        aria-label="Search"
-        onChange={handleSearch}
-      />
-    );
-  };
 
   const ButtonFilter = (props) => {
     return (
@@ -345,7 +334,7 @@ const AppareilsPage = () => {
 
   const AppareilsTable = () => {
     return (
-      <Table>
+      <Table className="table-presta">
         {TableHead()}
         <tbody>{TableBody()}</tbody>
       </Table>
@@ -356,11 +345,10 @@ const AppareilsPage = () => {
     return (
       <thead>
         <tr>
-          <th>Secteur {ButtonOrder("secteur")}</th>
-          <th>Code</th>
-          <th>Libellé de l'appareil {ButtonOrder("libelle")}</th>
-          <th></th>
-          <th>État {ButtonOrder("etat")}</th>
+          <th><div>Secteur {ButtonOrder("secteur")}</div> </th>
+          <th><div>Code</div></th>
+          <th><div>Libellé de l'appareil {ButtonOrder("libelle")}</div> </th>
+          <th><div>État {ButtonOrder("etat")}</div></th>
         </tr>
       </thead>
     );
@@ -374,11 +362,9 @@ const AppareilsPage = () => {
             <td>{HighlightTextIfSearch(appareil.Secteur)} </td>
             <td>{appareil.Id}</td>
             <td>{HighlightTextIfSearch(appareil.Libelle)}</td>
-            <td>{GetImageAppareilEtat(appareil.IdEtat)}</td>
-            <td>
-              {" "}
+            {/* <td>{GetImageAppareilEtat(appareil.IdEtat)}</td> */}
+            <td>{GetImageAppareilEtat(appareil.IdEtat)}
               <Badge bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
-                {" "}
                 {appareil.LibelleEtat}{" "}
               </Badge>{" "}
             </td>

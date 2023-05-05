@@ -43,6 +43,8 @@ import {
   faFileContract,
   faFileImage,
   faFilePdf,
+  faMagnifyingGlass,
+  faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 
 //#endregion
@@ -290,8 +292,8 @@ const ContratPrestation = ({
   const reactStringReplace = require("react-string-replace");
   function HighlightTextIfSearch(text) {
     if (
-      search.length > 0 &&
-      text.toUpperCase().includes(search.toUpperCase())
+      String(search).length > 0 &&
+      String(text).toUpperCase().includes(String(search).toUpperCase())
     ) {
       return (
         <span>
@@ -684,7 +686,7 @@ const ContratPrestation = ({
               <Link
                 to={ImgDOC}
                 target="_blank"
-                download={`${props.title}_${prestaSelected.libelle}`}
+                download={`${props.title}`}
               >
                 Télécharger
               </Link>
@@ -731,6 +733,7 @@ const ContratPrestation = ({
    */
   const TableGroupedMonth = () => {
     const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
+    
     return (
       <Table className="table-presta ">
         {TableHead()}
@@ -751,12 +754,36 @@ const ContratPrestation = ({
     );
   };
 
+
+  const dropdownFilter = () => {
+
+  
+  }
+const handleFilter = ()=> {
+
+}
+
   const TableHead = () => {
+    
+    
     return (
       <thead className="m-2">
         <tr>
           <th>
-            <div>Secteur</div>
+            <div>
+              Secteur
+              <Dropdown>
+                <Dropdown.Toggle>
+                  <FontAwesomeIcon icon={faFilter} />
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+
+
+                </Dropdown.Menu>
+
+              </Dropdown>
+            </div>
+              
           </th>
           <th>
             <div>N°</div>
@@ -884,9 +911,9 @@ const ContratPrestation = ({
                   </td>
                   {isListeTacheAffiche && (
                     <td>
-                      <Button onClick={() => handleAfficherListeTache()}>
-                        Afficher
-                      </Button>
+                      <FontAwesomeIcon icon={faMagnifyingGlass} onClick={() => handleAfficherListeTache()}>
+                        {/* Afficher */}
+                      </FontAwesomeIcon>
                     </td>
                   )}
                 </tr>
@@ -1009,61 +1036,7 @@ const ContratPrestation = ({
       </Modal>
     );
   };
-
-  // const PopoverDocs = (
-  //   // <Popover id="popover-basic">
-  //   //   <Popover.Header as="h3" className="m-2 popover-liste">
-  //   //     Liste des tâches ({listeTaches.length})
-  //   //     <Button
-  //   //       variant="contained"
-  //   //       aria-controls={`collapse-listeTaches`}
-  //   //       aria-expanded={openTaches}
-  //   //       onClick={() => setOpenTaches(!openTaches)}
-  //   //     >
-  //   //       {openTaches ? (
-  //   //         <FontAwesomeIcon icon={faCaretUp} />
-  //   //       ) : (
-  //   //         <FontAwesomeIcon icon={faCaretDown} />
-  //   //       )}
-  //   //     </Button>{" "}
-  //   //   </Popover.Header>
-  //   //   <Popover.Body>
-  //   //     <Collapse in={openTaches}>
-  //   //       <div
-  //   //         id="collapse-listeTaches"
-  //   //         style={{ height: "50vh", overflowY: "scroll" }}
-  //   //       >
-  //   //         {listeTaches.map((tache) => {
-  //   //           return <p key={tache.id}>{tache.description}</p>;
-  //   //         })}
-  //   //       </div>
-  //   //     </Collapse>
-  //   //   </Popover.Body>
-
-  //   //   <Popover.Header as="h3" className="m-2 popover-liste">
-  //   //     Liste des documents
-  //   //     <Button
-  //   //       variant="contained"
-  //   //       aria-controls={`collapse-listeDocuments`}
-  //   //       aria-expanded={openTaches}
-  //   //       onClick={() => setOpenDocuments(!openDocuments)}
-  //   //     >
-  //   //       {openDocuments ? (
-  //   //         <FontAwesomeIcon icon={faCaretUp} />
-  //   //       ) : (
-  //   //         <FontAwesomeIcon icon={faCaretDown} />
-  //   //       )}
-  //   //     </Button>{" "}
-  //   //   </Popover.Header>
-  //   //   <Popover.Body>
-  //   //     <Collapse in={openDocuments}>
-  //   //       <div id="collapse-listeDocuments">{ButtonDownloadDocuments()}</div>
-  //   //     </Collapse>
-  //   //   </Popover.Body>
-  //   // </Popover>
-
-  // );
-
+  
   //#endregion
 
   //#region small
