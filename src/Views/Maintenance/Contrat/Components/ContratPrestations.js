@@ -683,11 +683,7 @@ const ContratPrestation = ({
                   Voir
                 </Link>
               )}
-              <Link
-                to={ImgDOC}
-                target="_blank"
-                download={`${props.title}`}
-              >
+              <Link to={ImgDOC} target="_blank" download={`${props.title}`}>
                 Télécharger
               </Link>
             </span>
@@ -733,7 +729,7 @@ const ContratPrestation = ({
    */
   const TableGroupedMonth = () => {
     const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
-    
+
     return (
       <Table className="table-presta ">
         {TableHead()}
@@ -754,52 +750,68 @@ const ContratPrestation = ({
     );
   };
 
+  const dropdownFilter = () => {};
 
-  const dropdownFilter = () => {
-
-  
-  }
-const handleFilter = ()=> {
-
-}
+  const handleFilter = () => {};
 
   const TableHead = () => {
-    
-    
     return (
       <thead className="m-2">
         <tr>
           <th>
-            <div>
+            <Dropdown>
               Secteur
-              <Dropdown>
-                <Dropdown.Toggle>
-                  <FontAwesomeIcon icon={faFilter} />
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-
-
-                </Dropdown.Menu>
-
-              </Dropdown>
-            </div>
-              
+              <Dropdown.Toggle>
+                <FontAwesomeIcon icon={faFilter} />
+              </Dropdown.Toggle>
+              <Dropdown.Menu></Dropdown.Menu>
+            </Dropdown>
           </th>
           <th>
-            <div>N°</div>
+            <Dropdown>
+              N°
+              <Dropdown.Toggle>
+                <FontAwesomeIcon icon={faFilter} />
+              </Dropdown.Toggle>
+              <Dropdown.Menu></Dropdown.Menu>
+            </Dropdown>
           </th>
           <th>
-            <div>Libellé</div>
+            <Dropdown>
+              Libellé
+              <Dropdown.Toggle>
+                <FontAwesomeIcon icon={faFilter} />
+              </Dropdown.Toggle>
+              <Dropdown.Menu></Dropdown.Menu>
+            </Dropdown>
           </th>
           <th>
-            <div>Mois</div>
+            <Dropdown>
+              Mois
+              <Dropdown.Toggle>
+                <FontAwesomeIcon icon={faFilter} />
+              </Dropdown.Toggle>
+              <Dropdown.Menu></Dropdown.Menu>
+            </Dropdown>
           </th>
           <th>
-            <div>Etat</div>
+            <Dropdown>
+              Etat
+              <Dropdown.Toggle>
+                <FontAwesomeIcon icon={faFilter} />
+              </Dropdown.Toggle>
+              <Dropdown.Menu></Dropdown.Menu>
+            </Dropdown>
           </th>
           {isListeTacheAffiche && (
             <th>
-              <div>Liste des tâches</div>
+               <Dropdown>
+               Liste des tâches 
+              <Dropdown.Toggle>
+                <FontAwesomeIcon icon={faFilter} />
+              </Dropdown.Toggle>
+              <Dropdown.Menu></Dropdown.Menu>
+            </Dropdown>
             </th>
           )}
         </tr>
@@ -910,10 +922,14 @@ const handleFilter = ()=> {
                     </span>
                   </td>
                   {isListeTacheAffiche && (
-                    <td>
-                      <FontAwesomeIcon icon={faMagnifyingGlass} onClick={() => handleAfficherListeTache()}>
-                        {/* Afficher */}
+                        
+                        <td onClick={() => handleAfficherListeTache()} >
+                      <FontAwesomeIcon
+                        icon={faMagnifyingGlass}
+                        onClick={() => handleAfficherListeTache()}
+                      >
                       </FontAwesomeIcon>
+                      {"  "} Afficher les tâches
                     </td>
                   )}
                 </tr>
@@ -1036,7 +1052,7 @@ const handleFilter = ()=> {
       </Modal>
     );
   };
-  
+
   //#endregion
 
   //#region small
@@ -1277,7 +1293,6 @@ const handleFilter = ()=> {
 
   return (
     <BreakpointProvider>
-      {/* <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}> */}
 
       <Container fluid>
         <Col md={12} style={{ textAlign: "start" }}>
@@ -1296,11 +1311,7 @@ const handleFilter = ()=> {
               {gridColMDValue !== 12 && (
                 <Col md={12 - gridColMDValue}>{CardDocs()}</Col>
               )}
-              {/* {gridColMDValue !== 12 ? (
-                <Col md={gridColMDValue === 12 ? 0 : 12 - gridColMDValue}>
-                  {CardDocs()} 
-                </Col>
-              ) : null} */}
+              
             </Row>
           </Breakpoint>
 
@@ -1310,7 +1321,6 @@ const handleFilter = ()=> {
           </Breakpoint>
         </Container>
       </Container>
-      {/* </WhiteShadowCard> */}
     </BreakpointProvider>
   );
 };
