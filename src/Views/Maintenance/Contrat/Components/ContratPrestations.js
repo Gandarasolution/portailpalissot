@@ -3,16 +3,16 @@ import { useEffect, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#region Bootstrap
+// import Badge from "react-bootstrap/Badge";
+// import Tab from "react-bootstrap/Tab";
+// import Tabs from "react-bootstrap/Tabs";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import Collapse from "react-bootstrap/Collapse";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
-import Badge from "react-bootstrap/Badge";
 import Modal from "react-bootstrap/Modal";
-import Tab from "react-bootstrap/Tab";
-import Tabs from "react-bootstrap/Tabs";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -23,35 +23,29 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import Image from "react-bootstrap/Image";
 import Pagination from "react-bootstrap/Pagination";
 import Stack from "react-bootstrap/Stack";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Popover from "react-bootstrap/Popover";
+import Tooltip from "react-bootstrap/Tooltip";
 
 //#endregion
 
 //#region FontAwsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBookmark,
-  faCalendar,
   faCaretDown,
   faCaretUp,
-  faCheck,
-  faClock,
-  faFile,
-  faFileContract,
-  faFileImage,
-  faFilePdf,
-  faMagnifyingGlass,
   faFilter,
+  faListCheck,
+  faList,
 } from "@fortawesome/free-solid-svg-icons";
 
 //#endregion
 
 //#region Components
-// import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
-import { OverlayTrigger, Popover, SplitButton } from "react-bootstrap";
 
 //#endregion
 
@@ -82,8 +76,20 @@ const ContratPrestation = ({
   const MockupListeTache = () => {
     let _listeTaches = [];
 
+
+
     let _limit = getRandomInt(1, 20);
     for (let index = 0; index < _limit; index++) {
+
+      let _taches = [];
+      for (let indexT = 0; indexT < getRandomInt(1, 8); indexT++) {
+        _taches.push(loremIpsum({
+          avgSentencesPerParagraph: 1,
+          startWithLoremIpsum: false,
+          random: "false",
+        }).join())
+      }
+
       _listeTaches.push({
         id: index + 1,
         description: loremIpsum({
@@ -91,6 +97,7 @@ const ContratPrestation = ({
           startWithLoremIpsum: false,
           random: "false",
         }).join(),
+        taches: _taches
       });
     }
     setListeTaches(_listeTaches);
@@ -460,33 +467,71 @@ const ContratPrestation = ({
     }
   };
 
+  const handlePagePrev = () => {
+    if (pageActuelle > 1) {
+      //Suprrime les filtres sur colonnes
+      setArrayFilters([]);
+      setPageActuelle(pageActuelle - 1);
+
+      //Annule l'affichage des documents/tâches
+      setPrestaSelected(null);
+      setPrestaMoisSelected(null);
+      //La table prend toute la place
+      setGridColMDValue(12);
+    }
+  };
+
+  const handlePageChange = (number) => {
+    //Suprrime les filtres sur colonnes
+    setArrayFilters([]);
+    setPageActuelle(number);
+    //Annule l'affichage des documents/tâches
+    setPrestaSelected(null);
+    setPrestaMoisSelected(null);
+    //La table prend toute la place
+    setGridColMDValue(12);
+  };
+
+  const handlePageNext = (number) => {
+    if (pageActuelle < number) {
+      //Suprrime les filtres sur colonnes
+      setArrayFilters([]);
+      setPageActuelle(pageActuelle + 1);
+      //Annule l'affichage des documents/tâches
+      setPrestaSelected(null);
+      setPrestaMoisSelected(null);
+      //La table prend toute la place
+      setGridColMDValue(12);
+    }
+  };
+
   //#endregion
 
   //#region Composants
 
   //#region commun
-  const ButtonDownloadDocuments = () => {
-    return (
-      <Container p={2}>
-        <Button className="m-1">
-          {" "}
-          <FontAwesomeIcon icon={faFile} /> Extranet{" "}
-        </Button>
-        <Button className="m-1">
-          {" "}
-          <FontAwesomeIcon icon={faFileContract} /> CERFA{" "}
-        </Button>
-        <Button className="m-1">
-          {" "}
-          <FontAwesomeIcon icon={faFileImage} /> Fiche rammonage{" "}
-        </Button>
-        <Button className="m-1">
-          {" "}
-          <FontAwesomeIcon icon={faFilePdf} /> Rapport technicien{" "}
-        </Button>
-      </Container>
-    );
-  };
+  // const ButtonDownloadDocuments = () => {
+  //   return (
+  //     <Container p={2}>
+  //       <Button className="m-1">
+  //         {" "}
+  //         <FontAwesomeIcon icon={faFile} /> Extranet{" "}
+  //       </Button>
+  //       <Button className="m-1">
+  //         {" "}
+  //         <FontAwesomeIcon icon={faFileContract} /> CERFA{" "}
+  //       </Button>
+  //       <Button className="m-1">
+  //         {" "}
+  //         <FontAwesomeIcon icon={faFileImage} /> Fiche rammonage{" "}
+  //       </Button>
+  //       <Button className="m-1">
+  //         {" "}
+  //         <FontAwesomeIcon icon={faFilePdf} /> Rapport technicien{" "}
+  //       </Button>
+  //     </Container>
+  //   );
+  // };
 
   const ButtonFilter = (IdEtat) => {
     if (IdEtat === -1) {
@@ -554,44 +599,6 @@ const ContratPrestation = ({
         </Container>
       </Container>
     );
-  };
-
-  const handlePagePrev = () => {
-    if (pageActuelle > 1) {
-      //Suprrime les filtres sur colonnes
-      setArrayFilters([]);
-      setPageActuelle(pageActuelle - 1);
-
-      //Annule l'affichage des documents/tâches
-      setPrestaSelected(null);
-      setPrestaMoisSelected(null);
-      //La table prend toute la place
-      setGridColMDValue(12);
-    }
-  };
-
-  const handlePageChange = (number) => {
-    //Suprrime les filtres sur colonnes
-    setArrayFilters([]);
-    setPageActuelle(number);
-    //Annule l'affichage des documents/tâches
-    setPrestaSelected(null);
-    setPrestaMoisSelected(null);
-    //La table prend toute la place
-    setGridColMDValue(12);
-  };
-
-  const handlePageNext = (number) => {
-    if (pageActuelle < number) {
-      //Suprrime les filtres sur colonnes
-      setArrayFilters([]);
-      setPageActuelle(pageActuelle + 1);
-      //Annule l'affichage des documents/tâches
-      setPrestaSelected(null);
-      setPrestaMoisSelected(null);
-      //La table prend toute la place
-      setGridColMDValue(12);
-    }
   };
 
   const PaginationPrestations = () => {
@@ -809,9 +816,6 @@ const ContratPrestation = ({
     return (
       <thead className="m-2">
         <tr>
-          <th>{HeaderWithFilter("Secteur", "Secteur")}</th>
-          <th>{HeaderWithFilter("N°", "IdPrestationContrat")}</th>
-          <th>{HeaderWithFilter("Libellé", "DescriptionPrestationContrat")}</th>
           <th>
             {HeaderWithFilter(
               "Date",
@@ -819,10 +823,13 @@ const ContratPrestation = ({
               _methodeDate
             )}
           </th>
+          <th>{HeaderWithFilter("Secteur", "Secteur")}</th>
+          <th>{HeaderWithFilter("N°", "IdPrestationContrat")}</th>
+          <th>{HeaderWithFilter("Libellé", "DescriptionPrestationContrat")}</th>
           <th>{HeaderWithFilter("Etat", "IdEtat", _methodeEtat)}</th>
           {isListeTacheAffiche && (
             <th>
-              <div>Liste des tâches</div>
+              <div>Action</div>
             </th>
           )}
         </tr>
@@ -863,7 +870,7 @@ const ContratPrestation = ({
           (filter) =>
             filter.fieldname === "MoisInterventionPrestationContratCadencier"
         );
-        let _arrayIdEtat = arrayFilters.filter(
+      let _arrayIdEtat = arrayFilters.filter(
         (filter) => filter.fieldname === "IdEtat"
       );
 
@@ -932,6 +939,23 @@ const ContratPrestation = ({
               )
             }
           >
+            <h1>
+              {HighlightTextIfSearch(
+                `  ${GetNomMois(
+                  presta.MoisInterventionPrestationContratCadencier
+                )} ${presta.AnneInterventionPrestationContratCadencier} `
+              )}
+            </h1>
+          </td>
+
+          <td
+            onClick={() =>
+              handleRowClicked(
+                presta,
+                presta.MoisInterventionPrestationContratCadencier
+              )
+            }
+          >
             <span>{HighlightTextIfSearch(presta.Secteur)} </span>
           </td>
 
@@ -957,22 +981,7 @@ const ContratPrestation = ({
               {HighlightTextIfSearch(presta.DescriptionPrestationContrat)}
             </h1>
           </td>
-          <td
-            onClick={() =>
-              handleRowClicked(
-                presta,
-                presta.MoisInterventionPrestationContratCadencier
-              )
-            }
-          >
-            <h1>
-              {HighlightTextIfSearch(
-                `  ${GetNomMois(
-                  presta.MoisInterventionPrestationContratCadencier
-                )} ${presta.AnneInterventionPrestationContratCadencier} `
-              )}
-            </h1>
-          </td>
+
           <td
             onClick={() =>
               handleRowClicked(
@@ -987,11 +996,15 @@ const ContratPrestation = ({
           </td>
           {isListeTacheAffiche && (
             <td onClick={() => handleAfficherListeTache()}>
+              <OverlayTrigger placement="bottom" overlay={<Tooltip>Relevés de tâches</Tooltip>}  
+                >
+
               <FontAwesomeIcon
-                icon={faMagnifyingGlass}
+                icon={faListCheck}
                 onClick={() => handleAfficherListeTache()}
-              ></FontAwesomeIcon>
-              {"  "} Afficher les tâches
+                />
+
+                </OverlayTrigger>
             </td>
           )}
         </tr>
@@ -1000,7 +1013,8 @@ const ContratPrestation = ({
   };
 
   const handleAfficherListeTache = () => {
-    setModalLargeShow(!modalLargeShow);
+    let _value = JSON.parse(JSON.stringify(modalLargeShow))
+    setModalLargeShow(!_value);
   };
 
   const CardDocs = () => {
@@ -1060,13 +1074,33 @@ const ContratPrestation = ({
     );
   };
 
+
+
   const CardListeTaches = () => {
     if (listeTaches.length === 0) return null;
 
     let _body = (
-      <div>
-        {listeTaches.map((tache) => {
-          return <p key={tache.id}>{`\u25CF ${tache.description}`}</p>;
+
+      <div >
+        {listeTaches.map((Relevetache) => {
+          return (
+            <span key={Relevetache.id} className="mb-2">
+              <Row>
+                <Col>
+                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
+                </Col>
+              </Row>
+              {Relevetache.taches.map((tache, index) => {
+                return (
+                  <Row key={index}>
+                    <Col md={{ offset: 1 }}>
+                      <Form.Check readOnly checked={false} label={tache} />
+                    </Col>
+                  </Row>
+                );
+              })}
+            </span>
+          );
         })}
       </div>
     );
@@ -1079,7 +1113,7 @@ const ContratPrestation = ({
         keyboard={false}
       >
         <Modal.Header closeButton>
-          <Modal.Title> Liste des tâches</Modal.Title>
+          <Modal.Title> Liste des relevés de tâches</Modal.Title>
         </Modal.Header>
         <Modal.Body>{_body}</Modal.Body>
       </Modal>
@@ -1171,20 +1205,20 @@ const ContratPrestation = ({
    * @param {* La valeur de l'état du mois} e
    * @returns Un badge indiquant l'état de la prestation du mois
    */
-  const GetBadgeIcon = (e) => {
-    switch (e) {
-      case 1:
-        return <FontAwesomeIcon icon={faBookmark} />;
-      case 2:
-        return <FontAwesomeIcon icon={faCalendar} />;
-      case 3:
-        return <FontAwesomeIcon icon={faClock} />;
-      case 4:
-        return <FontAwesomeIcon icon={faCheck} />;
-      default:
-        break;
-    }
-  };
+  // const GetBadgeIcon = (e) => {
+  //   switch (e) {
+  //     case 1:
+  //       return <FontAwesomeIcon icon={faBookmark} />;
+  //     case 2:
+  //       return <FontAwesomeIcon icon={faCalendar} />;
+  //     case 3:
+  //       return <FontAwesomeIcon icon={faClock} />;
+  //     case 4:
+  //       return <FontAwesomeIcon icon={faCheck} />;
+  //     default:
+  //       break;
+  //   }
+  // };
 
   /**
    *
@@ -1319,7 +1353,7 @@ const ContratPrestation = ({
 
   useEffect(() => {
     setIsListeTacheAffiche(true);
-  },[]);
+  }, []);
 
   return (
     <BreakpointProvider>
