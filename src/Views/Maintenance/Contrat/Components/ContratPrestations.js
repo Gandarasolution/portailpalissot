@@ -129,8 +129,6 @@ const ContratPrestation = ({
   const [nbParPages, setNbParPages] = useState(10);
   const [pageActuelle, setPageActuelle] = useState(1);
 
-
-
   const [arrayFilters, setArrayFilters] = useState([]);
   //#endregion
 
@@ -292,7 +290,6 @@ const ContratPrestation = ({
         b.MoisInterventionPrestationContratCadencier
     );
 
-
     return _lPrestation;
   };
 
@@ -366,9 +363,13 @@ const ContratPrestation = ({
     }, {});
   };
 
-
-  function IsFiltercheckboxShouldBeCheck(fieldname,item){
-    if(arrayFilters.findIndex((filter)=> filter.fieldname === fieldname && filter.item === item) > -1) return true;
+  function IsFiltercheckboxShouldBeCheck(fieldname, item) {
+    if (
+      arrayFilters.findIndex(
+        (filter) => filter.fieldname === fieldname && filter.item === item
+      ) > -1
+    )
+      return true;
     return false;
   }
 
@@ -413,7 +414,6 @@ const ContratPrestation = ({
     }
   };
 
-
   const handleCardClicked = (presta) => {
     //Récupère les données
     MockupListeTache();
@@ -443,26 +443,22 @@ const ContratPrestation = ({
     }
   };
 
-
-
-  const handleCheckfilterChange = (checked,key,value) => {
-
+  const handleCheckfilterChange = (checked, key, value) => {
     let _arrTemp = JSON.parse(JSON.stringify(arrayFilters));
 
-    if(checked)
-    {
-      _arrTemp.push({fieldname: key, item: value});
+    if (checked) {
+      _arrTemp.push({ fieldname: key, item: value });
       setArrayFilters(_arrTemp);
-    }else {
-
-      const index = _arrTemp.findIndex((filter) => filter.fieldname === key && filter.item === value);
-      if(index > -1)
-      {
-        _arrTemp.splice(index,1);
+    } else {
+      const index = _arrTemp.findIndex(
+        (filter) => filter.fieldname === key && filter.item === value
+      );
+      if (index > -1) {
+        _arrTemp.splice(index, 1);
         setArrayFilters(_arrTemp);
       }
     }
-  }
+  };
 
   //#endregion
 
@@ -562,6 +558,8 @@ const ContratPrestation = ({
 
   const handlePagePrev = () => {
     if (pageActuelle > 1) {
+      //Suprrime les filtres sur colonnes
+      setArrayFilters([]);
       setPageActuelle(pageActuelle - 1);
 
       //Annule l'affichage des documents/tâches
@@ -573,6 +571,8 @@ const ContratPrestation = ({
   };
 
   const handlePageChange = (number) => {
+    //Suprrime les filtres sur colonnes
+    setArrayFilters([]);
     setPageActuelle(number);
     //Annule l'affichage des documents/tâches
     setPrestaSelected(null);
@@ -583,6 +583,8 @@ const ContratPrestation = ({
 
   const handlePageNext = (number) => {
     if (pageActuelle < number) {
+      //Suprrime les filtres sur colonnes
+      setArrayFilters([]);
       setPageActuelle(pageActuelle + 1);
       //Annule l'affichage des documents/tâches
       setPrestaSelected(null);
@@ -753,10 +755,6 @@ const ContratPrestation = ({
     );
   };
 
-
-
-
-
   const HeaderWithFilter = (title, fieldname, method) => {
     let _arFilters = [];
     let _lprestations = Prestations;
@@ -770,9 +768,23 @@ const ContratPrestation = ({
           trigger="click"
           overlay={
             <Popover className="popover-filters">
-              {_arFilters.map((item,index) => {
+              {_arFilters.map((item, index) => {
                 return (
-                  <Form.Check type="checkbox" checked={IsFiltercheckboxShouldBeCheck(fieldname, item[0])} label={`${method !== undefined ? method(item[0]) : item[0]}`  } key={index}  onChange={(e) => handleCheckfilterChange(e.target.checked,fieldname,item[0])} />
+                  <Form.Check
+                    type="checkbox"
+                    checked={IsFiltercheckboxShouldBeCheck(fieldname, item[0])}
+                    label={`${
+                      method !== undefined ? method(item[0]) : item[0]
+                    }`}
+                    key={index}
+                    onChange={(e) =>
+                      handleCheckfilterChange(
+                        e.target.checked,
+                        fieldname,
+                        item[0]
+                      )
+                    }
+                  />
                 );
               })}
             </Popover>
@@ -788,11 +800,11 @@ const ContratPrestation = ({
   const TableHead = () => {
     const _methodeDate = (e) => {
       return GetNomMois(Number(e));
-    }
+    };
 
     const _methodeEtat = (e) => {
       return GetLibEtat(Number(e));
-    }
+    };
 
     return (
       <thead className="m-2">
@@ -803,11 +815,11 @@ const ContratPrestation = ({
           <th>
             {HeaderWithFilter(
               "Date",
-              "MoisInterventionPrestationContratCadencier"
-              ,_methodeDate
+              "MoisInterventionPrestationContratCadencier",
+              _methodeDate
             )}
           </th>
-          <th>{HeaderWithFilter("Etat", "IdEtat",_methodeEtat)}</th>
+          <th>{HeaderWithFilter("Etat", "IdEtat", _methodeEtat)}</th>
           {isListeTacheAffiche && (
             <th>
               <div>Liste des tâches</div>
@@ -836,22 +848,62 @@ const ContratPrestation = ({
       );
     }
 
-    if(arrayFilters.length > 0)
-    {
-      const _arraySecteur = arrayFilters.filter((filter)=> filter.fieldname === "Secteur");
-      const _arrayIdPrestationContrat = arrayFilters.filter((filter)=> filter.fieldname === "IdPrestationContrat")
-      const _arrayDescriptionPrestationContrat = arrayFilters.filter((filter)=> filter.fieldname === "DescriptionPrestationContrat")
-      const _arrayMoisInterventionPrestationContratCadencier = arrayFilters.filter((filter)=> filter.fieldname === "MoisInterventionPrestationContratCadencier")
-      const _arrayIdEtat = arrayFilters.filter((filter)=> filter.fieldname === "IdEtat")
+    if (arrayFilters.length > 0) {
+      let _arraySecteur = arrayFilters.filter(
+        (filter) => filter.fieldname === "Secteur"
+      );
+      let _arrayIdPrestationContrat = arrayFilters.filter(
+        (filter) => filter.fieldname === "IdPrestationContrat"
+      );
+      let _arrayDescriptionPrestationContrat = arrayFilters.filter(
+        (filter) => filter.fieldname === "DescriptionPrestationContrat"
+      );
+      let _arrayMoisInterventionPrestationContratCadencier =
+        arrayFilters.filter(
+          (filter) =>
+            filter.fieldname === "MoisInterventionPrestationContratCadencier"
+        );
+        let _arrayIdEtat = arrayFilters.filter(
+        (filter) => filter.fieldname === "IdEtat"
+      );
 
-      if(_arraySecteur.length > 0) _lPrestation = _lPrestation.filter((presta) => _arraySecteur.filter((filter) =>  filter.item === presta.Secteur).length > 0  )
-      if(_arrayIdPrestationContrat.length > 0) _lPrestation = _lPrestation.filter((presta) => _arrayIdPrestationContrat.filter((filter) => Number(filter.item) === presta.IdPrestationContrat).length > 0  )
-      if(_arrayDescriptionPrestationContrat.length > 0) _lPrestation = _lPrestation.filter((presta) => _arrayDescriptionPrestationContrat.filter((filter) => filter.item === presta.DescriptionPrestationContrat).length > 0  )
-      if(_arrayMoisInterventionPrestationContratCadencier.length > 0) _lPrestation = _lPrestation.filter((presta) => _arrayMoisInterventionPrestationContratCadencier.filter((filter) => Number(filter.item) === presta.MoisInterventionPrestationContratCadencier).length > 0  )
-      if(_arrayIdEtat.length > 0) _lPrestation = _lPrestation.filter((presta) => _arrayIdEtat.filter((filter) => Number(filter.item) === presta.IdEtat).length > 0  )
-
+      if (_arraySecteur.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arraySecteur.filter((filter) => filter.item === presta.Secteur)
+              .length > 0
+        );
+      if (_arrayIdPrestationContrat.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arrayIdPrestationContrat.filter(
+              (filter) => Number(filter.item) === presta.IdPrestationContrat
+            ).length > 0
+        );
+      if (_arrayDescriptionPrestationContrat.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arrayDescriptionPrestationContrat.filter(
+              (filter) => filter.item === presta.DescriptionPrestationContrat
+            ).length > 0
+        );
+      if (_arrayMoisInterventionPrestationContratCadencier.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arrayMoisInterventionPrestationContratCadencier.filter(
+              (filter) =>
+                Number(filter.item) ===
+                presta.MoisInterventionPrestationContratCadencier
+            ).length > 0
+        );
+      if (_arrayIdEtat.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arrayIdEtat.filter(
+              (filter) => Number(filter.item) === presta.IdEtat
+            ).length > 0
+        );
     }
-
 
     return _lPrestation.map((presta, index) => {
       if (nombreAffiche >= nbParPages || nombreAffiche < 0) {
@@ -1142,70 +1194,70 @@ const ContratPrestation = ({
     let _tabs = null;
     let _title = null;
 
-    if (prestaSelected !== null) {
-      _title = prestaSelected.libelle;
-      _tabs = (
-        <Tabs variant="pills" fill>
-          {prestaSelected.mois.map((mois, index) => {
-            return mois > 0 ? (
-              <Tab
-                eventKey={GetNomMois(Number(index) + 1, true)}
-                title={
-                  <span>
-                    {GetBadgeIcon(mois)} {GetNomMois(Number(index) + 1, true)}
-                  </span>
-                }
-                key={index}
-                tabClassName={`bg- border border-${GetBadgeBgColor(
-                  mois
-                )} text-${GetBadgeBgColor(mois)}`}
-              >
-                <Badge pill bg={GetBadgeBgColor(mois)}>
-                  {GetBadgeIcon(mois)} {GetLibEtat(mois)}
-                </Badge>
-                <Container fluid>
-                  <p className="h2">Liste des documents</p>
-                  <span>{ButtonDownloadDocuments()}</span>
-                </Container>
+    // if (prestaSelected !== null) {
+    //   _title = prestaSelected.libelle;
+    //   _tabs = (
+    //     <Tabs variant="pills" fill>
+    //       {prestaSelected.mois.map((mois, index) => {
+    //         return mois > 0 ? (
+    //           <Tab
+    //             eventKey={GetNomMois(Number(index) + 1, true)}
+    //             title={
+    //               <span>
+    //                 {GetBadgeIcon(mois)} {GetNomMois(Number(index) + 1, true)}
+    //               </span>
+    //             }
+    //             key={index}
+    //             tabClassName={`bg- border border-${GetBadgeBgColor(
+    //               mois
+    //             )} text-${GetBadgeBgColor(mois)}`}
+    //           >
+    //             <Badge pill bg={GetBadgeBgColor(mois)}>
+    //               {GetBadgeIcon(mois)} {GetLibEtat(mois)}
+    //             </Badge>
+    //             <Container fluid>
+    //               <p className="h2">Liste des documents</p>
+    //               <span>{ButtonDownloadDocuments()}</span>
+    //             </Container>
 
-                <Container>
-                  <p className="h2">
-                    Liste des tâches
-                    <Button
-                      variant="contained"
-                      aria-controls={`collapse-listeTaches`}
-                      aria-expanded={openTaches}
-                      onClick={() => setOpenTaches(!openTaches)}
-                    >
-                      {openTaches ? (
-                        <FontAwesomeIcon icon={faCaretUp} />
-                      ) : (
-                        <FontAwesomeIcon icon={faCaretDown} />
-                      )}
-                    </Button>{" "}
-                  </p>
+    //             <Container>
+    //               <p className="h2">
+    //                 Liste des tâches
+    //                 <Button
+    //                   variant="contained"
+    //                   aria-controls={`collapse-listeTaches`}
+    //                   aria-expanded={openTaches}
+    //                   onClick={() => setOpenTaches(!openTaches)}
+    //                 >
+    //                   {openTaches ? (
+    //                     <FontAwesomeIcon icon={faCaretUp} />
+    //                   ) : (
+    //                     <FontAwesomeIcon icon={faCaretDown} />
+    //                   )}
+    //                 </Button>{" "}
+    //               </p>
 
-                  <Collapse in={openTaches}>
-                    <div
-                      id="collapse-listeTaches"
-                      style={{ height: "50vh", overflowY: "scroll" }}
-                    >
-                      {listeTaches.map((tache) => {
-                        return (
-                          <span key={tache.id}>
-                            <p>{tache.description}</p> <hr />{" "}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </Collapse>
-                </Container>
-              </Tab>
-            ) : null;
-          })}
-        </Tabs>
-      );
-    }
+    //               <Collapse in={openTaches}>
+    //                 <div
+    //                   id="collapse-listeTaches"
+    //                   style={{ height: "50vh", overflowY: "scroll" }}
+    //                 >
+    //                   {listeTaches.map((tache) => {
+    //                     return (
+    //                       <span key={tache.id}>
+    //                         <p>{tache.description}</p> <hr />{" "}
+    //                       </span>
+    //                     );
+    //                   })}
+    //                 </div>
+    //               </Collapse>
+    //             </Container>
+    //           </Tab>
+    //         ) : null;
+    //       })}
+    //     </Tabs>
+    //   );
+    // }
 
     return (
       <Modal
@@ -1267,7 +1319,7 @@ const ContratPrestation = ({
 
   useEffect(() => {
     setIsListeTacheAffiche(true);
-  });
+  },[]);
 
   return (
     <BreakpointProvider>
