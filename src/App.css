@@ -67,6 +67,25 @@
 
 
 
+.container-login-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+
+.viewport-height {
+  height: 75vh;
+}
+
+
+
+.bt-eye-password  {
+  background-color: transparent !important;
+  color: #212529 !important;
+  border-color: #ced4da !important;
+}
+
 .centerStack {
   display: flex;
   width: 100%;
