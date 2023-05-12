@@ -17,7 +17,7 @@ import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
 //#region Components
 import ContratPrestation from "./Components/ContratPrestations";
-import ContratInfo from "./Components/ContratInformation";
+// import ContratInfo from "./Components/ContratInformation";
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
@@ -38,113 +38,88 @@ const ContratPage = () => {
     LibelleContrat: "Entretien annuel",
   };
 
+
   let _Prestations = [
     {
-      id: 1,
-      libelle: "	Entretien annuel de la ventilation",
-      secteur: "toiture",
-      mois: [1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0],
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "visite principale annuelle en août : 10 brûleurs "
+      ,MoisInterventionPrestationContratCadencier: 8
+      ,AnneInterventionPrestationContratCadencier: 2021
+      ,IdEtat: 1
+      ,Secteur: "Bruleur proccess"
+
     },
     {
-      id: 2,
-      libelle: "Contrôle mensuel des températures par échantillonage",
-      secteur: "Ensemble",
-      mois: [1, 1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 0],
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "visite intermédiaire de  janvier/février : 10 brûleurs"
+      ,MoisInterventionPrestationContratCadencier: 1
+      ,AnneInterventionPrestationContratCadencier: 2021
+      ,IdEtat: 2
+      ,Secteur: "Bruleur proccess"
     },
     {
-      id: 3,
-      libelle: "Entretien annuel de la sous Station N°2",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "visite intermédiaire de  janvier/février : 10 brûleurs"
+      ,MoisInterventionPrestationContratCadencier: 2
+      ,AnneInterventionPrestationContratCadencier: 2021
+      ,IdEtat: 3
+      ,Secteur: "Bruleur proccess"
     },
     {
-      id: 4,
-      libelle: "Entretien annuel de la sous Station N°1",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 3, 0, 0, 4, 0, 2, 0, 0, 0],
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "visite intermédiaire d'avril : 10 brûleurs "
+      ,MoisInterventionPrestationContratCadencier: 4
+      ,AnneInterventionPrestationContratCadencier: 2021
+      ,IdEtat: 4
+      ,Secteur: "Bruleur proccess"
+
     },
     {
-      id: 5,
-      libelle: "eeeee",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "ramonage du conduit de cheminée de la chaudière de la cabine KREMLIN  P1- sous traitance "
+      ,MoisInterventionPrestationContratCadencier: 8
+      ,AnneInterventionPrestationContratCadencier: 2021
+      ,IdEtat: 1
+      ,Secteur: "Chaudiere"
+
     },
     {
-      id: 6,
-      libelle: "fgb",
-      secteur: "Batiment 2",
-      mois: [0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 7,
-      libelle: "Eefefef",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 1, 0, 1, 2, 0, 0, 0],
-    },
-    {
-      id: 8,
-      libelle: "Eneffff",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 9,
-      libelle: "Ezzzz2",
-      secteur: "Batiment 2",
-      mois: [0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 10,
-      libelle: "efzefzef",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 11,
-      libelle: "Entretien zefzf",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1],
-    },
-    {
-      id: 12,
-      libelle: "Entresdsddfdff",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0],
-    },
-  ];
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "Ramonage des 3 conduits de cheminée des Brûleurs PROCESS IPROS - sous traitance  "
+      ,MoisInterventionPrestationContratCadencier: 8
+      ,AnneInterventionPrestationContratCadencier: 2021
+      ,IdEtat: 4
+      ,Secteur: "Bruleur proccess"
+
+    }
+
+  ]
 
   const MockupDataPrestation = async () => {
     console.log("Mockup data Prestations !");
     let _prestas = [];
     for (let index = 0; index < 12; index++) {
       let _presta = {
-        id: index + 1,
-        libelle: loremIpsum({
+        IdPrestationContrat: getRandomInt(2000, 4000)
+        ,DescriptionPrestationContrat: loremIpsum({
           avgSentencesPerParagraph: 1,
           startWithLoremIpsum: false,
           random: "false",
-        }).join(),
-        secteur: loremIpsum({
+        }).join()
+        ,MoisInterventionPrestationContratCadencier: getRandomInt(1, 12)
+        ,AnneInterventionPrestationContratCadencier: 2021
+        ,IdEtat: getRandomInt(1, 4)
+        ,Secteur: loremIpsum({
           avgSentencesPerParagraph: 1,
           startWithLoremIpsum: false,
           random: "false",
           avgWordsPerSentence: 2,
-        }).join(),
-        mois: [
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-        ],
-      };
+        }).join()
+  
+      }
+
+
+
       _prestas.push(_presta);
     }
 

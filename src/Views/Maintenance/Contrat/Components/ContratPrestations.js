@@ -10,8 +10,6 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
 import Modal from "react-bootstrap/Modal";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
@@ -25,8 +23,6 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import Image from "react-bootstrap/Image";
 import Pagination from "react-bootstrap/Pagination";
 import Stack from "react-bootstrap/Stack";
-
-// import { Image, Pagination, Stack } from "react-bootstrap";
 
 //#endregion
 
@@ -55,12 +51,12 @@ import {
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
+import { OverlayTrigger, Popover, SplitButton } from "react-bootstrap";
 
 //#endregion
 
 const ContratPrestation = ({
   Prestations,
-  datePrestation,
   ParentComponentPeriodeSelect,
   IsLoaded,
 }) => {
@@ -105,18 +101,18 @@ const ContratPrestation = ({
   //#region States
 
   //#region Collapses
-  const [open1, setOpen1] = useState(true);
-  const [open2, setOpen2] = useState(true);
-  const [open3, setOpen3] = useState(true);
-  const [open4, setOpen4] = useState(true);
-  const [open5, setOpen5] = useState(true);
-  const [open6, setOpen6] = useState(true);
-  const [open7, setOpen7] = useState(true);
-  const [open8, setOpen8] = useState(true);
-  const [open9, setOpen9] = useState(true);
-  const [open10, setOpen10] = useState(true);
-  const [open11, setOpen11] = useState(true);
-  const [open12, setOpen12] = useState(true);
+  // const [open1, setOpen1] = useState(true);
+  // const [open2, setOpen2] = useState(true);
+  // const [open3, setOpen3] = useState(true);
+  // const [open4, setOpen4] = useState(true);
+  // const [open5, setOpen5] = useState(true);
+  // const [open6, setOpen6] = useState(true);
+  // const [open7, setOpen7] = useState(true);
+  // const [open8, setOpen8] = useState(true);
+  // const [open9, setOpen9] = useState(true);
+  // const [open10, setOpen10] = useState(true);
+  // const [open11, setOpen11] = useState(true);
+  // const [open12, setOpen12] = useState(true);
 
   const [openTaches, setOpenTaches] = useState(true);
   const [openDocuments, setOpenDocuments] = useState(true);
@@ -133,6 +129,9 @@ const ContratPrestation = ({
   const [nbParPages, setNbParPages] = useState(10);
   const [pageActuelle, setPageActuelle] = useState(1);
 
+
+
+  const [arrayFilters, setArrayFilters] = useState([]);
   //#endregion
 
   const [modaleShow, setModalShow] = useState(false);
@@ -179,69 +178,69 @@ const ContratPrestation = ({
     }
   }
 
-  function GetStateOpen(e) {
-    switch (e) {
-      case 1:
-        return open1;
-      case 2:
-        return open2;
-      case 3:
-        return open3;
-      case 4:
-        return open4;
-      case 5:
-        return open5;
-      case 6:
-        return open6;
-      case 7:
-        return open7;
-      case 8:
-        return open8;
-      case 9:
-        return open9;
-      case 10:
-        return open10;
-      case 11:
-        return open11;
-      case 12:
-        return open12;
+  // function GetStateOpen(e) {
+  //   switch (e) {
+  //     case 1:
+  //       return open1;
+  //     case 2:
+  //       return open2;
+  //     case 3:
+  //       return open3;
+  //     case 4:
+  //       return open4;
+  //     case 5:
+  //       return open5;
+  //     case 6:
+  //       return open6;
+  //     case 7:
+  //       return open7;
+  //     case 8:
+  //       return open8;
+  //     case 9:
+  //       return open9;
+  //     case 10:
+  //       return open10;
+  //     case 11:
+  //       return open11;
+  //     case 12:
+  //       return open12;
 
-      default:
-        return null;
-    }
-  }
+  //     default:
+  //       return null;
+  //   }
+  // }
 
-  function GetSetStateOpen(e) {
-    switch (e) {
-      case 1:
-        return setOpen1;
-      case 2:
-        return setOpen2;
-      case 3:
-        return setOpen3;
-      case 4:
-        return setOpen4;
-      case 5:
-        return setOpen5;
-      case 6:
-        return setOpen6;
-      case 7:
-        return setOpen7;
-      case 8:
-        return setOpen8;
-      case 9:
-        return setOpen9;
-      case 10:
-        return setOpen10;
-      case 11:
-        return setOpen11;
-      case 12:
-        return setOpen12;
+  // function GetSetStateOpen(e) {
+  //   switch (e) {
+  //     case 1:
+  //       return setOpen1;
+  //     case 2:
+  //       return setOpen2;
+  //     case 3:
+  //       return setOpen3;
+  //     case 4:
+  //       return setOpen4;
+  //     case 5:
+  //       return setOpen5;
+  //     case 6:
+  //       return setOpen6;
+  //     case 7:
+  //       return setOpen7;
+  //     case 8:
+  //       return setOpen8;
+  //     case 9:
+  //       return setOpen9;
+  //     case 10:
+  //       return setOpen10;
+  //     case 11:
+  //       return setOpen11;
+  //     case 12:
+  //       return setOpen12;
 
-      default:
-        return null;
-    }
-  }
+  //     default:
+  //       return null;
+  //   }
+  // }
 
   function GetLibEtat(e) {
     switch (e) {
@@ -281,10 +280,18 @@ const ContratPrestation = ({
     if (search.length > 0) {
       _lPrestation = _lPrestation.filter(
         (item) =>
-          item.libelle.toUpperCase().includes(search.toUpperCase()) ||
-          item.secteur.toUpperCase().includes(search.toUpperCase())
+          item.DescriptionPrestationContrat.toUpperCase().includes(
+            search.toUpperCase()
+          ) || item.Secteur.toUpperCase().includes(search.toUpperCase())
       );
     }
+
+    _lPrestation = _lPrestation.sort(
+      (a, b) =>
+        a.MoisInterventionPrestationContratCadencier -
+        b.MoisInterventionPrestationContratCadencier
+    );
+
 
     return _lPrestation;
   };
@@ -352,6 +359,19 @@ const ContratPrestation = ({
     }
   }
 
+  var groupBy = function (xs, key) {
+    return xs.reduce(function (rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
+
+
+  function IsFiltercheckboxShouldBeCheck(fieldname,item){
+    if(arrayFilters.findIndex((filter)=> filter.fieldname === fieldname && filter.item === item) > -1) return true;
+    return false;
+  }
+
   //#endregion
 
   //#region Evenements
@@ -393,16 +413,6 @@ const ContratPrestation = ({
     }
   };
 
-  const GroupClickedCollapse = (e) => {
-    //change la valeur du state gérant le collapse
-    GetSetStateOpen(e)(!GetStateOpen(e));
-
-    //Annule l'affichage des documents/tâches
-    setPrestaSelected(null);
-    setPrestaMoisSelected(null);
-    //La table prend toute la place
-    setGridColMDValue(12);
-  };
 
   const handleCardClicked = (presta) => {
     //Récupère les données
@@ -432,6 +442,27 @@ const ContratPrestation = ({
       MockupListeTache();
     }
   };
+
+
+
+  const handleCheckfilterChange = (checked,key,value) => {
+
+    let _arrTemp = JSON.parse(JSON.stringify(arrayFilters));
+
+    if(checked)
+    {
+      _arrTemp.push({fieldname: key, item: value});
+      setArrayFilters(_arrTemp);
+    }else {
+
+      const index = _arrTemp.findIndex((filter) => filter.fieldname === key && filter.item === value);
+      if(index > -1)
+      {
+        _arrTemp.splice(index,1);
+        setArrayFilters(_arrTemp);
+      }
+    }
+  }
 
   //#endregion
 
@@ -564,17 +595,8 @@ const ContratPrestation = ({
   const PaginationPrestations = () => {
     let _items = [];
 
-    let _limiter = 0;
-
     let _lPrestation = GetPrestationSearched();
-
-    _lPrestation.forEach((presta) => {
-      for (let index = 0; index < 12; index++) {
-        if (presta.mois[index] > 0) {
-          _limiter += 1;
-        }
-      }
-    });
+    let _limiter = _lPrestation.length;
 
     _items.push(
       <Pagination.Prev
@@ -598,11 +620,6 @@ const ContratPrestation = ({
     _items.push(
       <Pagination.Next
         key={_items.length + 1}
-        // onClick={() =>
-        //   pageActuelle >= _limiter / nbParPages
-        //     ? null
-        //     : setPageActuelle(pageActuelle + 1)
-        // }
         onClick={() => handlePageNext(_limiter / nbParPages)}
         className="m-1"
       />
@@ -728,90 +745,72 @@ const ContratPrestation = ({
    * @returns Le tableau des prestations, groupés par mois.
    */
   const TableGroupedMonth = () => {
-    const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
-
     return (
       <Table className="table-presta ">
         {TableHead()}
-
-        {RowGroupMois(_numMoisDebutPrestation)}
-        {RowGroupMois(_numMoisDebutPrestation + 1)}
-        {RowGroupMois(_numMoisDebutPrestation + 2)}
-        {RowGroupMois(_numMoisDebutPrestation + 3)}
-        {RowGroupMois(_numMoisDebutPrestation + 4)}
-        {RowGroupMois(_numMoisDebutPrestation + 5)}
-        {RowGroupMois(_numMoisDebutPrestation + 6)}
-        {RowGroupMois(_numMoisDebutPrestation + 7)}
-        {RowGroupMois(_numMoisDebutPrestation + 8)}
-        {RowGroupMois(_numMoisDebutPrestation + 9)}
-        {RowGroupMois(_numMoisDebutPrestation + 10)}
-        {RowGroupMois(_numMoisDebutPrestation + 11)}
+        {IsLoaded ? <tbody>{TableBody()}</tbody> : PlaceHolderTableLine(5)}
       </Table>
     );
   };
 
-  const dropdownFilter = () => {};
 
-  const handleFilter = () => {};
+
+
+
+  const HeaderWithFilter = (title, fieldname, method) => {
+    let _arFilters = [];
+    let _lprestations = Prestations;
+
+    _arFilters = Object.entries(groupBy(_lprestations, fieldname));
+
+    return (
+      <div>
+        {title}
+        <OverlayTrigger
+          trigger="click"
+          overlay={
+            <Popover className="popover-filters">
+              {_arFilters.map((item,index) => {
+                return (
+                  <Form.Check type="checkbox" checked={IsFiltercheckboxShouldBeCheck(fieldname, item[0])} label={`${method !== undefined ? method(item[0]) : item[0]}`  } key={index}  onChange={(e) => handleCheckfilterChange(e.target.checked,fieldname,item[0])} />
+                );
+              })}
+            </Popover>
+          }
+          placement="bottom"
+        >
+          <FontAwesomeIcon icon={faFilter} />
+        </OverlayTrigger>
+      </div>
+    );
+  };
 
   const TableHead = () => {
+    const _methodeDate = (e) => {
+      return GetNomMois(Number(e));
+    }
+
+    const _methodeEtat = (e) => {
+      return GetLibEtat(Number(e));
+    }
+
     return (
       <thead className="m-2">
         <tr>
+          <th>{HeaderWithFilter("Secteur", "Secteur")}</th>
+          <th>{HeaderWithFilter("N°", "IdPrestationContrat")}</th>
+          <th>{HeaderWithFilter("Libellé", "DescriptionPrestationContrat")}</th>
           <th>
-            <Dropdown>
-              Secteur
-              <Dropdown.Toggle>
-                <FontAwesomeIcon icon={faFilter} />
-              </Dropdown.Toggle>
-              <Dropdown.Menu></Dropdown.Menu>
-            </Dropdown>
+            {HeaderWithFilter(
+              "Date",
+              "MoisInterventionPrestationContratCadencier"
+              ,_methodeDate
+            )}
           </th>
-          <th>
-            <Dropdown>
-              N°
-              <Dropdown.Toggle>
-                <FontAwesomeIcon icon={faFilter} />
-              </Dropdown.Toggle>
-              <Dropdown.Menu></Dropdown.Menu>
-            </Dropdown>
-          </th>
-          <th>
-            <Dropdown>
-              Libellé
-              <Dropdown.Toggle>
-                <FontAwesomeIcon icon={faFilter} />
-              </Dropdown.Toggle>
-              <Dropdown.Menu></Dropdown.Menu>
-            </Dropdown>
-          </th>
-          <th>
-            <Dropdown>
-              Mois
-              <Dropdown.Toggle>
-                <FontAwesomeIcon icon={faFilter} />
-              </Dropdown.Toggle>
-              <Dropdown.Menu></Dropdown.Menu>
-            </Dropdown>
-          </th>
-          <th>
-            <Dropdown>
-              Etat
-              <Dropdown.Toggle>
-                <FontAwesomeIcon icon={faFilter} />
-              </Dropdown.Toggle>
-              <Dropdown.Menu></Dropdown.Menu>
-            </Dropdown>
-          </th>
+          <th>{HeaderWithFilter("Etat", "IdEtat",_methodeEtat)}</th>
           {isListeTacheAffiche && (
             <th>
-               <Dropdown>
-               Liste des tâches 
-              <Dropdown.Toggle>
-                <FontAwesomeIcon icon={faFilter} />
-              </Dropdown.Toggle>
-              <Dropdown.Menu></Dropdown.Menu>
-            </Dropdown>
+              <div>Liste des tâches</div>
             </th>
           )}
         </tr>
@@ -819,155 +818,137 @@ const ContratPrestation = ({
     );
   };
 
-  let nombreAffiche = nbParPages * -1 * (pageActuelle - 1);
-  /**
-   *
-   * @param {* Le numéro du mois (janvier = 1, décmebre = 12) } numeroDuMois
-   * @returns Une ligne groupant toutes les prestations du mois et une ligne par prestation de ce mois
-   */
-  const RowGroupMois = (numeroDuMois) => {
-    if (IsLoaded) {
-      //Cast du parametre
-      let _numMois = Number(numeroDuMois);
-      //Le numéro ne peut être supérieur à 12
-      if (_numMois > 12) {
-        _numMois -= 12;
-      }
-      //Les prestations sont filtrés par le 'search'
-      let _lPrestation = GetPrestationSearched().filter(
-        (item) => item.mois.at(_numMois - 1) > 0
+  const TableBody = () => {
+    let nombreAffiche = nbParPages * -1 * (pageActuelle - 1);
+
+    //     //Les prestations sont filtrés par le 'search'
+    let _lPrestation = GetPrestationSearched();
+
+    if (!filterTous) {
+      let _arrayFilterIdEtat = [];
+      if (filterNP) _arrayFilterIdEtat.push(1);
+      if (filterP) _arrayFilterIdEtat.push(2);
+      if (filterEC) _arrayFilterIdEtat.push(3);
+      if (filterT) _arrayFilterIdEtat.push(4);
+
+      _lPrestation = _lPrestation.filter((presta) =>
+        _arrayFilterIdEtat.includes(presta.IdEtat)
       );
-
-      if (!filterTous) {
-        let _arrayFilterIdEtat = [];
-        if (filterNP) _arrayFilterIdEtat.push(1);
-        if (filterP) _arrayFilterIdEtat.push(2);
-        if (filterEC) _arrayFilterIdEtat.push(3);
-        if (filterT) _arrayFilterIdEtat.push(4);
-
-        _lPrestation = _lPrestation.filter((item) =>
-          _arrayFilterIdEtat.includes(item.mois.at(_numMois - 1))
-        );
-      }
-
-      return (
-        <tbody>
-          {_lPrestation.length > 0 && 1 === 2 ? (
-            nombreAffiche > nbParPages ||
-            nombreAffiche + _lPrestation.length < 0 ? null : (
-              <tr>
-                <td colSpan={4} onClick={() => GroupClickedCollapse(_numMois)}>
-                  <div className=" rounded-pill bg-ligth border-secondary table-basic-row-group">
-                    <Row>
-                      <Col>
-                        <strong>
-                          {GetNomMois(_numMois)}{" "}
-                          {numeroDuMois > 12
-                            ? datePrestation.getFullYear() + 1
-                            : datePrestation.getFullYear()}{" "}
-                          ({_lPrestation.length}) :
-                        </strong>
-                      </Col>
-                      <Col>{ButtonAreaControl(_numMois)}</Col>
-                    </Row>
-                  </div>
-                </td>
-              </tr>
-            )
-          ) : null}
-
-          {_lPrestation.map((presta) => {
-            if (nombreAffiche >= nbParPages || nombreAffiche < 0) {
-              nombreAffiche += 1;
-              return null;
-            }
-            nombreAffiche += 1;
-            return (
-              <Collapse key={presta.id} in={GetStateOpen(_numMois)}>
-                <tr
-                  className={
-                    prestaMoisSelected !== null &&
-                    prestaSelected !== null &&
-                    prestaSelected.id === presta.id &&
-                    prestaMoisSelected === _numMois
-                      ? "table-presta-row-selected"
-                      : ""
-                  }
-                >
-                  <td onClick={() => handleRowClicked(presta, _numMois)}>
-                    <span>{HighlightTextIfSearch(presta.secteur)} </span>
-                  </td>
-
-                  <td onClick={() => handleRowClicked(presta, _numMois)}>
-                    <span> {presta.id}</span>
-                  </td>
-                  <td onClick={() => handleRowClicked(presta, _numMois)}>
-                    <h1>{HighlightTextIfSearch(presta.libelle)}</h1>
-                  </td>
-                  <td onClick={() => handleRowClicked(presta, _numMois)}>
-                    <h1>
-                      {HighlightTextIfSearch(GetNomMois(_numMois))}{" "}
-                      {numeroDuMois > 12
-                        ? datePrestation.getFullYear() + 1
-                        : datePrestation.getFullYear()}
-                    </h1>
-                  </td>
-                  <td onClick={() => handleRowClicked(presta, _numMois)}>
-                    <span
-                      className={`badge badge-${GetBadgeBgColor(
-                        presta.mois.at(_numMois - 1)
-                      )}`}
-                    >
-                      {GetLibEtat(presta.mois.at(_numMois - 1))}
-                    </span>
-                  </td>
-                  {isListeTacheAffiche && (
-                        
-                        <td onClick={() => handleAfficherListeTache()} >
-                      <FontAwesomeIcon
-                        icon={faMagnifyingGlass}
-                        onClick={() => handleAfficherListeTache()}
-                      >
-                      </FontAwesomeIcon>
-                      {"  "} Afficher les tâches
-                    </td>
-                  )}
-                </tr>
-              </Collapse>
-            );
-          })}
-        </tbody>
-      );
-    } else {
-      return PlaceHolderTableLine(5);
     }
+
+    if(arrayFilters.length > 0)
+    {
+      const _arraySecteur = arrayFilters.filter((filter)=> filter.fieldname === "Secteur");
+      const _arrayIdPrestationContrat = arrayFilters.filter((filter)=> filter.fieldname === "IdPrestationContrat")
+      const _arrayDescriptionPrestationContrat = arrayFilters.filter((filter)=> filter.fieldname === "DescriptionPrestationContrat")
+      const _arrayMoisInterventionPrestationContratCadencier = arrayFilters.filter((filter)=> filter.fieldname === "MoisInterventionPrestationContratCadencier")
+      const _arrayIdEtat = arrayFilters.filter((filter)=> filter.fieldname === "IdEtat")
+
+      if(_arraySecteur.length > 0) _lPrestation = _lPrestation.filter((presta) => _arraySecteur.filter((filter) =>  filter.item === presta.Secteur).length > 0  )
+      if(_arrayIdPrestationContrat.length > 0) _lPrestation = _lPrestation.filter((presta) => _arrayIdPrestationContrat.filter((filter) => Number(filter.item) === presta.IdPrestationContrat).length > 0  )
+      if(_arrayDescriptionPrestationContrat.length > 0) _lPrestation = _lPrestation.filter((presta) => _arrayDescriptionPrestationContrat.filter((filter) => filter.item === presta.DescriptionPrestationContrat).length > 0  )
+      if(_arrayMoisInterventionPrestationContratCadencier.length > 0) _lPrestation = _lPrestation.filter((presta) => _arrayMoisInterventionPrestationContratCadencier.filter((filter) => Number(filter.item) === presta.MoisInterventionPrestationContratCadencier).length > 0  )
+      if(_arrayIdEtat.length > 0) _lPrestation = _lPrestation.filter((presta) => _arrayIdEtat.filter((filter) => Number(filter.item) === presta.IdEtat).length > 0  )
+
+    }
+
+
+    return _lPrestation.map((presta, index) => {
+      if (nombreAffiche >= nbParPages || nombreAffiche < 0) {
+        nombreAffiche += 1;
+        return null;
+      }
+      nombreAffiche += 1;
+      return (
+        <tr
+          key={index}
+          className={
+            prestaMoisSelected !== null &&
+            prestaSelected !== null &&
+            prestaSelected.id === presta.id &&
+            prestaMoisSelected ===
+              presta.MoisInterventionPrestationContratCadencier
+              ? "table-presta-row-selected"
+              : ""
+          }
+        >
+          <td
+            onClick={() =>
+              handleRowClicked(
+                presta,
+                presta.MoisInterventionPrestationContratCadencier
+              )
+            }
+          >
+            <span>{HighlightTextIfSearch(presta.Secteur)} </span>
+          </td>
+
+          <td
+            onClick={() =>
+              handleRowClicked(
+                presta,
+                presta.MoisInterventionPrestationContratCadencier
+              )
+            }
+          >
+            <span> {presta.IdPrestationContrat}</span>
+          </td>
+          <td
+            onClick={() =>
+              handleRowClicked(
+                presta,
+                presta.MoisInterventionPrestationContratCadencier
+              )
+            }
+          >
+            <h1>
+              {HighlightTextIfSearch(presta.DescriptionPrestationContrat)}
+            </h1>
+          </td>
+          <td
+            onClick={() =>
+              handleRowClicked(
+                presta,
+                presta.MoisInterventionPrestationContratCadencier
+              )
+            }
+          >
+            <h1>
+              {HighlightTextIfSearch(
+                `  ${GetNomMois(
+                  presta.MoisInterventionPrestationContratCadencier
+                )} ${presta.AnneInterventionPrestationContratCadencier} `
+              )}
+            </h1>
+          </td>
+          <td
+            onClick={() =>
+              handleRowClicked(
+                presta,
+                presta.MoisInterventionPrestationContratCadencier
+              )
+            }
+          >
+            <span className={`badge badge-${GetBadgeBgColor(presta.IdEtat)}`}>
+              {GetLibEtat(presta.IdEtat)}
+            </span>
+          </td>
+          {isListeTacheAffiche && (
+            <td onClick={() => handleAfficherListeTache()}>
+              <FontAwesomeIcon
+                icon={faMagnifyingGlass}
+                onClick={() => handleAfficherListeTache()}
+              ></FontAwesomeIcon>
+              {"  "} Afficher les tâches
+            </td>
+          )}
+        </tr>
+      );
+    });
   };
 
   const handleAfficherListeTache = () => {
     setModalLargeShow(!modalLargeShow);
-  };
-  /**
-   *
-   * @param {* Le numéro du mois} numMois
-   * @returns un bouton controllant le collapse
-   */
-  const ButtonAreaControl = (numMois) => {
-    return (
-      <span className="align-right">
-        <Button
-          variant="contained"
-          aria-controls={`collapse-row-${numMois}`}
-          aria-expanded={open1}
-          onClick={() => GetSetStateOpen(numMois)(!GetStateOpen(numMois))}
-        >
-          {GetStateOpen(numMois) ? (
-            <FontAwesomeIcon icon={faCaretUp} />
-          ) : (
-            <FontAwesomeIcon icon={faCaretDown} />
-          )}
-        </Button>
-      </span>
-    );
   };
 
   const CardDocs = () => {
@@ -1068,7 +1049,7 @@ const ContratPrestation = ({
           {GetPrestationSearched().map((presta, index) => {
             return (
               <Card
-                key={presta.id}
+                key={index}
                 className="m-2 p-2  border-secondary"
                 // onClick={() => handleCardClicked(presta)}
               >
@@ -1076,25 +1057,20 @@ const ContratPrestation = ({
                   <Accordion.Item eventKey={index}>
                     <Accordion.Header>
                       <Card.Title>
-                        {presta.id} - {HighlightTextIfSearch(presta.libelle)}
+                        {presta.IdPrestationContrat} -{" "}
+                        {HighlightTextIfSearch(
+                          presta.DescriptionPrestationContrat
+                        )}
                       </Card.Title>
                     </Accordion.Header>
 
                     <Accordion.Body>
                       <Card.Subtitle>
-                        Secteur : {HighlightTextIfSearch(presta.secteur)}
+                        Secteur : {HighlightTextIfSearch(presta.Secteur)}
                       </Card.Subtitle>
-                      <Card.Body onClick={() => handleCardClicked(presta)}>
-                        <Row>
-                          {presta.mois.map((value, index) => {
-                            return value > 0 ? (
-                              <Col xs={12} key={index}>
-                                {Plannification(index, value)}
-                              </Col>
-                            ) : null;
-                          })}
-                        </Row>
-                      </Card.Body>
+                      <Card.Body
+                        onClick={() => handleCardClicked(presta)}
+                      ></Card.Body>
                     </Accordion.Body>
                   </Accordion.Item>
                 </Accordion>
@@ -1108,35 +1084,35 @@ const ContratPrestation = ({
     );
   };
 
-  /**
-   *
-   * @param {* l'index du mois indexé à 0 (0= janvier, 11=décembre)} indexMois
-   * @param {* La valeur de l'état de la prestation } valeurMois
-   * @returns Une liste des planification de cette préstation
-   */
-  const Plannification = (indexMois, valeurMois) => {
-    let _numMois = Number(indexMois) + 1;
+  // /**
+  //  *
+  //  * @param {* l'index du mois indexé à 0 (0= janvier, 11=décembre)} indexMois
+  //  * @param {* La valeur de l'état de la prestation } valeurMois
+  //  * @returns Une liste des planification de cette préstation
+  //  */
+  // const Plannification = (indexMois, valeurMois) => {
+  //   let _numMois = Number(indexMois) + 1;
 
-    return (
-      <span className="">
-        <Row>
-          <Col xs={6}>{GetNomMois(_numMois)} : </Col>
+  //   return (
+  //     <span className="">
+  //       <Row>
+  //         <Col xs={6}>{GetNomMois(_numMois)} : </Col>
 
-          <Col xs={6}>
-            <OverlayTrigger
-              delay={{ show: 250, hide: 400 }}
-              overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
-            >
-              <Badge pill bg={GetBadgeBgColor(valeurMois)}>
-                {GetBadgeIcon(valeurMois)} {GetLibEtat(valeurMois)}
-              </Badge>
-            </OverlayTrigger>
-          </Col>
-        </Row>
-        <hr />
-      </span>
-    );
-  };
+  //         <Col xs={6}>
+  //           <OverlayTrigger
+  //             delay={{ show: 250, hide: 400 }}
+  //             overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
+  //           >
+  //             <Badge pill bg={GetBadgeBgColor(valeurMois)}>
+  //               {GetBadgeIcon(valeurMois)} {GetLibEtat(valeurMois)}
+  //             </Badge>
+  //           </OverlayTrigger>
+  //         </Col>
+  //       </Row>
+  //       <hr />
+  //     </span>
+  //   );
+  // };
 
   /**
    *
@@ -1289,11 +1265,12 @@ const ContratPrestation = ({
 
   //#endregion
 
-  useEffect(() => {});
+  useEffect(() => {
+    setIsListeTacheAffiche(true);
+  });
 
   return (
     <BreakpointProvider>
-
       <Container fluid>
         <Col md={12} style={{ textAlign: "start" }}>
           <span className="title">Plannification </span>|
@@ -1311,7 +1288,6 @@ const ContratPrestation = ({
               {gridColMDValue !== 12 && (
                 <Col md={12 - gridColMDValue}>{CardDocs()}</Col>
               )}
-              
             </Row>
           </Breakpoint>
 
