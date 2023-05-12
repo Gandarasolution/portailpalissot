@@ -265,24 +265,34 @@
 
 .badge-termine{
   background-color: #01B81A !important;
+  display: inline-block;
+  width: 90px !important;
 }
 
 .badge-nonPlannifie{
   background-color: #FA8B0C !important;
-
+    display: inline-block;
+    width: 90px !important;
 }
 
 .badge-plannifie{
   background-color: var(--bs-primary) !important;
-
+    display: inline-block;
+    width: 90px !important;
 }
 
 .badge-enCours{
   background-color: #FF4D4F !important;
+    display: inline-block;
+    width: 90px !important;
 }
 
-
-
+.modal-90w
+{
+  margin: 5% !important;
+  /* width: 80%; */
+  max-width: none !important;
+}
 
 .popover-filters div {
   margin: 10px !important;

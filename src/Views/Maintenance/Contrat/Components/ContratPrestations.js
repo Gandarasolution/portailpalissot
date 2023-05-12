@@ -3,9 +3,6 @@ import { useEffect, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#region Bootstrap
-// import Badge from "react-bootstrap/Badge";
-// import Tab from "react-bootstrap/Tab";
-// import Tabs from "react-bootstrap/Tabs";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import Collapse from "react-bootstrap/Collapse";
@@ -76,18 +73,17 @@ const ContratPrestation = ({
   const MockupListeTache = () => {
     let _listeTaches = [];
 
-
-
     let _limit = getRandomInt(1, 20);
     for (let index = 0; index < _limit; index++) {
-
       let _taches = [];
       for (let indexT = 0; indexT < getRandomInt(1, 8); indexT++) {
-        _taches.push(loremIpsum({
-          avgSentencesPerParagraph: 1,
-          startWithLoremIpsum: false,
-          random: "false",
-        }).join())
+        _taches.push(
+          loremIpsum({
+            avgSentencesPerParagraph: 1,
+            startWithLoremIpsum: false,
+            random: "false",
+          }).join()
+        );
       }
 
       _listeTaches.push({
@@ -97,7 +93,7 @@ const ContratPrestation = ({
           startWithLoremIpsum: false,
           random: "false",
         }).join(),
-        taches: _taches
+        taches: _taches,
       });
     }
     setListeTaches(_listeTaches);
@@ -141,7 +137,8 @@ const ContratPrestation = ({
 
   const [modaleShow, setModalShow] = useState(false);
   const [prestaSelected, setPrestaSelected] = useState(null);
-  const [prestaMoisSelected, setPrestaMoisSelected] = useState(null);
+  const [prestaDateSelected, setPrestaDateSelected] = useState(null);
+  // const [prestaMoisSelected, setPrestaMoisSelected] = useState(null);
   const [gridColMDValue, setGridColMDValue] = useState(12);
   const [search, setSearch] = useState("");
   const [modalLargeShow, setModalLargeShow] = useState(false);
@@ -279,6 +276,19 @@ const ContratPrestation = ({
     }
   }
 
+  const GetListePrestationPrefiltre = () => {
+    //Les prestations sont filtrés par le 'search'
+    let _lPrestation = GetPrestationSearched();
+
+    //Les prestations sont filtrés par les boutons d'état
+    _lPrestation = FiltrePrestationsBouton(_lPrestation);
+
+    //Les prestations sont filtrés par les colonnes
+    _lPrestation = FiltreColonnes(_lPrestation);
+
+    return _lPrestation;
+  };
+
   const GetPrestationSearched = () => {
     let _lPrestation = Prestations;
 
@@ -292,13 +302,90 @@ const ContratPrestation = ({
     }
 
     _lPrestation = _lPrestation.sort(
-      (a, b) =>
-        a.MoisInterventionPrestationContratCadencier -
-        b.MoisInterventionPrestationContratCadencier
+      (a, b) => a.DateInterventionPrestation - b.DateInterventionPrestation
     );
 
     return _lPrestation;
   };
+
+  function FiltrePrestationsBouton(_lPrestations) {
+    if (!filterTous) {
+      let _arrayFilterIdEtat = [];
+      if (filterNP) _arrayFilterIdEtat.push(1);
+      if (filterP) _arrayFilterIdEtat.push(2);
+      if (filterEC) _arrayFilterIdEtat.push(3);
+      if (filterT) _arrayFilterIdEtat.push(4);
+
+      _lPrestations = _lPrestations.filter((presta) =>
+        _arrayFilterIdEtat.includes(presta.IdEtat)
+      );
+    }
+
+    return _lPrestations;
+  }
+
+  function FiltreColonnes(_lPrestation) {
+    if (arrayFilters.length > 0) {
+      console.log(arrayFilters);
+      let _arraySecteur = arrayFilters.filter(
+        (filter) => filter.fieldname === "Secteur"
+      );
+      let _arrayIdPrestationContrat = arrayFilters.filter(
+        (filter) => filter.fieldname === "IdPrestationContrat"
+      );
+      let _arrayDescriptionPrestationContrat = arrayFilters.filter(
+        (filter) => filter.fieldname === "DescriptionPrestationContrat"
+      );
+      let _arrayDateInterventionPrestation = arrayFilters.filter(
+        (filter) => filter.fieldname === "DateInterventionPrestation"
+      );
+
+      let _arrayIdEtat = arrayFilters.filter(
+        (filter) => filter.fieldname === "IdEtat"
+      );
+
+      if (_arraySecteur.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arraySecteur.filter((filter) => filter.item === presta.Secteur)
+              .length > 0
+        );
+      if (_arrayIdPrestationContrat.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arrayIdPrestationContrat.filter(
+              (filter) => Number(filter.item) === presta.IdPrestationContrat
+            ).length > 0
+        );
+      if (_arrayDescriptionPrestationContrat.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arrayDescriptionPrestationContrat.filter(
+              (filter) => filter.item === presta.DescriptionPrestationContrat
+            ).length > 0
+        );
+
+      if (_arrayDateInterventionPrestation.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arrayDateInterventionPrestation.filter(
+              (filter) =>
+                new Date(filter.item).getTime() ===
+                new Date(presta.DateInterventionPrestation).getTime()
+            ).length > 0
+        );
+
+      if (_arrayIdEtat.length > 0)
+        _lPrestation = _lPrestation.filter(
+          (presta) =>
+            _arrayIdEtat.filter(
+              (filter) => Number(filter.item) === presta.IdEtat
+            ).length > 0
+        );
+    }
+
+    return _lPrestation;
+  }
 
   const reactStringReplace = require("react-string-replace");
   function HighlightTextIfSearch(text) {
@@ -431,21 +518,23 @@ const ContratPrestation = ({
     setModalShow(true);
   };
 
-  const handleRowClicked = (presta, mois) => {
+  const handleRowClicked = (presta, date) => {
     if (
       prestaSelected !== null &&
       prestaSelected.id === presta.id &&
-      prestaMoisSelected !== null &&
-      prestaMoisSelected === mois
+      prestaDateSelected !== null &&
+      prestaDateSelected === date
     ) {
       //Même sélection (déselection)
       setGridColMDValue(12);
       setPrestaSelected(null);
-      setPrestaMoisSelected(null);
+      // setPrestaMoisSelected(null);
+      setPrestaDateSelected(null);
     } else {
       setGridColMDValue(10);
       setPrestaSelected(presta);
-      setPrestaMoisSelected(mois);
+      // setPrestaMoisSelected(mois);
+      setPrestaDateSelected(date);
       MockupListeTache();
     }
   };
@@ -475,7 +564,7 @@ const ContratPrestation = ({
 
       //Annule l'affichage des documents/tâches
       setPrestaSelected(null);
-      setPrestaMoisSelected(null);
+      setPrestaDateSelected(null);
       //La table prend toute la place
       setGridColMDValue(12);
     }
@@ -487,7 +576,7 @@ const ContratPrestation = ({
     setPageActuelle(number);
     //Annule l'affichage des documents/tâches
     setPrestaSelected(null);
-    setPrestaMoisSelected(null);
+    setPrestaDateSelected(null);
     //La table prend toute la place
     setGridColMDValue(12);
   };
@@ -499,10 +588,15 @@ const ContratPrestation = ({
       setPageActuelle(pageActuelle + 1);
       //Annule l'affichage des documents/tâches
       setPrestaSelected(null);
-      setPrestaMoisSelected(null);
+      setPrestaDateSelected(null);
       //La table prend toute la place
       setGridColMDValue(12);
     }
+  };
+
+  const handleAfficherListeTache = () => {
+    let _value = JSON.parse(JSON.stringify(modalLargeShow));
+    setModalLargeShow(!_value);
   };
 
   //#endregion
@@ -510,28 +604,6 @@ const ContratPrestation = ({
   //#region Composants
 
   //#region commun
-  // const ButtonDownloadDocuments = () => {
-  //   return (
-  //     <Container p={2}>
-  //       <Button className="m-1">
-  //         {" "}
-  //         <FontAwesomeIcon icon={faFile} /> Extranet{" "}
-  //       </Button>
-  //       <Button className="m-1">
-  //         {" "}
-  //         <FontAwesomeIcon icon={faFileContract} /> CERFA{" "}
-  //       </Button>
-  //       <Button className="m-1">
-  //         {" "}
-  //         <FontAwesomeIcon icon={faFileImage} /> Fiche rammonage{" "}
-  //       </Button>
-  //       <Button className="m-1">
-  //         {" "}
-  //         <FontAwesomeIcon icon={faFilePdf} /> Rapport technicien{" "}
-  //       </Button>
-  //     </Container>
-  //   );
-  // };
 
   const ButtonFilter = (IdEtat) => {
     if (IdEtat === -1) {
@@ -604,7 +676,7 @@ const ContratPrestation = ({
   const PaginationPrestations = () => {
     let _items = [];
 
-    let _lPrestation = GetPrestationSearched();
+    let _lPrestation = GetListePrestationPrefiltre();
     let _limiter = _lPrestation.length;
 
     _items.push(
@@ -806,7 +878,9 @@ const ContratPrestation = ({
 
   const TableHead = () => {
     const _methodeDate = (e) => {
-      return GetNomMois(Number(e));
+      return `${GetNomMois(new Date(e).getMonth())}  ${new Date(
+        e
+      ).getFullYear()}`;
     };
 
     const _methodeEtat = (e) => {
@@ -819,7 +893,7 @@ const ContratPrestation = ({
           <th>
             {HeaderWithFilter(
               "Date",
-              "MoisInterventionPrestationContratCadencier",
+              "DateInterventionPrestation",
               _methodeDate
             )}
           </th>
@@ -827,90 +901,38 @@ const ContratPrestation = ({
           <th>{HeaderWithFilter("N°", "IdPrestationContrat")}</th>
           <th>{HeaderWithFilter("Libellé", "DescriptionPrestationContrat")}</th>
           <th>{HeaderWithFilter("Etat", "IdEtat", _methodeEtat)}</th>
-          {isListeTacheAffiche && (
-            <th>
-              <div>Action</div>
-            </th>
-          )}
+          <th>
+            <div>Action</div>
+          </th>
         </tr>
       </thead>
+    );
+  };
+
+  const TableCell = (presta, text, isSearchable, isH1) => {
+    let _spanText = isSearchable ? (
+      <span>{HighlightTextIfSearch(text)}</span>
+    ) : (
+      <span>{text}</span>
+    );
+
+    let _cellText = isH1 ? <h1>{_spanText}</h1> : _spanText;
+
+    return (
+      <td
+        onClick={() =>
+          handleRowClicked(presta, presta.DateInterventionPrestation)
+        }
+      >
+        {_cellText}
+      </td>
     );
   };
 
   const TableBody = () => {
     let nombreAffiche = nbParPages * -1 * (pageActuelle - 1);
 
-    //     //Les prestations sont filtrés par le 'search'
-    let _lPrestation = GetPrestationSearched();
-
-    if (!filterTous) {
-      let _arrayFilterIdEtat = [];
-      if (filterNP) _arrayFilterIdEtat.push(1);
-      if (filterP) _arrayFilterIdEtat.push(2);
-      if (filterEC) _arrayFilterIdEtat.push(3);
-      if (filterT) _arrayFilterIdEtat.push(4);
-
-      _lPrestation = _lPrestation.filter((presta) =>
-        _arrayFilterIdEtat.includes(presta.IdEtat)
-      );
-    }
-
-    if (arrayFilters.length > 0) {
-      let _arraySecteur = arrayFilters.filter(
-        (filter) => filter.fieldname === "Secteur"
-      );
-      let _arrayIdPrestationContrat = arrayFilters.filter(
-        (filter) => filter.fieldname === "IdPrestationContrat"
-      );
-      let _arrayDescriptionPrestationContrat = arrayFilters.filter(
-        (filter) => filter.fieldname === "DescriptionPrestationContrat"
-      );
-      let _arrayMoisInterventionPrestationContratCadencier =
-        arrayFilters.filter(
-          (filter) =>
-            filter.fieldname === "MoisInterventionPrestationContratCadencier"
-        );
-      let _arrayIdEtat = arrayFilters.filter(
-        (filter) => filter.fieldname === "IdEtat"
-      );
-
-      if (_arraySecteur.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arraySecteur.filter((filter) => filter.item === presta.Secteur)
-              .length > 0
-        );
-      if (_arrayIdPrestationContrat.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arrayIdPrestationContrat.filter(
-              (filter) => Number(filter.item) === presta.IdPrestationContrat
-            ).length > 0
-        );
-      if (_arrayDescriptionPrestationContrat.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arrayDescriptionPrestationContrat.filter(
-              (filter) => filter.item === presta.DescriptionPrestationContrat
-            ).length > 0
-        );
-      if (_arrayMoisInterventionPrestationContratCadencier.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arrayMoisInterventionPrestationContratCadencier.filter(
-              (filter) =>
-                Number(filter.item) ===
-                presta.MoisInterventionPrestationContratCadencier
-            ).length > 0
-        );
-      if (_arrayIdEtat.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arrayIdEtat.filter(
-              (filter) => Number(filter.item) === presta.IdEtat
-            ).length > 0
-        );
-    }
+    let _lPrestation = GetListePrestationPrefiltre();
 
     return _lPrestation.map((presta, index) => {
       if (nombreAffiche >= nbParPages || nombreAffiche < 0) {
@@ -922,99 +944,52 @@ const ContratPrestation = ({
         <tr
           key={index}
           className={
-            prestaMoisSelected !== null &&
+            prestaDateSelected !== null &&
             prestaSelected !== null &&
             prestaSelected.id === presta.id &&
-            prestaMoisSelected ===
-              presta.MoisInterventionPrestationContratCadencier
+            prestaDateSelected === presta.DateInterventionPrestation
               ? "table-presta-row-selected"
               : ""
           }
         >
-          <td
-            onClick={() =>
-              handleRowClicked(
-                presta,
-                presta.MoisInterventionPrestationContratCadencier
-              )
-            }
-          >
-            <h1>
-              {HighlightTextIfSearch(
-                `  ${GetNomMois(
-                  presta.MoisInterventionPrestationContratCadencier
-                )} ${presta.AnneInterventionPrestationContratCadencier} `
-              )}
-            </h1>
-          </td>
-
-          <td
-            onClick={() =>
-              handleRowClicked(
-                presta,
-                presta.MoisInterventionPrestationContratCadencier
-              )
-            }
-          >
-            <span>{HighlightTextIfSearch(presta.Secteur)} </span>
-          </td>
-
-          <td
-            onClick={() =>
-              handleRowClicked(
-                presta,
-                presta.MoisInterventionPrestationContratCadencier
-              )
-            }
-          >
-            <span> {presta.IdPrestationContrat}</span>
-          </td>
-          <td
-            onClick={() =>
-              handleRowClicked(
-                presta,
-                presta.MoisInterventionPrestationContratCadencier
-              )
-            }
-          >
-            <h1>
-              {HighlightTextIfSearch(presta.DescriptionPrestationContrat)}
-            </h1>
-          </td>
-
-          <td
-            onClick={() =>
-              handleRowClicked(
-                presta,
-                presta.MoisInterventionPrestationContratCadencier
-              )
-            }
-          >
+          {/* Date */}
+          {TableCell(
+            presta,
+            `${GetNomMois(presta.DateInterventionPrestation.getMonth() + 1)} 
+            ${presta.DateInterventionPrestation.getFullYear()} `,
+            true,
+            true
+          )}
+          {/* Secteur */}
+          {TableCell(presta, presta.Secteur, true, false)}
+          {/* Id */}
+          {TableCell(presta, presta.IdPrestationContrat, true, false)}
+          {/* Libelle */}
+          {TableCell(presta, presta.DescriptionPrestationContrat, true, true)}
+          {/* Etat */}
+          {TableCell(
+            presta,
             <span className={`badge badge-${GetBadgeBgColor(presta.IdEtat)}`}>
               {GetLibEtat(presta.IdEtat)}
-            </span>
-          </td>
-          {isListeTacheAffiche && (
-            <td onClick={() => handleAfficherListeTache()}>
-              <OverlayTrigger placement="bottom" overlay={<Tooltip>Relevés de tâches</Tooltip>}  
-                >
+            </span>,
+            false,
+            false
+          )}
 
+          <td onClick={() => handleAfficherListeTache()}>
+            <OverlayTrigger
+              placement="bottom"
+              overlay={<Tooltip>Relevés de tâches</Tooltip>}
+            >
               <FontAwesomeIcon
                 icon={faListCheck}
                 onClick={() => handleAfficherListeTache()}
-                />
-
-                </OverlayTrigger>
-            </td>
-          )}
+              />
+            </OverlayTrigger>
+          </td>
         </tr>
       );
     });
-  };
-
-  const handleAfficherListeTache = () => {
-    let _value = JSON.parse(JSON.stringify(modalLargeShow))
-    setModalLargeShow(!_value);
   };
 
   const CardDocs = () => {
@@ -1074,14 +1049,11 @@ const ContratPrestation = ({
     );
   };
 
-
-
   const CardListeTaches = () => {
     if (listeTaches.length === 0) return null;
 
     let _body = (
-
-      <div >
+      <div>
         {listeTaches.map((Relevetache) => {
           return (
             <span key={Relevetache.id} className="mb-2">
@@ -1090,15 +1062,16 @@ const ContratPrestation = ({
                   <FontAwesomeIcon icon={faList} /> {Relevetache.description}
                 </Col>
               </Row>
-              {Relevetache.taches.map((tache, index) => {
-                return (
-                  <Row key={index}>
-                    <Col md={{ offset: 1 }}>
-                      <Form.Check readOnly checked={false} label={tache} />
-                    </Col>
-                  </Row>
-                );
-              })}
+              {isListeTacheAffiche &&
+                Relevetache.taches.map((tache, index) => {
+                  return (
+                    <Row key={index}>
+                      <Col md={{ offset: 1 }}>
+                        <Form.Check readOnly checked={false} label={tache} />
+                      </Col>
+                    </Row>
+                  );
+                })}
             </span>
           );
         })}
@@ -1107,6 +1080,7 @@ const ContratPrestation = ({
 
     return (
       <Modal
+        dialogClassName="modal-90w"
         show={modalLargeShow}
         onHide={() => setModalLargeShow(false)}
         backdrop="static"
@@ -1368,7 +1342,7 @@ const ContratPrestation = ({
             <Row>
               <Col md={gridColMDValue}>
                 {TableGroupedMonth()} {PaginationPrestations()}
-                {isListeTacheAffiche && CardListeTaches()}
+                {CardListeTaches()}
               </Col>
 
               {gridColMDValue !== 12 && (

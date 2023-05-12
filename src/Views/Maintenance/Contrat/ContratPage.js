@@ -43,8 +43,7 @@ const ContratPage = () => {
     {
       IdPrestationContrat: 3490
       ,DescriptionPrestationContrat: "visite principale annuelle en août : 10 brûleurs "
-      ,MoisInterventionPrestationContratCadencier: 8
-      ,AnneInterventionPrestationContratCadencier: 2021
+      ,DateInterventionPrestation: new Date(2021,8,1)
       ,IdEtat: 1
       ,Secteur: "Bruleur proccess"
 
@@ -52,24 +51,24 @@ const ContratPage = () => {
     {
       IdPrestationContrat: 3490
       ,DescriptionPrestationContrat: "visite intermédiaire de  janvier/février : 10 brûleurs"
-      ,MoisInterventionPrestationContratCadencier: 1
-      ,AnneInterventionPrestationContratCadencier: 2021
+      ,DateInterventionPrestation: new Date(2021,1,1)
+
       ,IdEtat: 2
       ,Secteur: "Bruleur proccess"
     },
     {
       IdPrestationContrat: 3490
       ,DescriptionPrestationContrat: "visite intermédiaire de  janvier/février : 10 brûleurs"
-      ,MoisInterventionPrestationContratCadencier: 2
-      ,AnneInterventionPrestationContratCadencier: 2021
+      ,DateInterventionPrestation: new Date(2021,2,1)
+
       ,IdEtat: 3
       ,Secteur: "Bruleur proccess"
     },
     {
       IdPrestationContrat: 3490
       ,DescriptionPrestationContrat: "visite intermédiaire d'avril : 10 brûleurs "
-      ,MoisInterventionPrestationContratCadencier: 4
-      ,AnneInterventionPrestationContratCadencier: 2021
+      ,DateInterventionPrestation: new Date(2021,4,1)
+
       ,IdEtat: 4
       ,Secteur: "Bruleur proccess"
 
@@ -77,8 +76,9 @@ const ContratPage = () => {
     {
       IdPrestationContrat: 3490
       ,DescriptionPrestationContrat: "ramonage du conduit de cheminée de la chaudière de la cabine KREMLIN  P1- sous traitance "
-      ,MoisInterventionPrestationContratCadencier: 8
-      ,AnneInterventionPrestationContratCadencier: 2021
+     ,InterventionPrestationContratCadencier: 2021
+      ,DateInterventionPrestation: new Date(2021,8,1)
+
       ,IdEtat: 1
       ,Secteur: "Chaudiere"
 
@@ -86,8 +86,7 @@ const ContratPage = () => {
     {
       IdPrestationContrat: 3490
       ,DescriptionPrestationContrat: "Ramonage des 3 conduits de cheminée des Brûleurs PROCESS IPROS - sous traitance  "
-      ,MoisInterventionPrestationContratCadencier: 8
-      ,AnneInterventionPrestationContratCadencier: 2021
+      ,DateInterventionPrestation: new Date(2021,8,1)
       ,IdEtat: 4
       ,Secteur: "Bruleur proccess"
 
@@ -106,8 +105,9 @@ const ContratPage = () => {
           startWithLoremIpsum: false,
           random: "false",
         }).join()
-        ,MoisInterventionPrestationContratCadencier: getRandomInt(1, 12)
-        ,AnneInterventionPrestationContratCadencier: 2021
+        ,DateInterventionPrestation : new Date(getRandomInt(2004,2025),getRandomInt(0,11),1)
+
+
         ,IdEtat: getRandomInt(1, 4)
         ,Secteur: loremIpsum({
           avgSentencesPerParagraph: 1,
@@ -122,6 +122,8 @@ const ContratPage = () => {
 
       _prestas.push(_presta);
     }
+
+    _prestas.sort((a,b)=> a.DateInterventionPrestation - b.DateInterventionPrestation)
 
     SetPrestations(_prestas);
   };
@@ -283,7 +285,7 @@ const ContratPage = () => {
         drop="down-centered"
         style={{ borderRadius: "10px" }}
         id="dropdown-datePeriode"
-        title={`Période : de ${GetNomMois(
+        title={`Période : ${GetNomMois(
           dateDebutPeriode.getMonth() + 1,
           small
         )}
@@ -297,7 +299,7 @@ const ContratPage = () => {
         {_arrayPeriodes.map((periode, index) => {
           return (
             <Dropdown.Item key={index} eventKey={periode.dateStart}>
-              {`de ${GetNomMois(
+              {` ${GetNomMois(
                 periode.dateStart.getMonth() + 1
               )} ${periode.dateStart.getFullYear()} à ${GetNomMois(
                 periode.dateEnd.getMonth() + 1
