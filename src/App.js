@@ -46,11 +46,16 @@ function App() {
     );
   }
 
+
+
+
+
   return (
     <Router>
       <div className="App font-link background">
         <NavbarMenu />
         <Routes>
+          
           <Route path="/" element={<HomePage />} />
           <Route path="/maintenance/contrat" element={<ContratPage />} />
           <Route path="/maintenance/appareils" element={<AppareilsPage />} />

@@ -86,6 +86,11 @@
   border-color: #ced4da !important;
 }
 
+
+.link-password-forgot{
+  color: var(--bs-primary) !important;
+}
+
 .centerStack {
   display: flex;
   width: 100%;

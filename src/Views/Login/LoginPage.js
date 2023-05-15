@@ -3,10 +3,16 @@
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
+import { Alert, Modal } from "react-bootstrap";
 
 //#region Bootstrap
-
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
+import NavLink from "react-bootstrap/NavLink";
+import Row from "react-bootstrap/Row";
 //#endregion
 
 //#region Components
@@ -22,6 +28,12 @@ const LoginPage = (props) => {
 
   const [password, setPassword] = useState("");
   const [login, setLogin] = useState("");
+
+  const [showModal, setShowModal] = useState(false);
+  const [mailRecup, setMailRecup] = useState("")
+
+  const [idError, setIdError] = useState(0);
+
 
   //#endregion
 
@@ -39,14 +51,139 @@ const LoginPage = (props) => {
 
   //#region Composants
 
+
+  //#region Forgot password
+
+
+const handleForgotPassword = () => {
+  if(mailRecup.length > 0)
+  {
+  }
+}
+
+  const FormModalForgotPassword = () => {
+    return (
+      <div>
+        <p>
+          Merci d'indiquer votre adresse mail. Si celle-ci est connu de notre
+          service, vous recevrez un mail avec le lien de réinitialisation du mot
+          de passe.
+        </p>
+
+        <Form className="m-4" onSubmit={() => handleForgotPassword()}>
+          <Form.FloatingLabel label="Email" className="mb-3">
+            <Form.Control
+              type="email"
+              required
+              placeholder="identifiant@exemple.com"
+              value={mailRecup}
+              onChange={(e) => setMailRecup(e.target.value)}
+            />
+          </Form.FloatingLabel>
+
+          <div className="d-flex justify-content-center">
+            <Button variant="primary" type="submit">
+              Envoyer
+            </Button>
+          </div>
+        </Form>
+      </div>
+    );
+  };
+
+  const ModalForgotPassword = () => {
+    return (
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <h1>Mot de passe oublié ?</h1>
+        </Modal.Header>
+
+        <Modal.Body>{FormModalForgotPassword()}</Modal.Body>
+      </Modal>
+    );
+  };
+
+
+  //#endregion
+
+
+  
+//#region Erreurs
+const Erreur500 = () => {
+  return (
+    <span>
+      Un problème est survenu lors de la connexion. Réessayez plus tard ou
+      contactez le support au 
+      <Alert.Link className="link-password-forgot ms-1" href="tel:+384328955">03 84 32 89 55 </Alert.Link>
+       ou par mail à
+      <Alert.Link className="link-password-forgot ms-1" href="mailto:support@gandarasolution.fr">
+        support@gandarasolution.fr
+      </Alert.Link>
+    </span>
+  );
+};
+
+const Erreur401 = () => {
+  return (
+    <span>
+      Identifiants incorrects. Vérifiez votre adresse mail et votre mot de
+      passe.
+      <Alert.Link
+        className="link-password-forgot ms-1"
+        onClick={() => setShowModal(true)}
+      >
+        Mot de passe oublié ?
+      </Alert.Link>
+    </span>
+  );
+};
+
+  const ErreurConnexion = () => {
+
+    let _IdError = Number(idError);
+    switch (true) {
+      case _IdError > 499:
+        return Erreur500();
+        case _IdError === 401:
+          return Erreur401();
+      default:
+        return Erreur500();
+    }
+  }
+
+
+  const AlertErrorConnexion = () => {
+
+    if (idError > 0) {
+      return (
+        <Alert variant="danger" className="m-2">
+          {ErreurConnexion()}
+        </Alert>
+      );
+    }
+  };
+
+  
+
+//#endregion
+
+
+
   const FormSubmit = () => {
     return (
-      <Form className="m-4" onSubmit={() => props.setToken("@")}>
+      <Form className="m-4 p-2" onSubmit={() => props.setToken("@")}>
         {/* <Form className="m-4"  onSubmit={()=> console.log(password)} > */}
         <Form.Group className="mb-3" controlId="formLogin">
           <Form.Label>Identifiant</Form.Label>
+
           <Form.Control
             type="email"
+            required
             placeholder="identifiant@exemple.com"
             value={login}
             onChange={(e) => setLogin(e.target.value)}
@@ -58,6 +195,7 @@ const LoginPage = (props) => {
           <InputGroup>
             <Form.Control
               type={revealed ? "text" : "password"}
+              required
               placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -69,9 +207,21 @@ const LoginPage = (props) => {
               <FontAwesomeIcon icon={revealed ? faEyeSlash : faEye} />
             </Button>
           </InputGroup>
+          {AlertErrorConnexion()}
+
+          <div className=" d-flex justify-content-end m-2">
+            <NavLink
+              onClick={() => setShowModal(true)}
+              className="link-password-forgot"
+            >
+              Mot de passe oublié ?
+            </NavLink>
+          </div>
+
         </Form.Group>
 
         <Button variant="primary" type="submit">
+        {/* <Button variant="primary" onClick={() => setIdError(401)} > */}
           Connexion
         </Button>
       </Form>
@@ -91,6 +241,7 @@ const LoginPage = (props) => {
           {FormSubmit()}
         </Col>
       </Row>
+      {ModalForgotPassword()}
     </Container>
   );
 };
