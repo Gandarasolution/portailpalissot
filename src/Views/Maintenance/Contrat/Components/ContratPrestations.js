@@ -21,7 +21,7 @@ import Stack from "react-bootstrap/Stack";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
 import Tooltip from "react-bootstrap/Tooltip";
-import  Nav  from "react-bootstrap/Nav";
+import Nav from "react-bootstrap/Nav";
 //#endregion
 
 //#region FontAwsome
@@ -42,7 +42,6 @@ import {
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
-
 
 //#endregion
 
@@ -585,18 +584,18 @@ const ContratPrestation = ({
   const ButtonFilter = (IdEtat) => {
     if (IdEtat === -1) {
       return (
-        <Nav.Link 
+        <Nav.Link
           className={
             filterTous ? "btn-filter-active border" : "btn-filter border"
           }
           onClick={() => handleTousFilter()}
         >
           {GetLibEtat(IdEtat)}
-          </Nav.Link>
+        </Nav.Link>
       );
     } else {
       return (
-        <Nav.Link 
+        <Nav.Link
           className={
             GetFilterState(IdEtat)
               ? "btn-filter-active border"
@@ -610,41 +609,36 @@ const ContratPrestation = ({
           }
         >
           {GetLibEtat(IdEtat)}
-          </Nav.Link>
+        </Nav.Link>
       );
     }
   };
 
   const SearchPrestation = () => {
+    return (
+      <Row className="mb-2">
+        <Col className="m-1">
+          <Nav fill>
+            <Nav.Item>{ButtonFilter(-1)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(1)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(2)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(3)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(4)}</Nav.Item>
+          </Nav>
+        </Col>
 
-return (
-  <Row className="mb-2">
-    <Col className="m-1">
-      <Nav fill >
-        <Nav.Item>{ButtonFilter(-1)}</Nav.Item>
-        <Nav.Item>{ButtonFilter(1)}</Nav.Item>
-        <Nav.Item>{ButtonFilter(2)}</Nav.Item>
-        <Nav.Item>{ButtonFilter(3)}</Nav.Item>
-        <Nav.Item>{ButtonFilter(4)}</Nav.Item>
-      </Nav>
-    </Col>
+        <Col md={5} className="m-1">
+          <Form.Control
+            type="search"
+            placeholder="Rechercher"
+            aria-label="Search"
+            onChange={handleSearch}
+          />
+        </Col>
 
-    <Col md={5} className="m-1">
-      <Form.Control
-        type="search"
-        placeholder="Rechercher"
-        aria-label="Search"
-        onChange={handleSearch}
-      />
-    </Col>
-
-    <Col className="m-1">
-      {ParentComponentPeriodeSelect}
-    </Col>
-  </Row>
-);
-
-
+        <Col className="m-1">{ParentComponentPeriodeSelect}</Col>
+      </Row>
+    );
   };
 
   //#endregion
@@ -917,8 +911,6 @@ return (
 
   //#endregion
 
-
-
   //#endregion
 
   //#region large
@@ -1123,13 +1115,12 @@ return (
 
   //#endregion
 
-
   //#endregion
 
   //#region small
 
   const GridCardPrestation = () => {
-    if(!IsLoaded) return PlaceholderCardPrestation(5)
+    if (!IsLoaded) return PlaceholderCardPrestation(5);
 
     let _lPrestation = GetListePrestationPrefiltre();
     return (
@@ -1186,61 +1177,56 @@ return (
     );
   };
 
-
-const PlaceholderCardPrestation = (numberOfCards) => {
+  const PlaceholderCardPrestation = (numberOfCards) => {
     let _arrayLoading = [];
     for (let index = 0; index < numberOfCards; index++) {
       _arrayLoading.push(index + 1);
     }
-  
-    return _arrayLoading.map((p)=> {
+
+    return _arrayLoading.map((p) => {
       return (
         <Card className="m-2">
-        <Card.Title>
-          <Row>
-            <Col>
+          <Card.Title>
+            <Row>
+              <Col>
+                <Placeholder as="p" animation="glow">
+                  <Placeholder xs={12} />
+                </Placeholder>
+              </Col>
+
+              <Col>
+                <Placeholder as="p" animation="glow">
+                  <Placeholder xs={12} />
+                </Placeholder>
+              </Col>
+            </Row>
+          </Card.Title>
+          <Card.Subtitle>
             <Placeholder as="p" animation="glow">
+              <Placeholder xs={12} />
+            </Placeholder>
+          </Card.Subtitle>
+
+          <Card.Body>
+            <h6>
+              <Placeholder as="p" animation="glow">
                 <Placeholder xs={12} />
               </Placeholder>
-            </Col>
+            </h6>
 
-            <Col>
-            <Placeholder as="p" animation="glow">
-                <Placeholder xs={12} />
-              </Placeholder>
-            </Col>
-          </Row>
-        </Card.Title>
-        <Card.Subtitle>
-        <Placeholder as="p" animation="glow">
-                <Placeholder xs={12} />
-              </Placeholder>
-        </Card.Subtitle>
+            <Button className="m-2 p-2">
+              <FontAwesomeIcon icon={faFile} /> Liste des documents
+            </Button>
 
-        <Card.Body>
-          <h6><Placeholder as="p" animation="glow">
-                <Placeholder xs={12} />
-              </Placeholder></h6>
-
-          <Button
-            className="m-2 p-2"
-           
-          >
-            <FontAwesomeIcon icon={faFile} /> Liste des documents
-          </Button>
-
-          <Button
-            className="m-2 p-2"
-          >
-            <FontAwesomeIcon icon={faList} /> Relevés de tâches
-          </Button>
-        </Card.Body>
-        {CardListeTaches()}
-      </Card>
-      )
-    })
-
-}
+            <Button className="m-2 p-2">
+              <FontAwesomeIcon icon={faList} /> Relevés de tâches
+            </Button>
+          </Card.Body>
+          {CardListeTaches()}
+        </Card>
+      );
+    });
+  };
 
   //#endregion
 

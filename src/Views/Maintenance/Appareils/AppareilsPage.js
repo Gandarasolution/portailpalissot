@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 //#region FontAwsome icones
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faMobileAlt,
   faSort,
   faSortDown,
   faSortUp,
@@ -12,20 +11,20 @@ import {
 //#endregion
 
 //#region Bootstrap
-import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
 import Table from "react-bootstrap/Table";
 import Image from "react-bootstrap/Image";
 import Badge from "react-bootstrap/Badge";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
+import Nav from "react-bootstrap/Nav";
+import Row from "react-bootstrap/Row";
 
 //#endregion
 
 //#region Components
-import WhiteShadowCard from "../../../components/commun/WhiteShadowCard";
 
 //#endregion
 
@@ -246,7 +245,9 @@ const AppareilsPage = () => {
 
   const ButtonFilter = (props) => {
     return (
-      <Button
+      <Nav.Item>
+
+      <Nav.Link
         onClick={() => props.methodState(!props.state)}
         variant=""
         className={
@@ -255,63 +256,61 @@ const AppareilsPage = () => {
       >
         {GetImageAppareilEtat(props.IdEtat, "img-bt-filter")}
         {props.title} ({props.number})
-      </Button>
+      </Nav.Link>
+      </Nav.Item>
+
     );
   };
 
   const FilterFindPanel = () => {
     return (
-      <Container fluid className="d-flex flex-column">
-        <Container fluid className="d-flex flex-row" style={{flex: "2"}}>
+      <Row className="mb-2">
+        <Col className="m-1">
+          <Nav fill>
+            {listeAppareils.filter((appar) => appar.IdEtat === 2).length > 0 &&
+              ButtonFilter({
+                title: "Actif",
+                methodState: SetFilterActif,
+                state: filterActif,
+                number: listeAppareils.filter((appar) => appar.IdEtat === 2)
+                  .length,
+                IdEtat: 2,
+              })}
 
-          <Container fluid className="m-2" style={{ flex: "1" }}>
-            <ButtonGroup>
-              {listeAppareils.filter((appar) => appar.IdEtat === 2).length >
-                0 &&
-                ButtonFilter({
-                  title: "Actif",
-                  methodState: SetFilterActif,
-                  state: filterActif,
-                  number: listeAppareils.filter((appar) => appar.IdEtat === 2)
-                    .length,
-                  IdEtat: 2,
-                })}
+            {listeAppareils.filter((appar) => appar.IdEtat === 1).length > 0 &&
+              ButtonFilter({
+                title: "Hors contrat",
+                methodState: SetFilterHorscontrat,
+                state: filterHorscontrat,
+                number: listeAppareils.filter((appar) => appar.IdEtat === 1)
+                  .length,
+                IdEtat: 1,
+              })}
 
-              {listeAppareils.filter((appar) => appar.IdEtat === 1).length >
-                0 &&
-                ButtonFilter({
-                  title: "Hors contrat",
-                  methodState: SetFilterHorscontrat,
-                  state: filterHorscontrat,
-                  number: listeAppareils.filter((appar) => appar.IdEtat === 1)
-                    .length,
-                  IdEtat: 1,
-                })}
+            {listeAppareils.filter((appar) => appar.IdEtat === 3).length > 0 &&
+              ButtonFilter({
+                title: "Détruit",
+                methodState: SetFilterDetruit,
+                state: filterDetruit,
+                number: listeAppareils.filter((appar) => appar.IdEtat === 3)
+                  .length,
+                IdEtat: 3,
+              })}
+          </Nav>
+        </Col>
 
-              {listeAppareils.filter((appar) => appar.IdEtat === 3).length >
-                0 &&
-                ButtonFilter({
-                  title: "Détruit",
-                  methodState: SetFilterDetruit,
-                  state: filterDetruit,
-                  number: listeAppareils.filter((appar) => appar.IdEtat === 3)
-                    .length,
-                  IdEtat: 3,
-                })}
-            </ButtonGroup>
-          </Container>
-
-          <Container className="m-2" style={{ flex: "2" }}>
-            <Form.Control
-              type="search"
-              placeholder="Rechercher"
-              aria-label="Search"
-              onChange={handleSearch}
-            />
-          </Container>
-        </Container>
-       </Container>
+        <Col md={6} className="m-1">
+          <Form.Control
+            type="search"
+            placeholder="Rechercher"
+            aria-label="Search"
+            onChange={handleSearch}
+          />
+        </Col>
+      </Row>
     );
+
+
   };
 
   const GetImageAppareilEtat = (IdEtat, className) => {
@@ -362,7 +361,6 @@ const AppareilsPage = () => {
             <td>{HighlightTextIfSearch(appareil.Secteur)} </td>
             <td>{appareil.Id}</td>
             <td>{HighlightTextIfSearch(appareil.Libelle)}</td>
-            {/* <td>{GetImageAppareilEtat(appareil.IdEtat)}</td> */}
             <td>{GetImageAppareilEtat(appareil.IdEtat)}
               <Badge bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
                 {appareil.LibelleEtat}{" "}
@@ -492,19 +490,22 @@ const AppareilsPage = () => {
 
   return (
     <Container fluid>
-      <WhiteShadowCard icon={faMobileAlt} title="Liste des appareils :">
+        <Col md={12} style={{ textAlign: "start" }}>
+          <span className="title">Liste des appareils </span>|
+          <span className="subtitle"> {listeAppareils.length} appareils </span>
+        </Col>
         {FilterFindPanel()}
-        <Container fluid>
           <BreakpointProvider>
             <Breakpoint large up>
+            <Container fluid className="container-table p-4">
+
               {AppareilsTable()}
+              </Container>
             </Breakpoint>
             <Breakpoint medium down>
               {AppareilsCards()}
             </Breakpoint>
           </BreakpointProvider>
-        </Container>
-      </WhiteShadowCard>
     </Container>
   );
 };
