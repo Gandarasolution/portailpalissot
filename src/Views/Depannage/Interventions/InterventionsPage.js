@@ -1,5 +1,7 @@
 //#region Imports
 
+import { Button, Col, Container, Table } from "react-bootstrap";
+
 //#region Bootstrap
 
 //#endregion
@@ -10,7 +12,7 @@
 
 //#endregion
 
-const InterventionPage = (props) => {
+const InterventionPage = () => {
   //#region States
 
   //#endregion
@@ -23,7 +25,38 @@ const InterventionPage = (props) => {
 
   //#endregion
 
-  return <div>Interventiosn ! yeah</div>;
+  return (
+    <Container fluid className="h-100">
+      <Col md={12} style={{ textAlign: "start" }}>
+        <span className="title">Interventions </span>|
+        <span className="subtitle"> xxx interventions </span>
+      </Col>
+
+      <Container fluid className="container-table p-4">
+
+
+      <div>
+<Button>
+  Nouvelle demande d'intervention
+</Button>
+
+      </div>
+
+<Table>
+<thead>
+  <th>
+    Date
+  </th>
+</thead>
+
+</Table>
+
+
+
+
+      </Container>
+    </Container>
+  );
 };
 
 export default InterventionPage;

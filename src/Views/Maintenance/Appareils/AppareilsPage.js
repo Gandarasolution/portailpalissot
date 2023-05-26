@@ -489,7 +489,7 @@ const AppareilsPage = () => {
   },[isLoaded]);
 
   return (
-    <Container fluid>
+    <Container fluid className="h-100">
         <Col md={12} style={{ textAlign: "start" }}>
           <span className="title">Liste des appareils </span>|
           <span className="subtitle"> {listeAppareils.length} appareils </span>

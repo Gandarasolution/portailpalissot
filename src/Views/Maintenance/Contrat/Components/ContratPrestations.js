@@ -42,6 +42,7 @@ import {
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
+import TableData from "../../../../components/commun/TableData";
 
 //#endregion
 
@@ -1034,7 +1035,7 @@ const ContratPrestation = ({
           {/* Date */}
           {TableCell(
             presta,
-            `${GetNomMois(presta.DateInterventionPrestation.getMonth() + 1)} 
+            `${GetNomMois(presta.DateInterventionPrestation.getMonth())} 
           ${presta.DateInterventionPrestation.getFullYear()} `,
             true,
             true
@@ -1236,6 +1237,149 @@ const ContratPrestation = ({
     setIsListeTacheAffiche(true);
   }, []);
 
+  const _methodeDate = (e) => {
+    return `${GetNomMois(new Date(e).getMonth())}  ${new Date(
+      e
+    ).getFullYear()}`;
+  };
+
+  const _methodeEtat = (e) => {
+    return GetLibEtat(Number(e));
+  };
+
+
+  const _header = [
+    {
+      title: "Date",
+      filter: {
+        fieldname: "DateInterventionPrestation",
+        method: _methodeDate,
+      },
+    },
+    {
+      title: "Secteur",
+      filter: {fieldname: "Secteur"}
+    },
+    {
+      title: "N°", filter:{fieldname:"IdPrestationContrat"}
+    },
+    {
+      title: "Libellé", filter:{fieldname:"DescriptionPrestationContrat"}
+    },
+    {
+      title: "Etat",
+      filter: {
+        fieldname: "IdEtat",
+        method: _methodeEtat,
+      },
+    },
+    {title:"Action"}
+
+  ];
+
+
+
+
+
+  const handleLigneClicked = (presta) => {
+
+    handleRowClicked(presta, presta.DateInterventionPrestation)
+  }
+
+
+  const isRowSelected = (presta) => {
+    return prestaDateSelected !== null &&
+    prestaSelected !== null &&
+    prestaSelected.id === presta.id &&
+    prestaDateSelected === presta.DateInterventionPrestation
+  }
+
+
+
+
+const _Data = () => {
+  let _body = [];
+
+  let _lprestations = GetListePrestationPrefiltre();
+
+  for (let index = 0; index < _lprestations.length; index++) {
+
+    const presta = _lprestations[index];
+    let _cells = [];
+
+    let _date = {
+      text: `${GetNomMois(
+        presta.DateInterventionPrestation.getMonth()
+      )} ${presta.DateInterventionPrestation.getFullYear()} `,
+      isSearchable: true,
+      isH1: true,
+      method: handleLigneClicked,
+    };
+    _cells.push(_date);
+
+    let _secteur = {
+      text: presta.Secteur,
+      isSearchable: true,
+      isH1: false,
+      method: handleLigneClicked,
+    };
+    _cells.push(_secteur);
+
+    let _id = {
+      text: presta.IdPrestationContrat,
+      isSearchable: false,
+      isH1: false,
+      method: handleLigneClicked,
+    };
+    _cells.push(_id);
+
+    let _libelle = {
+      text: presta.DescriptionPrestationContrat,
+      isSearchable: true,
+      isH1: true,
+      method: handleLigneClicked,
+    };
+    _cells.push(_libelle);
+
+
+    let _etat = {
+      text:    <span className={`badge badge-${GetBadgeBgColor(presta.IdEtat)}`}>
+           {GetLibEtat(presta.IdEtat)}
+        </span>,
+      isSearchable: false,
+      isH1: false,
+      method: handleLigneClicked,
+    };
+    _cells.push(_etat);
+
+
+    let _bt ={
+      text:  <OverlayTrigger
+      placement="bottom"
+      overlay={<Tooltip>Relevés de tâches</Tooltip>}
+    >
+      <FontAwesomeIcon
+        icon={faListCheck}
+        onClick={() => handleAfficherListeTache()}
+      />
+    </OverlayTrigger>,
+    isSearchable: false,
+    isH1: false,
+    method: handleAfficherListeTache
+    }
+
+    _cells.push(_bt)
+
+    let _row = {data: presta, cells: _cells};
+
+
+    _body.push(_row);
+  }
+  return _body;
+};
+
+ 
+
   return (
     <BreakpointProvider>
       <Container fluid>
@@ -1289,6 +1433,28 @@ const ContratPrestation = ({
             </Modal>
           </Breakpoint>
         </Container>
+
+        <Container fluid className="container-table p-4">
+
+        <TableData
+          IsLoaded={IsLoaded}
+          placeholdeNbLine={5}
+          headers={_header}
+          data={Prestations}
+          handleCheckfilterChange={handleCheckfilterChange}
+          isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+          lData={_Data()}
+          isRowActive= {isRowSelected}
+          HighlightTextIfSearch={HighlightTextIfSearch}
+
+
+          nbParPages={nbParPages}
+          pageActuelle={pageActuelle}
+        />
+
+</Container>
+
+
       </Container>
     </BreakpointProvider>
   );
