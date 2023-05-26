@@ -486,7 +486,7 @@ const AppareilsPage = () => {
     }
     makeRequest();
     MockupListeappareils();
-  }, [isLoaded]);
+  },[isLoaded]);
 
   return (
     <Container fluid>
