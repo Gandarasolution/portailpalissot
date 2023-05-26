@@ -10,7 +10,6 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Modal from "react-bootstrap/Modal";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
@@ -22,8 +21,7 @@ import Stack from "react-bootstrap/Stack";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
 import Tooltip from "react-bootstrap/Tooltip";
-import ListGroup from 'react-bootstrap/ListGroup';
-
+import  Nav  from "react-bootstrap/Nav";
 //#endregion
 
 //#region FontAwsome
@@ -44,7 +42,7 @@ import {
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
-import { Nav } from "react-bootstrap";
+
 
 //#endregion
 
@@ -1234,7 +1232,7 @@ return (
 
             <Modal
               dialogClassName="modal-90w"
-              show={gridColMDValue != 12}
+              show={gridColMDValue !== 12}
               onHide={() => setGridColMDValue(12)}
               backdrop="static"
               keyboard={false}

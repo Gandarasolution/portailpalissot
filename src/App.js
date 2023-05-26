@@ -22,11 +22,12 @@ import {
   faFolder,
 } from "@fortawesome/free-solid-svg-icons";
 
-import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, useSearchParams } from "react-router-dom";
 import AppareilsPage from "./Views/Maintenance/Appareils/AppareilsPage";
 import InterventionPage from "./Views/Depannage/Interventions/InterventionsPage";
 import LoginPage from "./Views/Login/LoginPage";
+import { useState } from "react";
 // import Sidebar from './components/menu/SidebarMenuV2';
 //#endregion
 
@@ -35,10 +36,15 @@ library.add(faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder);
 export const SiteContext = React.createContext(null);
 
 function App() {
-  const [token, setToken] = useState();
+  const storedJwt = sessionStorage.getItem("token");
+  const [jwt, setJwt] = useState(storedJwt || null);
 
+  function setToken(token) {
+    sessionStorage.setItem("token", token);
+    setJwt(token);
+  }
 
-  if (!token) {
+  if (!jwt) {
     return (
       <div className="App font-link background">
         <LoginPage setToken={setToken} />
@@ -46,16 +52,11 @@ function App() {
     );
   }
 
-
-
-
-
   return (
     <Router>
       <div className="App font-link background">
         <NavbarMenu />
         <Routes>
-          
           <Route path="/" element={<HomePage />} />
           <Route path="/maintenance/contrat" element={<ContratPage />} />
           <Route path="/maintenance/appareils" element={<AppareilsPage />} />

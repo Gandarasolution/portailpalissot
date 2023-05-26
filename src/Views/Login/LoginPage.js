@@ -2,7 +2,7 @@
 
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Modal } from "react-bootstrap";
 
 //#region Bootstrap
@@ -39,6 +39,7 @@ const LoginPage = (props) => {
 
   //#region Fonctions
 
+
   //#endregion
 
   //#region Evenements
@@ -47,6 +48,27 @@ const LoginPage = (props) => {
     let _revealed = !revealed;
     setRevealed(_revealed);
   };
+
+
+const handleSubmit= () => {
+//TODO : GetJWT
+
+//Envoye de la requête
+// let _response = login(login, password)
+//if _response.code == 200
+//setToken(_response.data)
+//else setIdError(_response.code)
+
+if(login === "a@a.fr")
+{
+  props.setToken("@");
+}else{
+  setIdError(401);
+}
+
+
+}
+
   //#endregion
 
   //#region Composants
@@ -172,11 +194,14 @@ const Erreur401 = () => {
 
 //#endregion
 
+useEffect(()=>{
 
+},[login])
 
   const FormSubmit = () => {
     return (
-      <Form className="m-4 p-2" onSubmit={() => props.setToken("@")}>
+      <Form className="m-4 p-2" >
+      {/* <Form className="m-4 p-2" onSubmit={() => handleSubmit()}> */}
         {/* <Form className="m-4"  onSubmit={()=> console.log(password)} > */}
         <Form.Group className="mb-3" controlId="formLogin">
           <Form.Label>Identifiant</Form.Label>
@@ -220,7 +245,7 @@ const Erreur401 = () => {
 
         </Form.Group>
 
-        <Button variant="primary" type="submit">
+        <Button variant="primary" onClick={() => handleSubmit()}>
         {/* <Button variant="primary" onClick={() => setIdError(401)} > */}
           Connexion
         </Button>
