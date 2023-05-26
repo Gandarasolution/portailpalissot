@@ -313,7 +313,7 @@ const ContratPage = () => {
 
   useEffect(() => {
     async function makeRequest() {
-      await delay(1);
+      await delay(1000);
 
       setIsLoadedContrat(true);
       setIsLoadedPresta(true);

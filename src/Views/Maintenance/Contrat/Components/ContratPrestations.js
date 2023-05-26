@@ -1108,7 +1108,7 @@ return (
       return (
         <tbody key={i}>
           <tr>
-            <td colSpan={4}>
+            <td colSpan={6}>
               <Placeholder as="p" animation="glow">
                 <Placeholder xs={12} />
               </Placeholder>
@@ -1129,6 +1129,8 @@ return (
   //#region small
 
   const GridCardPrestation = () => {
+    if(!IsLoaded) return PlaceholderCardPrestation(5)
+
     let _lPrestation = GetListePrestationPrefiltre();
     return (
       <div>
@@ -1183,6 +1185,62 @@ return (
       </Card>
     );
   };
+
+
+const PlaceholderCardPrestation = (numberOfCards) => {
+    let _arrayLoading = [];
+    for (let index = 0; index < numberOfCards; index++) {
+      _arrayLoading.push(index + 1);
+    }
+  
+    return _arrayLoading.map((p)=> {
+      return (
+        <Card className="m-2">
+        <Card.Title>
+          <Row>
+            <Col>
+            <Placeholder as="p" animation="glow">
+                <Placeholder xs={12} />
+              </Placeholder>
+            </Col>
+
+            <Col>
+            <Placeholder as="p" animation="glow">
+                <Placeholder xs={12} />
+              </Placeholder>
+            </Col>
+          </Row>
+        </Card.Title>
+        <Card.Subtitle>
+        <Placeholder as="p" animation="glow">
+                <Placeholder xs={12} />
+              </Placeholder>
+        </Card.Subtitle>
+
+        <Card.Body>
+          <h6><Placeholder as="p" animation="glow">
+                <Placeholder xs={12} />
+              </Placeholder></h6>
+
+          <Button
+            className="m-2 p-2"
+           
+          >
+            <FontAwesomeIcon icon={faFile} /> Liste des documents
+          </Button>
+
+          <Button
+            className="m-2 p-2"
+          >
+            <FontAwesomeIcon icon={faList} /> Relevés de tâches
+          </Button>
+        </Card.Body>
+        {CardListeTaches()}
+      </Card>
+      )
+    })
+
+}
 
   //#endregion
 
