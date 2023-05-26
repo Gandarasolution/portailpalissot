@@ -22,6 +22,7 @@ import ContratPrestation from "./Components/ContratPrestations";
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Breakpoint, BreakpointProvider } from "react-socks";
+import ContratInfo from "./Components/ContratInformation";
 
 //#endregion
 
@@ -323,7 +324,7 @@ const ContratPage = () => {
 
   return (
     <Container fluid className="h-100" > 
-      {/* <ContratInfo Contrat={Contrat} IsLoaded={isLoadedContrat} /> */}
+      <ContratInfo Contrat={Contrat} IsLoaded={isLoadedContrat} />
 
       <ContratPrestation
         IsLoaded={isLoadedPresta}

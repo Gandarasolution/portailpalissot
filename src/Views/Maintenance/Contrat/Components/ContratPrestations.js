@@ -1000,7 +1000,7 @@ const ContratPrestation = ({
           }
           placement="bottom"
         >
-          <FontAwesomeIcon icon={faFilter} />
+          <FontAwesomeIcon icon={faFilter} className="icon-bt" />
         </OverlayTrigger>
       </div>
     );
@@ -1185,7 +1185,7 @@ const ContratPrestation = ({
 
     return _arrayLoading.map((p) => {
       return (
-        <Card className="m-2">
+        <Card className="m-2" key={p}>
           <Card.Title>
             <Row>
               <Col>

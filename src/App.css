@@ -99,9 +99,15 @@
   justify-content: center;
 }
 
+.icon-bt:hover{
+  color: var(--bs-primary) ;
+  cursor: pointer;
+}
 
 
-
+.hoverclassic:hover{
+  cursor:default;
+}
 
 .btn-filter {
   background-color: white !important;
