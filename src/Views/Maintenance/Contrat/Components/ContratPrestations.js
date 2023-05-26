@@ -14,7 +14,6 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
-import Accordion from "react-bootstrap/Accordion";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Image from "react-bootstrap/Image";
@@ -23,6 +22,7 @@ import Stack from "react-bootstrap/Stack";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
 import Tooltip from "react-bootstrap/Tooltip";
+import ListGroup from 'react-bootstrap/ListGroup';
 
 //#endregion
 
@@ -34,6 +34,7 @@ import {
   faFilter,
   faListCheck,
   faList,
+  faFile,
 } from "@fortawesome/free-solid-svg-icons";
 
 //#endregion
@@ -43,6 +44,7 @@ import {
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
+import { Nav } from "react-bootstrap";
 
 //#endregion
 
@@ -72,7 +74,6 @@ const ContratPrestation = ({
 
   const MockupListeTache = () => {
     let _listeTaches = [];
-
     let _limit = getRandomInt(1, 20);
     for (let index = 0; index < _limit; index++) {
       let _taches = [];
@@ -104,20 +105,6 @@ const ContratPrestation = ({
   //#region States
 
   //#region Collapses
-  // const [open1, setOpen1] = useState(true);
-  // const [open2, setOpen2] = useState(true);
-  // const [open3, setOpen3] = useState(true);
-  // const [open4, setOpen4] = useState(true);
-  // const [open5, setOpen5] = useState(true);
-  // const [open6, setOpen6] = useState(true);
-  // const [open7, setOpen7] = useState(true);
-  // const [open8, setOpen8] = useState(true);
-  // const [open9, setOpen9] = useState(true);
-  // const [open10, setOpen10] = useState(true);
-  // const [open11, setOpen11] = useState(true);
-  // const [open12, setOpen12] = useState(true);
-
-  const [openTaches, setOpenTaches] = useState(true);
   const [openDocuments, setOpenDocuments] = useState(true);
   //#endregion
 
@@ -135,10 +122,8 @@ const ContratPrestation = ({
   const [arrayFilters, setArrayFilters] = useState([]);
   //#endregion
 
-  const [modaleShow, setModalShow] = useState(false);
   const [prestaSelected, setPrestaSelected] = useState(null);
   const [prestaDateSelected, setPrestaDateSelected] = useState(null);
-  // const [prestaMoisSelected, setPrestaMoisSelected] = useState(null);
   const [gridColMDValue, setGridColMDValue] = useState(12);
   const [search, setSearch] = useState("");
   const [modalLargeShow, setModalLargeShow] = useState(false);
@@ -508,16 +493,6 @@ const ContratPrestation = ({
     }
   };
 
-  const handleCardClicked = (presta) => {
-    //Récupère les données
-    MockupListeTache();
-
-    setPrestaSelected(presta);
-
-    //Affiche la modale
-    setModalShow(true);
-  };
-
   const handleRowClicked = (presta, date) => {
     if (
       prestaSelected !== null &&
@@ -596,7 +571,10 @@ const ContratPrestation = ({
 
   const handleAfficherListeTache = () => {
     let _value = JSON.parse(JSON.stringify(modalLargeShow));
-    setModalLargeShow(!_value);
+    _value = !_value;
+    //Récupère les données
+    MockupListeTache();
+    setModalLargeShow(_value);
   };
 
   //#endregion
@@ -605,21 +583,22 @@ const ContratPrestation = ({
 
   //#region commun
 
+  //#region Panel de recherche
   const ButtonFilter = (IdEtat) => {
     if (IdEtat === -1) {
       return (
-        <Button
+        <Nav.Link 
           className={
             filterTous ? "btn-filter-active border" : "btn-filter border"
           }
           onClick={() => handleTousFilter()}
         >
           {GetLibEtat(IdEtat)}
-        </Button>
+          </Nav.Link>
       );
     } else {
       return (
-        <Button
+        <Nav.Link 
           className={
             GetFilterState(IdEtat)
               ? "btn-filter-active border"
@@ -633,46 +612,46 @@ const ContratPrestation = ({
           }
         >
           {GetLibEtat(IdEtat)}
-        </Button>
+          </Nav.Link>
       );
     }
   };
 
   const SearchPrestation = () => {
-    return (
-      <Container fluid className="d-flex flex-column">
-        <Container fluid className="d-flex flex-row">
-          <BreakpointProvider>
-            <Breakpoint large up>
-              <Container fluid className="m-2" style={{ flex: "1" }}>
-                <ButtonGroup>
-                  {ButtonFilter(-1)}
-                  {ButtonFilter(1)}
-                  {ButtonFilter(2)}
-                  {ButtonFilter(3)}
-                  {ButtonFilter(4)}
-                </ButtonGroup>
-              </Container>
-            </Breakpoint>
-          </BreakpointProvider>
 
-          <Container className="m-2" style={{ flex: "2" }}>
-            <Form.Control
-              type="search"
-              placeholder="Rechercher"
-              aria-label="Search"
-              onChange={handleSearch}
-            />
-          </Container>
+return (
+  <Row className="mb-2">
+    <Col className="m-1">
+      <Nav fill >
+        <Nav.Item>{ButtonFilter(-1)}</Nav.Item>
+        <Nav.Item>{ButtonFilter(1)}</Nav.Item>
+        <Nav.Item>{ButtonFilter(2)}</Nav.Item>
+        <Nav.Item>{ButtonFilter(3)}</Nav.Item>
+        <Nav.Item>{ButtonFilter(4)}</Nav.Item>
+      </Nav>
+    </Col>
 
-          <div className="m-2" style={{ flex: "1" }}>
-            {ParentComponentPeriodeSelect}
-          </div>
-        </Container>
-      </Container>
-    );
+    <Col md={5} className="m-1">
+      <Form.Control
+        type="search"
+        placeholder="Rechercher"
+        aria-label="Search"
+        onChange={handleSearch}
+      />
+    </Col>
+
+    <Col className="m-1">
+      {ParentComponentPeriodeSelect}
+    </Col>
+  </Row>
+);
+
+
   };
 
+  //#endregion
+
+  //#region pagination
   const PaginationPrestations = () => {
     let _items = [];
 
@@ -761,7 +740,144 @@ const ContratPrestation = ({
 
   //#endregion
 
-  //#region large
+  //#region Liste des tâches
+  const CardListeTaches = () => {
+    if (listeTaches.length === 0) return null;
+
+    let _body = (
+      <div>
+        {listeTaches.map((Relevetache) => {
+          return (
+            <span key={Relevetache.id} className="mb-2">
+              <Row>
+                <Col>
+                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
+                </Col>
+              </Row>
+              {isListeTacheAffiche &&
+                Relevetache.taches.map((tache, index) => {
+                  return (
+                    <Row key={index}>
+                      <Col md={{ offset: 1 }}>
+                        <Form.Check readOnly checked={false} label={tache} />
+                      </Col>
+                    </Row>
+                  );
+                })}
+            </span>
+          );
+        })}
+      </div>
+    );
+
+    return (
+      <Modal
+        dialogClassName="modal-90w"
+        show={modalLargeShow}
+        onHide={() => setModalLargeShow(false)}
+        backdrop="static"
+        keyboard={false}
+        animation={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title> Liste des relevés de tâches</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{_body}</Modal.Body>
+      </Modal>
+    );
+  };
+
+  const CardListeTachesBody = () => {
+    if (listeTaches.length === 0) return <div>Aucune tâche enregistrée</div>;
+
+    let _body = (
+      <div>
+        {listeTaches.map((Relevetache) => {
+          return (
+            <span key={Relevetache.id} className="mb-2">
+              <Row>
+                <Col>
+                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
+                </Col>
+              </Row>
+              {isListeTacheAffiche &&
+                Relevetache.taches.map((tache, index) => {
+                  return (
+                    <Row key={index}>
+                      <Col md={{ offset: 1 }}>
+                        <Form.Check readOnly checked={false} label={tache} />
+                      </Col>
+                    </Row>
+                  );
+                })}
+            </span>
+          );
+        })}
+      </div>
+    );
+
+    return _body;
+  };
+  //#endregion
+
+  //#region Documents
+
+  const CardDocs = () => {
+    let _arrayDocs = [
+      { title: "CERFA", extension: "pdf", size: "18 MO" },
+      {
+        title: "Fiche rammonage",
+        extension: "pdf",
+        size: "12 MO",
+      },
+      {
+        title: "Photo extranet",
+        extension: "jpg",
+        size: "32 MO",
+      },
+      {
+        title: "Rapport d'intervention",
+        extension: "pdf",
+        size: "46 MO",
+      },
+    ];
+
+    let _DocZIP = {
+      title: "Tous les documents",
+      extension: "zip",
+      size: "90 MO",
+    };
+    return (
+      <Card className="mb-2">
+        <Card.Header className="card-document">
+          Documents ({_arrayDocs.length})
+          <Button
+            variant="contained"
+            aria-controls={`collapse-listeDocuments`}
+            aria-expanded={openDocuments}
+            onClick={() => setOpenDocuments(!openDocuments)}
+          >
+            {openDocuments ? (
+              <FontAwesomeIcon icon={faCaretUp} />
+            ) : (
+              <FontAwesomeIcon icon={faCaretDown} />
+            )}
+          </Button>
+        </Card.Header>
+        <Card.Body>
+          <Collapse in={openDocuments}>
+            <div id="collapse-listeDocuments">
+              {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
+
+              {_arrayDocs.map((doc, index) => {
+                return RowDocument(doc, index);
+              })}
+            </div>
+          </Collapse>
+        </Card.Body>
+      </Card>
+    );
+  };
 
   const RowDocument = (props, index) => {
     return (
@@ -801,25 +917,15 @@ const ContratPrestation = ({
     );
   };
 
-  const PlaceHolderTableLine = (numberOfLines) => {
-    let _arrayLoading = [];
-    for (let index = 0; index < numberOfLines; index++) {
-      _arrayLoading.push(index + 1);
-    }
-    return _arrayLoading.map((i) => {
-      return (
-        <tbody key={i}>
-          <tr>
-            <td colSpan={4}>
-              <Placeholder as="p" animation="glow">
-                <Placeholder xs={12} />
-              </Placeholder>
-            </td>
-          </tr>
-        </tbody>
-      );
-    });
-  };
+  //#endregion
+
+
+
+  //#endregion
+
+  //#region large
+
+  //#region Table
 
   /**
    *
@@ -831,6 +937,40 @@ const ContratPrestation = ({
         {TableHead()}
         {IsLoaded ? <tbody>{TableBody()}</tbody> : PlaceHolderTableLine(5)}
       </Table>
+    );
+  };
+
+  //#region Headers
+  const TableHead = () => {
+    const _methodeDate = (e) => {
+      return `${GetNomMois(new Date(e).getMonth())}  ${new Date(
+        e
+      ).getFullYear()}`;
+    };
+
+    const _methodeEtat = (e) => {
+      return GetLibEtat(Number(e));
+    };
+
+    return (
+      <thead className="m-2">
+        <tr>
+          <th>
+            {HeaderWithFilter(
+              "Date",
+              "DateInterventionPrestation",
+              _methodeDate
+            )}
+          </th>
+          <th>{HeaderWithFilter("Secteur", "Secteur")}</th>
+          <th>{HeaderWithFilter("N°", "IdPrestationContrat")}</th>
+          <th>{HeaderWithFilter("Libellé", "DescriptionPrestationContrat")}</th>
+          <th>{HeaderWithFilter("Etat", "IdEtat", _methodeEtat)}</th>
+          <th>
+            <div>Action</div>
+          </th>
+        </tr>
+      </thead>
     );
   };
 
@@ -875,60 +1015,9 @@ const ContratPrestation = ({
       </div>
     );
   };
+  //#endregion
 
-  const TableHead = () => {
-    const _methodeDate = (e) => {
-      return `${GetNomMois(new Date(e).getMonth())}  ${new Date(
-        e
-      ).getFullYear()}`;
-    };
-
-    const _methodeEtat = (e) => {
-      return GetLibEtat(Number(e));
-    };
-
-    return (
-      <thead className="m-2">
-        <tr>
-          <th>
-            {HeaderWithFilter(
-              "Date",
-              "DateInterventionPrestation",
-              _methodeDate
-            )}
-          </th>
-          <th>{HeaderWithFilter("Secteur", "Secteur")}</th>
-          <th>{HeaderWithFilter("N°", "IdPrestationContrat")}</th>
-          <th>{HeaderWithFilter("Libellé", "DescriptionPrestationContrat")}</th>
-          <th>{HeaderWithFilter("Etat", "IdEtat", _methodeEtat)}</th>
-          <th>
-            <div>Action</div>
-          </th>
-        </tr>
-      </thead>
-    );
-  };
-
-  const TableCell = (presta, text, isSearchable, isH1) => {
-    let _spanText = isSearchable ? (
-      <span>{HighlightTextIfSearch(text)}</span>
-    ) : (
-      <span>{text}</span>
-    );
-
-    let _cellText = isH1 ? <h1>{_spanText}</h1> : _spanText;
-
-    return (
-      <td
-        onClick={() =>
-          handleRowClicked(presta, presta.DateInterventionPrestation)
-        }
-      >
-        {_cellText}
-      </td>
-    );
-  };
-
+  //#region Body
   const TableBody = () => {
     let nombreAffiche = nbParPages * -1 * (pageActuelle - 1);
 
@@ -956,7 +1045,7 @@ const ContratPrestation = ({
           {TableCell(
             presta,
             `${GetNomMois(presta.DateInterventionPrestation.getMonth() + 1)} 
-            ${presta.DateInterventionPrestation.getFullYear()} `,
+          ${presta.DateInterventionPrestation.getFullYear()} `,
             true,
             true
           )}
@@ -992,333 +1081,109 @@ const ContratPrestation = ({
     });
   };
 
-  const CardDocs = () => {
-    let _arrayDocs = [
-      { title: "CERFA", extension: "pdf", size: "18 MO" },
-      {
-        title: "Fiche rammonage",
-        extension: "pdf",
-        size: "12 MO",
-      },
-      {
-        title: "Photo extranet",
-        extension: "jpg",
-        size: "32 MO",
-      },
-      {
-        title: "Rapport d'intervention",
-        extension: "pdf",
-        size: "46 MO",
-      },
-    ];
-
-    let _DocZIP = {
-      title: "Tous les documents",
-      extension: "zip",
-      size: "90 MO",
-    };
-    return (
-      <Card className="mb-2">
-        <Card.Header className="card-document">
-          Documents ({_arrayDocs.length})
-          <Button
-            variant="contained"
-            aria-controls={`collapse-listeDocuments`}
-            aria-expanded={openTaches}
-            onClick={() => setOpenDocuments(!openDocuments)}
-          >
-            {openDocuments ? (
-              <FontAwesomeIcon icon={faCaretUp} />
-            ) : (
-              <FontAwesomeIcon icon={faCaretDown} />
-            )}
-          </Button>
-        </Card.Header>
-        <Card.Body>
-          <Collapse in={openDocuments}>
-            <div id="collapse-listeDocuments">
-              {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
-
-              {_arrayDocs.map((doc, index) => {
-                return RowDocument(doc, index);
-              })}
-            </div>
-          </Collapse>
-        </Card.Body>
-      </Card>
-    );
-  };
-
-  const CardListeTaches = () => {
-    if (listeTaches.length === 0) return null;
-
-    let _body = (
-      <div>
-        {listeTaches.map((Relevetache) => {
-          return (
-            <span key={Relevetache.id} className="mb-2">
-              <Row>
-                <Col>
-                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
-                </Col>
-              </Row>
-              {isListeTacheAffiche &&
-                Relevetache.taches.map((tache, index) => {
-                  return (
-                    <Row key={index}>
-                      <Col md={{ offset: 1 }}>
-                        <Form.Check readOnly checked={false} label={tache} />
-                      </Col>
-                    </Row>
-                  );
-                })}
-            </span>
-          );
-        })}
-      </div>
+  const TableCell = (presta, text, isSearchable, isH1) => {
+    let _spanText = isSearchable ? (
+      <span>{HighlightTextIfSearch(text)}</span>
+    ) : (
+      <span>{text}</span>
     );
 
+    let _cellText = isH1 ? <h1>{_spanText}</h1> : _spanText;
+
     return (
-      <Modal
-        dialogClassName="modal-90w"
-        show={modalLargeShow}
-        onHide={() => setModalLargeShow(false)}
-        backdrop="static"
-        keyboard={false}
+      <td
+        onClick={() =>
+          handleRowClicked(presta, presta.DateInterventionPrestation)
+        }
       >
-        <Modal.Header closeButton>
-          <Modal.Title> Liste des relevés de tâches</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{_body}</Modal.Body>
-      </Modal>
+        {_cellText}
+      </td>
     );
   };
+
+  const PlaceHolderTableLine = (numberOfLines) => {
+    let _arrayLoading = [];
+    for (let index = 0; index < numberOfLines; index++) {
+      _arrayLoading.push(index + 1);
+    }
+    return _arrayLoading.map((i) => {
+      return (
+        <tbody key={i}>
+          <tr>
+            <td colSpan={4}>
+              <Placeholder as="p" animation="glow">
+                <Placeholder xs={12} />
+              </Placeholder>
+            </td>
+          </tr>
+        </tbody>
+      );
+    });
+  };
+
+  //#endregion
+
+  //#endregion
+
 
   //#endregion
 
   //#region small
 
-  /**
-   *
-   * @returns Les listes de toutes les prestations sous forme de card
-   */
-  const CardedPrestations = () => {
-    return IsLoaded ? (
-      <Container>
-        <div>
-          {GetPrestationSearched().map((presta, index) => {
-            return (
-              <Card
-                key={index}
-                className="m-2 p-2  border-secondary"
-                // onClick={() => handleCardClicked(presta)}
-              >
-                <Accordion defaultActiveKey={index}>
-                  <Accordion.Item eventKey={index}>
-                    <Accordion.Header>
-                      <Card.Title>
-                        {presta.IdPrestationContrat} -{" "}
-                        {HighlightTextIfSearch(
-                          presta.DescriptionPrestationContrat
-                        )}
-                      </Card.Title>
-                    </Accordion.Header>
-
-                    <Accordion.Body>
-                      <Card.Subtitle>
-                        Secteur : {HighlightTextIfSearch(presta.Secteur)}
-                      </Card.Subtitle>
-                      <Card.Body
-                        onClick={() => handleCardClicked(presta)}
-                      ></Card.Body>
-                    </Accordion.Body>
-                  </Accordion.Item>
-                </Accordion>
-              </Card>
-            );
-          })}
-        </div>
-      </Container>
-    ) : (
-      <div> {PlaceHolderCard(5)}</div>
-    );
-  };
-
-  // /**
-  //  *
-  //  * @param {* l'index du mois indexé à 0 (0= janvier, 11=décembre)} indexMois
-  //  * @param {* La valeur de l'état de la prestation } valeurMois
-  //  * @returns Une liste des planification de cette préstation
-  //  */
-  // const Plannification = (indexMois, valeurMois) => {
-  //   let _numMois = Number(indexMois) + 1;
-
-  //   return (
-  //     <span className="">
-  //       <Row>
-  //         <Col xs={6}>{GetNomMois(_numMois)} : </Col>
-
-  //         <Col xs={6}>
-  //           <OverlayTrigger
-  //             delay={{ show: 250, hide: 400 }}
-  //             overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
-  //           >
-  //             <Badge pill bg={GetBadgeBgColor(valeurMois)}>
-  //               {GetBadgeIcon(valeurMois)} {GetLibEtat(valeurMois)}
-  //             </Badge>
-  //           </OverlayTrigger>
-  //         </Col>
-  //       </Row>
-  //       <hr />
-  //     </span>
-  //   );
-  // };
-
-  /**
-   *
-   * @param {* La valeur de l'état du mois} e
-   * @returns Un badge indiquant l'état de la prestation du mois
-   */
-  // const GetBadgeIcon = (e) => {
-  //   switch (e) {
-  //     case 1:
-  //       return <FontAwesomeIcon icon={faBookmark} />;
-  //     case 2:
-  //       return <FontAwesomeIcon icon={faCalendar} />;
-  //     case 3:
-  //       return <FontAwesomeIcon icon={faClock} />;
-  //     case 4:
-  //       return <FontAwesomeIcon icon={faCheck} />;
-  //     default:
-  //       break;
-  //   }
-  // };
-
-  /**
-   *
-   * @returns La liste des taches et des documents à télécharger sous forme de fenêtre modal
-   */
-  const ModalDocuments = () => {
-    let _tabs = null;
-    let _title = null;
-
-    // if (prestaSelected !== null) {
-    //   _title = prestaSelected.libelle;
-    //   _tabs = (
-    //     <Tabs variant="pills" fill>
-    //       {prestaSelected.mois.map((mois, index) => {
-    //         return mois > 0 ? (
-    //           <Tab
-    //             eventKey={GetNomMois(Number(index) + 1, true)}
-    //             title={
-    //               <span>
-    //                 {GetBadgeIcon(mois)} {GetNomMois(Number(index) + 1, true)}
-    //               </span>
-    //             }
-    //             key={index}
-    //             tabClassName={`bg- border border-${GetBadgeBgColor(
-    //               mois
-    //             )} text-${GetBadgeBgColor(mois)}`}
-    //           >
-    //             <Badge pill bg={GetBadgeBgColor(mois)}>
-    //               {GetBadgeIcon(mois)} {GetLibEtat(mois)}
-    //             </Badge>
-    //             <Container fluid>
-    //               <p className="h2">Liste des documents</p>
-    //               <span>{ButtonDownloadDocuments()}</span>
-    //             </Container>
-
-    //             <Container>
-    //               <p className="h2">
-    //                 Liste des tâches
-    //                 <Button
-    //                   variant="contained"
-    //                   aria-controls={`collapse-listeTaches`}
-    //                   aria-expanded={openTaches}
-    //                   onClick={() => setOpenTaches(!openTaches)}
-    //                 >
-    //                   {openTaches ? (
-    //                     <FontAwesomeIcon icon={faCaretUp} />
-    //                   ) : (
-    //                     <FontAwesomeIcon icon={faCaretDown} />
-    //                   )}
-    //                 </Button>{" "}
-    //               </p>
-
-    //               <Collapse in={openTaches}>
-    //                 <div
-    //                   id="collapse-listeTaches"
-    //                   style={{ height: "50vh", overflowY: "scroll" }}
-    //                 >
-    //                   {listeTaches.map((tache) => {
-    //                     return (
-    //                       <span key={tache.id}>
-    //                         <p>{tache.description}</p> <hr />{" "}
-    //                       </span>
-    //                     );
-    //                   })}
-    //                 </div>
-    //               </Collapse>
-    //             </Container>
-    //           </Tab>
-    //         ) : null;
-    //       })}
-    //     </Tabs>
-    //   );
-    // }
-
+  const GridCardPrestation = () => {
+    let _lPrestation = GetListePrestationPrefiltre();
     return (
-      <Modal
-        show={modaleShow}
-        onHide={() => setModalShow(false)}
-        backdrop="static"
-        keyboard={false}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{_title}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{_tabs}</Modal.Body>
-      </Modal>
+      <div>
+        {_lPrestation.map((presta, index) => {
+          return <div key={index}>{CardPrestation(presta)}</div>;
+        })}
+      </div>
     );
   };
 
-  const PlaceHolderCard = (numberOfCards) => {
-    let _arrayLoading = [];
-    for (let index = 0; index < numberOfCards; index++) {
-      _arrayLoading.push(index + 1);
-    }
+  const CardPrestation = (presta) => {
+    return (
+      <Card className="m-2">
+        <Card.Title>
+          <Row>
+            <Col>
+              {`${GetNomMois(presta.DateInterventionPrestation.getMonth() + 1)} 
+            ${presta.DateInterventionPrestation.getFullYear()} `}
+            </Col>
 
-    return _arrayLoading.map((i) => {
-      return (
-        <Card key={i}>
-          <Card.Title>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={10} />
-            </Placeholder>
-          </Card.Title>
-          <Card.Subtitle>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={6} />
-            </Placeholder>
-          </Card.Subtitle>
+            <Col>
+              <span className={`badge badge-${GetBadgeBgColor(presta.IdEtat)}`}>
+                {GetLibEtat(presta.IdEtat)}
+              </span>
+            </Col>
+          </Row>
+        </Card.Title>
+        <Card.Subtitle>
+          {` ${presta.IdPrestationContrat} - ${presta.DescriptionPrestationContrat}`}
+        </Card.Subtitle>
 
-          <Card.Body>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={2} /> <Placeholder xs={4} />
-            </Placeholder>
-            <hr />
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={2} /> <Placeholder xs={4} />
-            </Placeholder>
-            <hr />
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={2} /> <Placeholder xs={4} />
-            </Placeholder>
-            <hr />
-          </Card.Body>
-        </Card>
-      );
-    });
+        <Card.Body>
+          <h6>{`Secteur : ${presta.Secteur}`}</h6>
+
+          <Button
+            className="m-2 p-2"
+            onClick={() =>
+              handleRowClicked(presta, presta.DateInterventionPrestation)
+            }
+          >
+            <FontAwesomeIcon icon={faFile} /> Liste des documents
+          </Button>
+
+          <Button
+            className="m-2 p-2"
+            onClick={() => handleAfficherListeTache()}
+          >
+            <FontAwesomeIcon icon={faList} /> Relevés de tâches
+          </Button>
+        </Card.Body>
+        {CardListeTaches()}
+      </Card>
+    );
   };
 
   //#endregion
@@ -1337,14 +1202,27 @@ const ContratPrestation = ({
           <span className="subtitle"> {Prestations.length} prestations </span>
         </Col>
         {SearchPrestation()}
+
+        <Modal
+          dialogClassName="modal-90w"
+          show={modalLargeShow}
+          onHide={() => setModalLargeShow(false)}
+          backdrop="static"
+          keyboard={false}
+          animation={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title> Liste des relevés de tâches </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{CardListeTachesBody()}</Modal.Body>
+        </Modal>
+
         <Container fluid className="container-table p-4">
           <Breakpoint large up>
             <Row>
               <Col md={gridColMDValue}>
                 {TableGroupedMonth()} {PaginationPrestations()}
-                {CardListeTaches()}
               </Col>
-
               {gridColMDValue !== 12 && (
                 <Col md={12 - gridColMDValue}>{CardDocs()}</Col>
               )}
@@ -1352,8 +1230,21 @@ const ContratPrestation = ({
           </Breakpoint>
 
           <Breakpoint medium down>
-            {CardedPrestations()}
-            {ModalDocuments()}
+            {GridCardPrestation()}
+
+            <Modal
+              dialogClassName="modal-90w"
+              show={gridColMDValue != 12}
+              onHide={() => setGridColMDValue(12)}
+              backdrop="static"
+              keyboard={false}
+              animation={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title> Liste des documents </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>{CardDocs()}</Modal.Body>
+            </Modal>
           </Breakpoint>
         </Container>
       </Container>

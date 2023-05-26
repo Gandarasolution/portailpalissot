@@ -99,15 +99,22 @@
   justify-content: center;
 }
 
+
+
+
+
 .btn-filter {
   background-color: white !important;
   color: #282c34 !important;
+  height: 38px !important;
+
 }
 
 .btn-filter-active {
   background-color: white !important;
   color: cornflowerblue !important;
   border: black !important;
+  height: 38px !important;
 }
 
 .btn-filter:hover {
@@ -290,25 +297,25 @@
 .badge-termine{
   background-color: #01B81A !important;
   display: inline-block;
-  width: 90px !important;
+  width: 100px !important;
 }
 
 .badge-nonPlannifie{
   background-color: #FA8B0C !important;
     display: inline-block;
-    width: 90px !important;
+    width: 100px !important;
 }
 
 .badge-plannifie{
   background-color: var(--bs-primary) !important;
     display: inline-block;
-    width: 90px !important;
+    width: 100px !important;
 }
 
 .badge-enCours{
   background-color: #FF4D4F !important;
     display: inline-block;
-    width: 90px !important;
+    width: 100px !important;
 }
 
 .modal-90w
