@@ -12,11 +12,7 @@ import Modal from "react-bootstrap/Modal";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
 import Image from "react-bootstrap/Image";
-import Pagination from "react-bootstrap/Pagination";
-import Stack from "react-bootstrap/Stack";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import Nav from "react-bootstrap/Nav";
@@ -35,11 +31,11 @@ import {
 //#endregion
 
 //#region Components
+import TableData from "../../../../components/commun/TableData";
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
-import TableData from "../../../../components/commun/TableData";
 
 //#endregion
 
@@ -111,8 +107,6 @@ const ContratPrestation = ({
   const [filterEC, setFilterEC] = useState(false);
   const [filterT, setFilterT] = useState(false);
 
-  const [nbParPages, setNbParPages] = useState(10);
-  const [pageActuelle, setPageActuelle] = useState(1);
 
   const [arrayFilters, setArrayFilters] = useState([]);
   //#endregion
@@ -180,13 +174,13 @@ const ContratPrestation = ({
   function GetBadgeBgColor(e) {
     switch (e) {
       case 1:
-        return "nonPlannifie";
+        return "bg-warning";
       case 2:
-        return "plannifie";
+        return "bg-primary";
       case 3:
-        return "enCours";
+        return "bg-danger";
       case 4:
-        return "termine";
+        return "bg-success";
       default:
         return "Non planifiée";
     }
@@ -199,8 +193,8 @@ const ContratPrestation = ({
     //Les prestations sont filtrés par les boutons d'état
     _lPrestation = FiltrePrestationsBouton(_lPrestation);
 
-    //Les prestations sont filtrés par les colonnes
-    _lPrestation = FiltreColonnes(_lPrestation);
+    // //Les prestations sont filtrés par les colonnes
+    _lPrestation = FiltrerParCollones(_lPrestation);
 
     return _lPrestation;
   };
@@ -240,85 +234,50 @@ const ContratPrestation = ({
     return _lPrestations;
   }
 
-  function FiltreColonnes(_lPrestation) {
-    if (arrayFilters.length > 0) {
-      let _arraySecteur = arrayFilters.filter(
-        (filter) => filter.fieldname === "Secteur"
-      );
-      let _arrayIdPrestationContrat = arrayFilters.filter(
-        (filter) => filter.fieldname === "IdPrestationContrat"
-      );
-      let _arrayDescriptionPrestationContrat = arrayFilters.filter(
-        (filter) => filter.fieldname === "DescriptionPrestationContrat"
-      );
-      let _arrayDateInterventionPrestation = arrayFilters.filter(
-        (filter) => filter.fieldname === "DateInterventionPrestation"
-      );
-
-      let _arrayIdEtat = arrayFilters.filter(
-        (filter) => filter.fieldname === "IdEtat"
-      );
-
-      if (_arraySecteur.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arraySecteur.filter((filter) => filter.item === presta.Secteur)
-              .length > 0
-        );
-      if (_arrayIdPrestationContrat.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arrayIdPrestationContrat.filter(
-              (filter) => Number(filter.item) === presta.IdPrestationContrat
-            ).length > 0
-        );
-      if (_arrayDescriptionPrestationContrat.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arrayDescriptionPrestationContrat.filter(
-              (filter) => filter.item === presta.DescriptionPrestationContrat
-            ).length > 0
-        );
-
-      if (_arrayDateInterventionPrestation.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arrayDateInterventionPrestation.filter(
-              (filter) =>
-                new Date(filter.item).getTime() ===
-                new Date(presta.DateInterventionPrestation).getTime()
-            ).length > 0
-        );
-
-      if (_arrayIdEtat.length > 0)
-        _lPrestation = _lPrestation.filter(
-          (presta) =>
-            _arrayIdEtat.filter(
-              (filter) => Number(filter.item) === presta.IdEtat
-            ).length > 0
-        );
+  function FiltrerParCollones(_lData) {
+    let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
+    for (let index = 0; index < _arFilters.length; index++) {
+      const arrayGroup = _arFilters[index];
+      _lData = FiltreUnecollone(arrayGroup[0], _lData);
     }
-
-    return _lPrestation;
+    return _lData;
   }
 
-  const reactStringReplace = require("react-string-replace");
-  function HighlightTextIfSearch(text) {
-    if (
-      String(search).length > 0 &&
-      String(text).toUpperCase().includes(String(search).toUpperCase())
-    ) {
-      return (
-        <span>
-          {reactStringReplace(text, search, (match, i) => (
-            <mark key={i}>{match}</mark>
-          ))}
-        </span>
-      );
-    } else {
-      return text;
+  function FiltreUnecollone(fieldname, _lData) {
+    let _arColonne = arrayFilters.filter(
+      (filter) => filter.fieldname === fieldname
+    );
+    if (_arColonne.length > 0) {
+      _lData = _lData.filter((data) => {
+        return (
+          _arColonne.filter(filterColoneByTypeOfData(data, fieldname)).length >
+          0
+        );
+      });
     }
+    return _lData;
   }
+
+  const filterColoneByTypeOfData = (data, fieldname) => {
+    switch (typeof data[fieldname]) {
+      case typeof "":
+        return (filter) => filter.item === data[fieldname];
+      case typeof 0:
+        return (filter) => Number(filter.item) === data[fieldname];
+      case typeof new Date():
+        return (filter) =>
+          new Date(filter.item).getTime() === data[fieldname].getTime();
+      default:
+        return (filter) => filter.item === data[fieldname];
+    }
+  };
+
+  var groupBy = function (xs, key) {
+    return xs.reduce(function (rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
 
   function GetFilterState(idEtat) {
     switch (idEtat) {
@@ -454,43 +413,6 @@ const ContratPrestation = ({
     }
   };
 
-  const handlePagePrev = () => {
-    if (pageActuelle > 1) {
-      //Suprrime les filtres sur colonnes
-      setArrayFilters([]);
-      setPageActuelle(pageActuelle - 1);
-
-      //Annule l'affichage des documents/tâches
-      setPrestaSelected(null);
-      setPrestaDateSelected(null);
-      //La table prend toute la place
-      setGridColMDValue(12);
-    }
-  };
-
-  const handlePageChange = (number) => {
-    //Suprrime les filtres sur colonnes
-    setArrayFilters([]);
-    setPageActuelle(number);
-    //Annule l'affichage des documents/tâches
-    setPrestaSelected(null);
-    setPrestaDateSelected(null);
-    //La table prend toute la place
-    setGridColMDValue(12);
-  };
-
-  const handlePageNext = (number) => {
-    if (pageActuelle < number) {
-      //Suprrime les filtres sur colonnes
-      setArrayFilters([]);
-      setPageActuelle(pageActuelle + 1);
-      //Annule l'affichage des documents/tâches
-      setPrestaSelected(null);
-      setPrestaDateSelected(null);
-      //La table prend toute la place
-      setGridColMDValue(12);
-    }
-  };
 
   const handleAfficherListeTache = () => {
     let _value = JSON.parse(JSON.stringify(modalLargeShow));
@@ -570,91 +492,17 @@ const ContratPrestation = ({
   //#endregion
 
   //#region pagination
-  const PaginationPrestations = () => {
-    let _items = [];
 
-    let _lPrestation = GetListePrestationPrefiltre();
-    let _limiter = _lPrestation.length;
+  function resetSelection() {
+    //Suprime les filtres sur colonnes
+    setArrayFilters([]);
+    //Annule l'affichage des documents/tâches
+    setPrestaSelected(null);
+    setPrestaDateSelected(null);
+    //La table prend toute la place
+    setGridColMDValue(12);
+  }
 
-    _items.push(
-      <Pagination.Prev
-        key={0}
-        onClick={() => handlePagePrev()}
-        className="m-1"
-      />
-    );
-    for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
-      _items.push(
-        <Pagination.Item
-          key={number}
-          active={number === pageActuelle}
-          onClick={() => handlePageChange(number)}
-          className="m-1"
-        >
-          {number}
-        </Pagination.Item>
-      );
-    }
-    _items.push(
-      <Pagination.Next
-        key={_items.length + 1}
-        onClick={() => handlePageNext(_limiter / nbParPages)}
-        className="m-1"
-      />
-    );
-
-    return (
-      <Stack direction="horizontal">
-        <Pagination className="m-2">{_items}</Pagination>
-        {DrodpdownNbPages()}
-      </Stack>
-    );
-  };
-
-  const DrodpdownNbPages = () => {
-    return (
-      <DropdownButton
-        variant=""
-        className="border button-periode"
-        drop="down-centered"
-        style={{ borderRadius: "10px" }}
-        title={`${nbParPages} / page`}
-      >
-        <Dropdown.Item
-          onClick={() => {
-            setNbParPages(10);
-            setPageActuelle(1);
-          }}
-        >
-          10 / page
-        </Dropdown.Item>
-        <Dropdown.Item
-          onClick={() => {
-            setNbParPages(20);
-            setPageActuelle(1);
-          }}
-        >
-          20 / page
-        </Dropdown.Item>
-        <Dropdown.Item
-          onClick={() => {
-            setNbParPages(50);
-            setPageActuelle(1);
-          }}
-        >
-          50 / page
-        </Dropdown.Item>
-        <Dropdown.Item
-          onClick={() => {
-            setNbParPages(100);
-            setPageActuelle(1);
-          }}
-        >
-          100 / page
-        </Dropdown.Item>
-      </DropdownButton>
-    );
-  };
 
   //#endregion
 
@@ -839,7 +687,6 @@ const ContratPrestation = ({
 
   //#endregion
 
-
   //#region small
 
   const GridCardPrestation = () => {
@@ -978,7 +825,7 @@ const ContratPrestation = ({
       title: "Date",
       filter: {
         fieldname: "DateInterventionPrestation",
-        method: _methodeDate,
+        affichageMethod: _methodeDate,
       },
     },
     {
@@ -997,7 +844,7 @@ const ContratPrestation = ({
       title: "Etat",
       filter: {
         fieldname: "IdEtat",
-        method: _methodeEtat,
+        affichageMethod: _methodeEtat,
       },
     },
     { title: "Action" },
@@ -1022,7 +869,7 @@ const ContratPrestation = ({
         )} ${presta.DateInterventionPrestation.getFullYear()} `,
         isSearchable: true,
         isH1: true,
-        method: handleLigneClicked,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_date);
 
@@ -1030,7 +877,7 @@ const ContratPrestation = ({
         text: presta.Secteur,
         isSearchable: true,
         isH1: false,
-        method: handleLigneClicked,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_secteur);
 
@@ -1038,7 +885,7 @@ const ContratPrestation = ({
         text: presta.IdPrestationContrat,
         isSearchable: false,
         isH1: false,
-        method: handleLigneClicked,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_id);
 
@@ -1046,7 +893,7 @@ const ContratPrestation = ({
         text: presta.DescriptionPrestationContrat,
         isSearchable: true,
         isH1: true,
-        method: handleLigneClicked,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_libelle);
 
@@ -1058,7 +905,7 @@ const ContratPrestation = ({
         ),
         isSearchable: false,
         isH1: false,
-        method: handleLigneClicked,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_etat);
 
@@ -1076,7 +923,7 @@ const ContratPrestation = ({
         ),
         isSearchable: false,
         isH1: false,
-        method: handleAfficherListeTache,
+        onClickMethod: handleAfficherListeTache,
       };
 
       _cells.push(_bt);
@@ -1112,9 +959,15 @@ const ContratPrestation = ({
       <Container fluid>
         <Col md={12} style={{ textAlign: "start" }}>
           <span className="title">Plannification </span>|
-          <span className="subtitle"> { IsLoaded ? `${Prestations.length} prestations` : <Placeholder animation="glow">
-        <Placeholder xs={1} />
-      </Placeholder>   }  </span>
+          <span className="subtitle">
+            {IsLoaded ? (
+              `${Prestations.length} prestations`
+            ) : (
+              <Placeholder animation="glow">
+                <Placeholder xs={1} />
+              </Placeholder>
+            )}
+          </span>
         </Col>
         {SearchPrestation()}
 
@@ -1140,15 +993,14 @@ const ContratPrestation = ({
                   IsLoaded={IsLoaded}
                   placeholdeNbLine={5}
                   headers={_header}
+                  lData={_Data()}
                   rawData={Prestations}
                   handleCheckfilterChange={handleCheckfilterChange}
                   isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-                  lData={_Data()}
                   isRowActive={isRowSelected}
-                  HighlightTextIfSearch={HighlightTextIfSearch}
-                  Pagination={PaginationPrestations()}
-                  nbParPages={nbParPages}
-                  pageActuelle={pageActuelle}
+                  search={search}
+                  Pagination
+                  methodPagination={resetSelection}
                 />
               </Col>
               {gridColMDValue !== 12 && (

@@ -300,25 +300,34 @@
   margin-right: 10px;
 }
 
-.badge-termine{
+
+
+.badge-bg-success{
   background-color: #01B81A !important;
   display: inline-block;
   width: 100px !important;
 }
 
-.badge-nonPlannifie{
+
+.badge-bg-warning{
   background-color: #FA8B0C !important;
-    display: inline-block;
-    width: 100px !important;
+  display: inline-block;
+  width: 100px !important;
 }
 
-.badge-plannifie{
+.badge-bg-primary{
   background-color: var(--bs-primary) !important;
     display: inline-block;
     width: 100px !important;
 }
 
-.badge-enCours{
+.badge-bg-secondary{
+  background-color: var(--bs-secondary) !important;
+    display: inline-block;
+    width: 100px !important;
+}
+
+.badge-bg-danger{
   background-color: #FF4D4F !important;
     display: inline-block;
     width: 100px !important;

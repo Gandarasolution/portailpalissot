@@ -1,5 +1,6 @@
 //#region Imports
 import { useState, useEffect } from "react";
+import { Breakpoint, BreakpointProvider } from "react-socks";
 //#region FontAwsome icones
 
 //#endregion
@@ -18,14 +19,12 @@ import Row from "react-bootstrap/Row";
 //#endregion
 
 //#region Components
+import TableData from "../../../components/commun/TableData";
 
 //#endregion
 
 //#region DEV
 import { loremIpsum } from "react-lorem-ipsum";
-import { Breakpoint, BreakpointProvider } from "react-socks";
-import TableData from "../../../components/commun/TableData";
-import { Dropdown, DropdownButton, Pagination, Stack } from "react-bootstrap";
 
 //#endregion
 
@@ -108,8 +107,7 @@ const AppareilsPage = () => {
   const [arrayFilters, setArrayFilters] = useState([]);
 
   //#endregion
-  const [nbParPages, setNbParPages] = useState(10);
-  const [pageActuelle, setPageActuelle] = useState(1);
+
   //#endregion
 
   //#region Fonctions
@@ -221,11 +219,11 @@ const AppareilsPage = () => {
   function GetBGColorAppareilEtat(IdEtat) {
     switch (IdEtat) {
       case 1:
-        return "nonPlannifie";
+        return "bg-secondary";
       case 2:
-        return "plannifie";
+        return "bg-primary";
       case 3:
-        return "enCours";
+        return "bg-danger";
       default:
         break;
     }
@@ -256,28 +254,6 @@ const AppareilsPage = () => {
     }
   };
 
-  const handlePagePrev = () => {
-    if (pageActuelle > 1) {
-      //Suprrime les filtres sur colonnes
-      setArrayFilters([]);
-      setPageActuelle(pageActuelle - 1);
-    }
-  };
-
-  const handlePageChange = (number) => {
-    //Suprrime les filtres sur colonnes
-    setArrayFilters([]);
-    setPageActuelle(number);
-  };
-
-  const handlePageNext = (number) => {
-    if (pageActuelle < number) {
-      //Suprrime les filtres sur colonnes
-      setArrayFilters([]);
-      setPageActuelle(pageActuelle + 1);
-      //Annule l'affichage des documents/tâches
-    }
-  };
 
   //#endregion
 
@@ -517,96 +493,6 @@ const AppareilsPage = () => {
 
   //#endregion
 
-  //#region pagination
-
-  const PaginationAppareil = () => {
-    let _items = [];
-
-    let _lAppareils = GetAppareilsSearched();
-    let _limiter = _lAppareils.length;
-
-    _items.push(
-      <Pagination.Prev
-        key={0}
-        onClick={() => handlePagePrev()}
-        className="m-1"
-      />
-    );
-    for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
-      _items.push(
-        <Pagination.Item
-          key={number}
-          active={number === pageActuelle}
-          onClick={() => handlePageChange(number)}
-          className="m-1"
-        >
-          {number}
-        </Pagination.Item>
-      );
-    }
-    _items.push(
-      <Pagination.Next
-        key={_items.length + 1}
-        onClick={() => handlePageNext(_limiter / nbParPages)}
-        className="m-1"
-      />
-    );
-
-    return (
-      <Stack direction="horizontal">
-        <Pagination className="m-2">{_items}</Pagination>
-        {DrodpdownNbPages()}
-      </Stack>
-    );
-  };
-
-  const DrodpdownNbPages = () => {
-    return (
-      <DropdownButton
-        variant=""
-        className="border button-periode"
-        drop="down-centered"
-        style={{ borderRadius: "10px" }}
-        title={`${nbParPages} / page`}
-      >
-        <Dropdown.Item
-          onClick={() => {
-            setNbParPages(10);
-            setPageActuelle(1);
-          }}
-        >
-          10 / page
-        </Dropdown.Item>
-        <Dropdown.Item
-          onClick={() => {
-            setNbParPages(20);
-            setPageActuelle(1);
-          }}
-        >
-          20 / page
-        </Dropdown.Item>
-        <Dropdown.Item
-          onClick={() => {
-            setNbParPages(50);
-            setPageActuelle(1);
-          }}
-        >
-          50 / page
-        </Dropdown.Item>
-        <Dropdown.Item
-          onClick={() => {
-            setNbParPages(100);
-            setPageActuelle(1);
-          }}
-        >
-          100 / page
-        </Dropdown.Item>
-      </DropdownButton>
-    );
-  };
-
-  //#endregion
-
   //#endregion
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -627,7 +513,7 @@ const AppareilsPage = () => {
         <span className="title">Liste des appareils </span>|
         <span className="subtitle">
           {isLoaded ? (
-            `${listeAppareils.length} appareils`
+            ` ${listeAppareils.length} appareils`
           ) : (
             <Placeholder animation="glow">
               <Placeholder xs={1} />
@@ -643,17 +529,15 @@ const AppareilsPage = () => {
               IsLoaded={isLoaded}
               placeholdeNbLine={5}
               headers={_header}
+              lData={_Data()}
               rawData={listeAppareils}
               handleCheckfilterChange={handleCheckfilterChange}
               isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-              lData={_Data()}
               isRowActive={() => {
                 return false;
               }}
-              HighlightTextIfSearch={HighlightTextIfSearch}
-              Pagination={PaginationAppareil()}
-              nbParPages={nbParPages}
-              pageActuelle={pageActuelle}
+              search={search}
+              Pagination
             />
           </Container>
         </Breakpoint>

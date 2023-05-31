@@ -1,6 +1,11 @@
 //#region Imports
 
-import { Button, Col, Container, Nav, Placeholder, Row, Table } from "react-bootstrap";
+
+import Container from "react-bootstrap/Container";
+import Col from "react-bootstrap/Col";
+import Nav from "react-bootstrap/Nav";
+import Placeholder from "react-bootstrap/Placeholder";
+import Row from "react-bootstrap/Row";
 import TableData from "../../../components/commun/TableData";
 import { useEffect, useState } from "react";
 
@@ -234,7 +239,7 @@ const InterventionPage = () => {
       _cells.push(_lib);
 
       let _etat = {
-        text: <span className="badge badge-enCours">{inter.LibelleEtat} </span>,
+        text: <span className="badge badge-bg-success">{inter.LibelleEtat} </span>,
         isSearchable: false,
         isH1: false,
       };
@@ -312,17 +317,14 @@ const InterventionPage = () => {
           IsLoaded={isLoaded}
           placeholdeNbLine={5}
           headers={_header}
+          lData={_Data()}
           rawData={listeInterventions}
           handleCheckfilterChange={handleCheckfilterChange}
           isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-          lData={_Data()}
           isRowActive={() => {
             return false;
           }}
-          // HighlightTextIfSearch={HighlightTextIfSearch}
-          // Pagination={PaginationAppareil()}
-          // nbParPages={nbParPages}
-          // pageActuelle={pageActuelle}
+           Pagination
         />
       </Container>
     </Container>
