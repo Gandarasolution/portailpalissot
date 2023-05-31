@@ -1,13 +1,20 @@
-//IsLoaded
-//placeholdeNbLine
-//headers [{title: "", filter: {fieldname: "", method: eee(), }}]
-//handleCheckfilterChange : eee()
-// isFiltercheckboxShouldBeCheck : eee()
-//data []
+//#region Imports
 
+//#region Bootstrap
+
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Popover from "react-bootstrap/Popover";
+import Form from "react-bootstrap/Form";
+import Table from "react-bootstrap/Table";
+//#endregion
+
+//#region fontAwsome
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { OverlayTrigger, Popover, Form, Table } from "react-bootstrap";
+import { Placeholder } from "react-bootstrap";
+//#endregion
+
+//#endregion
 
 const TableData = (props) => {
   //#region Fonctions
@@ -66,7 +73,7 @@ const TableData = (props) => {
    */
   const HeaderCellWithFilter = (header) => {
     let _arFilters = [];
-    let _lData = props.data;
+    let _lData = props.rawData;
 
     _arFilters = Object.entries(groupBy(_lData, header.filter.fieldname));
     return (
@@ -124,16 +131,13 @@ const TableData = (props) => {
       return (
         <tr
           key={index}
-          className={props.isRowActive(arr.data) ? "table-presta-row-selected" : ""}
+          className={
+            props.isRowActive(arr.data) ? "table-presta-row-selected" : ""
+          }
         >
-
-            {
-                arr.cells.map((item, indexCell) => {
-                    return BodyCell(item, indexCell, arr.data)
-                }) 
-            }
-
-          
+          {arr.cells.map((item, indexCell) => {
+            return BodyCell(item, indexCell, arr.data);
+          })}
         </tr>
       );
     });
@@ -147,20 +151,58 @@ const TableData = (props) => {
 
     let _cellText = item.isH1 ? <h1>{_spanText}</h1> : _spanText;
 
-    return <td key={index} onClick={() => item.method(data)}>{_cellText}</td>;
+    if (item.method) {
+      return (
+        <td key={index} onClick={() => item.method(data)}>
+          {_cellText}
+        </td>
+      );
+    }
+
+    return <td key={index}>{_cellText}</td>;
   };
 
   //#endregion
 
-  
+  //#region Placeholder
 
+  const PlaceHolderTableLine = (numberOfLines) => {
+    let _arrayLoading = [];
+    for (let index = 0; index < numberOfLines; index++) {
+      _arrayLoading.push(index + 1);
+    }
+    return _arrayLoading.map((i) => {
+      return (
+        <tbody key={i}>
+          <tr>
+            <td colSpan={props.headers.length}>
+              <Placeholder as="p" animation="glow">
+                <Placeholder xs={12} />
+              </Placeholder>
+            </td>
+          </tr>
+        </tbody>
+      );
+    });
+  };
+
+  //#endregion
+
+  //#endregion
   return (
-    <Table className="table-presta ">
-      {TableHead()}
-      <tbody>{TableBody()}</tbody>
-
-      
-    </Table>
+    <span>
+      <Table className="table-presta ">
+        {TableHead()}
+        {props.IsLoaded ? (
+          <tbody>{TableBody()}</tbody>
+        ) : (
+          PlaceHolderTableLine(
+            props.placeholdeNbLine ? props.placeholdeNbLine : 5
+          )
+        )}
+      </Table>
+      {props.Pagination && props.Pagination}
+    </span>
   );
 };
 

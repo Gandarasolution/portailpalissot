@@ -4,7 +4,6 @@ import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
 import Collapse from "react-bootstrap/Collapse";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -19,7 +18,6 @@ import Image from "react-bootstrap/Image";
 import Pagination from "react-bootstrap/Pagination";
 import Stack from "react-bootstrap/Stack";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Popover from "react-bootstrap/Popover";
 import Tooltip from "react-bootstrap/Tooltip";
 import Nav from "react-bootstrap/Nav";
 //#endregion
@@ -29,7 +27,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCaretDown,
   faCaretUp,
-  faFilter,
   faListCheck,
   faList,
   faFile,
@@ -163,70 +160,6 @@ const ContratPrestation = ({
     }
   }
 
-  // function GetStateOpen(e) {
-  //   switch (e) {
-  //     case 1:
-  //       return open1;
-  //     case 2:
-  //       return open2;
-  //     case 3:
-  //       return open3;
-  //     case 4:
-  //       return open4;
-  //     case 5:
-  //       return open5;
-  //     case 6:
-  //       return open6;
-  //     case 7:
-  //       return open7;
-  //     case 8:
-  //       return open8;
-  //     case 9:
-  //       return open9;
-  //     case 10:
-  //       return open10;
-  //     case 11:
-  //       return open11;
-  //     case 12:
-  //       return open12;
-
-  //     default:
-  //       return null;
-  //   }
-  // }
-
-  // function GetSetStateOpen(e) {
-  //   switch (e) {
-  //     case 1:
-  //       return setOpen1;
-  //     case 2:
-  //       return setOpen2;
-  //     case 3:
-  //       return setOpen3;
-  //     case 4:
-  //       return setOpen4;
-  //     case 5:
-  //       return setOpen5;
-  //     case 6:
-  //       return setOpen6;
-  //     case 7:
-  //       return setOpen7;
-  //     case 8:
-  //       return setOpen8;
-  //     case 9:
-  //       return setOpen9;
-  //     case 10:
-  //       return setOpen10;
-  //     case 11:
-  //       return setOpen11;
-  //     case 12:
-  //       return setOpen12;
-
-  //     default:
-  //       return null;
-  //   }
-  // }
-
   function GetLibEtat(e) {
     switch (e) {
       case 1:
@@ -309,7 +242,6 @@ const ContratPrestation = ({
 
   function FiltreColonnes(_lPrestation) {
     if (arrayFilters.length > 0) {
-      console.log(arrayFilters);
       let _arraySecteur = arrayFilters.filter(
         (filter) => filter.fieldname === "Secteur"
       );
@@ -432,13 +364,6 @@ const ContratPrestation = ({
         return ImgDOC;
     }
   }
-
-  var groupBy = function (xs, key) {
-    return xs.reduce(function (rv, x) {
-      (rv[x[key]] = rv[x[key]] || []).push(x);
-      return rv;
-    }, {});
-  };
 
   function IsFiltercheckboxShouldBeCheck(fieldname, item) {
     if (
@@ -916,206 +841,6 @@ const ContratPrestation = ({
 
   //#region large
 
-  //#region Table
-
-  /**
-   *
-   * @returns Le tableau des prestations, groupés par mois.
-   */
-  const TableGroupedMonth = () => {
-    return (
-      <Table className="table-presta ">
-        {TableHead()}
-        {IsLoaded ? <tbody>{TableBody()}</tbody> : PlaceHolderTableLine(5)}
-      </Table>
-    );
-  };
-
-  //#region Headers
-  const TableHead = () => {
-    const _methodeDate = (e) => {
-      return `${GetNomMois(new Date(e).getMonth())}  ${new Date(
-        e
-      ).getFullYear()}`;
-    };
-
-    const _methodeEtat = (e) => {
-      return GetLibEtat(Number(e));
-    };
-
-    return (
-      <thead className="m-2">
-        <tr>
-          <th>
-            {HeaderWithFilter(
-              "Date",
-              "DateInterventionPrestation",
-              _methodeDate
-            )}
-          </th>
-          <th>{HeaderWithFilter("Secteur", "Secteur")}</th>
-          <th>{HeaderWithFilter("N°", "IdPrestationContrat")}</th>
-          <th>{HeaderWithFilter("Libellé", "DescriptionPrestationContrat")}</th>
-          <th>{HeaderWithFilter("Etat", "IdEtat", _methodeEtat)}</th>
-          <th>
-            <div>Action</div>
-          </th>
-        </tr>
-      </thead>
-    );
-  };
-
-  const HeaderWithFilter = (title, fieldname, method) => {
-    let _arFilters = [];
-    let _lprestations = Prestations;
-
-    _arFilters = Object.entries(groupBy(_lprestations, fieldname));
-
-    return (
-      <div>
-        {title}
-        <OverlayTrigger
-          trigger="click"
-          overlay={
-            <Popover className="popover-filters">
-              {_arFilters.map((item, index) => {
-                return (
-                  <Form.Check
-                    type="checkbox"
-                    checked={IsFiltercheckboxShouldBeCheck(fieldname, item[0])}
-                    label={`${
-                      method !== undefined ? method(item[0]) : item[0]
-                    }`}
-                    key={index}
-                    onChange={(e) =>
-                      handleCheckfilterChange(
-                        e.target.checked,
-                        fieldname,
-                        item[0]
-                      )
-                    }
-                  />
-                );
-              })}
-            </Popover>
-          }
-          placement="bottom"
-        >
-          <FontAwesomeIcon icon={faFilter} className="icon-bt" />
-        </OverlayTrigger>
-      </div>
-    );
-  };
-  //#endregion
-
-  //#region Body
-  const TableBody = () => {
-    let nombreAffiche = nbParPages * -1 * (pageActuelle - 1);
-
-    let _lPrestation = GetListePrestationPrefiltre();
-
-    return _lPrestation.map((presta, index) => {
-      if (nombreAffiche >= nbParPages || nombreAffiche < 0) {
-        nombreAffiche += 1;
-        return null;
-      }
-      nombreAffiche += 1;
-      return (
-        <tr
-          key={index}
-          className={
-            prestaDateSelected !== null &&
-            prestaSelected !== null &&
-            prestaSelected.id === presta.id &&
-            prestaDateSelected === presta.DateInterventionPrestation
-              ? "table-presta-row-selected"
-              : ""
-          }
-        >
-          {/* Date */}
-          {TableCell(
-            presta,
-            `${GetNomMois(presta.DateInterventionPrestation.getMonth())} 
-          ${presta.DateInterventionPrestation.getFullYear()} `,
-            true,
-            true
-          )}
-          {/* Secteur */}
-          {TableCell(presta, presta.Secteur, true, false)}
-          {/* Id */}
-          {TableCell(presta, presta.IdPrestationContrat, true, false)}
-          {/* Libelle */}
-          {TableCell(presta, presta.DescriptionPrestationContrat, true, true)}
-          {/* Etat */}
-          {TableCell(
-            presta,
-            <span className={`badge badge-${GetBadgeBgColor(presta.IdEtat)}`}>
-              {GetLibEtat(presta.IdEtat)}
-            </span>,
-            false,
-            false
-          )}
-
-          <td onClick={() => handleAfficherListeTache()}>
-            <OverlayTrigger
-              placement="bottom"
-              overlay={<Tooltip>Relevés de tâches</Tooltip>}
-            >
-              <FontAwesomeIcon
-                icon={faListCheck}
-                onClick={() => handleAfficherListeTache()}
-              />
-            </OverlayTrigger>
-          </td>
-        </tr>
-      );
-    });
-  };
-
-  const TableCell = (presta, text, isSearchable, isH1) => {
-    let _spanText = isSearchable ? (
-      <span>{HighlightTextIfSearch(text)}</span>
-    ) : (
-      <span>{text}</span>
-    );
-
-    let _cellText = isH1 ? <h1>{_spanText}</h1> : _spanText;
-
-    return (
-      <td
-        onClick={() =>
-          handleRowClicked(presta, presta.DateInterventionPrestation)
-        }
-      >
-        {_cellText}
-      </td>
-    );
-  };
-
-  const PlaceHolderTableLine = (numberOfLines) => {
-    let _arrayLoading = [];
-    for (let index = 0; index < numberOfLines; index++) {
-      _arrayLoading.push(index + 1);
-    }
-    return _arrayLoading.map((i) => {
-      return (
-        <tbody key={i}>
-          <tr>
-            <td colSpan={6}>
-              <Placeholder as="p" animation="glow">
-                <Placeholder xs={12} />
-              </Placeholder>
-            </td>
-          </tr>
-        </tbody>
-      );
-    });
-  };
-
-  //#endregion
-
-  //#endregion
-
   //#endregion
 
   //#region small
@@ -1237,6 +962,10 @@ const ContratPrestation = ({
     setIsListeTacheAffiche(true);
   }, []);
 
+  //#region TableData
+
+  //#region Headers
+
   const _methodeDate = (e) => {
     return `${GetNomMois(new Date(e).getMonth())}  ${new Date(
       e
@@ -1246,7 +975,6 @@ const ContratPrestation = ({
   const _methodeEtat = (e) => {
     return GetLibEtat(Number(e));
   };
-
 
   const _header = [
     {
@@ -1258,13 +986,15 @@ const ContratPrestation = ({
     },
     {
       title: "Secteur",
-      filter: {fieldname: "Secteur"}
+      filter: { fieldname: "Secteur" },
     },
     {
-      title: "N°", filter:{fieldname:"IdPrestationContrat"}
+      title: "N°",
+      filter: { fieldname: "IdPrestationContrat" },
     },
     {
-      title: "Libellé", filter:{fieldname:"DescriptionPrestationContrat"}
+      title: "Libellé",
+      filter: { fieldname: "DescriptionPrestationContrat" },
     },
     {
       title: "Etat",
@@ -1273,119 +1003,121 @@ const ContratPrestation = ({
         method: _methodeEtat,
       },
     },
-    {title:"Action"}
-
+    { title: "Action" },
   ];
 
+  //#endregion
 
+  //#region Données
 
+  const _Data = () => {
+    let _body = [];
 
+    let _lprestations = GetListePrestationPrefiltre();
 
+    for (let index = 0; index < _lprestations.length; index++) {
+      const presta = _lprestations[index];
+      let _cells = [];
+
+      let _date = {
+        text: `${GetNomMois(
+          presta.DateInterventionPrestation.getMonth()
+        )} ${presta.DateInterventionPrestation.getFullYear()} `,
+        isSearchable: true,
+        isH1: true,
+        method: handleLigneClicked,
+      };
+      _cells.push(_date);
+
+      let _secteur = {
+        text: presta.Secteur,
+        isSearchable: true,
+        isH1: false,
+        method: handleLigneClicked,
+      };
+      _cells.push(_secteur);
+
+      let _id = {
+        text: presta.IdPrestationContrat,
+        isSearchable: false,
+        isH1: false,
+        method: handleLigneClicked,
+      };
+      _cells.push(_id);
+
+      let _libelle = {
+        text: presta.DescriptionPrestationContrat,
+        isSearchable: true,
+        isH1: true,
+        method: handleLigneClicked,
+      };
+      _cells.push(_libelle);
+
+      let _etat = {
+        text: (
+          <span className={`badge badge-${GetBadgeBgColor(presta.IdEtat)}`}>
+            {GetLibEtat(presta.IdEtat)}
+          </span>
+        ),
+        isSearchable: false,
+        isH1: false,
+        method: handleLigneClicked,
+      };
+      _cells.push(_etat);
+
+      let _bt = {
+        text: (
+          <OverlayTrigger
+            placement="bottom"
+            overlay={<Tooltip>Relevés de tâches</Tooltip>}
+          >
+            <FontAwesomeIcon
+              icon={faListCheck}
+              onClick={() => handleAfficherListeTache()}
+            />
+          </OverlayTrigger>
+        ),
+        isSearchable: false,
+        isH1: false,
+        method: handleAfficherListeTache,
+      };
+
+      _cells.push(_bt);
+
+      let _row = { data: presta, cells: _cells };
+
+      _body.push(_row);
+    }
+    return _body;
+  };
+
+  //#endregion
+
+  //#region Events
   const handleLigneClicked = (presta) => {
-
-    handleRowClicked(presta, presta.DateInterventionPrestation)
-  }
-
+    handleRowClicked(presta, presta.DateInterventionPrestation);
+  };
 
   const isRowSelected = (presta) => {
-    return prestaDateSelected !== null &&
-    prestaSelected !== null &&
-    prestaSelected.id === presta.id &&
-    prestaDateSelected === presta.DateInterventionPrestation
-  }
+    return (
+      prestaDateSelected !== null &&
+      prestaSelected !== null &&
+      prestaSelected.id === presta.id &&
+      prestaDateSelected === presta.DateInterventionPrestation
+    );
+  };
+  //#endregion
 
-
-
-
-const _Data = () => {
-  let _body = [];
-
-  let _lprestations = GetListePrestationPrefiltre();
-
-  for (let index = 0; index < _lprestations.length; index++) {
-
-    const presta = _lprestations[index];
-    let _cells = [];
-
-    let _date = {
-      text: `${GetNomMois(
-        presta.DateInterventionPrestation.getMonth()
-      )} ${presta.DateInterventionPrestation.getFullYear()} `,
-      isSearchable: true,
-      isH1: true,
-      method: handleLigneClicked,
-    };
-    _cells.push(_date);
-
-    let _secteur = {
-      text: presta.Secteur,
-      isSearchable: true,
-      isH1: false,
-      method: handleLigneClicked,
-    };
-    _cells.push(_secteur);
-
-    let _id = {
-      text: presta.IdPrestationContrat,
-      isSearchable: false,
-      isH1: false,
-      method: handleLigneClicked,
-    };
-    _cells.push(_id);
-
-    let _libelle = {
-      text: presta.DescriptionPrestationContrat,
-      isSearchable: true,
-      isH1: true,
-      method: handleLigneClicked,
-    };
-    _cells.push(_libelle);
-
-
-    let _etat = {
-      text:    <span className={`badge badge-${GetBadgeBgColor(presta.IdEtat)}`}>
-           {GetLibEtat(presta.IdEtat)}
-        </span>,
-      isSearchable: false,
-      isH1: false,
-      method: handleLigneClicked,
-    };
-    _cells.push(_etat);
-
-
-    let _bt ={
-      text:  <OverlayTrigger
-      placement="bottom"
-      overlay={<Tooltip>Relevés de tâches</Tooltip>}
-    >
-      <FontAwesomeIcon
-        icon={faListCheck}
-        onClick={() => handleAfficherListeTache()}
-      />
-    </OverlayTrigger>,
-    isSearchable: false,
-    isH1: false,
-    method: handleAfficherListeTache
-    }
-
-    _cells.push(_bt)
-
-    let _row = {data: presta, cells: _cells};
-
-
-    _body.push(_row);
-  }
-  return _body;
-};
-
- 
+  //#endregion
 
   return (
     <BreakpointProvider>
       <Container fluid>
         <Col md={12} style={{ textAlign: "start" }}>
           <span className="title">Plannification </span>|
-          <span className="subtitle"> {Prestations.length} prestations </span>
+          <span className="subtitle"> { IsLoaded ? `${Prestations.length} prestations` : <Placeholder animation="glow">
+        <Placeholder xs={1} />
+      </Placeholder>   }  </span>
         </Col>
         {SearchPrestation()}
 
@@ -1407,7 +1139,20 @@ const _Data = () => {
           <Breakpoint large up>
             <Row>
               <Col md={gridColMDValue}>
-                {TableGroupedMonth()} {PaginationPrestations()}
+                <TableData
+                  IsLoaded={IsLoaded}
+                  placeholdeNbLine={5}
+                  headers={_header}
+                  rawData={Prestations}
+                  handleCheckfilterChange={handleCheckfilterChange}
+                  isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+                  lData={_Data()}
+                  isRowActive={isRowSelected}
+                  HighlightTextIfSearch={HighlightTextIfSearch}
+                  Pagination={PaginationPrestations()}
+                  nbParPages={nbParPages}
+                  pageActuelle={pageActuelle}
+                />
               </Col>
               {gridColMDValue !== 12 && (
                 <Col md={12 - gridColMDValue}>{CardDocs()}</Col>
@@ -1434,27 +1179,7 @@ const _Data = () => {
           </Breakpoint>
         </Container>
 
-        <Container fluid className="container-table p-4">
-
-        <TableData
-          IsLoaded={IsLoaded}
-          placeholdeNbLine={5}
-          headers={_header}
-          data={Prestations}
-          handleCheckfilterChange={handleCheckfilterChange}
-          isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-          lData={_Data()}
-          isRowActive= {isRowSelected}
-          HighlightTextIfSearch={HighlightTextIfSearch}
-
-
-          nbParPages={nbParPages}
-          pageActuelle={pageActuelle}
-        />
-
-</Container>
-
-
+        <Container fluid className="container-table p-4"></Container>
       </Container>
     </BreakpointProvider>
   );

@@ -1,12 +1,6 @@
 //#region Imports
 import { useState, useEffect } from "react";
 //#region FontAwsome icones
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSort,
-  faSortDown,
-  faSortUp,
-} from "@fortawesome/free-solid-svg-icons";
 
 //#endregion
 
@@ -14,7 +8,6 @@ import {
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
-import Table from "react-bootstrap/Table";
 import Image from "react-bootstrap/Image";
 import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
@@ -31,6 +24,8 @@ import Row from "react-bootstrap/Row";
 //#region DEV
 import { loremIpsum } from "react-lorem-ipsum";
 import { Breakpoint, BreakpointProvider } from "react-socks";
+import TableData from "../../../components/commun/TableData";
+import { Dropdown, DropdownButton, Pagination, Stack } from "react-bootstrap";
 
 //#endregion
 
@@ -110,12 +105,62 @@ const AppareilsPage = () => {
   const [filterHorscontrat, SetFilterHorscontrat] = useState(true);
   const [filterDetruit, SetFilterDetruit] = useState(true);
 
-  const [orderBy, setOrderBy] = useState({ col: "etat", order: "ASC" });
-  //#endregion
+  const [arrayFilters, setArrayFilters] = useState([]);
 
+  //#endregion
+  const [nbParPages, setNbParPages] = useState(10);
+  const [pageActuelle, setPageActuelle] = useState(1);
   //#endregion
 
   //#region Fonctions
+
+  function IsFiltercheckboxShouldBeCheck(fieldname, item) {
+    if (
+      arrayFilters.findIndex(
+        (filter) => filter.fieldname === fieldname && filter.item === item
+      ) > -1
+    )
+      return true;
+    return false;
+  }
+
+  function FiltreColonnes(_lAppareils) {
+    if (arrayFilters.length > 0) {
+      let _arraySecteur = arrayFilters.filter(
+        (filter) => filter.fieldname === "Secteur"
+      );
+      let _arrayLibelle = arrayFilters.filter(
+        (filter) => filter.fieldname === "Libelle"
+      );
+      let _arrayEtat = arrayFilters.filter(
+        (filter) => filter.fieldname === "LibelleEtat"
+      );
+
+      if (_arraySecteur.length > 0)
+        _lAppareils = _lAppareils.filter(
+          (appareil) =>
+            _arraySecteur.filter((filter) => filter.item === appareil.Secteur)
+              .length > 0
+        );
+
+      if (_arrayLibelle.length > 0)
+        _lAppareils = _lAppareils.filter(
+          (appareil) =>
+            _arrayLibelle.filter((filter) => filter.item === appareil.Libelle)
+              .length > 0
+        );
+
+      if (_arrayEtat.length > 0)
+        _lAppareils = _lAppareils.filter(
+          (appareil) =>
+            _arrayEtat.filter((filter) => filter.item === appareil.LibelleEtat)
+              .length > 0
+        );
+    }
+
+    return _lAppareils;
+  }
+
   const reactStringReplace = require("react-string-replace");
   /**
    *
@@ -158,9 +203,8 @@ const AppareilsPage = () => {
     if (!filterDetruit)
       _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 3);
 
-    //OrderBy
-
-    _listeAppareil = ListeAppareilOrderBy(_listeAppareil);
+    //Colonnes
+    _listeAppareil = FiltreColonnes(_listeAppareil);
 
     //Search
     if (search.length > 0) {
@@ -174,40 +218,14 @@ const AppareilsPage = () => {
     }
   };
 
-  /**
-   * Ordonne la liste selon le state orderBy
-   * @param {La liste des appareils que l'on veut ordonné} liste
-   * @returns La liste ordonnée selon le $orderBy ({col: ["libelle","etat","secteur"] , order: ["ASC","DESC"]})
-   */
-  function ListeAppareilOrderBy(liste) {
-    switch (orderBy.col) {
-      case "libelle":
-        return orderBy.order === "ASC"
-          ? liste.sort((a, b) => a.Libelle.localeCompare(b.Libelle))
-          : liste.sort((a, b) => b.Libelle.localeCompare(a.Libelle));
-
-      case "etat":
-        return orderBy.order === "ASC"
-          ? liste.sort((a, b) => a.LibelleEtat.localeCompare(b.LibelleEtat))
-          : liste.sort((a, b) => b.LibelleEtat.localeCompare(a.LibelleEtat));
-
-      case "secteur":
-        return orderBy.order === "ASC"
-          ? liste.sort((a, b) => a.Secteur.localeCompare(b.Secteur))
-          : liste.sort((a, b) => b.Secteur.localeCompare(a.Secteur));
-      default:
-        return liste;
-    }
-  }
-
   function GetBGColorAppareilEtat(IdEtat) {
     switch (IdEtat) {
       case 1:
-        return "secondary";
+        return "nonPlannifie";
       case 2:
-        return "primary";
+        return "plannifie";
       case 3:
-        return "danger";
+        return "enCours";
       default:
         break;
     }
@@ -221,17 +239,45 @@ const AppareilsPage = () => {
     setSearch(event.target.value);
   };
 
-  const handleOrderby = (colonne) => {
-    let _order = "ASC";
+  const handleCheckfilterChange = (checked, key, value) => {
+    let _arrTemp = JSON.parse(JSON.stringify(arrayFilters));
 
-    if (orderBy.col === colonne) {
-      _order = orderBy.order === "ASC" ? "DESC" : "ASC";
+    if (checked) {
+      _arrTemp.push({ fieldname: key, item: value });
+      setArrayFilters(_arrTemp);
+    } else {
+      const index = _arrTemp.findIndex(
+        (filter) => filter.fieldname === key && filter.item === value
+      );
+      if (index > -1) {
+        _arrTemp.splice(index, 1);
+        setArrayFilters(_arrTemp);
+      }
     }
-
-    setOrderBy({ col: colonne, order: _order });
   };
 
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const handlePagePrev = () => {
+    if (pageActuelle > 1) {
+      //Suprrime les filtres sur colonnes
+      setArrayFilters([]);
+      setPageActuelle(pageActuelle - 1);
+    }
+  };
+
+  const handlePageChange = (number) => {
+    //Suprrime les filtres sur colonnes
+    setArrayFilters([]);
+    setPageActuelle(number);
+  };
+
+  const handlePageNext = (number) => {
+    if (pageActuelle < number) {
+      //Suprrime les filtres sur colonnes
+      setArrayFilters([]);
+      setPageActuelle(pageActuelle + 1);
+      //Annule l'affichage des documents/tâches
+    }
+  };
 
   //#endregion
 
@@ -242,23 +288,20 @@ const AppareilsPage = () => {
   const AppareilGrey = require("../../../image/bottleGrey.png");
   const AppareilRed = require("../../../image/bottleRed.png");
 
-
   const ButtonFilter = (props) => {
     return (
       <Nav.Item>
-
-      <Nav.Link
-        onClick={() => props.methodState(!props.state)}
-        variant=""
-        className={
-          props.state ? "btn-filter-active border" : "btn-filter border"
-        }
-      >
-        {GetImageAppareilEtat(props.IdEtat, "img-bt-filter")}
-        {props.title} ({props.number})
-      </Nav.Link>
+        <Nav.Link
+          onClick={() => props.methodState(!props.state)}
+          variant=""
+          className={
+            props.state ? "btn-filter-active border" : "btn-filter border"
+          }
+        >
+          {GetImageAppareilEtat(props.IdEtat, "img-bt-filter")}
+          {props.title} {isLoaded && `(${props.number})`}
+        </Nav.Link>
       </Nav.Item>
-
     );
   };
 
@@ -309,8 +352,6 @@ const AppareilsPage = () => {
         </Col>
       </Row>
     );
-
-
   };
 
   const GetImageAppareilEtat = (IdEtat, className) => {
@@ -329,82 +370,82 @@ const AppareilsPage = () => {
   };
   //#endregion
 
-  //#region large
+  //#region TableData
+  const _header = [
+    {
+      title: "Secteur",
+      filter: {
+        fieldname: "Secteur",
+      },
+    },
 
-  const AppareilsTable = () => {
-    return (
-      <Table className="table-presta">
-        {TableHead()}
-        <tbody>{TableBody()}</tbody>
-      </Table>
-    );
-  };
+    {
+      title: "Code",
+    },
+    {
+      title: "Libellé de l'appareil",
+      filter: {
+        fieldname: "Libelle",
+      },
+    },
+    {
+      title: "État",
+      filter: {
+        fieldname: "LibelleEtat",
+      },
+    },
+  ];
 
-  const TableHead = () => {
-    return (
-      <thead>
-        <tr>
-          <th><div>Secteur {ButtonOrder("secteur")}</div> </th>
-          <th><div>Code</div></th>
-          <th><div>Libellé de l'appareil {ButtonOrder("libelle")}</div> </th>
-          <th><div>État {ButtonOrder("etat")}</div></th>
-        </tr>
-      </thead>
-    );
-  };
+  const _Data = () => {
+    let _body = [];
 
-  const TableBody = () => {
-    if (isLoaded) {
-      return GetAppareilsSearched().map((appareil) => {
-        return (
-          <tr key={appareil.Id}>
-            <td>{HighlightTextIfSearch(appareil.Secteur)} </td>
-            <td>{appareil.Id}</td>
-            <td>{HighlightTextIfSearch(appareil.Libelle)}</td>
-            <td>{GetImageAppareilEtat(appareil.IdEtat)}
-              <Badge bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
-                {appareil.LibelleEtat}{" "}
-              </Badge>{" "}
-            </td>
-          </tr>
-        );
-      });
-    } else {
-      return PlaceHolderTableLine(5);
+    let _lAppareils = GetAppareilsSearched();
+
+    for (let index = 0; index < _lAppareils.length; index++) {
+      const appareil = _lAppareils[index];
+      let _cells = [];
+
+      let _secteur = {
+        text: appareil.Secteur,
+        isSearchable: true,
+        isH1: false,
+      };
+
+      _cells.push(_secteur);
+      let _code = {
+        text: appareil.Id,
+        isSearchable: false,
+        isH1: false,
+      };
+
+      _cells.push(_code);
+
+      let _lib = {
+        text: appareil.Libelle,
+        isSearchable: true,
+        isH1: false,
+      };
+      _cells.push(_lib);
+
+      let _etat = {
+        text: (
+          <span
+            className={`badge badge-${GetBGColorAppareilEtat(appareil.IdEtat)}`}
+          >
+            {appareil.LibelleEtat}
+          </span>
+        ),
+        isSearchable: true,
+        isH1: false,
+      };
+
+      _cells.push(_etat);
+
+      let _row = { data: appareil, cells: _cells };
+
+      _body.push(_row);
     }
-  };
-
-  const PlaceHolderTableLine = (numberOfLines) => {
-    let _arrayLoading = [];
-    for (let index = 0; index < numberOfLines; index++) {
-      _arrayLoading.push(index + 1);
-    }
-    return _arrayLoading.map((i) => {
-      return (
-        <tr key={i}>
-          <td colSpan={4}>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={12} />
-            </Placeholder>
-          </td>
-        </tr>
-      );
-    });
-  };
-
-  const ButtonOrder = (orderName) => {
-    return (
-      <FontAwesomeIcon
-        onClick={() => handleOrderby(orderName)}
-        icon={
-          orderBy.col === orderName
-            ? orderBy.order === "ASC"
-              ? faSortUp
-              : faSortDown
-            : faSort
-        }
-      />
-    );
+    return _body;
   };
 
   //#endregion
@@ -476,7 +517,99 @@ const AppareilsPage = () => {
 
   //#endregion
 
+  //#region pagination
+
+  const PaginationAppareil = () => {
+    let _items = [];
+
+    let _lAppareils = GetAppareilsSearched();
+    let _limiter = _lAppareils.length;
+
+    _items.push(
+      <Pagination.Prev
+        key={0}
+        onClick={() => handlePagePrev()}
+        className="m-1"
+      />
+    );
+    for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
+      _items.push(
+        <Pagination.Item
+          key={number}
+          active={number === pageActuelle}
+          onClick={() => handlePageChange(number)}
+          className="m-1"
+        >
+          {number}
+        </Pagination.Item>
+      );
+    }
+    _items.push(
+      <Pagination.Next
+        key={_items.length + 1}
+        onClick={() => handlePageNext(_limiter / nbParPages)}
+        className="m-1"
+      />
+    );
+
+    return (
+      <Stack direction="horizontal">
+        <Pagination className="m-2">{_items}</Pagination>
+        {DrodpdownNbPages()}
+      </Stack>
+    );
+  };
+
+  const DrodpdownNbPages = () => {
+    return (
+      <DropdownButton
+        variant=""
+        className="border button-periode"
+        drop="down-centered"
+        style={{ borderRadius: "10px" }}
+        title={`${nbParPages} / page`}
+      >
+        <Dropdown.Item
+          onClick={() => {
+            setNbParPages(10);
+            setPageActuelle(1);
+          }}
+        >
+          10 / page
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={() => {
+            setNbParPages(20);
+            setPageActuelle(1);
+          }}
+        >
+          20 / page
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={() => {
+            setNbParPages(50);
+            setPageActuelle(1);
+          }}
+        >
+          50 / page
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={() => {
+            setNbParPages(100);
+            setPageActuelle(1);
+          }}
+        >
+          100 / page
+        </Dropdown.Item>
+      </DropdownButton>
+    );
+  };
+
   //#endregion
+
+  //#endregion
+
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   useEffect(() => {
     async function makeRequest() {
@@ -486,26 +619,48 @@ const AppareilsPage = () => {
     }
     makeRequest();
     MockupListeappareils();
-  },[isLoaded]);
+  }, [isLoaded]);
 
   return (
     <Container fluid className="h-100">
-        <Col md={12} style={{ textAlign: "start" }}>
-          <span className="title">Liste des appareils </span>|
-          <span className="subtitle"> {listeAppareils.length} appareils </span>
-        </Col>
-        {FilterFindPanel()}
-          <BreakpointProvider>
-            <Breakpoint large up>
-            <Container fluid className="container-table p-4">
-
-              {AppareilsTable()}
-              </Container>
-            </Breakpoint>
-            <Breakpoint medium down>
-              {AppareilsCards()}
-            </Breakpoint>
-          </BreakpointProvider>
+      <Col md={12} style={{ textAlign: "start" }}>
+        <span className="title">Liste des appareils </span>|
+        <span className="subtitle">
+          {isLoaded ? (
+            `${listeAppareils.length} appareils`
+          ) : (
+            <Placeholder animation="glow">
+              <Placeholder xs={1} />
+            </Placeholder>
+          )}
+        </span>
+      </Col>
+      {FilterFindPanel()}
+      <BreakpointProvider>
+        <Breakpoint large up>
+          <Container fluid className="container-table p-4">
+            <TableData
+              IsLoaded={isLoaded}
+              placeholdeNbLine={5}
+              headers={_header}
+              rawData={listeAppareils}
+              handleCheckfilterChange={handleCheckfilterChange}
+              isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+              lData={_Data()}
+              isRowActive={() => {
+                return false;
+              }}
+              HighlightTextIfSearch={HighlightTextIfSearch}
+              Pagination={PaginationAppareil()}
+              nbParPages={nbParPages}
+              pageActuelle={pageActuelle}
+            />
+          </Container>
+        </Breakpoint>
+        <Breakpoint medium down>
+          {AppareilsCards()}
+        </Breakpoint>
+      </BreakpointProvider>
     </Container>
   );
 };
