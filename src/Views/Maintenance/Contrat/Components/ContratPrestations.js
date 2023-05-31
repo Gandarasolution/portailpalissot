@@ -839,9 +839,6 @@ const ContratPrestation = ({
 
   //#endregion
 
-  //#region large
-
-  //#endregion
 
   //#region small
 

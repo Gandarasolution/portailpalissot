@@ -84,6 +84,7 @@ const TableData = (props) => {
           overlay={
             <Popover className="popover-filters">
               {_arFilters.map((item, index) => {
+                if (item[0] === "undefined") return null
                 return (
                   <Form.Check
                     type="checkbox"
