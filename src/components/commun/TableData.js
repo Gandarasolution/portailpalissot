@@ -6,18 +6,17 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
-//#endregion
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Pagination from "react-bootstrap/Pagination";
+import Placeholder from "react-bootstrap/Placeholder";
+import Stack from "react-bootstrap/Stack";
 
+//#endregion
+import { groupBy } from "../../functions";
 //#region fontAwsome
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  Dropdown,
-  DropdownButton,
-  Pagination,
-  Placeholder,
-  Stack,
-} from "react-bootstrap";
 import { useState } from "react";
 //#endregion
 
@@ -33,12 +32,7 @@ const TableData = (props) => {
 
   //#region Fonctions
 
-  var groupBy = function (xs, key) {
-    return xs.reduce(function (rv, x) {
-      (rv[x[key]] = rv[x[key]] || []).push(x);
-      return rv;
-    }, {});
-  };
+ 
 
   const reactStringReplace = require("react-string-replace");
   function HighlightTextIfSearch(text) {

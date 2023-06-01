@@ -1,20 +1,23 @@
 //#region Imports
 
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
+//#region Bootstrap
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
 import Nav from "react-bootstrap/Nav";
 import Placeholder from "react-bootstrap/Placeholder";
 import Row from "react-bootstrap/Row";
-import TableData from "../../../components/commun/TableData";
-import { useEffect, useState } from "react";
-
-//#region Bootstrap
+import Card from "react-bootstrap/Card";
 
 //#endregion
 
 //#region Components
-
+import { FiltrerParCollones } from "../../../functions";
+import Search from "../../../components/commun/Search";
+import TableData from "../../../components/commun/TableData";
+import ImageExtension from "../../../components/commun/ImageExtension";
 //#endregion
 
 //#endregion
@@ -60,6 +63,12 @@ const InterventionPage = () => {
 
   const [arrayFilters, setArrayFilters] = useState([]);
 
+  const [search, setSearch] = useState("");
+
+  const [gridColMDValue, setGridColMDValue] = useState(12);
+  const [interSelected, setInterSelected] = useState(null);
+  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
+
   //#endregion
 
   //#region Fonctions
@@ -68,70 +77,40 @@ const InterventionPage = () => {
     let _lInters = JSON.parse(JSON.stringify(listeInterventions));
 
     //Filtré par search
-
+    _lInters = GetIntersSearched();
     //Filtrés par boutons d'état
 
     //Filtrés par colonnes
-    _lInters = FiltreColonnes(_lInters);
+    _lInters = FiltrerParCollones(_lInters, arrayFilters);
 
     return _lInters;
   }
 
-  function FiltreColonnes(_lInters) {
-    if (arrayFilters.length > 0) {
-      let _arrayIdDossierIntervention = arrayFilters.filter(
-        (filter) => filter.fieldname === "IdDossierIntervention"
+  const GetIntersSearched = () => {
+    let _llisteInterventions = listeInterventions;
+
+    if (search.length > 0) {
+      _llisteInterventions = _llisteInterventions.filter(
+        (item) =>
+          item.LibelleDossierIntervention.toUpperCase().includes(
+            search.toUpperCase()
+          ) ||
+          `DI${item.IdDossierIntervention.toString().toUpperCase()}`.includes(
+            search.toUpperCase()
+          ) ||
+          (item.IdFacture &&
+            `F${item.IdFacture.toString().toUpperCase()}`.includes(
+              search.toUpperCase()
+            ))
       );
-
-      let _arrayLibelle = arrayFilters.filter(
-        (filter) => filter.fieldname === "LibelleDossierIntervention"
-      );
-
-      let _arrayEtat = arrayFilters.filter(
-        (filter) => filter.fieldname === "LibelleEtat"
-      );
-
-      let _dateFacture = arrayFilters.filter(
-        (filter) => filter.fieldname === "DateFacture"
-      );
-
-      if (_arrayIdDossierIntervention.length > 0)
-        _lInters = _lInters.filter(
-          (inter) =>
-            _arrayIdDossierIntervention.filter(
-              (filter) =>
-                Number(filter.item) === Number(inter.IdDossierIntervention)
-            ).length > 0
-        );
-
-      if (_arrayLibelle.length > 0)
-        _lInters = _lInters.filter(
-          (inter) =>
-            _arrayLibelle.filter(
-              (filter) => filter.item === inter.LibelleDossierIntervention
-            ).length > 0
-        );
-
-      if (_arrayEtat.length > 0)
-        _lInters = _lInters.filter(
-          (inter) =>
-            _arrayEtat.filter((filter) => filter.item === inter.LibelleEtat)
-              .length > 0
-        );
-
-      if (_dateFacture.length > 0)
-        _lInters = _lInters.filter(
-          (inter) =>
-            _dateFacture.filter(
-              (filter) =>
-                new Date(filter.item).getTime() ===
-                new Date(inter.DateFacture).getTime()
-            ).length > 0
-        );
     }
 
-    return _lInters;
-  }
+    _llisteInterventions = _llisteInterventions.sort(
+      (a, b) => a.DateDemande - b.DateDemande
+    );
+
+    return _llisteInterventions;
+  };
 
   function IsFiltercheckboxShouldBeCheck(fieldname, item) {
     if (
@@ -162,6 +141,13 @@ const InterventionPage = () => {
       }
     }
   };
+
+  const handleLigneClicked = (intervention) => {
+    setInterSelected(intervention);
+    setGridColMDValue(10);
+    setIsDocumentLoaded(false);
+  };
+
   //#endregion
 
   //#region TableData
@@ -179,7 +165,7 @@ const InterventionPage = () => {
       title: "Code",
       filter: {
         fieldname: "IdDossierIntervention",
-        method: (e) => {
+        affichageMethod: (e) => {
           return `DI${e}`;
         },
       },
@@ -203,7 +189,7 @@ const InterventionPage = () => {
       title: "Date Facture",
       filter: {
         fieldname: "DateFacture",
-        method: _methodeDate,
+        affichageMethod: _methodeDate,
       },
     },
   ];
@@ -221,35 +207,42 @@ const InterventionPage = () => {
         text: new Date(inter.DateDemande).toLocaleDateString("fr-FR"),
         isSearchable: false,
         isH1: false,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_DateDemande);
 
       let _code = {
         text: `DI${inter.IdDossierIntervention}`,
-        isSearchable: false,
-        isH1: false,
+        isSearchable: true,
+        isH1: true,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_code);
 
       let _lib = {
         text: inter.LibelleDossierIntervention,
-        isSearchable: false,
-        isH1: false,
+        isSearchable: true,
+        isH1: true,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_lib);
 
       let _etat = {
-        text: <span className="badge badge-bg-success">{inter.LibelleEtat} </span>,
+        text: (
+          <span className="badge badge-bg-success">{inter.LibelleEtat} </span>
+        ),
         isSearchable: false,
         isH1: false,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_etat);
 
       let _idFacture = {
         text:
           inter.IdFacture && inter.IdFacture > 0 ? `F${inter.IdFacture}` : null,
-        isSearchable: false,
-        isH1: false,
+        isSearchable: true,
+        isH1: true,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_idFacture);
 
@@ -259,6 +252,7 @@ const InterventionPage = () => {
           : null,
         isSearchable: false,
         isH1: false,
+        onClickMethod: handleLigneClicked,
       };
       _cells.push(_dateFacture);
 
@@ -267,6 +261,92 @@ const InterventionPage = () => {
       _body.push(_row);
     }
     return _body;
+  };
+
+  //#endregion
+
+  //#region Component
+
+  const Pannel = () => {
+    return (
+      <Row className="mb-2">
+        <Col md={6} className="m-1">
+          <Nav fill>
+            <Nav.Item>
+              <Nav.Link className="btn-filter border">
+                Nouvelle intervention
+              </Nav.Link>
+            </Nav.Item>
+          </Nav>
+        </Col>
+
+        <Col className="m-1">
+          <Search setSearch={setSearch} />
+        </Col>
+      </Row>
+    );
+  };
+
+  const CardDocuments = () => {
+    if (!interSelected.IdFacture || interSelected.IdFacture <= 0) {
+      return (
+        <Card className="mb-2">
+          <Card.Header className="card-document">Facture</Card.Header>
+          <Card.Body></Card.Body>
+          <p>Aucune facture.</p>
+        </Card>
+      );
+    }
+
+    async function makeRequest() {
+      await delay(1000);
+
+      setIsDocumentLoaded(true);
+    }
+    makeRequest();
+    let _facture = { title: "Facture", extension: "pdf", size: "18 MO" };
+    return (
+      <Card className="mb-2">
+        <Card.Header className="card-document">Facture</Card.Header>
+        <Card.Body>
+          {isDocumentLoaded ? (
+            <Row className="mb-1">
+              <Col md={3}>
+                <ImageExtension extension={_facture.extension} />
+              </Col>
+              <Col md={9}>
+                <Row>
+                  <p className="mb-0 document-title">{`${_facture.title}${
+                    _facture.extension.toUpperCase() === "ZIP"
+                      ? ""
+                      : `.${_facture.extension}`
+                  }`}</p>
+                  <span className="document-size">{`${_facture.size}`}</span>
+                  <span className="document-links">
+                    {_facture.extension.toUpperCase() !== "ZIP" && (
+                      <Link to={"#"} target="_blank">
+                        Voir
+                      </Link>
+                    )}
+                    <Link
+                      to={"#"}
+                      target="_blank"
+                      download={`${_facture.title}`}
+                    >
+                      Télécharger
+                    </Link>
+                  </span>
+                </Row>
+              </Col>
+            </Row>
+          ) : (
+            <Placeholder animation="glow">
+              <Placeholder xs={12} />
+            </Placeholder>
+          )}
+        </Card.Body>
+      </Card>
+    );
   };
 
   //#endregion
@@ -300,32 +380,34 @@ const InterventionPage = () => {
         </span>
       </Col>
 
-      <Row className="mb-2">
-        <Col className="m-1">
-          <Nav fill>
-            <Nav.Item>
-              <Nav.Link className="btn-filter border">
-                Nouvelle intervention
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Col>
-      </Row>
+      {Pannel()}
 
       <Container fluid className="container-table p-4">
-        <TableData
-          IsLoaded={isLoaded}
-          placeholdeNbLine={5}
-          headers={_header}
-          lData={_Data()}
-          rawData={listeInterventions}
-          handleCheckfilterChange={handleCheckfilterChange}
-          isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-          isRowActive={() => {
-            return false;
-          }}
-           Pagination
-        />
+        <Row>
+          <Col md={gridColMDValue}>
+            <TableData
+              IsLoaded={isLoaded}
+              placeholdeNbLine={5}
+              headers={_header}
+              lData={_Data()}
+              rawData={listeInterventions}
+              handleCheckfilterChange={handleCheckfilterChange}
+              isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+              isRowActive={(inter) => {
+                return (
+                  inter.IdDossierIntervention ===
+                  interSelected.IdDossierIntervention
+                );
+              }}
+              Pagination
+              search={search}
+            />
+          </Col>
+
+          {gridColMDValue !== 12 && (
+            <Col md={12 - gridColMDValue}>{CardDocuments()}</Col>
+          )}
+        </Row>
       </Container>
     </Container>
   );

@@ -7,7 +7,6 @@ import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
 import Image from "react-bootstrap/Image";
 import Badge from "react-bootstrap/Badge";
@@ -20,11 +19,13 @@ import Row from "react-bootstrap/Row";
 
 //#region Components
 import TableData from "../../../components/commun/TableData";
+import {FiltrerParCollones} from "../../../functions";
 
 //#endregion
 
 //#region DEV
 import { loremIpsum } from "react-lorem-ipsum";
+import Search from "../../../components/commun/Search";
 
 //#endregion
 
@@ -122,42 +123,48 @@ const AppareilsPage = () => {
     return false;
   }
 
-  function FiltreColonnes(_lAppareils) {
-    if (arrayFilters.length > 0) {
-      let _arraySecteur = arrayFilters.filter(
-        (filter) => filter.fieldname === "Secteur"
-      );
-      let _arrayLibelle = arrayFilters.filter(
-        (filter) => filter.fieldname === "Libelle"
-      );
-      let _arrayEtat = arrayFilters.filter(
-        (filter) => filter.fieldname === "LibelleEtat"
-      );
 
-      if (_arraySecteur.length > 0)
-        _lAppareils = _lAppareils.filter(
-          (appareil) =>
-            _arraySecteur.filter((filter) => filter.item === appareil.Secteur)
-              .length > 0
-        );
 
-      if (_arrayLibelle.length > 0)
-        _lAppareils = _lAppareils.filter(
-          (appareil) =>
-            _arrayLibelle.filter((filter) => filter.item === appareil.Libelle)
-              .length > 0
-        );
+ 
 
-      if (_arrayEtat.length > 0)
-        _lAppareils = _lAppareils.filter(
-          (appareil) =>
-            _arrayEtat.filter((filter) => filter.item === appareil.LibelleEtat)
-              .length > 0
-        );
-    }
 
-    return _lAppareils;
-  }
+
+  // function FiltreColonnes(_lAppareils) {
+  //   if (arrayFilters.length > 0) {
+  //     let _arraySecteur = arrayFilters.filter(
+  //       (filter) => filter.fieldname === "Secteur"
+  //     );
+  //     let _arrayLibelle = arrayFilters.filter(
+  //       (filter) => filter.fieldname === "Libelle"
+  //     );
+  //     let _arrayEtat = arrayFilters.filter(
+  //       (filter) => filter.fieldname === "LibelleEtat"
+  //     );
+
+  //     if (_arraySecteur.length > 0)
+  //       _lAppareils = _lAppareils.filter(
+  //         (appareil) =>
+  //           _arraySecteur.filter((filter) => filter.item === appareil.Secteur)
+  //             .length > 0
+  //       );
+
+  //     if (_arrayLibelle.length > 0)
+  //       _lAppareils = _lAppareils.filter(
+  //         (appareil) =>
+  //           _arrayLibelle.filter((filter) => filter.item === appareil.Libelle)
+  //             .length > 0
+  //       );
+
+  //     if (_arrayEtat.length > 0)
+  //       _lAppareils = _lAppareils.filter(
+  //         (appareil) =>
+  //           _arrayEtat.filter((filter) => filter.item === appareil.LibelleEtat)
+  //             .length > 0
+  //       );
+  //   }
+
+  //   return _lAppareils;
+  // }
 
   const reactStringReplace = require("react-string-replace");
   /**
@@ -202,7 +209,7 @@ const AppareilsPage = () => {
       _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 3);
 
     //Colonnes
-    _listeAppareil = FiltreColonnes(_listeAppareil);
+    _listeAppareil = FiltrerParCollones(_listeAppareil,arrayFilters);
 
     //Search
     if (search.length > 0) {
@@ -233,9 +240,7 @@ const AppareilsPage = () => {
 
   //#region Evenements
 
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
-  };
+
 
   const handleCheckfilterChange = (checked, key, value) => {
     let _arrTemp = JSON.parse(JSON.stringify(arrayFilters));
@@ -319,12 +324,7 @@ const AppareilsPage = () => {
         </Col>
 
         <Col md={6} className="m-1">
-          <Form.Control
-            type="search"
-            placeholder="Rechercher"
-            aria-label="Search"
-            onChange={handleSearch}
-          />
+         <Search setSearch={setSearch} />
         </Col>
       </Row>
     );

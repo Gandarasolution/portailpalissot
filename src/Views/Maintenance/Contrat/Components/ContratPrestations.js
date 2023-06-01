@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
+
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
 import Collapse from "react-bootstrap/Collapse";
@@ -12,7 +13,6 @@ import Modal from "react-bootstrap/Modal";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
-import Image from "react-bootstrap/Image";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import Nav from "react-bootstrap/Nav";
@@ -31,7 +31,10 @@ import {
 //#endregion
 
 //#region Components
+import {FiltrerParCollones} from "../../../../functions";
+import Search from "../../../../components/commun/Search";
 import TableData from "../../../../components/commun/TableData";
+import ImageExtension from "../../../../components/commun/ImageExtension";
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
@@ -44,11 +47,7 @@ const ContratPrestation = ({
   ParentComponentPeriodeSelect,
   IsLoaded,
 }) => {
-  const ImgJPG = require("../../../../image/jpg.png");
-  const ImgPDF = require("../../../../image/pdf.png");
-  const ImgPNG = require("../../../../image/png.png");
-  const ImgDOC = require("../../../../image/doc.png");
-  const ImgZIP = require("../../../../image/zip.png");
+  
 
   //#region Mockup
 
@@ -194,7 +193,7 @@ const ContratPrestation = ({
     _lPrestation = FiltrePrestationsBouton(_lPrestation);
 
     // //Les prestations sont filtrés par les colonnes
-    _lPrestation = FiltrerParCollones(_lPrestation);
+    _lPrestation = FiltrerParCollones(_lPrestation, arrayFilters);
 
     return _lPrestation;
   };
@@ -234,51 +233,6 @@ const ContratPrestation = ({
     return _lPrestations;
   }
 
-  function FiltrerParCollones(_lData) {
-    let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
-    for (let index = 0; index < _arFilters.length; index++) {
-      const arrayGroup = _arFilters[index];
-      _lData = FiltreUnecollone(arrayGroup[0], _lData);
-    }
-    return _lData;
-  }
-
-  function FiltreUnecollone(fieldname, _lData) {
-    let _arColonne = arrayFilters.filter(
-      (filter) => filter.fieldname === fieldname
-    );
-    if (_arColonne.length > 0) {
-      _lData = _lData.filter((data) => {
-        return (
-          _arColonne.filter(filterColoneByTypeOfData(data, fieldname)).length >
-          0
-        );
-      });
-    }
-    return _lData;
-  }
-
-  const filterColoneByTypeOfData = (data, fieldname) => {
-    switch (typeof data[fieldname]) {
-      case typeof "":
-        return (filter) => filter.item === data[fieldname];
-      case typeof 0:
-        return (filter) => Number(filter.item) === data[fieldname];
-      case typeof new Date():
-        return (filter) =>
-          new Date(filter.item).getTime() === data[fieldname].getTime();
-      default:
-        return (filter) => filter.item === data[fieldname];
-    }
-  };
-
-  var groupBy = function (xs, key) {
-    return xs.reduce(function (rv, x) {
-      (rv[x[key]] = rv[x[key]] || []).push(x);
-      return rv;
-    }, {});
-  };
-
   function GetFilterState(idEtat) {
     switch (idEtat) {
       case 1:
@@ -309,20 +263,7 @@ const ContratPrestation = ({
     }
   }
 
-  function GetImageExtension(extension) {
-    switch (extension.toUpperCase()) {
-      case "JPG":
-        return ImgJPG;
-      case "PDF":
-        return ImgPDF;
-      case "PNG":
-        return ImgPNG;
-      case "ZIP":
-        return ImgZIP;
-      default:
-        return ImgDOC;
-    }
-  }
+
 
   function IsFiltercheckboxShouldBeCheck(fieldname, item) {
     if (
@@ -337,10 +278,6 @@ const ContratPrestation = ({
   //#endregion
 
   //#region Evenements
-
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
-  };
 
   const handleTousFilter = () => {
     let _valueStart = JSON.parse(JSON.stringify(filterTous));
@@ -476,12 +413,7 @@ const ContratPrestation = ({
         </Col>
 
         <Col md={5} className="m-1">
-          <Form.Control
-            type="search"
-            placeholder="Rechercher"
-            aria-label="Search"
-            onChange={handleSearch}
-          />
+          <Search setSearch={setSearch} />
         </Col>
 
         <Col className="m-1">{ParentComponentPeriodeSelect}</Col>
@@ -648,7 +580,7 @@ const ContratPrestation = ({
   const RowDocument = (props, index) => {
     return (
       <Row className="mb-1" key={index}>
-        <Col md={3}>{ImageExtension(props.extension)}</Col>
+        <Col md={3}><ImageExtension extension={props.extension}  /></Col>
         <Col md={9}>
           <Row>
             <p className="mb-0 document-title">{`${props.title}${
@@ -659,11 +591,11 @@ const ContratPrestation = ({
             <span className="document-size">{`${props.size}`}</span>
             <span className="document-links">
               {props.extension.toUpperCase() !== "ZIP" && (
-                <Link to={ImgDOC} target="_blank">
+                <Link to={"#"} target="_blank">
                   Voir
                 </Link>
               )}
-              <Link to={ImgDOC} target="_blank" download={`${props.title}`}>
+              <Link to={"#"} target="_blank" download={`${props.title}`}>
                 Télécharger
               </Link>
             </span>
@@ -673,15 +605,7 @@ const ContratPrestation = ({
     );
   };
 
-  const ImageExtension = (extension) => {
-    return (
-      <Image
-        src={GetImageExtension(extension)}
-        height={42}
-        alt={`Icone ${extension} Crédit Dimitriy Morilubov`}
-      />
-    );
-  };
+ 
 
   //#endregion
 
