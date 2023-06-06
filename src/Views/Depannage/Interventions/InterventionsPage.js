@@ -393,12 +393,13 @@ const InterventionPage = () => {
               rawData={listeInterventions}
               handleCheckfilterChange={handleCheckfilterChange}
               isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-              isRowActive={(inter) => {
-                return (
-                  inter.IdDossierIntervention ===
-                  interSelected.IdDossierIntervention
-                );
-              }}
+              // isRowActive={(inter) => {
+              //   return ( inter ?
+              //     inter.IdDossierIntervention === interSelected.IdDossierIntervention
+              //     : false
+              //   );
+              // }}
+              isRowActive={()=>{return false}}
               Pagination
               search={search}
             />

@@ -1,7 +1,7 @@
 //#region Imports
 import { useEffect, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
-
+import dateFormat from "dateformat";
 
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
@@ -31,7 +31,7 @@ import {
 //#endregion
 
 //#region Components
-import {FiltrerParCollones} from "../../../../functions";
+import { FiltrerParCollones } from "../../../../functions";
 import Search from "../../../../components/commun/Search";
 import TableData from "../../../../components/commun/TableData";
 import ImageExtension from "../../../../components/commun/ImageExtension";
@@ -39,6 +39,7 @@ import ImageExtension from "../../../../components/commun/ImageExtension";
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
+import { Stack } from "react-bootstrap";
 
 //#endregion
 
@@ -46,9 +47,8 @@ const ContratPrestation = ({
   Prestations,
   ParentComponentPeriodeSelect,
   IsLoaded,
+  datePrestation,
 }) => {
-  
-
   //#region Mockup
 
   const [listeTaches, setListeTaches] = useState([]);
@@ -106,7 +106,6 @@ const ContratPrestation = ({
   const [filterEC, setFilterEC] = useState(false);
   const [filterT, setFilterT] = useState(false);
 
-
   const [arrayFilters, setArrayFilters] = useState([]);
   //#endregion
 
@@ -115,6 +114,9 @@ const ContratPrestation = ({
   const [gridColMDValue, setGridColMDValue] = useState(12);
   const [search, setSearch] = useState("");
   const [modalLargeShow, setModalLargeShow] = useState(false);
+
+  const [dateDebutPeriode, setDateDebutPeriode] = useState(0);
+  const [dateFinPeriode, setDateFinPeriode] = useState(0);
 
   //#endregion
 
@@ -263,8 +265,6 @@ const ContratPrestation = ({
     }
   }
 
-
-
   function IsFiltercheckboxShouldBeCheck(fieldname, item) {
     if (
       arrayFilters.findIndex(
@@ -350,7 +350,6 @@ const ContratPrestation = ({
     }
   };
 
-
   const handleAfficherListeTache = () => {
     let _value = JSON.parse(JSON.stringify(modalLargeShow));
     _value = !_value;
@@ -416,7 +415,31 @@ const ContratPrestation = ({
           <Search setSearch={setSearch} />
         </Col>
 
-        <Col className="m-1">{ParentComponentPeriodeSelect}</Col>
+        {/* <Col className="m-1">{ParentComponentPeriodeSelect}</Col> */}
+
+        <Col className="m-1">
+          <Stack direction="horizontal">
+            <span className="m-2">Du </span>
+          <Form.Control
+            type="date"
+            value={dateDebutPeriode}
+            onChange={(e) => setDateDebutPeriode(e.target.value)}
+            />
+            </Stack>
+
+            <Stack direction="horizontal">
+            <span className="m-2"> Au </span>
+             
+            <Form.Control
+            type="date"
+            value={dateFinPeriode}
+            onChange={(e) => setDateFinPeriode(e.target.value)}
+          /> 
+            </Stack>
+
+
+
+        </Col>
       </Row>
     );
   };
@@ -434,7 +457,6 @@ const ContratPrestation = ({
     //La table prend toute la place
     setGridColMDValue(12);
   }
-
 
   //#endregion
 
@@ -580,7 +602,9 @@ const ContratPrestation = ({
   const RowDocument = (props, index) => {
     return (
       <Row className="mb-1" key={index}>
-        <Col md={3}><ImageExtension extension={props.extension}  /></Col>
+        <Col md={3}>
+          <ImageExtension extension={props.extension} />
+        </Col>
         <Col md={9}>
           <Row>
             <p className="mb-0 document-title">{`${props.title}${
@@ -604,8 +628,6 @@ const ContratPrestation = ({
       </Row>
     );
   };
-
- 
 
   //#endregion
 
@@ -726,8 +748,31 @@ const ContratPrestation = ({
 
   //#endregion
 
+  function addYears(date, years) {
+    date.setFullYear(date.getFullYear() + years);
+    return date;
+  }
+
   useEffect(() => {
     setIsListeTacheAffiche(true);
+    const _dateToday = new Date();
+    let _debutDate = new Date(
+      _dateToday.getFullYear(),
+      Number(dateFormat(new Date(datePrestation), "mm")) - 1,
+      Number(dateFormat(new Date(datePrestation), "dd"))
+    );
+    _debutDate = dateFormat(new Date(_debutDate), "yyyy-dd-mm");
+
+    let _finDate = new Date(
+      _dateToday.getFullYear(),
+      Number(dateFormat(new Date(datePrestation), "mm")) - 1,
+      Number(dateFormat(new Date(datePrestation), "dd"))
+    );
+    _finDate = addYears(_finDate, 1);
+    _finDate = dateFormat(new Date(_finDate), "yyyy-dd-mm");
+
+    setDateDebutPeriode(_debutDate);
+    setDateFinPeriode(_finDate);
   }, []);
 
   //#region TableData

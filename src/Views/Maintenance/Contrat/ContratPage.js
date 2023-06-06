@@ -222,7 +222,6 @@ const ContratPage = () => {
     let _monthI = _dateContrat.getMonth();
     let _year = new Date().getFullYear();
     let _DateRetour = new Date(_year, _monthI, _day);
-
     return _DateRetour;
   }
 
@@ -329,7 +328,7 @@ const ContratPage = () => {
       <ContratPrestation
         IsLoaded={isLoadedPresta}
         Prestations={Prestations}
-        datePrestation={dateDebutPeriode}
+        datePrestation={new Date(Contrat.DateSouscrit)}
         ParentComponentPeriodeSelect={
           <BreakpointProvider>
             <Breakpoint large up>

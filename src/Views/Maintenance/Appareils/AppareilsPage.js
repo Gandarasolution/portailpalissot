@@ -20,18 +20,21 @@ import Row from "react-bootstrap/Row";
 //#region Components
 import TableData from "../../../components/commun/TableData";
 import {FiltrerParCollones} from "../../../functions";
+import Search from "../../../components/commun/Search";
 
 //#endregion
 
 //#region DEV
 import { loremIpsum } from "react-lorem-ipsum";
-import Search from "../../../components/commun/Search";
 
 //#endregion
 
 //#endregion
 
 const AppareilsPage = () => {
+
+
+
   //#region Mockup
 
   const [listeAppareils, setListeAppareils] = useState([
@@ -123,48 +126,6 @@ const AppareilsPage = () => {
     return false;
   }
 
-
-
- 
-
-
-
-  // function FiltreColonnes(_lAppareils) {
-  //   if (arrayFilters.length > 0) {
-  //     let _arraySecteur = arrayFilters.filter(
-  //       (filter) => filter.fieldname === "Secteur"
-  //     );
-  //     let _arrayLibelle = arrayFilters.filter(
-  //       (filter) => filter.fieldname === "Libelle"
-  //     );
-  //     let _arrayEtat = arrayFilters.filter(
-  //       (filter) => filter.fieldname === "LibelleEtat"
-  //     );
-
-  //     if (_arraySecteur.length > 0)
-  //       _lAppareils = _lAppareils.filter(
-  //         (appareil) =>
-  //           _arraySecteur.filter((filter) => filter.item === appareil.Secteur)
-  //             .length > 0
-  //       );
-
-  //     if (_arrayLibelle.length > 0)
-  //       _lAppareils = _lAppareils.filter(
-  //         (appareil) =>
-  //           _arrayLibelle.filter((filter) => filter.item === appareil.Libelle)
-  //             .length > 0
-  //       );
-
-  //     if (_arrayEtat.length > 0)
-  //       _lAppareils = _lAppareils.filter(
-  //         (appareil) =>
-  //           _arrayEtat.filter((filter) => filter.item === appareil.LibelleEtat)
-  //             .length > 0
-  //       );
-  //   }
-
-  //   return _lAppareils;
-  // }
 
   const reactStringReplace = require("react-string-replace");
   /**
@@ -495,8 +456,10 @@ const AppareilsPage = () => {
 
   //#endregion
 
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+
+
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   useEffect(() => {
     async function makeRequest() {
       await delay(1000);
@@ -505,6 +468,7 @@ const AppareilsPage = () => {
     }
     makeRequest();
     MockupListeappareils();
+    // eslint-disable-next-line
   }, [isLoaded]);
 
   return (
