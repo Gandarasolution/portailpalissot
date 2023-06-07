@@ -1,7 +1,7 @@
 //#region Imports
 
 //#region Bootstrap
-import { Container } from "react-bootstrap";
+import {  Container } from "react-bootstrap";
 
 //#endregion
 
@@ -14,21 +14,16 @@ import React from "react";
 //#endregion
 
 
+const HomePage =  () => {
 
 
-const HomePage = () => {
 
-
-    return (
-        <Container fluid>
-            <WhiteShadowCard icon="yin-yang" title="Portail GMAO" >
-
-            </WhiteShadowCard>
-
-        </Container>
-
-    );
-}
-
+  return (
+    <Container fluid>
+      <WhiteShadowCard icon="yin-yang" title="Portail GMAO">
+      </WhiteShadowCard>
+    </Container>
+  );
+};
 
 export default HomePage;

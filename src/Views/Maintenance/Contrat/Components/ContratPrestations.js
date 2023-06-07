@@ -1,52 +1,58 @@
 //#region Imports
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
-import Collapse from "react-bootstrap/Collapse";
+// import Collapse from "react-bootstrap/Collapse";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
-import Badge from "react-bootstrap/Badge";
+import Modal from "react-bootstrap/Modal";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Placeholder from "react-bootstrap/Placeholder";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
-import Modal from "react-bootstrap/Modal";
-import Tab from "react-bootstrap/Tab";
-import Tabs from "react-bootstrap/Tabs";
-
+import Nav from "react-bootstrap/Nav";
 //#endregion
 
 //#region FontAwsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBookmark,
-  faCalendar,
-  faCaretDown,
-  faCaretUp,
-  faCheck,
-  faClock,
+  // faCaretDown,
+  // faCaretUp,
+  faListCheck,
+  faList,
   faFile,
-  faFileContract,
-  faFileImage,
-  faFilePdf,
+  faFileAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import WhiteShadowCard from "../../../../components/commun/WhiteShadowCard";
-import { Container, Form, Popover } from "react-bootstrap";
+
 //#endregion
 
 //#region Components
-
-//#endregion
+import { FiltrerParCollones } from "../../../../functions";
+import Search from "../../../../components/commun/Search";
+import TableData from "../../../../components/commun/TableData";
+import ImageExtension from "../../../../components/commun/ImageExtension";
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
+import { Link } from "react-router-dom";
+import { CloseButton, Stack } from "react-bootstrap";
 
-const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriodeSelect }) => {
+//#endregion
+
+const ContratPrestation = ({
+  Prestations,
+  ParentComponentPeriodeSelect,
+  IsLoaded,
+  // datePrestation,
+}) => {
   //#region Mockup
 
   const [listeTaches, setListeTaches] = useState([]);
+  const [isListeTacheAffiche, setIsListeTacheAffiche] = useState(true);
 
   function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -58,9 +64,19 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
 
   const MockupListeTache = () => {
     let _listeTaches = [];
-
     let _limit = getRandomInt(1, 20);
     for (let index = 0; index < _limit; index++) {
+      let _taches = [];
+      for (let indexT = 0; indexT < getRandomInt(1, 8); indexT++) {
+        _taches.push(
+          loremIpsum({
+            avgSentencesPerParagraph: 1,
+            startWithLoremIpsum: false,
+            random: "false",
+          }).join()
+        );
+      }
+
       _listeTaches.push({
         id: index + 1,
         description: loremIpsum({
@@ -68,6 +84,7 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
           startWithLoremIpsum: false,
           random: "false",
         }).join(),
+        taches: _taches,
       });
     }
     setListeTaches(_listeTaches);
@@ -78,33 +95,30 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
   //#region States
 
   //#region Collapses
-  const [open1, setOpen1] = useState(true);
-  const [open2, setOpen2] = useState(true);
-  const [open3, setOpen3] = useState(true);
-  const [open4, setOpen4] = useState(true);
-  const [open5, setOpen5] = useState(true);
-  const [open6, setOpen6] = useState(true);
-  const [open7, setOpen7] = useState(true);
-  const [open8, setOpen8] = useState(true);
-  const [open9, setOpen9] = useState(true);
-  const [open10, setOpen10] = useState(true);
-  const [open11, setOpen11] = useState(true);
-  const [open12, setOpen12] = useState(true);
-
-  const [openTaches, setOpenTaches] = useState(true);
-  const [openDocuments, setOpenDocuments] = useState(true);
+  // const [openDocuments, setOpenDocuments] = useState(true);
   //#endregion
 
-  const [modaleShow, setModalShow] = useState(false);
-  const [prestaSelected, setPrestaSelected] = useState(null);
+  //#region Filters
 
+  const [filterTous, setFilterTous] = useState(true);
+  const [filterNP, setFilterNP] = useState(false);
+  const [filterP, setFilterP] = useState(false);
+  const [filterEC, setFilterEC] = useState(false);
+  const [filterT, setFilterT] = useState(false);
+
+  const [arrayFilters, setArrayFilters] = useState([]);
+  //#endregion
+
+  const [prestaSelected, setPrestaSelected] = useState(null);
+  const [prestaDateSelected, setPrestaDateSelected] = useState(null);
+  const [gridColMDValue, setGridColMDValue] = useState(12);
   const [search, setSearch] = useState("");
+  const [modalLargeShow, setModalLargeShow] = useState(false);
 
   //#endregion
 
   //#region Fonctions
   function GetNomMois(num, short = false) {
-    // console.log(num)
     if (num > 12) {
       num = num - 12;
     }
@@ -138,80 +152,18 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
     }
   }
 
-  function GetStateOpen(e) {
-    switch (e) {
-      case 1:
-        return open1;
-      case 2:
-        return open2;
-      case 3:
-        return open3;
-      case 4:
-        return open4;
-      case 5:
-        return open5;
-      case 6:
-        return open6;
-      case 7:
-        return open7;
-      case 8:
-        return open8;
-      case 9:
-        return open9;
-      case 10:
-        return open10;
-      case 11:
-        return open11;
-      case 12:
-        return open12;
-
-      default:
-        return null;
-    }
-  }
-
-  function GetSetStateOpen(e) {
-    switch (e) {
-      case 1:
-        return setOpen1;
-      case 2:
-        return setOpen2;
-      case 3:
-        return setOpen3;
-      case 4:
-        return setOpen4;
-      case 5:
-        return setOpen5;
-      case 6:
-        return setOpen6;
-      case 7:
-        return setOpen7;
-      case 8:
-        return setOpen8;
-      case 9:
-        return setOpen9;
-      case 10:
-        return setOpen10;
-      case 11:
-        return setOpen11;
-      case 12:
-        return setOpen12;
-
-      default:
-        return null;
-    }
-  }
-
   function GetLibEtat(e) {
     switch (e) {
       case 1:
-        return "Non plannifiée";
+        return "Non planifiée";
       case 2:
-        return "Planifiée";
+        return "Planifiée    ";
       case 3:
-        return "En cours";
+        return "En cours     ";
       case 4:
-        return "Terminée";
+        return "Terminée     ";
+      case -1:
+        return "Tous         ";
       default:
         return "Non planifiée";
     }
@@ -220,64 +172,217 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
   function GetBadgeBgColor(e) {
     switch (e) {
       case 1:
-        return "secondary";
+        return "bg-warning";
       case 2:
-        return "warning";
+        return "bg-primary";
       case 3:
-        return "warning";
+        return "bg-danger";
       case 4:
-        return "success";
+        return "bg-success";
       default:
         return "Non planifiée";
     }
   }
 
-  const GetPrestationSearched = () => {
-    if (search.length > 0) {
-      return Prestations.filter(
-        (item) =>
-          item.libelle.toUpperCase().includes(search.toUpperCase()) ||
-          item.secteur.toUpperCase().includes(search.toUpperCase())
-      );
-    } else {
-      return Prestations;
-    }
+  const GetListePrestationPrefiltre = () => {
+    //Les prestations sont filtrés par le 'search'
+    let _lPrestation = GetPrestationSearched();
+
+    //Les prestations sont filtrés par les boutons d'état
+    _lPrestation = FiltrePrestationsBouton(_lPrestation);
+
+    // //Les prestations sont filtrés par les colonnes
+    _lPrestation = FiltrerParCollones(_lPrestation, arrayFilters);
+
+    return _lPrestation;
   };
 
-  const reactStringReplace = require("react-string-replace");
-  function HighlightTextIfSearch(text) {
-    if (
-      search.length > 0 &&
-      text.toUpperCase().includes(search.toUpperCase())
-    ) {
-      return (
-        <span>
-          {reactStringReplace(text, search, (match, i) => (
-            <mark key={i}>{match}</mark>
-          ))}
-        </span>
+  const GetPrestationSearched = () => {
+    let _lPrestation = Prestations;
+
+    if (search.length > 0) {
+      _lPrestation = _lPrestation.filter(
+        (item) =>
+          item.DescriptionPrestationContrat.toUpperCase().includes(
+            search.toUpperCase()
+          ) || item.Secteur.toUpperCase().includes(search.toUpperCase())
       );
-    } else {
-      return text;
     }
+
+    _lPrestation = _lPrestation.sort(
+      (a, b) => a.DateInterventionPrestation - b.DateInterventionPrestation
+    );
+
+    return _lPrestation;
+  };
+
+  function FiltrePrestationsBouton(_lPrestations) {
+    if (!filterTous) {
+      let _arrayFilterIdEtat = [];
+      if (filterNP) _arrayFilterIdEtat.push(1);
+      if (filterP) _arrayFilterIdEtat.push(2);
+      if (filterEC) _arrayFilterIdEtat.push(3);
+      if (filterT) _arrayFilterIdEtat.push(4);
+
+      _lPrestations = _lPrestations.filter((presta) =>
+        _arrayFilterIdEtat.includes(presta.IdEtat)
+      );
+    }
+
+    return _lPrestations;
+  }
+
+  function GetFilterState(idEtat) {
+    switch (idEtat) {
+      case 1:
+        return filterNP;
+      case 2:
+        return filterP;
+      case 3:
+        return filterEC;
+      case 4:
+        return filterT;
+      default:
+        return null;
+    }
+  }
+
+  function GetFilterSetState(idEtat) {
+    switch (idEtat) {
+      case 1:
+        return setFilterNP;
+      case 2:
+        return setFilterP;
+      case 3:
+        return setFilterEC;
+      case 4:
+        return setFilterT;
+      default:
+        return null;
+    }
+  }
+
+  function IsFiltercheckboxShouldBeCheck(fieldname, item) {
+    if (
+      arrayFilters.findIndex(
+        (filter) => filter.fieldname === fieldname && filter.item === item
+      ) > -1
+    )
+      return true;
+    return false;
+  }
+
+  function IsButtonShouldBeCheck(fieldname) {
+    if (
+      arrayFilters.findIndex((filter) => filter.fieldname === fieldname) > -1
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  function resetSelection() {
+    //Suprime les filtres sur colonnes
+    setArrayFilters([]);
+    //Annule l'affichage des documents/tâches
+    setPrestaSelected(null);
+    setPrestaDateSelected(null);
+    //La table prend toute la place
+    setGridColMDValue(12);
   }
 
   //#endregion
 
   //#region Evenements
 
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
+  const handleTousFilter = () => {
+    let _valueStart = JSON.parse(JSON.stringify(filterTous));
+
+    if (_valueStart) {
+      //on décoche la case tous : vérification qu'il y a au moins 1 filtre actif
+      if (filterEC || filterNP || filterP || filterT) {
+        setFilterTous(false);
+      }
+    } else {
+      //on coche la case tous : on décoche tous les filtres
+
+      setFilterEC(false);
+      setFilterNP(false);
+      setFilterP(false);
+      setFilterT(false);
+
+      setFilterTous(true);
+    }
   };
 
-  const GroupClickedCollapse = (e) => {
-    GetSetStateOpen(e)(!GetStateOpen(e));
+  const handleEtatsFilter = (props) => {
+    let _valueStart = JSON.parse(JSON.stringify(props.state));
+
+    if (_valueStart) {
+      //on décoche la case d'un filtre : vérification qu'il y a au moins un autre filtre sinon on coche la case tous
+      props.setState(false);
+    } else {
+      //on coche la case d'un filtre : on décoche la case Tous
+      setFilterTous(false);
+      props.setState(true);
+    }
   };
 
-  const handleCardClicked = (presta) => {
+  const handleRowClicked = (presta, date) => {
+    if (
+      prestaSelected !== null &&
+      prestaSelected.id === presta.id &&
+      prestaDateSelected !== null &&
+      prestaDateSelected === date
+    ) {
+      //Même sélection (déselection)
+      // setGridColMDValue(12);
+      // setPrestaSelected(null);
+      // setPrestaMoisSelected(null);
+      // setPrestaDateSelected(null);
+    } else {
+      // setGridColMDValue(10);
+      setPrestaSelected(presta);
+      // setPrestaMoisSelected(mois);
+      setPrestaDateSelected(date);
+      MockupListeTache();
+    }
+  };
+
+  const handleCheckfilterChange = (checked, key, value) => {
+    let _arrTemp = JSON.parse(JSON.stringify(arrayFilters));
+
+    if (checked) {
+      _arrTemp.push({ fieldname: key, item: value });
+      setArrayFilters(_arrTemp);
+    } else {
+      const index = _arrTemp.findIndex(
+        (filter) => filter.fieldname === key && filter.item === value
+      );
+      if (index > -1) {
+        _arrTemp.splice(index, 1);
+        setArrayFilters(_arrTemp);
+      }
+    }
+  };
+
+  const handleAfficherListeTache = () => {
+    let _value = JSON.parse(JSON.stringify(modalLargeShow));
+    _value = !_value;
+    //Récupère les données
     MockupListeTache();
-    setPrestaSelected(presta);
-    setModalShow(true);
+    setModalLargeShow(_value);
+  };
+
+  const handleAfficherDocuments = (presta) => {
+    if (prestaSelected === presta) {
+      setGridColMDValue(gridColMDValue === 12 ? 10 : 12);
+      return;
+    }
+
+    handleLigneClicked(presta);
+
+    setGridColMDValue(10);
   };
 
   //#endregion
@@ -285,419 +390,609 @@ const ContratPrestation = ({ Prestations, datePrestation, ParentComponentPeriode
   //#region Composants
 
   //#region commun
-  const ButtonDownloadDocuments = () => {
-    return (
-      <Container p={2}>
-        <Button className="m-1">
-          {" "}
-          <FontAwesomeIcon icon={faFile} /> Extranet{" "}
-        </Button>
-        <Button className="m-1">
-          {" "}
-          <FontAwesomeIcon icon={faFileContract} /> CERFA{" "}
-        </Button>
-        <Button className="m-1">
-          {" "}
-          <FontAwesomeIcon icon={faFileImage} /> Fiche rammonage{" "}
-        </Button>
-        <Button className="m-1">
-          {" "}
-          <FontAwesomeIcon icon={faFilePdf} /> Rapport technicien{" "}
-        </Button>
-      </Container>
-    );
+
+  //#region Panel de recherche
+  const ButtonFilter = (IdEtat) => {
+    if (IdEtat === -1) {
+      return (
+        <Nav.Link
+          className={
+            filterTous ? "btn-filter-active border " : "btn-filter border"
+          }
+          onClick={() => handleTousFilter()}
+        >
+          {GetLibEtat(IdEtat)}
+        </Nav.Link>
+      );
+    } else {
+      return (
+        <Nav.Link
+          className={
+            GetFilterState(IdEtat)
+              ? "btn-filter-active border"
+              : "btn-filter border"
+          }
+          onClick={() =>
+            handleEtatsFilter({
+              state: GetFilterState(IdEtat),
+              setState: GetFilterSetState(IdEtat),
+            })
+          }
+        >
+          {GetLibEtat(IdEtat)}
+        </Nav.Link>
+      );
+    }
   };
 
   const SearchPrestation = () => {
     return (
-      <Form.Control
-        type="search"
-        placeholder="Rechercher"
-        className="mx-4"
-        aria-label="Search"
-        onChange={handleSearch}
-      />
+      <Row className="mb-2">
+        <Col className="m-1">
+          <Nav fill>
+            <Nav.Item>{ButtonFilter(-1)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(1)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(2)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(3)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(4)}</Nav.Item>
+          </Nav>
+        </Col>
+
+        <Col md={5} className="m-1">
+          <Search setSearch={setSearch} />
+        </Col>
+
+        <Col className="m-1">{ParentComponentPeriodeSelect}</Col>
+      </Row>
     );
   };
 
   //#endregion
 
-  //#region large
+  //#region pagination
 
-  /**
-   *
-   * @returns Le tableau des prestations, groupés par mois.
-   */
-  const TableGroupedMonth = () => {
-    const _numMoisDebutPrestation = Number(datePrestation.getMonth() + 1);
-    return (
-      <Table>
-        <thead>
-          <tr>
-            <th>Secteur</th>
-            <th>N° de prestation</th>
-            <th>Libellé</th>
-            <th>Etat</th>
-          </tr>
-        </thead>
+  //#endregion
 
-        {RowGroupMois(_numMoisDebutPrestation)}
-        {RowGroupMois(_numMoisDebutPrestation + 1)}
-        {RowGroupMois(_numMoisDebutPrestation + 2)}
-        {RowGroupMois(_numMoisDebutPrestation + 3)}
-        {RowGroupMois(_numMoisDebutPrestation + 4)}
-        {RowGroupMois(_numMoisDebutPrestation + 5)}
-        {RowGroupMois(_numMoisDebutPrestation + 6)}
-        {RowGroupMois(_numMoisDebutPrestation + 7)}
-        {RowGroupMois(_numMoisDebutPrestation + 8)}
-        {RowGroupMois(_numMoisDebutPrestation + 9)}
-        {RowGroupMois(_numMoisDebutPrestation + 10)}
-        {RowGroupMois(_numMoisDebutPrestation + 11)}
-      </Table>
-    );
-  };
+  //#region Liste des tâches
+  const CardListeTaches = () => {
+    if (listeTaches.length === 0) return null;
 
-  /**
-   *
-   * @param {* Le numéro du mois (janvier = 1, décmebre = 12) } numeroDuMois
-   * @returns Une ligne groupant toutes les prestations du mois et une ligne par prestation de ce mois
-   */
-  const RowGroupMois = (numeroDuMois) => {
-    //Cast du parametre
-    let _numMois = Number(numeroDuMois);
-    //Le numéro ne peut être supérieur à 12
-    if (_numMois > 12) {
-      _numMois -= 12;
-    }
-    //Les prestations sont filtrés par le 'search'
-    let _lPrestation = GetPrestationSearched().filter(
-      (item) => item.mois.at(_numMois - 1) > 0
-    );
-
-    return (
-      <tbody>
-        {_lPrestation.length > 0 ? (
-          <tr>
-            <td colSpan={4} onClick={() => GroupClickedCollapse(_numMois)}>
-              <div className="shadow border rounded-pill bg-ligth border-secondary">
-                <Row>
-                  <Col>
-                    {GetNomMois(_numMois)}{" "}
-                    {_numMois > 12
-                      ? datePrestation.getFullYear() + 1
-                      : datePrestation.getFullYear()}{" "}
-                    ({_lPrestation.length}) :
-                  </Col>
-                  <Col>{ButtonAreaControl(_numMois)}</Col>
-                </Row>
-              </div>
-            </td>
-          </tr>
-        ) : null}
-
-        {_lPrestation.map((presta) => {
+    let _body = (
+      <div>
+        {listeTaches.map((Relevetache) => {
           return (
-            <OverlayTrigger
-              trigger={"click"}
-              rootClose
-              placement="right"
-              overlay={PopoverDocs}
-              key={presta.id}
-            >
-              <Collapse
-                onClick={() => MockupListeTache()}
-                in={GetStateOpen(_numMois)}
-              >
-                <tr>
-                  <td>{HighlightTextIfSearch(presta.secteur)}</td>
-                  <td>{presta.id}</td>
-                  <td>{HighlightTextIfSearch(presta.libelle)}</td>
-                  <td>
-                    {" "}
-                    <Badge
-                      pill
-                      bg={GetBadgeBgColor(presta.mois.at(_numMois - 1))}
-                    >
-                      {" "}
-                      {GetLibEtat(presta.mois.at(_numMois - 1))}{" "}
-                    </Badge>{" "}
-                  </td>
-                </tr>
-              </Collapse>
-            </OverlayTrigger>
+            <span key={Relevetache.id} className="mb-2">
+              <Row>
+                <Col>
+                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
+                </Col>
+              </Row>
+              {isListeTacheAffiche &&
+                Relevetache.taches.map((tache, index) => {
+                  return (
+                    <Row key={index}>
+                      <Col md={{ offset: 1 }}>
+                        <Form.Check readOnly checked={false} label={tache} />
+                      </Col>
+                    </Row>
+                  );
+                })}
+            </span>
           );
         })}
-      </tbody>
+      </div>
     );
-  };
 
-  /**
-   *
-   * @param {* Le numéro du mois} numMois
-   * @returns un bouton controllant le collapse
-   */
-  const ButtonAreaControl = (numMois) => {
     return (
-      <span className="align-right">
-        <Button
-          variant="contained"
-          aria-controls={`collapse-row-${numMois}`}
-          aria-expanded={open1}
-          onClick={() => GetSetStateOpen(numMois)(!GetStateOpen(numMois))}
-        >
-          {GetStateOpen(numMois) ? (
-            <FontAwesomeIcon icon={faCaretUp} />
-          ) : (
-            <FontAwesomeIcon icon={faCaretDown} />
-          )}
-        </Button>
-      </span>
+      <Modal
+        dialogClassName="modal-90w"
+        show={modalLargeShow}
+        onHide={() => setModalLargeShow(false)}
+        backdrop="static"
+        keyboard={false}
+        animation={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title> Liste des relevés de tâches</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{_body}</Modal.Body>
+      </Modal>
     );
   };
 
-  const PopoverDocs = (
-    <Popover id="popover-basic">
-      <Popover.Header as="h3" className="m-2">
-        Liste des tâches ({listeTaches.length})
-        <Button
-          variant="contained"
-          aria-controls={`collapse-listeTaches`}
-          aria-expanded={openTaches}
-          onClick={() => setOpenTaches(!openTaches)}
-        >
-          {openTaches ? (
-            <FontAwesomeIcon icon={faCaretUp} />
-          ) : (
-            <FontAwesomeIcon icon={faCaretDown} />
-          )}
-        </Button>{" "}
-      </Popover.Header>
-      <Popover.Body>
-        <Collapse in={openTaches}>
-          <div
-            id="collapse-listeTaches"
-            style={{ height: "50vh", overflowY: "scroll" }}
+  const CardListeTachesBody = () => {
+    if (listeTaches.length === 0) return <div>Aucune tâche enregistrée</div>;
+
+    let _body = (
+      <div>
+        {listeTaches.map((Relevetache) => {
+          return (
+            <span key={Relevetache.id} className="mb-2">
+              <Row>
+                <Col>
+                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
+                </Col>
+              </Row>
+              {isListeTacheAffiche &&
+                Relevetache.taches.map((tache, index) => {
+                  return (
+                    <Row key={index}>
+                      <Col md={{ offset: 1 }}>
+                        <Form.Check readOnly checked={false} label={tache} />
+                      </Col>
+                    </Row>
+                  );
+                })}
+            </span>
+          );
+        })}
+      </div>
+    );
+
+    return _body;
+  };
+  //#endregion
+
+  //#region Documents
+
+  const CardDocs = () => {
+    let _arrayDocs = [
+      { title: "CERFA", extension: "pdf", size: "18 MO" },
+      {
+        title: "Fiche rammonage",
+        extension: "pdf",
+        size: "12 MO",
+      },
+      {
+        title: "Photo extranet",
+        extension: "jpg",
+        size: "32 MO",
+      },
+      {
+        title: "Rapport d'intervention",
+        extension: "pdf",
+        size: "46 MO",
+      },
+    ];
+
+    let _DocZIP = {
+      title: "Tous les documents",
+      extension: "zip",
+      size: "90 MO",
+    };
+    return (
+      <Card className="mb-2">
+        <Card.Header className="card-document">
+          Documents ({_arrayDocs.length})
+          <CloseButton
+            onClick={() => {
+              setGridColMDValue(12);
+            }}
+            className="ms-4"
+          />
+          {/* <Button
+            variant="contained"
+            aria-controls={`collapse-listeDocuments`}
+            aria-expanded={openDocuments}
+            onClick={() => setOpenDocuments(!openDocuments)}
           >
-            {listeTaches.map((tache) => {
-              return <p key={tache.id}>{tache.description}</p>;
+            {openDocuments ? (
+              <FontAwesomeIcon icon={faCaretUp} />
+            ) : (
+              <FontAwesomeIcon icon={faCaretDown} />
+            )}
+          </Button> */}
+        </Card.Header>
+        <Card.Body>
+          {/* <Collapse in={openDocuments}> */}
+          <div id="collapse-listeDocuments">
+            {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
+
+            {_arrayDocs.map((doc, index) => {
+              return RowDocument(doc, index);
             })}
           </div>
-        </Collapse>
-      </Popover.Body>
+          {/* </Collapse> */}
+        </Card.Body>
+      </Card>
+    );
+  };
 
-      <Popover.Header as="h3" className="m-2">
-        Liste des documents
-        <Button
-          variant="contained"
-          aria-controls={`collapse-listeDocuments`}
-          aria-expanded={openTaches}
-          onClick={() => setOpenDocuments(!openDocuments)}
-        >
-          {openDocuments ? (
-            <FontAwesomeIcon icon={faCaretUp} />
-          ) : (
-            <FontAwesomeIcon icon={faCaretDown} />
-          )}
-        </Button>{" "}
-      </Popover.Header>
-      <Popover.Body>
-        <Collapse in={openDocuments}>
-          <div id="collapse-listeDocuments">{ButtonDownloadDocuments()}</div>
-        </Collapse>
-      </Popover.Body>
-    </Popover>
-  );
+  const RowDocument = (props, index) => {
+    return (
+      <Row className="mb-1" key={index}>
+        <Col md={3}>
+          <ImageExtension extension={props.extension} />
+        </Col>
+        <Col md={9}>
+          <Row>
+            <p className="mb-0 document-title">{`${props.title}${
+              props.extension.toUpperCase() === "ZIP"
+                ? ""
+                : `.${props.extension}`
+            }`}</p>
+            <span className="document-size">{`${props.size}`}</span>
+            <span className="document-links">
+              {props.extension.toUpperCase() !== "ZIP" && (
+                <Link to={"#"} target="_blank">
+                  Voir
+                </Link>
+              )}
+              <Link to={"#"} target="_blank" download={`${props.title}`}>
+                Télécharger
+              </Link>
+            </span>
+          </Row>
+        </Col>
+      </Row>
+    );
+  };
+
+  //#endregion
 
   //#endregion
 
   //#region small
 
-  /**
-   *
-   * @returns Les listes de toutes les prestations sous forme de card
-   */
-  const CardedPrestations = () => {
-    return GetPrestationSearched().map((presta) => {
+  const GridCardPrestation = () => {
+    if (!IsLoaded) return PlaceholderCardPrestation(5);
+
+    let _lPrestation = GetListePrestationPrefiltre();
+    return (
+      <div>
+        {_lPrestation.map((presta, index) => {
+          return <div key={index}>{CardPrestation(presta)}</div>;
+        })}
+      </div>
+    );
+  };
+
+  const CardPrestation = (presta) => {
+    return (
+      <Card className="m-2">
+        <Card.Title>
+          <Row>
+            <Col>
+              {`${GetNomMois(presta.DateInterventionPrestation.getMonth() + 1)} 
+            ${presta.DateInterventionPrestation.getFullYear()} `}
+            </Col>
+
+            <Col>
+              <span className={`badge badge-${GetBadgeBgColor(presta.IdEtat)}`}>
+                {GetLibEtat(presta.IdEtat)}
+              </span>
+            </Col>
+          </Row>
+        </Card.Title>
+        <Card.Subtitle>
+          {` ${presta.IdPrestationContrat} - ${presta.DescriptionPrestationContrat}`}
+        </Card.Subtitle>
+
+        <Card.Body>
+          <h6>{`Secteur : ${presta.Secteur}`}</h6>
+
+          <Button
+            className="m-2 p-2"
+            onClick={() =>
+              handleRowClicked(presta, presta.DateInterventionPrestation)
+            }
+          >
+            <FontAwesomeIcon icon={faFile} /> Liste des documents
+          </Button>
+
+          <Button
+            className="m-2 p-2"
+            onClick={() => handleAfficherListeTache()}
+          >
+            <FontAwesomeIcon icon={faList} /> Relevés de tâches
+          </Button>
+        </Card.Body>
+        {CardListeTaches()}
+      </Card>
+    );
+  };
+
+  const PlaceholderCardPrestation = (numberOfCards) => {
+    let _arrayLoading = [];
+    for (let index = 0; index < numberOfCards; index++) {
+      _arrayLoading.push(index + 1);
+    }
+
+    return _arrayLoading.map((p) => {
       return (
-        <Card
-          key={presta.id}
-          className="m-2 p-2 shadow border-secondary"
-          onClick={() => handleCardClicked(presta)}
-        >
-          <Card.Title>{HighlightTextIfSearch(presta.libelle)}</Card.Title>
-          <Card.Subtitle>
-            Secteur : {HighlightTextIfSearch(presta.secteur)}
-          </Card.Subtitle>
-          <Card.Body>
+        <Card className="m-2" key={p}>
+          <Card.Title>
             <Row>
-              {presta.mois.map((value, index) => {
-                return value > 0 ? (
-                  <Col key={index}>{Plannification(index, value)}</Col>
-                ) : null;
-              })}
+              <Col>
+                <Placeholder as="p" animation="glow">
+                  <Placeholder xs={12} />
+                </Placeholder>
+              </Col>
+
+              <Col>
+                <Placeholder as="p" animation="glow">
+                  <Placeholder xs={12} />
+                </Placeholder>
+              </Col>
             </Row>
+          </Card.Title>
+          <Card.Subtitle>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={12} />
+            </Placeholder>
+          </Card.Subtitle>
+
+          <Card.Body>
+            <h6>
+              <Placeholder as="p" animation="glow">
+                <Placeholder xs={12} />
+              </Placeholder>
+            </h6>
+
+            <Button className="m-2 p-2">
+              <FontAwesomeIcon icon={faFile} /> Liste des documents
+            </Button>
+
+            <Button className="m-2 p-2">
+              <FontAwesomeIcon icon={faList} /> Relevés de tâches
+            </Button>
           </Card.Body>
+          {CardListeTaches()}
         </Card>
       );
     });
   };
 
-  /**
-   *
-   * @param {* l'index du mois indexé à 0 (0= janvier, 11=décembre)} indexMois
-   * @param {* La valeur de l'état de la prestation } valeurMois
-   * @returns Une liste des planification de cette préstation
-   */
-  const Plannification = (indexMois, valeurMois) => {
-    let _numMois = Number(indexMois) + 1;
+  //#endregion
 
-    return (
-      <span className="m-1">
-        {GetNomMois(_numMois, true)}
+  //#endregion
 
-        <OverlayTrigger
-          delay={{ show: 250, hide: 400 }}
-          overlay={<Tooltip>{GetLibEtat(valeurMois)}</Tooltip>}
-        >
-          <Badge pill bg={GetBadgeBgColor(valeurMois)}>
-            {GetBadgeIcon(valeurMois)} {GetLibEtat(valeurMois)}
-          </Badge>
-        </OverlayTrigger>
+  useEffect(() => {
+    setIsListeTacheAffiche(true);
+  }, []);
 
-        {}
-      </span>
-    );
+  //#region TableData
+
+  //#region Headers
+
+  const _methodeDate = (e) => {
+    return `${GetNomMois(new Date(e).getMonth())}  ${new Date(
+      e
+    ).getFullYear()}`;
   };
 
-  /**
-   *
-   * @param {* La valeur de l'état du mois} e
-   * @returns Un badge indiquant l'état de la prestation du mois
-   */
-  const GetBadgeIcon = (e) => {
-    switch (e) {
-      case 1:
-        return <FontAwesomeIcon icon={faBookmark} />;
-      case 2:
-        return <FontAwesomeIcon icon={faCalendar} />;
-      case 3:
-        return <FontAwesomeIcon icon={faClock} />;
-      case 4:
-        return <FontAwesomeIcon icon={faCheck} />;
-      default:
-        break;
-    }
+  const _methodeEtat = (e) => {
+    return GetLibEtat(Number(e));
   };
 
-  /**
-   *
-   * @returns La liste des taches et des documents à télécharger sous forme de fenêtre modal
-   */
-  const ModalDocuments = () => {
-    let _tabs = null;
-    let _title = null;
+  const _header = [
+    {
+      title: "Date",
+      filter: {
+        fieldname: "DateInterventionPrestation",
+        affichageMethod: _methodeDate,
+      },
+    },
+    {
+      title: "Secteur",
+      filter: { fieldname: "Secteur" },
+    },
+    {
+      title: "N°",
+      filter: { fieldname: "IdPrestationContrat" },
+    },
+    {
+      title: "Libellé",
+      filter: { fieldname: "DescriptionPrestationContrat" },
+    },
+    {
+      title: "Etat",
+      filter: {
+        fieldname: "IdEtat",
+        affichageMethod: _methodeEtat,
+      },
+    },
+    { title: "Action" },
+  ];
 
-    if (prestaSelected !== null) {
-      _title = prestaSelected.libelle;
-      _tabs = (
-        <Tabs variant="pills" fill>
-          {prestaSelected.mois.map((mois, index) => {
-            return mois > 0 ? (
-              <Tab
-                eventKey={GetNomMois(Number(index) + 1, true)}
-                title={
-                  <span>
-                    {GetBadgeIcon(mois)} {GetNomMois(Number(index) + 1, true)}
-                  </span>
-                }
-                key={index}
-                tabClassName={`bg- border border-${GetBadgeBgColor(
-                  mois
-                )} text-${GetBadgeBgColor(mois)}`}
+  //#endregion
+
+  //#region Données
+
+  const _Data = () => {
+    let _body = [];
+
+    let _lprestations = GetListePrestationPrefiltre();
+
+    for (let index = 0; index < _lprestations.length; index++) {
+      const presta = _lprestations[index];
+      let _cells = [];
+
+      let _date = {
+        text: `${GetNomMois(
+          presta.DateInterventionPrestation.getMonth()
+        )} ${presta.DateInterventionPrestation.getFullYear()} `,
+        isSearchable: true,
+        isH1: true,
+        onClickMethod: handleLigneClicked,
+      };
+      _cells.push(_date);
+
+      let _secteur = {
+        text: presta.Secteur,
+        isSearchable: true,
+        isH1: false,
+        onClickMethod: handleLigneClicked,
+      };
+      _cells.push(_secteur);
+
+      let _id = {
+        text: presta.IdPrestationContrat,
+        isSearchable: false,
+        isH1: false,
+        onClickMethod: handleLigneClicked,
+      };
+      _cells.push(_id);
+
+      let _libelle = {
+        text: presta.DescriptionPrestationContrat,
+        isSearchable: true,
+        isH1: true,
+        onClickMethod: handleLigneClicked,
+      };
+      _cells.push(_libelle);
+
+      let _etat = {
+        text: (
+          <span className={`badge badge-${GetBadgeBgColor(presta.IdEtat)}`}>
+            {GetLibEtat(presta.IdEtat)}
+          </span>
+        ),
+        isSearchable: false,
+        isH1: false,
+        onClickMethod: handleLigneClicked,
+      };
+      _cells.push(_etat);
+
+      let _bt = {
+        text: (
+          <Stack direction="horizontal">
+            <span>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip>Relevés de tâches</Tooltip>}
               >
-                <Badge pill bg={GetBadgeBgColor(mois)}>
-                  {GetBadgeIcon(mois)} {GetLibEtat(mois)}
-                </Badge>
-                <Container fluid>
-                  <p className="h2">Liste des documents</p>
-                  <span>{ButtonDownloadDocuments()}</span>
-                </Container>
+                <FontAwesomeIcon
+                  icon={faListCheck}
+                  onClick={() => handleAfficherListeTache()}
+                />
+              </OverlayTrigger>
+            </span>
 
-                <Container>
-                  <p className="h2">
-                    Liste des tâches
-                    <Button
-                      variant="contained"
-                      aria-controls={`collapse-listeTaches`}
-                      aria-expanded={openTaches}
-                      onClick={() => setOpenTaches(!openTaches)}
-                    >
-                      {openTaches ? (
-                        <FontAwesomeIcon icon={faCaretUp} />
-                      ) : (
-                        <FontAwesomeIcon icon={faCaretDown} />
-                      )}
-                    </Button>{" "}
-                  </p>
+            <span className="ms-2">
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip>Liste des documents</Tooltip>}
+              >
+                <FontAwesomeIcon
+                  icon={faFileAlt}
+                  onClick={() => handleAfficherDocuments(presta)}
+                />
+              </OverlayTrigger>
+            </span>
+          </Stack>
+        ),
+        isSearchable: false,
+        isH1: false,
+        fixedWidth: "100px",
+      };
 
-                  <Collapse in={openTaches}>
-                    <div
-                      id="collapse-listeTaches"
-                      style={{ height: "50vh", overflowY: "scroll" }}
-                    >
-                      {listeTaches.map((tache) => {
-                        return <p key={tache.id}>{tache.description}</p>;
-                      })}
-                    </div>
-                  </Collapse>
-                </Container>
-              </Tab>
-            ) : null;
-          })}
-        </Tabs>
-      );
+      _cells.push(_bt);
+
+      let _row = { data: presta, cells: _cells };
+
+      _body.push(_row);
     }
-
-    return (
-      <Modal
-        show={modaleShow}
-        onHide={() => setModalShow(false)}
-        backdrop="static"
-        keyboard={false}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{_title}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{_tabs}</Modal.Body>
-      </Modal>
-    );
+    return _body;
   };
 
+  //#endregion
+
+  //#region Events
+  const handleLigneClicked = (presta) => {
+    handleRowClicked(presta, presta.DateInterventionPrestation);
+    //TODO : Liste des documents
+  };
+
+  const isRowSelected = (presta) => {
+    return (
+      prestaDateSelected !== null &&
+      prestaSelected !== null &&
+      prestaSelected.id === presta.id &&
+      prestaDateSelected === presta.DateInterventionPrestation
+    );
+  };
   //#endregion
 
   //#endregion
 
   return (
     <BreakpointProvider>
-      <WhiteShadowCard icon="calendar-plus" title={`Suivi des prestations :`}>  
-   {SearchPrestation()}
-   { ParentComponentPeriodeSelect}   
+      <Container fluid>
+        <Col md={12} style={{ textAlign: "start" }}>
+          <span className="title">Plannification </span>|
+          <span className="subtitle">
+            {IsLoaded ? (
+              ` ${Prestations.length} prestations`
+            ) : (
+              <Placeholder animation="glow">
+                <Placeholder xs={1} />
+              </Placeholder>
+            )}
+          </span>
+        </Col>
+        {SearchPrestation()}
 
-        <Container fluid>
+        <Modal
+          dialogClassName="modal-90w"
+          show={modalLargeShow}
+          onHide={() => setModalLargeShow(false)}
+          backdrop="static"
+          keyboard={false}
+          animation={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title> Liste des relevés de tâches </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{CardListeTachesBody()}</Modal.Body>
+        </Modal>
+
+        <Container fluid className="container-table p-4">
           <Breakpoint large up>
             <Row>
-              <Col md={10}>{TableGroupedMonth()}</Col>
-
-              <Col md={4}></Col>
+              <Col md={gridColMDValue}>
+                <TableData
+                  IsLoaded={IsLoaded}
+                  placeholdeNbLine={5}
+                  headers={_header}
+                  lData={_Data()}
+                  rawData={Prestations}
+                  handleCheckfilterChange={handleCheckfilterChange}
+                  isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+                  isButtonShouldBeCheck={IsButtonShouldBeCheck}
+                  isRowActive={isRowSelected}
+                  search={search}
+                  Pagination
+                  methodPagination={resetSelection}
+                />
+              </Col>
+              {gridColMDValue !== 12 && (
+                <Col md={12 - gridColMDValue}>{CardDocs()}</Col>
+              )}
             </Row>
           </Breakpoint>
 
           <Breakpoint medium down>
-            {CardedPrestations()}
-            {ModalDocuments()}
+            {GridCardPrestation()}
+
+            <Modal
+              dialogClassName="modal-90w"
+              show={gridColMDValue !== 12}
+              onHide={() => setGridColMDValue(12)}
+              backdrop="static"
+              keyboard={false}
+              animation={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title> Liste des documents </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>{CardDocs()}</Modal.Body>
+            </Modal>
           </Breakpoint>
         </Container>
-      </WhiteShadowCard>
+
+        <Container fluid className="container-table p-4"></Container>
+      </Container>
     </BreakpointProvider>
   );
 };

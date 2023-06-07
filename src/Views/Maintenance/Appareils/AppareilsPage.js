@@ -1,40 +1,40 @@
 //#region Imports
 import { useState, useEffect } from "react";
+import { Breakpoint, BreakpointProvider } from "react-socks";
 //#region FontAwsome icones
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFilter,
-  faMobileAlt,
-  faSort,
-  faSortDown,
-  faSortUp,
-} from "@fortawesome/free-solid-svg-icons";
 
 //#endregion
 
 //#region Bootstrap
-import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
-import Table from "react-bootstrap/Table";
+import Image from "react-bootstrap/Image";
+import Badge from "react-bootstrap/Badge";
+import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
+import Nav from "react-bootstrap/Nav";
+import Row from "react-bootstrap/Row";
+
 //#endregion
 
 //#region Components
-import WhiteShadowCard from "../../../components/commun/WhiteShadowCard";
+import TableData from "../../../components/commun/TableData";
+import {FiltrerParCollones} from "../../../functions";
+import Search from "../../../components/commun/Search";
 
 //#endregion
 
 //#region DEV
 import { loremIpsum } from "react-lorem-ipsum";
-import { Badge, Card, Image } from "react-bootstrap";
-import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#endregion
 
 //#endregion
 
 const AppareilsPage = () => {
+
+
+
   //#region Mockup
 
   const [listeAppareils, setListeAppareils] = useState([
@@ -49,7 +49,6 @@ const AppareilsPage = () => {
 
   const MockupListeappareils = () => {
     let _listeAppareil = [];
-
     for (
       let index = 0;
       index < getRandomInt(getRandomInt(0, 4), getRandomInt(15, 26));
@@ -109,12 +108,25 @@ const AppareilsPage = () => {
   const [filterHorscontrat, SetFilterHorscontrat] = useState(true);
   const [filterDetruit, SetFilterDetruit] = useState(true);
 
-  const [orderBy, setOrderBy] = useState({ col: "etat", order: "ASC" });
+  const [arrayFilters, setArrayFilters] = useState([]);
+
   //#endregion
 
   //#endregion
 
   //#region Fonctions
+
+  function IsFiltercheckboxShouldBeCheck(fieldname, item) {
+    if (
+      arrayFilters.findIndex(
+        (filter) => filter.fieldname === fieldname && filter.item === item
+      ) > -1
+    )
+      return true;
+    return false;
+  }
+
+
   const reactStringReplace = require("react-string-replace");
   /**
    *
@@ -157,9 +169,8 @@ const AppareilsPage = () => {
     if (!filterDetruit)
       _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 3);
 
-    //OrderBy
-
-    _listeAppareil = ListeAppareilOrderBy(_listeAppareil);
+    //Colonnes
+    _listeAppareil = FiltrerParCollones(_listeAppareil,arrayFilters);
 
     //Search
     if (search.length > 0) {
@@ -173,40 +184,14 @@ const AppareilsPage = () => {
     }
   };
 
-  /**
-   * Ordonne la liste selon le state orderBy
-   * @param {La liste des appareils que l'on veut ordonné} liste
-   * @returns La liste ordonnée selon le $orderBy ({col: ["libelle","etat","secteur"] , order: ["ASC","DESC"]})
-   */
-  function ListeAppareilOrderBy(liste) {
-    switch (orderBy.col) {
-      case "libelle":
-        return orderBy.order === "ASC"
-          ? liste.sort((a, b) => a.Libelle.localeCompare(b.Libelle))
-          : liste.sort((a, b) => b.Libelle.localeCompare(a.Libelle));
-
-      case "etat":
-        return orderBy.order === "ASC"
-          ? liste.sort((a, b) => a.LibelleEtat.localeCompare(b.LibelleEtat))
-          : liste.sort((a, b) => b.LibelleEtat.localeCompare(a.LibelleEtat));
-
-      case "secteur":
-        return orderBy.order === "ASC"
-          ? liste.sort((a, b) => a.Secteur.localeCompare(b.Secteur))
-          : liste.sort((a, b) => b.Secteur.localeCompare(a.Secteur));
-      default:
-        return liste;
-    }
-  }
-
   function GetBGColorAppareilEtat(IdEtat) {
     switch (IdEtat) {
       case 1:
-        return "secondary";
+        return "bg-secondary";
       case 2:
-        return "primary";
+        return "bg-primary";
       case 3:
-        return "danger";
+        return "bg-danger";
       default:
         break;
     }
@@ -216,30 +201,25 @@ const AppareilsPage = () => {
 
   //#region Evenements
 
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
+
+
+  const handleCheckfilterChange = (checked, key, value) => {
+    let _arrTemp = JSON.parse(JSON.stringify(arrayFilters));
+
+    if (checked) {
+      _arrTemp.push({ fieldname: key, item: value });
+      setArrayFilters(_arrTemp);
+    } else {
+      const index = _arrTemp.findIndex(
+        (filter) => filter.fieldname === key && filter.item === value
+      );
+      if (index > -1) {
+        _arrTemp.splice(index, 1);
+        setArrayFilters(_arrTemp);
+      }
+    }
   };
 
-  const handleOrderby = (colonne) => {
-    let _order = "ASC";
-
-    if (orderBy.col === colonne) {
-      _order = orderBy.order === "ASC" ? "DESC" : "ASC";
-    }
-
-    setOrderBy({ col: colonne, order: _order });
-  };
-
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  useEffect(() => {
-    async function makeRequest() {
-      await delay(1000);
-      MockupListeappareils();
-
-      setIsLoaded(true);
-    }
-    makeRequest();
-  }, []);
 
   //#endregion
 
@@ -250,67 +230,71 @@ const AppareilsPage = () => {
   const AppareilGrey = require("../../../image/bottleGrey.png");
   const AppareilRed = require("../../../image/bottleRed.png");
 
-  const SearchAppareil = () => {
-    return (
-      <Form.Control
-        type="search"
-        placeholder="Rechercher"
-        className="mx-4"
-        aria-label="Search"
-        onChange={handleSearch}
-      />
-    );
-  };
-
   const ButtonFilter = (props) => {
     return (
-      <Button
-        onClick={() => props.methodState(!props.state)}
-        variant={props.state ? GetBGColorAppareilEtat(props.IdEtat) : "light"}
-        className={`m-1 border-${GetBGColorAppareilEtat(props.IdEtat)}`}
-      >
-        <FontAwesomeIcon icon={faFilter} /> {props.title} ({props.number})
-      </Button>
+      <Nav.Item>
+        <Nav.Link
+          onClick={() => props.methodState(!props.state)}
+          variant=""
+          className={
+            props.state ? "btn-filter-active border" : "btn-filter border"
+          }
+        >
+          {GetImageAppareilEtat(props.IdEtat, "img-bt-filter")}
+          {props.title} {isLoaded && `(${props.number})`}
+        </Nav.Link>
+      </Nav.Item>
     );
   };
 
   const FilterFindPanel = () => {
     return (
-      <Container>
-        {listeAppareils.filter((appar) => appar.IdEtat === 2).length > 0 &&
-          ButtonFilter({
-            title: "Actif",
-            methodState: SetFilterActif,
-            state: filterActif,
-            number: listeAppareils.filter((appar) => appar.IdEtat === 2).length,
-            IdEtat: 2,
-          })}
+      <Row className="mb-2">
+        <Col className="m-1">
+          <Nav fill>
+            {listeAppareils.filter((appar) => appar.IdEtat === 2).length > 0 &&
+              ButtonFilter({
+                title: "Actif",
+                methodState: SetFilterActif,
+                state: filterActif,
+                number: listeAppareils.filter((appar) => appar.IdEtat === 2)
+                  .length,
+                IdEtat: 2,
+              })}
 
-        {listeAppareils.filter((appar) => appar.IdEtat === 1).length > 0 &&
-          ButtonFilter({
-            title: "Hors contrat",
-            methodState: SetFilterHorscontrat,
-            state: filterHorscontrat,
-            number: listeAppareils.filter((appar) => appar.IdEtat === 1).length,
-            IdEtat: 1,
-          })}
+            {listeAppareils.filter((appar) => appar.IdEtat === 1).length > 0 &&
+              ButtonFilter({
+                title: "Hors contrat",
+                methodState: SetFilterHorscontrat,
+                state: filterHorscontrat,
+                number: listeAppareils.filter((appar) => appar.IdEtat === 1)
+                  .length,
+                IdEtat: 1,
+              })}
 
-        {listeAppareils.filter((appar) => appar.IdEtat === 3).length > 0 &&
-          ButtonFilter({
-            title: "Détruit",
-            methodState: SetFilterDetruit,
-            state: filterDetruit,
-            number: listeAppareils.filter((appar) => appar.IdEtat === 3).length,
-            IdEtat: 3,
-          })}
-        {SearchAppareil()}
-      </Container>
+            {listeAppareils.filter((appar) => appar.IdEtat === 3).length > 0 &&
+              ButtonFilter({
+                title: "Détruit",
+                methodState: SetFilterDetruit,
+                state: filterDetruit,
+                number: listeAppareils.filter((appar) => appar.IdEtat === 3)
+                  .length,
+                IdEtat: 3,
+              })}
+          </Nav>
+        </Col>
+
+        <Col md={6} className="m-1">
+         <Search setSearch={setSearch} />
+        </Col>
+      </Row>
     );
   };
 
-  const GetImageAppareilEtat = (IdEtat) => {
+  const GetImageAppareilEtat = (IdEtat, className) => {
     return (
       <Image
+        className={className}
         src={
           IdEtat === 1
             ? AppareilGrey
@@ -323,86 +307,82 @@ const AppareilsPage = () => {
   };
   //#endregion
 
-  //#region large
+  //#region TableData
+  const _header = [
+    {
+      title: "Secteur",
+      filter: {
+        fieldname: "Secteur",
+      },
+    },
 
-  const AppareilsTable = () => {
-    return (
-      <Table>
-        {TableHead()}
-        <tbody>{TableBody()}</tbody>
-      </Table>
-    );
-  };
+    {
+      title: "Code",
+    },
+    {
+      title: "Libellé de l'appareil",
+      filter: {
+        fieldname: "Libelle",
+      },
+    },
+    {
+      title: "État",
+      filter: {
+        fieldname: "LibelleEtat",
+      },
+    },
+  ];
 
-  const TableHead = () => {
-    return (
-      <thead>
-        <tr>
-          <th>Secteur {ButtonOrder("secteur")}</th>
-          <th>Code</th>
-          <th>Libellé de l'appareil {ButtonOrder("libelle")}</th>
-          <th></th>
-          <th>État {ButtonOrder("etat")}</th>
-        </tr>
-      </thead>
-    );
-  };
+  const _Data = () => {
+    let _body = [];
 
-  const TableBody = () => {
-    if (isLoaded) {
-      return GetAppareilsSearched().map((appareil) => {
-        return (
-          <tr key={appareil.Id}>
-            <td>{HighlightTextIfSearch(appareil.Secteur)} </td>
-            <td>{appareil.Id}</td>
-            <td>{HighlightTextIfSearch(appareil.Libelle)}</td>
-            <td>{GetImageAppareilEtat(appareil.IdEtat)}</td>
-            <td>
-              {" "}
-              <Badge bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
-                {" "}
-                {appareil.LibelleEtat}{" "}
-              </Badge>{" "}
-            </td>
-          </tr>
-        );
-      });
-    } else {
-      return PlaceHolderTableLine(5);
+    let _lAppareils = GetAppareilsSearched();
+
+    for (let index = 0; index < _lAppareils.length; index++) {
+      const appareil = _lAppareils[index];
+      let _cells = [];
+
+      let _secteur = {
+        text: appareil.Secteur,
+        isSearchable: true,
+        isH1: false,
+      };
+
+      _cells.push(_secteur);
+      let _code = {
+        text: appareil.Id,
+        isSearchable: false,
+        isH1: false,
+      };
+
+      _cells.push(_code);
+
+      let _lib = {
+        text: appareil.Libelle,
+        isSearchable: true,
+        isH1: false,
+      };
+      _cells.push(_lib);
+
+      let _etat = {
+        text: (
+          <span
+            className={`badge badge-${GetBGColorAppareilEtat(appareil.IdEtat)}`}
+          >
+            {appareil.LibelleEtat}
+          </span>
+        ),
+        isSearchable: true,
+        isH1: false,
+      };
+
+      _cells.push(_etat);
+
+      let _row = { data: appareil, cells: _cells };
+
+      _body.push(_row);
     }
-  };
-
-  const PlaceHolderTableLine = (numberOfLines) => {
-    let _arrayLoading = [];
-    for (let index = 0; index < numberOfLines; index++) {
-      _arrayLoading.push(index + 1);
-    }
-    return _arrayLoading.map((i) => {
-      return (
-        <tr key={i}>
-          <td colSpan={4}>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={12} />
-            </Placeholder>
-          </td>
-        </tr>
-      );
-    });
-  };
-
-  const ButtonOrder = (orderName) => {
-    return (
-      <FontAwesomeIcon
-        onClick={() => handleOrderby(orderName)}
-        icon={
-          orderBy.col === orderName
-            ? orderBy.order === "ASC"
-              ? faSortUp
-              : faSortDown
-            : faSort
-        }
-      />
-    );
+    return _body;
   };
 
   //#endregion
@@ -476,21 +456,59 @@ const AppareilsPage = () => {
 
   //#endregion
 
+
+
+
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  useEffect(() => {
+    async function makeRequest() {
+      await delay(1000);
+
+      setIsLoaded(true);
+    }
+    makeRequest();
+    MockupListeappareils();
+    // eslint-disable-next-line
+  }, [isLoaded]);
+
   return (
-    <Container fluid>
-      <WhiteShadowCard icon={faMobileAlt} title="Liste des appareils :">
-        {FilterFindPanel()}
-        <Container fluid>
-          <BreakpointProvider>
-            <Breakpoint large up>
-              {AppareilsTable()}
-            </Breakpoint>
-            <Breakpoint medium down>
-              {AppareilsCards()}
-            </Breakpoint>
-          </BreakpointProvider>
-        </Container>
-      </WhiteShadowCard>
+    <Container fluid className="h-100">
+      <Col md={12} style={{ textAlign: "start" }}>
+        <span className="title">Liste des appareils </span>|
+        <span className="subtitle">
+          {isLoaded ? (
+            ` ${listeAppareils.length} appareils`
+          ) : (
+            <Placeholder animation="glow">
+              <Placeholder xs={1} />
+            </Placeholder>
+          )}
+        </span>
+      </Col>
+      {FilterFindPanel()}
+      <BreakpointProvider>
+        <Breakpoint large up>
+          <Container fluid className="container-table p-4">
+            <TableData
+              IsLoaded={isLoaded}
+              placeholdeNbLine={5}
+              headers={_header}
+              lData={_Data()}
+              rawData={listeAppareils}
+              handleCheckfilterChange={handleCheckfilterChange}
+              isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+              isRowActive={() => {
+                return false;
+              }}
+              search={search}
+              Pagination
+            />
+          </Container>
+        </Breakpoint>
+        <Breakpoint medium down>
+          {AppareilsCards()}
+        </Breakpoint>
+      </BreakpointProvider>
     </Container>
   );
 };

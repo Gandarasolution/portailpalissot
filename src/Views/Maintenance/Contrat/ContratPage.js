@@ -8,17 +8,22 @@ import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Stack from "react-bootstrap/Stack";
+//#endregion
 
+//#region FontAwesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 //#endregion
 
 //#region Components
 import ContratPrestation from "./Components/ContratPrestations";
-import ContratInfo from "./Components/ContratInformation";
+// import ContratInfo from "./Components/ContratInformation";
 
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { Breakpoint, BreakpointProvider } from "react-socks";
+// import ContratInfo from "./Components/ContratInformation";
+
 //#endregion
 
 const ContratPage = () => {
@@ -34,116 +39,92 @@ const ContratPage = () => {
     LibelleContrat: "Entretien annuel",
   };
 
+
   let _Prestations = [
     {
-      id: 1,
-      libelle: "	Entretien annuel de la ventilation",
-      secteur: "toiture",
-      mois: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    },
-    {
-      id: 2,
-      libelle: "Contrôle mensuel des températures par échantillonage",
-      secteur: "Ensemble",
-      mois: [1, 1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 0],
-    },
-    {
-      id: 3,
-      libelle: "Entretien annuel de la sous Station N°2",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 4,
-      libelle: "Entretien annuel de la sous Station N°1",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 3, 0, 0, 4, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 5,
-      libelle: "eeeee",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 6,
-      libelle: "fgb",
-      secteur: "Batiment 2",
-      mois: [0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 7,
-      libelle: "Eefefef",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 1, 0, 1, 2, 0, 0, 0],
-    },
-    {
-      id: 8,
-      libelle: "Eneffff",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 9,
-      libelle: "Ezzzz2",
-      secteur: "Batiment 2",
-      mois: [0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 10,
-      libelle: "efzefzef",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0],
-    },
-    {
-      id: 11,
-      libelle: "Entretien zefzf",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1],
-    },
-    {
-      id: 12,
-      libelle: "Entresdsddfdff",
-      secteur: "Batiment 2",
-      mois: [0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0],
-    },
-  ];
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "visite principale annuelle en août : 10 brûleurs "
+      ,DateInterventionPrestation: new Date(2021,8,1)
+      ,IdEtat: 1
+      ,Secteur: "Bruleur proccess"
 
-  const [Prestations, SetPrestations] = useState(_Prestations);
+    },
+    {
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "visite intermédiaire de  janvier/février : 10 brûleurs"
+      ,DateInterventionPrestation: new Date(2021,1,1)
 
-  const MockupDataPrestation = () => {
+      ,IdEtat: 2
+      ,Secteur: "Bruleur proccess"
+    },
+    {
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "visite intermédiaire de  janvier/février : 10 brûleurs"
+      ,DateInterventionPrestation: new Date(2021,2,1)
+
+      ,IdEtat: 3
+      ,Secteur: "Bruleur proccess"
+    },
+    {
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "visite intermédiaire d'avril : 10 brûleurs "
+      ,DateInterventionPrestation: new Date(2021,4,1)
+
+      ,IdEtat: 4
+      ,Secteur: "Bruleur proccess"
+
+    },
+    {
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "ramonage du conduit de cheminée de la chaudière de la cabine KREMLIN  P1- sous traitance "
+     ,InterventionPrestationContratCadencier: 2021
+      ,DateInterventionPrestation: new Date(2021,8,1)
+
+      ,IdEtat: 1
+      ,Secteur: "Chaudiere"
+
+    },
+    {
+      IdPrestationContrat: 3490
+      ,DescriptionPrestationContrat: "Ramonage des 3 conduits de cheminée des Brûleurs PROCESS IPROS - sous traitance  "
+      ,DateInterventionPrestation: new Date(2021,8,1)
+      ,IdEtat: 4
+      ,Secteur: "Bruleur proccess"
+
+    }
+
+  ]
+
+  const MockupDataPrestation = async () => {
+    // console.log("Mockup data Prestations !");
     let _prestas = [];
     for (let index = 0; index < 12; index++) {
       let _presta = {
-        id: index + 1,
-        libelle: loremIpsum({
+        IdPrestationContrat: getRandomInt(2000, 4000)
+        ,DescriptionPrestationContrat: loremIpsum({
           avgSentencesPerParagraph: 1,
           startWithLoremIpsum: false,
           random: "false",
-        }).join(),
-        secteur: loremIpsum({
+        }).join()
+        ,DateInterventionPrestation : new Date(getRandomInt(2004,2025),getRandomInt(0,11),1)
+
+
+        ,IdEtat: getRandomInt(1, 4)
+        ,Secteur: loremIpsum({
           avgSentencesPerParagraph: 1,
           startWithLoremIpsum: false,
           random: "false",
           avgWordsPerSentence: 2,
-        }).join(),
-        mois: [
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-          getRandomInt(0, 4),
-        ],
-      };
+        }).join()
+  
+      }
+
+
+
       _prestas.push(_presta);
     }
+
+    _prestas.sort((a,b)=> a.DateInterventionPrestation - b.DateInterventionPrestation)
 
     SetPrestations(_prestas);
   };
@@ -156,21 +137,37 @@ const ContratPage = () => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   //#endregion
 
-  //#region States
+  //#region Données
 
   const _dateContrat = new Date(
     dateFormat(new Date(Contrat.DateSouscrit), "dd/mm/yyyy")
   );
 
-  const [datePrestation, SetDatePrestation] = useState(
-    new Date(new Date().getFullYear(), _dateContrat.getMonth(), 1)
+  const dateFinPeriode = () => {
+    let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
+    return new Date(_dateEndTmp.setMonth(_dateEndTmp.getMonth() + 11));
+  };
+
+  //#endregion
+
+  //#region States
+  // const [isLoadedContrat, setIsLoadedContrat] = useState(false);
+  const [isLoadedPresta, setIsLoadedPresta] = useState(false);
+
+  const [Prestations, SetPrestations] = useState(_Prestations);
+
+  const [dateDebutPeriode, setDateDebutPeriode] = useState(
+    GetDatePeriodeInitial()
   );
 
   //#endregion
 
   //#region Fonctions
+
   function addOneYear(date) {
     date.setFullYear(date.getFullYear() + 1);
     return date;
@@ -181,99 +178,201 @@ const ContratPage = () => {
     return date;
   }
 
+  function GetNomMois(num, short = false) {
+    // console.log(num)
+    if (num > 12) {
+      num = num - 12;
+    }
+    switch (num) {
+      case 1:
+        return short ? "Jan." : "Janvier";
+      case 2:
+        return short ? "Fév." : "Février";
+      case 3:
+        return "Mars";
+      case 4:
+        return short ? "Avr." : "Avril";
+      case 5:
+        return "Mai";
+      case 6:
+        return "Juin";
+      case 7:
+        return short ? "Juil." : "Juillet";
+      case 8:
+        return "Août";
+      case 9:
+        return short ? "Sept." : "Septembre";
+      case 10:
+        return short ? "Oct." : "Octobre";
+      case 11:
+        return short ? "Nov." : "Novembre";
+      case 12:
+        return short ? "Déc." : "Décembre";
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Construit la date de début des preriodes initial
+   * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
+   */
+  function GetDatePeriodeInitial() {
+    let _day = 1;
+    let _monthI = _dateContrat.getMonth();
+    let _year = new Date().getFullYear();
+    let _DateRetour = new Date(_year, _monthI, _day);
+    return _DateRetour;
+  }
+
   //#endregion
 
   //#region Evenement
 
-  const AjouterUnAnPeriode = () => {
-    let _dateTmp = datePrestation;
-    _dateTmp = addOneYear(_dateTmp);
-    let _datePrestation = new Date(_dateTmp);
-    SetDatePrestation(_datePrestation);
-    MockupDataPrestation();
+  const AjouterUnAnPeriode = async () => {
+    let _dateTMP = dateDebutPeriode;
+    _dateTMP = addOneYear(_dateTMP);
+    let _dateDebutPeriode = new Date(_dateTMP);
+    setDateDebutPeriode(_dateDebutPeriode);
+
+    setIsLoadedPresta(false);
+    await MockupDataPrestation();
+    // setIsLoaded(true);
   };
 
-  const SoustraireUnAnPeriode = () => {
-    let _dateTmp = datePrestation;
-    _dateTmp = subOneYear(_dateTmp);
-    let _datePrestation = new Date(_dateTmp);
-    SetDatePrestation(_datePrestation);
-    MockupDataPrestation();
+  const SoustraireUnAnPeriode = async () => {
+    let _dateTMP = dateDebutPeriode;
+    _dateTMP = subOneYear(_dateTMP);
+    let _dateDebutPeriode = new Date(_dateTMP);
+    setDateDebutPeriode(_dateDebutPeriode);
+    setIsLoadedPresta(false);
+
+    await MockupDataPrestation();
   };
 
-  const HandleDropdownPeriodeSelect = (year) => {
-    
-    let _dateTemp = new Date();
-    _dateTemp.setFullYear(Number(year));
-    
-    SetDatePrestation(_dateTemp);
-    MockupDataPrestation();
-  };
+  const HandleDropdownPeriodeSelect = async (dateStart) => {
+    let _dateTemp = new Date(dateStart);
 
-  useEffect(() => {}, [datePrestation]);
+    setDateDebutPeriode(_dateTemp);
+    setIsLoadedPresta(false);
+
+    await MockupDataPrestation();
+  };
 
   //#endregion
 
-
-  const DropDownYears = () => {
+  const DropDownYears = (small) => {
+    let _dateDebut = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
+    let _dateEnd = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
     let _arrayPeriodes = [
       {
-        yearStart: new Date(Contrat.DateSouscrit).getFullYear(),
-        yearEnd: new Date(Contrat.DateSouscrit).getFullYear() + 1,
+        dateStart: new Date(_dateDebut),
+        dateEnd: new Date(_dateEnd.setMonth(_dateDebut.getMonth() + 11)),
       },
     ];
 
     for (let index = 0; index < 10; index++) {
-      let _yearStart = _arrayPeriodes[index].yearStart + 1;
-      let _yearEnd = _arrayPeriodes[index].yearEnd + 1;
-      _arrayPeriodes.push({ yearStart: _yearStart, yearEnd: _yearEnd });
+      let _dateStart = addOneYear(new Date(_arrayPeriodes[index].dateStart));
+      let _dateEnd = addOneYear(new Date(_arrayPeriodes[index].dateEnd));
+
+      _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
     }
 
     return (
       <DropdownButton
+        variant=""
+        className="button-periode"
+        drop="down-centered"
+        style={{ borderRadius: "10px" }}
         id="dropdown-datePeriode"
-        title={`Période : ${datePrestation.getFullYear()}  / ${
-          datePrestation.getFullYear() + 1
-        }`}
+        title={`Période : ${GetNomMois(
+          dateDebutPeriode.getMonth() + 1,
+          small
+        )}
+              ${dateDebutPeriode.getFullYear()} à
+              ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
+              ${dateFinPeriode().getFullYear()}`}
         onSelect={(e) => {
           HandleDropdownPeriodeSelect(e);
         }}
       >
         {_arrayPeriodes.map((periode, index) => {
           return (
-            <Dropdown.Item
-              eventKey={periode.yearStart}
-              key={index}
-            >{`${periode.yearStart} / ${periode.yearEnd}`}</Dropdown.Item>
+            <Dropdown.Item key={index} eventKey={periode.dateStart}>
+              {` ${GetNomMois(
+                periode.dateStart.getMonth() + 1
+              )} ${periode.dateStart.getFullYear()} à ${GetNomMois(
+                periode.dateEnd.getMonth() + 1
+              )} ${periode.dateEnd.getFullYear()}`}
+            </Dropdown.Item>
           );
         })}
       </DropdownButton>
     );
   };
 
+  useEffect(() => {
+    async function makeRequest() {
+      await delay(1000);
 
+      // setIsLoadedContrat(true);
+      setIsLoadedPresta(true);
+    }
+    makeRequest();
+  }, [isLoadedPresta]);
 
   return (
-    <Container fluid>
-      <ContratInfo Contrat={Contrat} />
-
-       
-
+    <Container fluid className="h-100" > 
+      {/* <ContratInfo Contrat={Contrat} IsLoaded={isLoadedContrat} /> */}
 
       <ContratPrestation
+        IsLoaded={isLoadedPresta}
         Prestations={Prestations}
-        datePrestation={datePrestation}
-        ParentComponentPeriodeSelect={ <Stack direction="horizontal" className="centerStack" gap={3}>
-        <Button variant="primary" onClick={() => SoustraireUnAnPeriode()}>
-          <FontAwesomeIcon icon={faArrowLeft} />
-        </Button>
+        datePrestation={new Date(Contrat.DateSouscrit)}
+        ParentComponentPeriodeSelect={
+          <BreakpointProvider>
+            <Breakpoint large up>
+              <Stack direction="horizontal" className="centerStack " gap={1}>
+                <Button
+                  variant=""
+                  className=" button-periode"
+                  onClick={() => SoustraireUnAnPeriode()}
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </Button>
 
-        {DropDownYears()}
-        <Button variant="primary" onClick={() => AjouterUnAnPeriode()}>
-          {" "}
-          <FontAwesomeIcon icon={faArrowRight} />{" "}
-        </Button>
-      </Stack>}
+                {DropDownYears(false)}
+
+                <Button
+                  variant=""
+                  className="button-periode "
+                  onClick={() => AjouterUnAnPeriode()}
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Button>
+              </Stack>
+            </Breakpoint>
+            <Breakpoint medium down>
+              {DropDownYears(true)}
+              <Stack direction="horizontal" className="centerStack" gap={1}>
+                <Button
+                  variant=""
+                  className="border button-periode"
+                  onClick={() => SoustraireUnAnPeriode()}
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </Button>
+                <Button
+                  variant=""
+                  className="border button-periode"
+                  onClick={() => AjouterUnAnPeriode()}
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Button>
+              </Stack>
+            </Breakpoint>
+          </BreakpointProvider>
+        }
       />
     </Container>
   );
