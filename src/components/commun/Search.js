@@ -11,6 +11,7 @@ const Search = ( {setSearch}) => {
       placeholder="Rechercher"
       aria-label="Search"
       onChange={handleSearch}
+      className="noBorder"
     />
   );
 };

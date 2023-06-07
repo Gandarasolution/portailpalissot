@@ -1,11 +1,10 @@
 //#region Imports
 import { useEffect, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
-import dateFormat from "dateformat";
 
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
-import Collapse from "react-bootstrap/Collapse";
+// import Collapse from "react-bootstrap/Collapse";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
@@ -21,11 +20,12 @@ import Nav from "react-bootstrap/Nav";
 //#region FontAwsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCaretDown,
-  faCaretUp,
+  // faCaretDown,
+  // faCaretUp,
   faListCheck,
   faList,
   faFile,
+  faFileAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 //#endregion
@@ -39,7 +39,7 @@ import ImageExtension from "../../../../components/commun/ImageExtension";
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
-import { Stack } from "react-bootstrap";
+import { CloseButton, Stack } from "react-bootstrap";
 
 //#endregion
 
@@ -47,7 +47,7 @@ const ContratPrestation = ({
   Prestations,
   ParentComponentPeriodeSelect,
   IsLoaded,
-  datePrestation,
+  // datePrestation,
 }) => {
   //#region Mockup
 
@@ -95,7 +95,7 @@ const ContratPrestation = ({
   //#region States
 
   //#region Collapses
-  const [openDocuments, setOpenDocuments] = useState(true);
+  // const [openDocuments, setOpenDocuments] = useState(true);
   //#endregion
 
   //#region Filters
@@ -114,9 +114,6 @@ const ContratPrestation = ({
   const [gridColMDValue, setGridColMDValue] = useState(12);
   const [search, setSearch] = useState("");
   const [modalLargeShow, setModalLargeShow] = useState(false);
-
-  const [dateDebutPeriode, setDateDebutPeriode] = useState(0);
-  const [dateFinPeriode, setDateFinPeriode] = useState(0);
 
   //#endregion
 
@@ -275,6 +272,25 @@ const ContratPrestation = ({
     return false;
   }
 
+  function IsButtonShouldBeCheck(fieldname) {
+    if (
+      arrayFilters.findIndex((filter) => filter.fieldname === fieldname) > -1
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  function resetSelection() {
+    //Suprime les filtres sur colonnes
+    setArrayFilters([]);
+    //Annule l'affichage des documents/tâches
+    setPrestaSelected(null);
+    setPrestaDateSelected(null);
+    //La table prend toute la place
+    setGridColMDValue(12);
+  }
+
   //#endregion
 
   //#region Evenements
@@ -320,12 +336,12 @@ const ContratPrestation = ({
       prestaDateSelected === date
     ) {
       //Même sélection (déselection)
-      setGridColMDValue(12);
-      setPrestaSelected(null);
+      // setGridColMDValue(12);
+      // setPrestaSelected(null);
       // setPrestaMoisSelected(null);
-      setPrestaDateSelected(null);
+      // setPrestaDateSelected(null);
     } else {
-      setGridColMDValue(10);
+      // setGridColMDValue(10);
       setPrestaSelected(presta);
       // setPrestaMoisSelected(mois);
       setPrestaDateSelected(date);
@@ -358,6 +374,17 @@ const ContratPrestation = ({
     setModalLargeShow(_value);
   };
 
+  const handleAfficherDocuments = (presta) => {
+    if (prestaSelected === presta) {
+      setGridColMDValue(gridColMDValue === 12 ? 10 : 12);
+      return;
+    }
+
+    handleLigneClicked(presta);
+
+    setGridColMDValue(10);
+  };
+
   //#endregion
 
   //#region Composants
@@ -370,7 +397,7 @@ const ContratPrestation = ({
       return (
         <Nav.Link
           className={
-            filterTous ? "btn-filter-active border" : "btn-filter border"
+            filterTous ? "btn-filter-active border " : "btn-filter border"
           }
           onClick={() => handleTousFilter()}
         >
@@ -415,31 +442,7 @@ const ContratPrestation = ({
           <Search setSearch={setSearch} />
         </Col>
 
-        {/* <Col className="m-1">{ParentComponentPeriodeSelect}</Col> */}
-
-        <Col className="m-1">
-          <Stack direction="horizontal">
-            <span className="m-2">Du </span>
-          <Form.Control
-            type="date"
-            value={dateDebutPeriode}
-            onChange={(e) => setDateDebutPeriode(e.target.value)}
-            />
-            </Stack>
-
-            <Stack direction="horizontal">
-            <span className="m-2"> Au </span>
-             
-            <Form.Control
-            type="date"
-            value={dateFinPeriode}
-            onChange={(e) => setDateFinPeriode(e.target.value)}
-          /> 
-            </Stack>
-
-
-
-        </Col>
+        <Col className="m-1">{ParentComponentPeriodeSelect}</Col>
       </Row>
     );
   };
@@ -447,16 +450,6 @@ const ContratPrestation = ({
   //#endregion
 
   //#region pagination
-
-  function resetSelection() {
-    //Suprime les filtres sur colonnes
-    setArrayFilters([]);
-    //Annule l'affichage des documents/tâches
-    setPrestaSelected(null);
-    setPrestaDateSelected(null);
-    //La table prend toute la place
-    setGridColMDValue(12);
-  }
 
   //#endregion
 
@@ -571,7 +564,13 @@ const ContratPrestation = ({
       <Card className="mb-2">
         <Card.Header className="card-document">
           Documents ({_arrayDocs.length})
-          <Button
+          <CloseButton
+            onClick={() => {
+              setGridColMDValue(12);
+            }}
+            className="ms-4"
+          />
+          {/* <Button
             variant="contained"
             aria-controls={`collapse-listeDocuments`}
             aria-expanded={openDocuments}
@@ -582,18 +581,18 @@ const ContratPrestation = ({
             ) : (
               <FontAwesomeIcon icon={faCaretDown} />
             )}
-          </Button>
+          </Button> */}
         </Card.Header>
         <Card.Body>
-          <Collapse in={openDocuments}>
-            <div id="collapse-listeDocuments">
-              {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
+          {/* <Collapse in={openDocuments}> */}
+          <div id="collapse-listeDocuments">
+            {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
 
-              {_arrayDocs.map((doc, index) => {
-                return RowDocument(doc, index);
-              })}
-            </div>
-          </Collapse>
+            {_arrayDocs.map((doc, index) => {
+              return RowDocument(doc, index);
+            })}
+          </div>
+          {/* </Collapse> */}
         </Card.Body>
       </Card>
     );
@@ -748,31 +747,8 @@ const ContratPrestation = ({
 
   //#endregion
 
-  function addYears(date, years) {
-    date.setFullYear(date.getFullYear() + years);
-    return date;
-  }
-
   useEffect(() => {
     setIsListeTacheAffiche(true);
-    const _dateToday = new Date();
-    let _debutDate = new Date(
-      _dateToday.getFullYear(),
-      Number(dateFormat(new Date(datePrestation), "mm")) - 1,
-      Number(dateFormat(new Date(datePrestation), "dd"))
-    );
-    _debutDate = dateFormat(new Date(_debutDate), "yyyy-dd-mm");
-
-    let _finDate = new Date(
-      _dateToday.getFullYear(),
-      Number(dateFormat(new Date(datePrestation), "mm")) - 1,
-      Number(dateFormat(new Date(datePrestation), "dd"))
-    );
-    _finDate = addYears(_finDate, 1);
-    _finDate = dateFormat(new Date(_finDate), "yyyy-dd-mm");
-
-    setDateDebutPeriode(_debutDate);
-    setDateFinPeriode(_finDate);
   }, []);
 
   //#region TableData
@@ -880,19 +856,35 @@ const ContratPrestation = ({
 
       let _bt = {
         text: (
-          <OverlayTrigger
-            placement="bottom"
-            overlay={<Tooltip>Relevés de tâches</Tooltip>}
-          >
-            <FontAwesomeIcon
-              icon={faListCheck}
-              onClick={() => handleAfficherListeTache()}
-            />
-          </OverlayTrigger>
+          <Stack direction="horizontal">
+            <span>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip>Relevés de tâches</Tooltip>}
+              >
+                <FontAwesomeIcon
+                  icon={faListCheck}
+                  onClick={() => handleAfficherListeTache()}
+                />
+              </OverlayTrigger>
+            </span>
+
+            <span className="ms-2">
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip>Liste des documents</Tooltip>}
+              >
+                <FontAwesomeIcon
+                  icon={faFileAlt}
+                  onClick={() => handleAfficherDocuments(presta)}
+                />
+              </OverlayTrigger>
+            </span>
+          </Stack>
         ),
         isSearchable: false,
         isH1: false,
-        onClickMethod: handleAfficherListeTache,
+        fixedWidth: "100px",
       };
 
       _cells.push(_bt);
@@ -909,6 +901,7 @@ const ContratPrestation = ({
   //#region Events
   const handleLigneClicked = (presta) => {
     handleRowClicked(presta, presta.DateInterventionPrestation);
+    //TODO : Liste des documents
   };
 
   const isRowSelected = (presta) => {
@@ -930,7 +923,7 @@ const ContratPrestation = ({
           <span className="title">Plannification </span>|
           <span className="subtitle">
             {IsLoaded ? (
-              `${Prestations.length} prestations`
+              ` ${Prestations.length} prestations`
             ) : (
               <Placeholder animation="glow">
                 <Placeholder xs={1} />
@@ -966,6 +959,7 @@ const ContratPrestation = ({
                   rawData={Prestations}
                   handleCheckfilterChange={handleCheckfilterChange}
                   isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+                  isButtonShouldBeCheck={IsButtonShouldBeCheck}
                   isRowActive={isRowSelected}
                   search={search}
                   Pagination

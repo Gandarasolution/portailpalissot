@@ -85,10 +85,11 @@ const NavbarMenu = ({ setSite }) => {
                 <Offcanvas.Title>{`S${SiteCXT.IdSite} - ${SiteCXT.NomSite}`}</Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
+                {listeSite.length > 1 && <h6>Liste des sites :</h6>}
                 {listeSite.map((site) => {
                   return (
                     site.IdSite !== SiteCXT.IdSite && (
-                      <Button
+                      <Button variant="info"
                         onClick={() => {
                           setSite(site);
                         }}

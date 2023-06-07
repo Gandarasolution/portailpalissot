@@ -22,7 +22,7 @@ import ContratPrestation from "./Components/ContratPrestations";
 //#endregion
 import { loremIpsum } from "react-lorem-ipsum";
 import { Breakpoint, BreakpointProvider } from "react-socks";
-import ContratInfo from "./Components/ContratInformation";
+// import ContratInfo from "./Components/ContratInformation";
 
 //#endregion
 
@@ -96,7 +96,7 @@ const ContratPage = () => {
   ]
 
   const MockupDataPrestation = async () => {
-    console.log("Mockup data Prestations !");
+    // console.log("Mockup data Prestations !");
     let _prestas = [];
     for (let index = 0; index < 12; index++) {
       let _presta = {
@@ -155,7 +155,7 @@ const ContratPage = () => {
   //#endregion
 
   //#region States
-  const [isLoadedContrat, setIsLoadedContrat] = useState(false);
+  // const [isLoadedContrat, setIsLoadedContrat] = useState(false);
   const [isLoadedPresta, setIsLoadedPresta] = useState(false);
 
   const [Prestations, SetPrestations] = useState(_Prestations);
@@ -281,7 +281,7 @@ const ContratPage = () => {
     return (
       <DropdownButton
         variant=""
-        className="border button-periode"
+        className="button-periode"
         drop="down-centered"
         style={{ borderRadius: "10px" }}
         id="dropdown-datePeriode"
@@ -315,7 +315,7 @@ const ContratPage = () => {
     async function makeRequest() {
       await delay(1000);
 
-      setIsLoadedContrat(true);
+      // setIsLoadedContrat(true);
       setIsLoadedPresta(true);
     }
     makeRequest();
@@ -323,7 +323,7 @@ const ContratPage = () => {
 
   return (
     <Container fluid className="h-100" > 
-      <ContratInfo Contrat={Contrat} IsLoaded={isLoadedContrat} />
+      {/* <ContratInfo Contrat={Contrat} IsLoaded={isLoadedContrat} /> */}
 
       <ContratPrestation
         IsLoaded={isLoadedPresta}
@@ -335,7 +335,7 @@ const ContratPage = () => {
               <Stack direction="horizontal" className="centerStack " gap={1}>
                 <Button
                   variant=""
-                  className="border button-periode"
+                  className=" button-periode"
                   onClick={() => SoustraireUnAnPeriode()}
                 >
                   <FontAwesomeIcon icon={faArrowLeft} />
@@ -345,7 +345,7 @@ const ContratPage = () => {
 
                 <Button
                   variant=""
-                  className="border button-periode"
+                  className="button-periode "
                   onClick={() => AjouterUnAnPeriode()}
                 >
                   <FontAwesomeIcon icon={faArrowRight} />

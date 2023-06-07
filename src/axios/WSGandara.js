@@ -104,9 +104,9 @@ const Connexion = async (login, pass, setToken) => {
 
 
 
-const GetAppareils = async (token) => {
+// const GetAppareils = async (token) => {
     
-}
+// }
 
 //#endregion
 

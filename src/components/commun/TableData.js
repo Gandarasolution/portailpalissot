@@ -32,8 +32,6 @@ const TableData = (props) => {
 
   //#region Fonctions
 
- 
-
   const reactStringReplace = require("react-string-replace");
   function HighlightTextIfSearch(text) {
     if (
@@ -93,7 +91,7 @@ const TableData = (props) => {
         <tr>
           {props.headers.map((header, index) => {
             return header.filter && props.IsLoaded ? (
-              <th key={index}>{HeaderCellWithFilter(header)} </th>
+              <th key={index}  >{HeaderCellWithFilter(header)} </th>
             ) : (
               HeaderCell(index, header)
             );
@@ -164,7 +162,13 @@ const TableData = (props) => {
           }
           placement="bottom"
         >
-          <FontAwesomeIcon icon={faFilter} className="icon-bt" />
+          <FontAwesomeIcon
+            icon={faFilter}
+            className={`icon-bt ${
+              props.isButtonShouldBeCheck(header.filter.fieldname) &&
+              "filter-actif"
+            } `}
+          />
         </OverlayTrigger>
       </div>
     );
@@ -207,13 +211,13 @@ const TableData = (props) => {
 
     if (item.onClickMethod) {
       return (
-        <td key={index} onClick={() => item.onClickMethod(data)}>
+        <td key={index} onClick={() => item.onClickMethod(data)} style={item.fixedWidth && {width: item.fixedWidth}}  >
           {_cellText}
         </td>
       );
     }
 
-    return <td key={index}>{_cellText}</td>;
+    return <td key={index} style={item.fixedWidth && {width: item.fixedWidth}} >{_cellText}</td>;
   };
 
   //#endregion

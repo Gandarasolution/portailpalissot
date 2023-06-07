@@ -99,6 +99,21 @@
   justify-content: center;
 }
 
+
+.noBorder{
+  border:none !important
+}
+
+
+.icon-bt{
+  height: 10px;
+  margin-bottom: 5px !important;
+}
+
+.filter-actif{
+  color: var(--bs-primary);
+}
+
 .icon-bt:hover{
   color: var(--bs-primary) ;
   cursor: pointer;
@@ -306,6 +321,7 @@
   background-color: #01B81A !important;
   display: inline-block;
   width: 100px !important;
+  font-weight: 400 !important;
 }
 
 
@@ -313,24 +329,28 @@
   background-color: #FA8B0C !important;
   display: inline-block;
   width: 100px !important;
+  font-weight: 400 !important;
 }
 
 .badge-bg-primary{
   background-color: var(--bs-primary) !important;
     display: inline-block;
     width: 100px !important;
+    font-weight: 400 !important;
 }
 
 .badge-bg-secondary{
   background-color: var(--bs-secondary) !important;
     display: inline-block;
     width: 100px !important;
+    font-weight: 400 !important;
 }
 
 .badge-bg-danger{
   background-color: #FF4D4F !important;
     display: inline-block;
     width: 100px !important;
+    font-weight: 400 !important;
 }
 
 .modal-90w
