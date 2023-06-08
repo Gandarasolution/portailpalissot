@@ -158,7 +158,7 @@ function ConnexionGMAO($login = "", $pass_clear="", $ws="")
         {
             return $result["ConnexionResult"];
         }else{
-            return $result;
+            return "500";
         }
 	}
 
