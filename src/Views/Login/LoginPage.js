@@ -18,6 +18,7 @@ import Modal from "react-bootstrap/Modal";
 
 //#region Components
 import { Connexion } from "../../axios/WSGandara";
+import { Spinner } from "react-bootstrap";
 
 //#endregion
 
@@ -35,6 +36,8 @@ const LoginPage = (props) => {
   const [mailRecup, setMailRecup] = useState("");
 
   const [idError, setIdError] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   //#endregion
 
@@ -50,12 +53,14 @@ const LoginPage = (props) => {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     const getToken = (response) => {
       if (isNaN(response)) {
         props.setToken(response);
       } else {
         setIdError(response);
       }
+      setIsLoading(false);
     };
     await Connexion(login, password, getToken);
   };
@@ -216,6 +221,11 @@ const LoginPage = (props) => {
               <FontAwesomeIcon icon={revealed ? faEyeSlash : faEye} />
             </Button>
           </InputGroup>
+          {
+            isLoading && ( <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>)
+          }
           {AlertErrorConnexion()}
 
           <div className=" d-flex justify-content-end m-2">
