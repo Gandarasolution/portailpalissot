@@ -44,7 +44,7 @@ const NavbarMenu = ({ setSite }) => {
               height="30"
               className="d-inline-block align-top"
             />{" "}
-            GANDARA-DEMO
+            GANDARA-DEMOS
           </Container>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
