@@ -57,9 +57,9 @@ const LoginPage = (props) => {
         setIdError(response);
       }
     };
-    console.log("connexion");
     await Connexion(login, password, getToken);
   };
+
 
   //#endregion
 
