@@ -1,10 +1,13 @@
 //#region Imports
-import axios from "axios";
+import $ from 'jquery'; 
+
 //#endregion
 
 
 //#region Données
-const WSURL = "http://webservices.gandarasolution.fr:8039/WSGandara?wsdl";
+ const WSURL = "http://webservices.gandarasolution.fr:8039/WSGandara?wsdl";
+//const WSURL = "http://localhost:8038/WSGandara?wsdl";
+// http://localhost:8038/WSGandara?wsdl
 //#endregion
 
 
@@ -81,32 +84,24 @@ const CreateXML = (TemName, arrayParam) => {
 //#region Fonction publics
 
 const Connexion = async (login, pass, setToken) => {
-  let xml = CreateXML("Connexion", [
-    { key: "login", value: login },
-    { key: "pass_clear", value: pass },
-  ]);
-  // console.log(xml)
-  axios
-    .post(WSURL, xml, {
-      headers: {
-        "Content-Type": "text/xml",
-        SOAPAction: "http://tempuri.org/IWSGandara/Connexion",
+ 
+  let urlAction =`http://localhost:8000/WSGandara.php?endpoint=Connexion`;
+  $.ajax({
+      type: "POST",
+      url: urlAction,
+      data: {login: login, pass_clear: pass},
+      success(data) {
+        setToken(data);
       },
-    })
-    .then((response) => {
-      setToken(ParseData(response.data, "Connexion"));
-    })
-    .catch((error) => {
-      setToken(error.response.status);
-    });
+  });
+
+
 };
 
 
 
 
-// const GetAppareils = async (token) => {
-    
-// }
+
 
 //#endregion
 

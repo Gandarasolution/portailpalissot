@@ -56,8 +56,11 @@ const [site, setSite] = useState({IdSite: 2, NomSite: "Madame LUCOT Marguerite"}
     );
   }
 
+  
   return (
+    
     <TokenContext.Provider value={jwt}>
+      
       <Router>
         <div className="App font-link background">
           <SiteContext.Provider value={site}>
@@ -78,5 +81,44 @@ const [site, setSite] = useState({IdSite: 2, NomSite: "Madame LUCOT Marguerite"}
     </TokenContext.Provider>
   );
 }
+
+
+
+// function App() {
+//   const [name, setName] = useState("");
+//   const [result, setResult] = useState("");
+
+//   const handleChange = (e) => {
+//       setName(e.target.value);
+//   };
+
+ 
+
+
+//   return (
+//       <div className="App">
+//           <form
+//               action="http://localhost:8000/WSGandara.php"
+//               method="post"
+//               onSubmit={(event) => handleSumbit(event)}
+//           >
+//               <label htmlFor="name">Name: </label>
+//               <input
+//                   type="text"
+//                   id="name"
+//                   name="name"
+//                   value={name}
+//                   onChange={(event) => handleChange(event)}
+//               />
+//               <br />
+//               <button type="submit">Submit</button>
+//           </form>
+//           <h1>{result}</h1>
+//       </div>
+//   );
+
+// }
+
+
 
 export default App;
