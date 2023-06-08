@@ -224,11 +224,17 @@ function CallENDPOINT($url="",$endpoint="", )
 // $pass_clear = "4ea9E9s+Bjdr4A7UtcRqUw==rr";
 // // $callToWS = ConnecteWS($login, $pass_clear,"http://webservices.gandarasolution.fr:8039/WSGandara?wsdl");
 // $callToWS = ConnexionGMAO("a@a.fr","Youforlife","http://webservices.gandarasolution.fr:8039/WSGandara?wsdl");
+
+
+
+
     $url = "http://webservices.gandarasolution.fr:8039/WSGandara?wsdl";
     $terminaison = $_GET["endpoint"];
     $callToWS = CallENDPOINT($url, $terminaison);
     echo($callToWS);
 
+
+    
 
 
 ?>

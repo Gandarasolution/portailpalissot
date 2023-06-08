@@ -27,6 +27,8 @@ import React from "react";
 import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { createContext } from "react";
+
+
 //#endregion
 
 library.add(faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder);
@@ -38,7 +40,11 @@ export const SiteContext = createContext(null);
 
 function App() {
 
+  
+
 const [site, setSite] = useState({IdSite: 2, NomSite: "Madame LUCOT Marguerite"})
+
+
 
   const storedJwt = sessionStorage.getItem("token");
   const [jwt, setJwt] = useState(storedJwt || null);

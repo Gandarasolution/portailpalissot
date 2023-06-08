@@ -85,7 +85,8 @@ const CreateXML = (TemName, arrayParam) => {
 
 const Connexion = async (login, pass, setToken) => {
  
-  let urlAction =`http://localhost:8000/WSGandara.php?endpoint=Connexion`;
+  // let urlAction =`http://localhost:8000/WSGandara.php?endpoint=Connexion`;
+  let urlAction =`https://phpgao.000webhostapp.com/?endpoint=Connexion`;
   $.ajax({
       type: "POST",
       url: urlAction,
