@@ -20,14 +20,15 @@ import ContratPrestation from "./Components/ContratPrestations";
 // import ContratInfo from "./Components/ContratInformation";
 
 //#endregion
-import { loremIpsum } from "react-lorem-ipsum";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 // import ContratInfo from "./Components/ContratInformation";
-
+import { GetPrestationContrat } from "../../../axios/WSGandara";
+import { TokenContext } from "../../../App";
+import { useContext } from "react";
 //#endregion
 
 const ContratPage = () => {
-  //#region Mockup
+  //#region Data
 
   const Contrat = {
     IdContrat: 2557,
@@ -40,105 +41,27 @@ const ContratPage = () => {
   };
 
 
-  let _Prestations = [
-    {
-      IdPrestationContrat: 3490
-      ,DescriptionPrestationContrat: "visite principale annuelle en août : 10 brûleurs "
-      ,DateInterventionPrestation: new Date(2021,8,1)
-      ,IdEtat: 1
-      ,Secteur: "Bruleur proccess"
-
-    },
-    {
-      IdPrestationContrat: 3490
-      ,DescriptionPrestationContrat: "visite intermédiaire de  janvier/février : 10 brûleurs"
-      ,DateInterventionPrestation: new Date(2021,1,1)
-
-      ,IdEtat: 2
-      ,Secteur: "Bruleur proccess"
-    },
-    {
-      IdPrestationContrat: 3490
-      ,DescriptionPrestationContrat: "visite intermédiaire de  janvier/février : 10 brûleurs"
-      ,DateInterventionPrestation: new Date(2021,2,1)
-
-      ,IdEtat: 3
-      ,Secteur: "Bruleur proccess"
-    },
-    {
-      IdPrestationContrat: 3490
-      ,DescriptionPrestationContrat: "visite intermédiaire d'avril : 10 brûleurs "
-      ,DateInterventionPrestation: new Date(2021,4,1)
-
-      ,IdEtat: 4
-      ,Secteur: "Bruleur proccess"
-
-    },
-    {
-      IdPrestationContrat: 3490
-      ,DescriptionPrestationContrat: "ramonage du conduit de cheminée de la chaudière de la cabine KREMLIN  P1- sous traitance "
-     ,InterventionPrestationContratCadencier: 2021
-      ,DateInterventionPrestation: new Date(2021,8,1)
-
-      ,IdEtat: 1
-      ,Secteur: "Chaudiere"
-
-    },
-    {
-      IdPrestationContrat: 3490
-      ,DescriptionPrestationContrat: "Ramonage des 3 conduits de cheminée des Brûleurs PROCESS IPROS - sous traitance  "
-      ,DateInterventionPrestation: new Date(2021,8,1)
-      ,IdEtat: 4
-      ,Secteur: "Bruleur proccess"
-
-    }
-
-  ]
-
-  const MockupDataPrestation = async () => {
-    // console.log("Mockup data Prestations !");
-    let _prestas = [];
-    for (let index = 0; index < 12; index++) {
-      let _presta = {
-        IdPrestationContrat: getRandomInt(2000, 4000)
-        ,DescriptionPrestationContrat: loremIpsum({
-          avgSentencesPerParagraph: 1,
-          startWithLoremIpsum: false,
-          random: "false",
-        }).join()
-        ,DateInterventionPrestation : new Date(getRandomInt(2004,2025),getRandomInt(0,11),1)
-
-
-        ,IdEtat: getRandomInt(1, 4)
-        ,Secteur: loremIpsum({
-          avgSentencesPerParagraph: 1,
-          startWithLoremIpsum: false,
-          random: "false",
-          avgWordsPerSentence: 2,
-        }).join()
-  
-      }
 
 
 
-      _prestas.push(_presta);
-    }
+  const tokenCt = useContext(TokenContext);
 
-    _prestas.sort((a,b)=> a.DateInterventionPrestation - b.DateInterventionPrestation)
-
-    SetPrestations(_prestas);
+  const FetchDataPrestation = async () => {
+    let _ddebut = `${dateDebutPeriode.getFullYear()}-${dateDebutPeriode.getMonth() + 1}-1`
+    let _dfint = `${dateFinPeriode().getFullYear()}-${dateFinPeriode().getMonth() + 1}-1`
+    await GetPrestationContrat(tokenCt,DateSOAP(dateDebutPeriode), DateSOAP(dateFinPeriode()), 6663  ,SetPrestations).then(()=> setIsLoadedPresta(true) )
   };
 
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
 
-    max = Math.floor(max);
+  function DateSOAP(date) {
+    // Get year, month, and day part from the date
+    var year = date.toLocaleString("default", { year: "numeric" });
+    // var month = date.toLocaleString("default", { month: "2-digit" });
+    var month = "01"
+    var day = date.toLocaleString("default", { day: "2-digit" });
 
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    return year + "-" + month + "-" + day;
   }
-
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
   //#endregion
 
   //#region Données
@@ -158,7 +81,7 @@ const ContratPage = () => {
   // const [isLoadedContrat, setIsLoadedContrat] = useState(false);
   const [isLoadedPresta, setIsLoadedPresta] = useState(false);
 
-  const [Prestations, SetPrestations] = useState(_Prestations);
+  const [Prestations, SetPrestations] = useState([]);
 
   const [dateDebutPeriode, setDateDebutPeriode] = useState(
     GetDatePeriodeInitial()
@@ -236,8 +159,7 @@ const ContratPage = () => {
     setDateDebutPeriode(_dateDebutPeriode);
 
     setIsLoadedPresta(false);
-    await MockupDataPrestation();
-    // setIsLoaded(true);
+    await FetchDataPrestation();
   };
 
   const SoustraireUnAnPeriode = async () => {
@@ -247,7 +169,7 @@ const ContratPage = () => {
     setDateDebutPeriode(_dateDebutPeriode);
     setIsLoadedPresta(false);
 
-    await MockupDataPrestation();
+    await FetchDataPrestation();
   };
 
   const HandleDropdownPeriodeSelect = async (dateStart) => {
@@ -256,7 +178,7 @@ const ContratPage = () => {
     setDateDebutPeriode(_dateTemp);
     setIsLoadedPresta(false);
 
-    await MockupDataPrestation();
+    await FetchDataPrestation();
   };
 
   //#endregion
@@ -311,15 +233,29 @@ const ContratPage = () => {
     );
   };
 
-  useEffect(() => {
-    async function makeRequest() {
-      await delay(1000);
+  // useEffect(()  => {
+  //   console.log("effect");
+  //   FetchDataPrestation();
+  // }, [isLoadedPresta]);
 
-      // setIsLoadedContrat(true);
-      setIsLoadedPresta(true);
-    }
-    makeRequest();
-  }, [isLoadedPresta]);
+
+  // useEffect(async () => {
+  //   const result = await FetchDataPrestation();
+
+  //   // setData(result.data);
+  // });
+
+
+  useEffect(() => {
+  async function fetchData() {
+    // You can await here
+    
+    await FetchDataPrestation();
+  }
+  fetchData();
+  // setIsLoadedPresta(true);
+
+}, [isLoadedPresta]); // Or [] if effect doesn't need props or state
 
   return (
     <Container fluid className="h-100" > 

@@ -30,7 +30,6 @@ class MSSoapClient extends SoapClient
 			$this->ws = $wsdl;
 			$this->opts = $options;
 			$this->arrFonctions = parent::__getFunctions();
-			//var_dump($this->arrFonctions);		
 		}
 		catch(Exception $e)
 		{
@@ -122,6 +121,45 @@ class MSSoapClient extends SoapClient
 }
 
 
+function GetPrestationContrat($token, $dateDebut, $dateFin, $idSite, $ws)
+{
+	global $URL_API_CCS, $g_useSoapClientV2;
+	$request = array("token"=>$token, "dateDebut" => $dateDebut, "dateFin"=> $dateFin, "IdSite"=> $idSite);
+
+if($g_useSoapClientV2)
+	{
+		$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+		$result = $client->__soapCall("GetPrestationContrat",  array("parameters" => $request));
+
+		if (is_object($result)) {
+			$result = json_decode(json_encode($result), true);
+		}
+	}
+	else
+	{
+		$client = new nusoap_client($ws, true);
+		$client->soap_defencoding = 'UTF-8';
+		$client->decode_utf8 = false;
+		$result = $client->call("GetPrestationContrat", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
+	}
+
+	$error = $client->getError();
+
+
+    if ($error) {
+		error_log($error);
+		return $error;
+	} else {
+
+		if(isset($result["GetPrestationContratResult"]["PrestationContrat"]))
+        {
+			return json_encode($result["GetPrestationContratResult"]["PrestationContrat"]);
+
+        }else{
+            return "500";
+        }
+	}
+}
 
 
 function ConnexionGMAO($login = "", $pass_clear="", $ws="")
@@ -149,9 +187,7 @@ function ConnexionGMAO($login = "", $pass_clear="", $ws="")
 
 
     if ($error) {
-		//var_dump($_SESSION);
 		error_log($error);
-        return "ERRREUR";
 		return $error;
 	} else {
 		if($result["ConnexionResult"])
@@ -203,7 +239,6 @@ function ConnecteWS($user = "", $pass = "", $ws = "")
 	$error = $client->getError();
 	
 	if ($error) {
-		//var_dump($_SESSION);
 		error_log($error);
 		return $error;
 	} else {
@@ -212,12 +247,19 @@ function ConnecteWS($user = "", $pass = "", $ws = "")
 }
 
 
+
 function CallENDPOINT($url="",$endpoint="", )
 {
+
     if($endpoint === "Connexion")
     {
         return ConnexionGMAO($_POST['login'],$_POST['pass_clear'],$url);
     }
+
+	if($endpoint === "GetPrestationContrat")
+	{
+		return GetPrestationContrat($_POST['token'], $_POST['dateDebut'],$_POST['dateFin'],$_POST['IdSite'],$url);
+	}
 }
 
 // $login = "-1";
@@ -225,6 +267,8 @@ function CallENDPOINT($url="",$endpoint="", )
 // // $callToWS = ConnecteWS($login, $pass_clear,"http://webservices.gandarasolution.fr:8039/WSGandara?wsdl");
 // $callToWS = ConnexionGMAO("a@a.fr","Youforlife","http://webservices.gandarasolution.fr:8039/WSGandara?wsdl");
 
+
+	
 
 
 

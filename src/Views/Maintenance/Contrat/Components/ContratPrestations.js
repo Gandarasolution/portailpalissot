@@ -1,5 +1,5 @@
 //#region Imports
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#region Bootstrap
@@ -41,6 +41,7 @@ import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
 import { CloseButton, Stack } from "react-bootstrap";
 
+
 //#endregion
 
 const ContratPrestation = ({
@@ -61,6 +62,7 @@ const ContratPrestation = ({
 
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
+
 
   const MockupListeTache = () => {
     let _listeTaches = [];
@@ -88,6 +90,7 @@ const ContratPrestation = ({
       });
     }
     setListeTaches(_listeTaches);
+
   };
 
   //#endregion
@@ -156,11 +159,11 @@ const ContratPrestation = ({
     switch (e) {
       case 1:
         return "Non planifiée";
-      case 2:
+      case 95:
         return "Planifiée    ";
       case 3:
         return "En cours     ";
-      case 4:
+      case 96:
         return "Terminée     ";
       case -1:
         return "Tous         ";
@@ -173,11 +176,11 @@ const ContratPrestation = ({
     switch (e) {
       case 1:
         return "bg-warning";
-      case 2:
+      case 95:
         return "bg-primary";
       case 3:
         return "bg-danger";
-      case 4:
+      case 96:
         return "bg-success";
       default:
         return "Non planifiée";
@@ -200,6 +203,11 @@ const ContratPrestation = ({
   const GetPrestationSearched = () => {
     let _lPrestation = Prestations;
 
+    for (let index = 0; index < _lPrestation.length; index++) {
+      const element = _lPrestation[index];
+      element.DateInterventionPrestation = new Date(element.DateInterventionPrestation);
+    }
+
     if (search.length > 0) {
       _lPrestation = _lPrestation.filter(
         (item) =>
@@ -208,6 +216,7 @@ const ContratPrestation = ({
           ) || item.Secteur.toUpperCase().includes(search.toUpperCase())
       );
     }
+
 
     _lPrestation = _lPrestation.sort(
       (a, b) => a.DateInterventionPrestation - b.DateInterventionPrestation
@@ -220,9 +229,9 @@ const ContratPrestation = ({
     if (!filterTous) {
       let _arrayFilterIdEtat = [];
       if (filterNP) _arrayFilterIdEtat.push(1);
-      if (filterP) _arrayFilterIdEtat.push(2);
+      if (filterP) _arrayFilterIdEtat.push(95);
       if (filterEC) _arrayFilterIdEtat.push(3);
-      if (filterT) _arrayFilterIdEtat.push(4);
+      if (filterT) _arrayFilterIdEtat.push(96);
 
       _lPrestations = _lPrestations.filter((presta) =>
         _arrayFilterIdEtat.includes(presta.IdEtat)
@@ -236,11 +245,11 @@ const ContratPrestation = ({
     switch (idEtat) {
       case 1:
         return filterNP;
-      case 2:
+      case 95:
         return filterP;
       case 3:
         return filterEC;
-      case 4:
+      case 96:
         return filterT;
       default:
         return null;
@@ -251,11 +260,11 @@ const ContratPrestation = ({
     switch (idEtat) {
       case 1:
         return setFilterNP;
-      case 2:
+      case 95:
         return setFilterP;
       case 3:
         return setFilterEC;
-      case 4:
+      case 96:
         return setFilterT;
       default:
         return null;
@@ -432,12 +441,11 @@ const ContratPrestation = ({
           <Nav fill>
             <Nav.Item>{ButtonFilter(-1)}</Nav.Item>
             <Nav.Item>{ButtonFilter(1)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(2)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(95)}</Nav.Item>
             <Nav.Item>{ButtonFilter(3)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(4)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(96)}</Nav.Item>
           </Nav>
         </Col>
-
         <Col md={5} className="m-1">
           <Search setSearch={setSearch} />
         </Col>
@@ -653,7 +661,7 @@ const ContratPrestation = ({
         <Card.Title>
           <Row>
             <Col>
-              {`${GetNomMois(presta.DateInterventionPrestation.getMonth() + 1)} 
+              {`${GetNomMois(presta.DateInterventionPrestation.getMonth())} 
             ${presta.DateInterventionPrestation.getFullYear()} `}
             </Col>
 
@@ -749,6 +757,7 @@ const ContratPrestation = ({
 
   useEffect(() => {
     setIsListeTacheAffiche(true);
+
   }, []);
 
   //#region TableData
@@ -810,7 +819,7 @@ const ContratPrestation = ({
 
       let _date = {
         text: `${GetNomMois(
-          presta.DateInterventionPrestation.getMonth()
+          presta.DateInterventionPrestation.getMonth() + 1
         )} ${presta.DateInterventionPrestation.getFullYear()} `,
         isSearchable: true,
         isH1: true,
