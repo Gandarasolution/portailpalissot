@@ -28,6 +28,7 @@ const TableData = (props) => {
   const [nbParPages, setNbParPages] = useState(10);
   const [pageActuelle, setPageActuelle] = useState(1);
 
+
   //#endregion
 
   //#region Fonctions
@@ -130,9 +131,10 @@ const TableData = (props) => {
       <div>
         {header.title}
         <OverlayTrigger
-          trigger={"click"}
+          trigger="click"
+          rootClose
           overlay={
-            <Popover className="popover-filters">
+            <Popover className="popover-filters"  >
               {_arFilters.map((item, index) => {
                 if (item[0] === "undefined") return null;
                 return (
@@ -165,7 +167,7 @@ const TableData = (props) => {
           <FontAwesomeIcon
             icon={faFilter}
             className={`icon-bt ${
-              props.isButtonShouldBeCheck(header.filter.fieldname) &&
+              (props.isButtonShouldBeCheck && props.isButtonShouldBeCheck(header.filter.fieldname)) &&
               "filter-actif"
             } `}
           />
