@@ -172,7 +172,7 @@ function ConnexionGMAO($login = "", $pass_clear="", $ws="")
     if($g_useSoapClientV2)
 	{
 		$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
-		$result = $client->__soapCall("Connexion",  array("parameters" => $request));
+		$result = $client->__soapCall("GMAOConnexion",  array("parameters" => $request));
 		if (is_object($result)) {
 			$result = json_decode(json_encode($result), true);
 		}
@@ -182,7 +182,7 @@ function ConnexionGMAO($login = "", $pass_clear="", $ws="")
 		$client = new nusoap_client($ws, true);
 		$client->soap_defencoding = 'UTF-8';
 		$client->decode_utf8 = false;
-		$result = $client->call("Users", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
+		$result = $client->call("GMAOConnexion", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
 	}
 
 	$error = $client->getError();
@@ -192,9 +192,9 @@ function ConnexionGMAO($login = "", $pass_clear="", $ws="")
 		error_log($error);
 		return $error;
 	} else {
-		if($result["ConnexionResult"])
+		if($result["GMAOConnexionResult"])
         {
-            return $result["ConnexionResult"];
+            return $result["GMAOConnexionResult"];
         }else{
             return "500";
         }
