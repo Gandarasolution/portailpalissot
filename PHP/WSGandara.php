@@ -30,7 +30,6 @@ class MSSoapClient extends SoapClient
 			$this->ws = $wsdl;
 			$this->opts = $options;
 			$this->arrFonctions = parent::__getFunctions();
-			//var_dump($this->arrFonctions);		
 		}
 		catch(Exception $e)
 		{
@@ -120,50 +119,6 @@ class MSSoapClient extends SoapClient
 		return false;
 	}
 }
-
-
-
-
-function ConnexionGMAO($login = "", $pass_clear="", $ws="")
-{
-    global $URL_API_CCS, $g_useSoapClientV2;
-    $request=array("login"=>$login,"pass_clear"=>$pass_clear);
-
-    if($g_useSoapClientV2)
-	{
-		$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
-		$result = $client->__soapCall("Connexion",  array("parameters" => $request));
-		if (is_object($result)) {
-			$result = json_decode(json_encode($result), true);
-		}
-	}
-	else
-	{
-		$client = new nusoap_client($ws, true);
-		$client->soap_defencoding = 'UTF-8';
-		$client->decode_utf8 = false;
-		$result = $client->call("Users", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
-	}
-
-	$error = $client->getError();
-
-
-    if ($error) {
-		//var_dump($_SESSION);
-		error_log($error);
-        return "ERRREUR";
-		return $error;
-	} else {
-		if($result["ConnexionResult"])
-        {
-            return $result["ConnexionResult"];
-        }else{
-            return "500";
-        }
-	}
-
-}
-
 /**
  *
  * @global string $URL_API_CCS
@@ -203,38 +158,288 @@ function ConnecteWS($user = "", $pass = "", $ws = "")
 	$error = $client->getError();
 	
 	if ($error) {
-		//var_dump($_SESSION);
 		error_log($error);
 		return $error;
 	} else {
 		return 1;
 	}
 }
+function ConnexionGMAO($login = "", $pass_clear="", $ws="")
+{
+    global $URL_API_CCS, $g_useSoapClientV2;
+    $request=array("login"=>$login,"pass_clear"=>$pass_clear);
+
+    if($g_useSoapClientV2)
+	{
+		$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+		$result = $client->__soapCall("Connexion",  array("parameters" => $request));
+		if (is_object($result)) {
+			$result = json_decode(json_encode($result), true);
+		}
+	}
+	else
+	{
+		$client = new nusoap_client($ws, true);
+		$client->soap_defencoding = 'UTF-8';
+		$client->decode_utf8 = false;
+		$result = $client->call("Users", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
+	}
+
+	$error = $client->getError();
+
+
+    if ($error) {
+		error_log($error);
+		return $error;
+	} else {
+		if($result["ConnexionResult"])
+        {
+            return $result["ConnexionResult"];
+        }else{
+            return "500";
+        }
+	}
+
+}
+
+function GetPrestationContrat($token, $dateDebut, $dateFin, $idSite, $ws)
+{
+	global $URL_API_CCS, $g_useSoapClientV2;
+	$request = array("token"=>$token, "dateDebut" => $dateDebut, "dateFin"=> $dateFin, "IdSite"=> $idSite);
+
+	if($g_useSoapClientV2)
+	{
+		$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+		$result = $client->__soapCall("GMAOGetPrestationContrat",  array("parameters" => $request));
+
+		if (is_object($result)) {
+			$result = json_decode(json_encode($result), true);
+		}
+	}
+	else
+	{
+		$client = new nusoap_client($ws, true);
+		$client->soap_defencoding = 'UTF-8';
+		$client->decode_utf8 = false;
+		$result = $client->call("GMAOGetPrestationContrat", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
+	}
+
+	$error = $client->getError();
+
+
+    if ($error) {
+		error_log($error);
+		return $error;
+	} else {
+
+		if(isset($result["GMAOGetPrestationContratResult"]["PrestationContrat"]))
+        {
+			return json_encode($result["GMAOGetPrestationContratResult"]["PrestationContrat"]);
+
+        }else{
+            return "500";
+        }
+	}
+}
+
+
+
+
+
+
+
+function GetDocumentPrestation($token, $IdDossierIntervention,$ws)
+{
+	global $URL_API_CCS, $g_useSoapClientV2;
+	$request = array("token"=>$token, "IdDossierIntervention" => $IdDossierIntervention);
+
+	if($g_useSoapClientV2)
+	{
+		$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+		$result = $client->__soapCall("GMAOGetDocumentsPrestation",  array("parameters" => $request));
+
+		if (is_object($result)) {
+			$result = json_decode(json_encode($result), true);
+		}
+	}
+	else
+	{
+		$client = new nusoap_client($ws, true);
+		$client->soap_defencoding = 'UTF-8';
+		$client->decode_utf8 = false;
+		$result = $client->call("GMAOGetDocumentsPrestation", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
+	}
+
+	$error = $client->getError();
+
+
+    if ($error) {
+		error_log($error);
+		return $error;
+	} else {
+
+		if(isset($result["GMAOGetDocumentsPrestationResult"]["KV"]))
+        {
+			return json_encode($result["GMAOGetDocumentsPrestationResult"]["KV"]);
+
+        }else{
+            return "500";
+        }
+	}
+}
+
+function File64($b64string = "", $fileName = "")
+{
+
+
+	$file = base64_decode($b64string);
+	file_put_contents($fileName,$file);
+
+	return ($fileName);
+	
+}
+
+Function VoirDocument($fileName = "")
+{
+	
+$fileN = $fileName;
+
+header('Content-type: application/pdf');
+
+header('Content-Disposition: inline; filename="' . $fileN . '"');
+  
+header('Content-Transfer-Encoding: binary');
+  
+header('Accept-Ranges: bytes');
+
+
+flush(); // this doesn't really matter.
+$fp = fopen($fileName, "r");
+while (!feof($fp))
+{
+	echo fread($fp, 65536);
+	flush(); // this is essential for large downloads
+} 
+fclose($fp); 
+unlink($fileName);
+
+}
+
+
+
+Function TelechargerDocument($fileName)
+{
+	
+	$fileN = $fileName;
+	
+	header("Content-Disposition: attachment; filename=" . urlencode($fileN));   
+	header("Content-Type: application/octet-stream");
+	header("Content-Type: application/download");
+	header("Content-type: application/pdf"); 
+	
+	header('Content-Type: application/zip');
+
+
+	header("Content-Description: File Transfer");            
+	header("Content-Length: " . filesize($fileN));
+
+
+	flush(); // this doesn't really matter.
+	$fp = fopen($fileName, "r");
+	while (!feof($fp))
+	{
+		echo fread($fp, 65536);
+		flush(); // this is essential for large downloads
+	} 
+	fclose($fp); 
+	unlink($fileName);
+
+}
+
+
+
+function DownloadZIP($arrayDocs, $fileName)
+{
+
+	$files = array();
+foreach ($arrayDocs as $value) {
+
+	$files[] = File64($value[0], $value[1]);
+
+}
+
+	$zipname = $fileName.".zip";
+	$zip = new ZipArchive;
+	$zip->open($zipname, ZipArchive::CREATE);
+	foreach ($files as $file) {
+	  $zip->addFile($file);
+	}
+	$zip->close();
+	
+	foreach ($files as $file) {
+		unlink($file);
+	}
+
+	echo($zipname);
+
+}
+
 
 
 function CallENDPOINT($url="",$endpoint="", )
 {
-    if($endpoint === "Connexion")
+
+    if($endpoint === "GMAOConnexion")
     {
-        return ConnexionGMAO($_POST['login'],$_POST['pass_clear'],$url);
+        echo(ConnexionGMAO($_POST['login'],$_POST['pass_clear'],$url));
     }
+
+	if($endpoint === "GMAOGetPrestationContrat")
+	{
+		echo(GetPrestationContrat($_POST['token'], $_POST['dateDebut'],$_POST['dateFin'],$_POST['IdSite'],$url));
+	}
+
+
+	if($endpoint === "GMAOGetDocumentsPrestation")	
+	{
+		echo(GetDocumentPrestation($_POST['token'], $_POST['IdDossierIntervention'],$url));
+	}
+
+
+	if($endpoint === "GMAOFile64")
+	{
+
+		echo(File64($_POST['b64'],$_POST['filename']));
+
+	}
+
+	if($endpoint === "GMAOSeeDocument")
+	{
+		return VoirDocument($_GET['filename']);
+	}
+
+	if($endpoint === "GMAODownloadDocument")
+	{
+		return TelechargerDocument($_GET['filename']);
+	}
+
+	if($endpoint === "GMAOZIPDocs")
+	{
+		return DownloadZIP($_POST['arrayDocs'], $_POST['filename']);
+	}
+
+
+	
+
 }
-
-// $login = "-1";
-// $pass_clear = "4ea9E9s+Bjdr4A7UtcRqUw==rr";
-// // $callToWS = ConnecteWS($login, $pass_clear,"http://webservices.gandarasolution.fr:8039/WSGandara?wsdl");
-// $callToWS = ConnexionGMAO("a@a.fr","Youforlife","http://webservices.gandarasolution.fr:8039/WSGandara?wsdl");
-
 
 
 
     $url = "http://webservices.gandarasolution.fr:8039/WSGandara?wsdl";
     $terminaison = $_GET["endpoint"];
     $callToWS = CallENDPOINT($url, $terminaison);
-    echo($callToWS);
-
-
-    
+    // echo($callToWS);
+ 
 
 
 ?>

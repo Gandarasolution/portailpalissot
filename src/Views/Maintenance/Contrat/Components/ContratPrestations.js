@@ -40,6 +40,14 @@ import ImageExtension from "../../../../components/commun/ImageExtension";
 import { loremIpsum } from "react-lorem-ipsum";
 import { Link } from "react-router-dom";
 import { CloseButton, Stack } from "react-bootstrap";
+import {
+  GetDocumentPrestation,
+  TelechargerDocument,
+  TelechargerZIP,
+  VoirDocument,
+} from "../../../../axios/WSGandara";
+import { TokenContext } from "../../../../App";
+import { useContext } from "react";
 
 //#endregion
 
@@ -49,10 +57,10 @@ const ContratPrestation = ({
   IsLoaded,
   // datePrestation,
 }) => {
-  //#region Mockup
+  //#region Data
+  const tokenCt = useContext(TokenContext);
 
-  const [listeTaches, setListeTaches] = useState([]);
-  const [isListeTacheAffiche, setIsListeTacheAffiche] = useState(true);
+
 
   function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -90,6 +98,42 @@ const ContratPrestation = ({
     setListeTaches(_listeTaches);
   };
 
+
+
+  const FetchSetDocuments = (data) => {
+    const _arrDocs = [];
+
+    const arrData = JSON.parse(data);
+
+    if (arrData.length) {
+      //eslint-disable-next-line
+      arrData.map((element) => {
+        const _obj = {};
+
+        _obj.title = element.k.split("fiche technicien\\").pop();
+        _obj.extension = element.k.split(".").pop();
+        _obj.size = GetFileSizeB64S(element.v);
+        _obj.b64s = element.v;
+
+        _arrDocs.push(_obj);
+      });
+    } else {
+      const _obj = {};
+
+      _obj.title = arrData.k.split("fiche technicien\\").pop();
+      _obj.extension = arrData.k.split(".").pop();
+      _obj.size = GetFileSizeB64S(arrData.v);
+      _obj.b64s = arrData.v;
+
+      _arrDocs.push(_obj);
+    }
+
+    setDocuments(_arrDocs);
+    setIsDocumentLoaded(true);
+  };
+
+
+
   //#endregion
 
   //#region States
@@ -114,6 +158,12 @@ const ContratPrestation = ({
   const [gridColMDValue, setGridColMDValue] = useState(12);
   const [search, setSearch] = useState("");
   const [modalLargeShow, setModalLargeShow] = useState(false);
+
+  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
+  const [documents, setDocuments] = useState([]);
+
+  const [listeTaches, setListeTaches] = useState([]);
+  const [isListeTacheAffiche, setIsListeTacheAffiche] = useState(true);
 
   //#endregion
 
@@ -156,11 +206,11 @@ const ContratPrestation = ({
     switch (e) {
       case 1:
         return "Non planifiée";
-      case 2:
+      case 95:
         return "Planifiée    ";
       case 3:
         return "En cours     ";
-      case 4:
+      case 96:
         return "Terminée     ";
       case -1:
         return "Tous         ";
@@ -173,11 +223,11 @@ const ContratPrestation = ({
     switch (e) {
       case 1:
         return "bg-warning";
-      case 2:
+      case 95:
         return "bg-primary";
       case 3:
         return "bg-danger";
-      case 4:
+      case 96:
         return "bg-success";
       default:
         return "Non planifiée";
@@ -200,6 +250,13 @@ const ContratPrestation = ({
   const GetPrestationSearched = () => {
     let _lPrestation = Prestations;
 
+    for (let index = 0; index < _lPrestation.length; index++) {
+      const element = _lPrestation[index];
+      element.DateInterventionPrestation = new Date(
+        element.DateInterventionPrestation
+      );
+    }
+
     if (search.length > 0) {
       _lPrestation = _lPrestation.filter(
         (item) =>
@@ -220,9 +277,9 @@ const ContratPrestation = ({
     if (!filterTous) {
       let _arrayFilterIdEtat = [];
       if (filterNP) _arrayFilterIdEtat.push(1);
-      if (filterP) _arrayFilterIdEtat.push(2);
+      if (filterP) _arrayFilterIdEtat.push(95);
       if (filterEC) _arrayFilterIdEtat.push(3);
-      if (filterT) _arrayFilterIdEtat.push(4);
+      if (filterT) _arrayFilterIdEtat.push(96);
 
       _lPrestations = _lPrestations.filter((presta) =>
         _arrayFilterIdEtat.includes(presta.IdEtat)
@@ -236,11 +293,11 @@ const ContratPrestation = ({
     switch (idEtat) {
       case 1:
         return filterNP;
-      case 2:
+      case 95:
         return filterP;
       case 3:
         return filterEC;
-      case 4:
+      case 96:
         return filterT;
       default:
         return null;
@@ -251,11 +308,11 @@ const ContratPrestation = ({
     switch (idEtat) {
       case 1:
         return setFilterNP;
-      case 2:
+      case 95:
         return setFilterP;
       case 3:
         return setFilterEC;
-      case 4:
+      case 96:
         return setFilterT;
       default:
         return null;
@@ -290,6 +347,30 @@ const ContratPrestation = ({
     //La table prend toute la place
     setGridColMDValue(12);
   }
+
+  const GetFileSizeB64S = (b64string) => {
+    if (!b64string || b64string.length === 0) return 0;
+
+    let characterCount = b64string.length;
+
+    return characterCount;
+  };
+  const GetZipName = () => {
+    return `Documents_P${prestaSelected.IdPrestationContrat}_${prestaSelected.DateInterventionPrestation.getMonth() + 1}_${prestaSelected.DateInterventionPrestation.getFullYear()}`
+  }
+
+const GetJsonArrayOfDocumentForZIP = () => {
+  let _arrDocs = JSON.parse(JSON.stringify(documents));
+
+  let _arrayRetour = [];
+
+      //eslint-disable-next-line
+  _arrDocs.map((doc) => {
+    let _arrayDocument = [doc.b64s, doc.title];
+    _arrayRetour.push(_arrayDocument);
+  });
+  return _arrayRetour;
+};
 
   //#endregion
 
@@ -374,7 +455,8 @@ const ContratPrestation = ({
     setModalLargeShow(_value);
   };
 
-  const handleAfficherDocuments = (presta) => {
+
+  const handleAfficherDocuments = async (presta) => {
     if (prestaSelected === presta) {
       setGridColMDValue(gridColMDValue === 12 ? 10 : 12);
       return;
@@ -382,8 +464,20 @@ const ContratPrestation = ({
 
     handleLigneClicked(presta);
 
+    if (presta.IdDossierIntervention > 0) {
+      setIsDocumentLoaded(false);
+
+      await GetDocumentPrestation(
+        tokenCt,
+        presta.IdDossierIntervention,
+        FetchSetDocuments
+      );
+    }
+
     setGridColMDValue(10);
   };
+
+ 
 
   //#endregion
 
@@ -432,12 +526,11 @@ const ContratPrestation = ({
           <Nav fill>
             <Nav.Item>{ButtonFilter(-1)}</Nav.Item>
             <Nav.Item>{ButtonFilter(1)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(2)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(95)}</Nav.Item>
             <Nav.Item>{ButtonFilter(3)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(4)}</Nav.Item>
+            <Nav.Item>{ButtonFilter(96)}</Nav.Item>
           </Nav>
         </Col>
-
         <Col md={5} className="m-1">
           <Search setSearch={setSearch} />
         </Col>
@@ -536,64 +629,57 @@ const ContratPrestation = ({
   //#region Documents
 
   const CardDocs = () => {
-    let _arrayDocs = [
-      { title: "CERFA", extension: "pdf", size: "18 MO" },
-      {
-        title: "Fiche rammonage",
-        extension: "pdf",
-        size: "12 MO",
-      },
-      {
-        title: "Photo extranet",
-        extension: "jpg",
-        size: "32 MO",
-      },
-      {
-        title: "Rapport d'intervention",
-        extension: "pdf",
-        size: "46 MO",
-      },
-    ];
 
     let _DocZIP = {
       title: "Tous les documents",
       extension: "zip",
-      size: "90 MO",
+      size: " ",
     };
+
+    const _arrayDocs = JSON.parse(JSON.stringify(documents));
+
     return (
       <Card className="mb-2">
         <Card.Header className="card-document">
-          Documents ({_arrayDocs.length})
+          Documents{" "}
+          {isDocumentLoaded ? (
+            `(${_arrayDocs.length})`
+          ) : (
+            <Placeholder animation="glow">
+              <Placeholder xs={1} />
+            </Placeholder>
+          )}
           <CloseButton
             onClick={() => {
               setGridColMDValue(12);
             }}
             className="ms-4"
           />
-          {/* <Button
-            variant="contained"
-            aria-controls={`collapse-listeDocuments`}
-            aria-expanded={openDocuments}
-            onClick={() => setOpenDocuments(!openDocuments)}
-          >
-            {openDocuments ? (
-              <FontAwesomeIcon icon={faCaretUp} />
-            ) : (
-              <FontAwesomeIcon icon={faCaretDown} />
-            )}
-          </Button> */}
+         
         </Card.Header>
-        <Card.Body>
-          {/* <Collapse in={openDocuments}> */}
-          <div id="collapse-listeDocuments">
-            {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
+        {isDocumentLoaded ? (
+          <Card.Body>
+            <div id="collapse-listeDocuments">
+              {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
 
-            {_arrayDocs.map((doc, index) => {
-              return RowDocument(doc, index);
-            })}
-          </div>
-          {/* </Collapse> */}
-        </Card.Body>
+              {_arrayDocs.map((doc, index) => {
+                return RowDocument(doc, index);
+              })}
+            </div>
+          </Card.Body>
+        ) : (
+          <Card.Body>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+          </Card.Body>
+        )}
       </Card>
     );
   };
@@ -614,19 +700,29 @@ const ContratPrestation = ({
             <span className="document-size">{`${props.size}`}</span>
             <span className="document-links">
               {props.extension.toUpperCase() !== "ZIP" && (
-                <Link to={"#"} target="_blank">
+                <Link onClick={() => VoirDocument(props.b64s, props.title)}>
                   Voir
                 </Link>
               )}
-              <Link to={"#"} target="_blank" download={`${props.title}`}>
-                Télécharger
-              </Link>
+              {props.extension.toUpperCase() === "ZIP" ? (
+                <Link onClick={() => TelechargerZIP(GetJsonArrayOfDocumentForZIP(),GetZipName())}>
+                  Télécharger
+                </Link>
+              ) : (
+                <Link
+                  onClick={() => TelechargerDocument(props.b64s, props.title)}
+                >
+                  Télécharger
+                </Link>
+              )}
             </span>
           </Row>
         </Col>
       </Row>
     );
   };
+
+
 
   //#endregion
 
@@ -653,7 +749,7 @@ const ContratPrestation = ({
         <Card.Title>
           <Row>
             <Col>
-              {`${GetNomMois(presta.DateInterventionPrestation.getMonth() + 1)} 
+              {`${GetNomMois(presta.DateInterventionPrestation.getMonth())} 
             ${presta.DateInterventionPrestation.getFullYear()} `}
             </Col>
 
@@ -749,7 +845,10 @@ const ContratPrestation = ({
 
   useEffect(() => {
     setIsListeTacheAffiche(true);
-  }, []);
+
+    // if (prestaSelected) {
+    // }
+  }, [isDocumentLoaded]);
 
   //#region TableData
 
@@ -810,7 +909,7 @@ const ContratPrestation = ({
 
       let _date = {
         text: `${GetNomMois(
-          presta.DateInterventionPrestation.getMonth()
+          presta.DateInterventionPrestation.getMonth() + 1
         )} ${presta.DateInterventionPrestation.getFullYear()} `,
         isSearchable: true,
         isH1: true,
@@ -908,8 +1007,9 @@ const ContratPrestation = ({
     return (
       prestaDateSelected !== null &&
       prestaSelected !== null &&
-      prestaSelected.id === presta.id &&
-      prestaDateSelected === presta.DateInterventionPrestation
+      prestaSelected.IdPrestationContrat === presta.IdPrestationContrat &&
+      prestaDateSelected.getTime() ===
+        presta.DateInterventionPrestation.getTime()
     );
   };
   //#endregion
