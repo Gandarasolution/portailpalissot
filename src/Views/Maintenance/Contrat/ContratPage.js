@@ -39,18 +39,20 @@ const ContratPage = () => {
     Delai: "12h",
     LibelleContrat: "Entretien annuel",
   };
-
-
-
+  
 
 
   const tokenCt = useContext(TokenContext);
 
   const FetchDataPrestation = async () => {
-    let _ddebut = `${dateDebutPeriode.getFullYear()}-${dateDebutPeriode.getMonth() + 1}-1`
-    let _dfint = `${dateFinPeriode().getFullYear()}-${dateFinPeriode().getMonth() + 1}-1`
-    await GetPrestationContrat(tokenCt,DateSOAP(dateDebutPeriode), DateSOAP(dateFinPeriode()), 6663  ,SetPrestations).then(()=> setIsLoadedPresta(true) )
+    SetPrestations([]);
+    await GetPrestationContrat(tokenCt,DateSOAP(dateDebutPeriode), DateSOAP(dateFinPeriode()), 6663  ,PrestationLoad)
   };
+
+const PrestationLoad = (data) => {
+  SetPrestations(data);
+    setIsLoadedPresta(true);
+}
 
 
   function DateSOAP(date) {
@@ -233,29 +235,19 @@ const ContratPage = () => {
     );
   };
 
-  // useEffect(()  => {
-  //   console.log("effect");
-  //   FetchDataPrestation();
-  // }, [isLoadedPresta]);
-
-
-  // useEffect(async () => {
-  //   const result = await FetchDataPrestation();
-
-  //   // setData(result.data);
-  // });
 
 
   useEffect(() => {
-  async function fetchData() {
-    // You can await here
-    
-    await FetchDataPrestation();
-  }
-  fetchData();
-  // setIsLoadedPresta(true);
+    async function makeRequest() {
+      await FetchDataPrestation();
 
-}, [isLoadedPresta]); // Or [] if effect doesn't need props or state
+    }
+    makeRequest();
+    // eslint-disable-next-line
+  }, []);
+
+
+
 
   return (
     <Container fluid className="h-100" > 
