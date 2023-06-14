@@ -1,7 +1,7 @@
 //#region Imports
 
 //#region Bootstrap
-import {   Container } from "react-bootstrap";
+import  Container  from "react-bootstrap/Container";
 
 //#endregion
 
@@ -20,6 +20,8 @@ const HomePage =  () => {
   return (
     <Container fluid>
       <WhiteShadowCard icon="yin-yang" title="Portail GMAO">
+
+
       </WhiteShadowCard>
 
     </Container>

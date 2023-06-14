@@ -22,6 +22,20 @@ const Connexion = async (login, pass, setToken) => {
   });
 };
 
+const GetClientSiteContrat = async (token, setClientSiteContrat) => {
+ 
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetClientSiteContrat",
+    data: { token: token },
+    success(data) {
+      setClientSiteContrat(JSON.parse(data));
+    },
+  });
+}
+
+
+
 const GetPrestationContrat = async (
   token,
   dateDebut,
@@ -29,6 +43,8 @@ const GetPrestationContrat = async (
   IdSite,
   setData
 ) => {
+
+
   $.ajax({
     type: "POST",
     url: urlAction + "GetPrestationContrat",
@@ -49,6 +65,29 @@ const GetPrestationContrat = async (
   });
 };
 
+
+
+const GetPrestationReleveTache = async (token, IdPrestationContrat, setData) => {
+  console.log(IdPrestationContrat)
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetListeTaches",
+
+    data: {
+      token: token,
+      IdPrestationContrat: IdPrestationContrat,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+
+
+};
 
 //#region Documents
 
@@ -114,9 +153,11 @@ const TelechargerZIP = (files, filename) => {
 
 export {
   Connexion,
+  GetClientSiteContrat,
   GetPrestationContrat,
   GetDocumentPrestation,
   VoirDocument,
   TelechargerDocument,
   TelechargerZIP,
+  GetPrestationReleveTache,
 };

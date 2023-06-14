@@ -2,39 +2,57 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import Offcanvas from "react-bootstrap/Offcanvas";
+import Dropdown from "react-bootstrap/Dropdown";
+import Tooltip from "react-bootstrap/Tooltip";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Button from "react-bootstrap/Button";
+
 import logo from "../../image/favicon.ico";
-import { useState } from "react";
 import { useContext } from "react";
-import { SiteContext } from "../../App";
-import { Button } from "react-bootstrap";
+import { ClientSiteContratContext } from "../../App";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
-const NavbarMenu = ({ setSite }) => {
-  const [show, setShow] = useState(false);
-  const [listeSite, setListeSite] = useState([]);
 
-  const handleShowOffCanvas = () => {
-    let _liste = [
-      {
-        IdSite: 2,
-        NomSite: "Madame LUCOT Marguerite",
-      },
-      {
-        IdSite: 425,
-        NomSite: "Appartements",
-      },
-    ];
+const NavbarMenu = ({handleDeconnexion}) => {
+  const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
-    setListeSite(_liste);
 
-    setShow(true);
+
+  const NavDropDownListeSite = () => {
+    return (
+      <Dropdown>
+        <Dropdown.Toggle variant=" " id="dropdown-basic">
+          {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
+        </Dropdown.Toggle>
+        <span className="mx-auto">
+          <a href="/maintenance/contrat">
+            Contrat N°{ClientSiteContratCtx.storedClientSite.IdContrat}
+          </a>{" "}
+          souscrit le{" "}
+          {new Date(
+            ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
+          ).toLocaleDateString()}
+        </span>
+        <Dropdown.Menu>
+          {ClientSiteContratCtx.storedListe.map((csc, index) => {
+            return (
+              <Dropdown.Item
+                key={index}
+                onClick={() => ClientSiteContratCtx.setClientSite(csc)}
+              >
+                {csc.NomCompletClientSite}
+              </Dropdown.Item>
+            );
+          })}
+        </Dropdown.Menu>
+      </Dropdown>
+    );
   };
 
-  const SiteCXT = useContext(SiteContext);
-
   return (
-    <Navbar bg="light" expand="lg" sticky="top">
-      <Container>
+    <span>
+      <Navbar bg="light" expand="lg" sticky="top">
         <Navbar.Brand href="/">
           <Container>
             <img
@@ -72,39 +90,25 @@ const NavbarMenu = ({ setSite }) => {
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
-          <Nav>
-            <Nav.Link onClick={() => handleShowOffCanvas()}>
-              {`S${SiteCXT.IdSite} - ${SiteCXT.NomSite}`}
-            </Nav.Link>
-            <Offcanvas
-              placement="end"
-              show={show}
-              onHide={() => setShow(false)}
-            >
-              <Offcanvas.Header closeButton>
-                <Offcanvas.Title>{`S${SiteCXT.IdSite} - ${SiteCXT.NomSite}`}</Offcanvas.Title>
-              </Offcanvas.Header>
-              <Offcanvas.Body>
-                {listeSite.length > 1 && <h6>Liste des sites :</h6>}
-                {listeSite.map((site) => {
-                  return (
-                    site.IdSite !== SiteCXT.IdSite && (
-                      <Button variant="info"
-                        onClick={() => {
-                          setSite(site);
-                        }}
-                        className="m-2"
-                        key={site.IdSite}
-                      >{`S${site.IdSite} - ${site.NomSite}`}</Button>
-                    )
-                  );
-                })}
-              </Offcanvas.Body>
-            </Offcanvas>
-          </Nav>
         </Navbar.Collapse>
-      </Container>
-    </Navbar>
+        <Nav>
+          <NavDropDownListeSite />
+
+          <Button variant=" " onClick={() => {handleDeconnexion()}}>
+            <OverlayTrigger
+              placement="bottom"
+              overlay={
+                <Tooltip placement="bottom" className="in" id="tooltip-right">
+                  Déconnexion
+                </Tooltip>
+              }
+            >
+              <FontAwesomeIcon icon={faRightFromBracket} />
+            </OverlayTrigger>
+          </Button>
+        </Nav>
+      </Navbar>
+    </span>
   );
 };
 

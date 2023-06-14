@@ -1,10 +1,10 @@
 //#region Imports
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
+import { Link } from "react-router-dom";
 
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
-// import Collapse from "react-bootstrap/Collapse";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
@@ -14,7 +14,9 @@ import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
-import Nav from "react-bootstrap/Nav";
+import CloseButton from "react-bootstrap/CloseButton";
+import Stack from "react-bootstrap/Stack";
+import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region FontAwsome
@@ -35,19 +37,17 @@ import { FiltrerParCollones } from "../../../../functions";
 import Search from "../../../../components/commun/Search";
 import TableData from "../../../../components/commun/TableData";
 import ImageExtension from "../../../../components/commun/ImageExtension";
+import { TokenContext } from "../../../../App";
 
-//#endregion
-import { loremIpsum } from "react-lorem-ipsum";
-import { Link } from "react-router-dom";
-import { CloseButton, Stack } from "react-bootstrap";
 import {
   GetDocumentPrestation,
+  GetPrestationReleveTache,
   TelechargerDocument,
   TelechargerZIP,
   VoirDocument,
 } from "../../../../axios/WSGandara";
-import { TokenContext } from "../../../../App";
-import { useContext } from "react";
+
+//#endregion
 
 //#endregion
 
@@ -55,50 +55,27 @@ const ContratPrestation = ({
   Prestations,
   ParentComponentPeriodeSelect,
   IsLoaded,
-  // datePrestation,
 }) => {
   //#region Data
   const tokenCt = useContext(TokenContext);
 
+  const FetchSetListeTache = (data) => {
+    const groups = data.reduce((groups, item) => {
+      const k = groups[item.k] || [];
+      k.push(item);
+      groups[item.k] = k;
+      return groups;
+    }, {});
 
+    const arr = [];
+    Object.keys(groups).forEach((key) =>
+      arr.push({ name: key, value: groups[key] })
+    );
 
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-
-    max = Math.floor(max);
-
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  const MockupListeTache = () => {
-    let _listeTaches = [];
-    let _limit = getRandomInt(1, 20);
-    for (let index = 0; index < _limit; index++) {
-      let _taches = [];
-      for (let indexT = 0; indexT < getRandomInt(1, 8); indexT++) {
-        _taches.push(
-          loremIpsum({
-            avgSentencesPerParagraph: 1,
-            startWithLoremIpsum: false,
-            random: "false",
-          }).join()
-        );
-      }
-
-      _listeTaches.push({
-        id: index + 1,
-        description: loremIpsum({
-          avgSentencesPerParagraph: 1,
-          startWithLoremIpsum: false,
-          random: "false",
-        }).join(),
-        taches: _taches,
-      });
-    }
-    setListeTaches(_listeTaches);
+    setListeTaches(arr);
+    setModalLargeShow(true);
+    setIsLoadingTache(false);
   };
-
-
 
   const FetchSetDocuments = (data) => {
     const _arrDocs = [];
@@ -132,15 +109,9 @@ const ContratPrestation = ({
     setIsDocumentLoaded(true);
   };
 
-
-
   //#endregion
 
   //#region States
-
-  //#region Collapses
-  // const [openDocuments, setOpenDocuments] = useState(true);
-  //#endregion
 
   //#region Filters
 
@@ -153,21 +124,31 @@ const ContratPrestation = ({
   const [arrayFilters, setArrayFilters] = useState([]);
   //#endregion
 
+  const [search, setSearch] = useState("");
+
+  const [gridColMDValue, setGridColMDValue] = useState(12);
+  const [modalLargeShow, setModalLargeShow] = useState(false);
+
   const [prestaSelected, setPrestaSelected] = useState(null);
   const [prestaDateSelected, setPrestaDateSelected] = useState(null);
-  const [gridColMDValue, setGridColMDValue] = useState(12);
-  const [search, setSearch] = useState("");
-  const [modalLargeShow, setModalLargeShow] = useState(false);
 
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   const [documents, setDocuments] = useState([]);
 
-  const [listeTaches, setListeTaches] = useState([]);
   const [isListeTacheAffiche, setIsListeTacheAffiche] = useState(true);
+  const [listeTaches, setListeTaches] = useState([]);
+  const [isLoadingTaches, setIsLoadingTache] = useState(false);
 
   //#endregion
 
   //#region Fonctions
+
+  /**
+   * retourne le nom du mois selon l'index
+   * @param {Number} num L'index du mois
+   * @param {bool} short Si le nom est abrégé ou pas
+   * @returns String le nom du mois
+   */
   function GetNomMois(num, short = false) {
     if (num > 12) {
       num = num - 12;
@@ -266,9 +247,15 @@ const ContratPrestation = ({
       );
     }
 
-    _lPrestation = _lPrestation.sort(
-      (a, b) => a.DateInterventionPrestation - b.DateInterventionPrestation
-    );
+    if (_lPrestation.length) {
+      _lPrestation = _lPrestation.sort(
+        (a, b) => a.DateInterventionPrestation - b.DateInterventionPrestation
+      );
+    } else {
+      if (!_lPrestation.IdPrestationContrat) return [];
+
+      _lPrestation = [_lPrestation];
+    }
 
     return _lPrestation;
   };
@@ -356,25 +343,29 @@ const ContratPrestation = ({
     return characterCount;
   };
   const GetZipName = () => {
-    return `Documents_P${prestaSelected.IdPrestationContrat}_${prestaSelected.DateInterventionPrestation.getMonth() + 1}_${prestaSelected.DateInterventionPrestation.getFullYear()}`
-  }
+    return `Documents_P${prestaSelected.IdPrestationContrat}_${
+      prestaSelected.DateInterventionPrestation.getMonth() + 1
+    }_${prestaSelected.DateInterventionPrestation.getFullYear()}`;
+  };
 
-const GetJsonArrayOfDocumentForZIP = () => {
-  let _arrDocs = JSON.parse(JSON.stringify(documents));
+  const GetJsonArrayOfDocumentForZIP = () => {
+    let _arrDocs = JSON.parse(JSON.stringify(documents));
 
-  let _arrayRetour = [];
+    let _arrayRetour = [];
 
-      //eslint-disable-next-line
-  _arrDocs.map((doc) => {
-    let _arrayDocument = [doc.b64s, doc.title];
-    _arrayRetour.push(_arrayDocument);
-  });
-  return _arrayRetour;
-};
+    //eslint-disable-next-line
+    _arrDocs.map((doc) => {
+      let _arrayDocument = [doc.b64s, doc.title];
+      _arrayRetour.push(_arrayDocument);
+    });
+    return _arrayRetour;
+  };
 
   //#endregion
 
   //#region Evenements
+
+  //#region Filtres
 
   const handleTousFilter = () => {
     let _valueStart = JSON.parse(JSON.stringify(filterTous));
@@ -409,6 +400,9 @@ const GetJsonArrayOfDocumentForZIP = () => {
     }
   };
 
+  //#endregion
+
+  //#region Click
   const handleRowClicked = (presta, date) => {
     if (
       prestaSelected !== null &&
@@ -416,17 +410,9 @@ const GetJsonArrayOfDocumentForZIP = () => {
       prestaDateSelected !== null &&
       prestaDateSelected === date
     ) {
-      //Même sélection (déselection)
-      // setGridColMDValue(12);
-      // setPrestaSelected(null);
-      // setPrestaMoisSelected(null);
-      // setPrestaDateSelected(null);
     } else {
-      // setGridColMDValue(10);
       setPrestaSelected(presta);
-      // setPrestaMoisSelected(mois);
       setPrestaDateSelected(date);
-      MockupListeTache();
     }
   };
 
@@ -447,14 +433,17 @@ const GetJsonArrayOfDocumentForZIP = () => {
     }
   };
 
-  const handleAfficherListeTache = () => {
-    let _value = JSON.parse(JSON.stringify(modalLargeShow));
-    _value = !_value;
+  const handleAfficherListeTache = async (presta) => {
     //Récupère les données
-    MockupListeTache();
-    setModalLargeShow(_value);
-  };
+    if (isLoadingTaches) return;
 
+    setIsLoadingTache(true);
+    await GetPrestationReleveTache(
+      tokenCt,
+      presta.IdPrestationContrat,
+      FetchSetListeTache
+    );
+  };
 
   const handleAfficherDocuments = async (presta) => {
     if (prestaSelected === presta) {
@@ -477,7 +466,7 @@ const GetJsonArrayOfDocumentForZIP = () => {
     setGridColMDValue(10);
   };
 
- 
+  //#endregion
 
   //#endregion
 
@@ -486,26 +475,20 @@ const GetJsonArrayOfDocumentForZIP = () => {
   //#region commun
 
   //#region Panel de recherche
-  const ButtonFilter = (IdEtat) => {
+  const ButtonFilter = ({ IdEtat }) => {
     if (IdEtat === -1) {
       return (
-        <Nav.Link
-          className={
-            filterTous ? "btn-filter-active border " : "btn-filter border"
-          }
+        <li
+          className={filterTous ? "li-actif" : "li-inactif"}
           onClick={() => handleTousFilter()}
         >
           {GetLibEtat(IdEtat)}
-        </Nav.Link>
+        </li>
       );
     } else {
       return (
-        <Nav.Link
-          className={
-            GetFilterState(IdEtat)
-              ? "btn-filter-active border"
-              : "btn-filter border"
-          }
+        <li
+          className={GetFilterState(IdEtat) ? "li-actif" : "li-inactif"}
           onClick={() =>
             handleEtatsFilter({
               state: GetFilterState(IdEtat),
@@ -514,7 +497,7 @@ const GetJsonArrayOfDocumentForZIP = () => {
           }
         >
           {GetLibEtat(IdEtat)}
-        </Nav.Link>
+        </li>
       );
     }
   };
@@ -522,16 +505,20 @@ const GetJsonArrayOfDocumentForZIP = () => {
   const SearchPrestation = () => {
     return (
       <Row className="mb-2">
-        <Col className="m-1">
-          <Nav fill>
-            <Nav.Item>{ButtonFilter(-1)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(1)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(95)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(3)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(96)}</Nav.Item>
-          </Nav>
+        <Col className="m-1" md={"auto"}>
+          <div className="project-sort-nav">
+            <nav>
+              <ul>
+                <ButtonFilter IdEtat={-1} />
+                <ButtonFilter IdEtat={1} />
+                <ButtonFilter IdEtat={95} />
+                <ButtonFilter IdEtat={3} />
+                <ButtonFilter IdEtat={96} />
+              </ul>
+            </nav>
+          </div>
         </Col>
-        <Col md={5} className="m-1">
+        <Col className="m-1">
           <Search setSearch={setSearch} />
         </Col>
 
@@ -552,20 +539,20 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
     let _body = (
       <div>
-        {listeTaches.map((Relevetache) => {
+        {listeTaches.map((Relevetache, index) => {
           return (
-            <span key={Relevetache.id} className="mb-2">
+            <span key={index} className="mb-2">
               <Row>
                 <Col>
-                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
+                  <FontAwesomeIcon icon={faList} /> {Relevetache.name}
                 </Col>
               </Row>
               {isListeTacheAffiche &&
-                Relevetache.taches.map((tache, index) => {
+                Relevetache.value.map((tache, indexT) => {
                   return (
-                    <Row key={index}>
+                    <Row key={indexT}>
                       <Col md={{ offset: 1 }}>
-                        <Form.Check readOnly checked={false} label={tache} />
+                        <Form.Check readOnly checked={false} label={tache.v} />
                       </Col>
                     </Row>
                   );
@@ -598,20 +585,21 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
     let _body = (
       <div>
-        {listeTaches.map((Relevetache) => {
+        {listeTaches.map((Relevetache, index) => {
           return (
-            <span key={Relevetache.id} className="mb-2">
+            <span key={index} className="mb-2">
               <Row>
                 <Col>
-                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
+                  <FontAwesomeIcon icon={faList} /> {Relevetache.name}
                 </Col>
               </Row>
+
               {isListeTacheAffiche &&
-                Relevetache.taches.map((tache, index) => {
+                Relevetache.value.map((tache, indexT) => {
                   return (
-                    <Row key={index}>
+                    <Row key={indexT}>
                       <Col md={{ offset: 1 }}>
-                        <Form.Check readOnly checked={false} label={tache} />
+                        <Form.Check readOnly checked={false} label={tache.v} />
                       </Col>
                     </Row>
                   );
@@ -629,7 +617,6 @@ const GetJsonArrayOfDocumentForZIP = () => {
   //#region Documents
 
   const CardDocs = () => {
-
     let _DocZIP = {
       title: "Tous les documents",
       extension: "zip",
@@ -655,7 +642,6 @@ const GetJsonArrayOfDocumentForZIP = () => {
             }}
             className="ms-4"
           />
-         
         </Card.Header>
         {isDocumentLoaded ? (
           <Card.Body>
@@ -705,7 +691,11 @@ const GetJsonArrayOfDocumentForZIP = () => {
                 </Link>
               )}
               {props.extension.toUpperCase() === "ZIP" ? (
-                <Link onClick={() => TelechargerZIP(GetJsonArrayOfDocumentForZIP(),GetZipName())}>
+                <Link
+                  onClick={() =>
+                    TelechargerZIP(GetJsonArrayOfDocumentForZIP(), GetZipName())
+                  }
+                >
                   Télécharger
                 </Link>
               ) : (
@@ -721,8 +711,6 @@ const GetJsonArrayOfDocumentForZIP = () => {
       </Row>
     );
   };
-
-
 
   //#endregion
 
@@ -749,8 +737,10 @@ const GetJsonArrayOfDocumentForZIP = () => {
         <Card.Title>
           <Row>
             <Col>
-              {`${GetNomMois(presta.DateInterventionPrestation.getMonth())} 
-            ${presta.DateInterventionPrestation.getFullYear()} `}
+              {`${GetNomMois(
+                new Date(presta.DateInterventionPrestation).getMonth() + 1
+              )} 
+            ${new Date(presta.DateInterventionPrestation).getFullYear()} `}
             </Col>
 
             <Col>
@@ -769,16 +759,16 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
           <Button
             className="m-2 p-2"
-            onClick={() =>
-              handleRowClicked(presta, presta.DateInterventionPrestation)
-            }
+            onClick={() => {
+              presta.IdEtat === 96 && handleAfficherDocuments(presta);
+            }}
           >
             <FontAwesomeIcon icon={faFile} /> Liste des documents
           </Button>
 
           <Button
             className="m-2 p-2"
-            onClick={() => handleAfficherListeTache()}
+            onClick={() => handleAfficherListeTache(presta)}
           >
             <FontAwesomeIcon icon={faList} /> Relevés de tâches
           </Button>
@@ -841,16 +831,26 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
   //#endregion
 
-  //#endregion
-
-  useEffect(() => {
-    setIsListeTacheAffiche(true);
-
-    // if (prestaSelected) {
-    // }
-  }, [isDocumentLoaded]);
-
   //#region TableData
+
+  const TablePrestation = () => {
+    return (
+      <TableData
+        IsLoaded={IsLoaded}
+        placeholdeNbLine={5}
+        headers={_header}
+        lData={_Data()}
+        rawData={Prestations.length ? Prestations : [Prestations]}
+        handleCheckfilterChange={handleCheckfilterChange}
+        isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+        isButtonShouldBeCheck={IsButtonShouldBeCheck}
+        isRowActive={isRowSelected}
+        search={search}
+        Pagination
+        methodPagination={resetSelection}
+      />
+    );
+  };
 
   //#region Headers
 
@@ -903,17 +903,19 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
     let _lprestations = GetListePrestationPrefiltre();
 
+    if (_lprestations.length === 0) return [];
+
     for (let index = 0; index < _lprestations.length; index++) {
       const presta = _lprestations[index];
       let _cells = [];
 
       let _date = {
         text: `${GetNomMois(
-          presta.DateInterventionPrestation.getMonth() + 1
-        )} ${presta.DateInterventionPrestation.getFullYear()} `,
+          new Date(presta.DateInterventionPrestation).getMonth() + 1
+        )} ${new Date(presta.DateInterventionPrestation).getFullYear()} `,
         isSearchable: true,
         isH1: true,
-        onClickMethod: handleLigneClicked,
+        onClickMethod: handleligneChangeDoc,
       };
       _cells.push(_date);
 
@@ -921,7 +923,7 @@ const GetJsonArrayOfDocumentForZIP = () => {
         text: presta.Secteur,
         isSearchable: true,
         isH1: false,
-        onClickMethod: handleLigneClicked,
+        onClickMethod: handleligneChangeDoc,
       };
       _cells.push(_secteur);
 
@@ -929,7 +931,7 @@ const GetJsonArrayOfDocumentForZIP = () => {
         text: presta.IdPrestationContrat,
         isSearchable: false,
         isH1: false,
-        onClickMethod: handleLigneClicked,
+        onClickMethod: handleligneChangeDoc,
       };
       _cells.push(_id);
 
@@ -957,15 +959,20 @@ const GetJsonArrayOfDocumentForZIP = () => {
         text: (
           <Stack direction="horizontal">
             <span>
-              <OverlayTrigger
-                placement="bottom"
-                overlay={<Tooltip>Relevés de tâches</Tooltip>}
-              >
-                <FontAwesomeIcon
-                  icon={faListCheck}
-                  onClick={() => handleAfficherListeTache()}
-                />
-              </OverlayTrigger>
+              {isLoadingTaches ? (
+                <Spinner size="sm" animation="border" role="status"></Spinner>
+              ) : (
+                <OverlayTrigger
+                  placement="bottom"
+                  overlay={<Tooltip>Relevés de tâches</Tooltip>}
+                >
+                  <FontAwesomeIcon
+                    icon={faListCheck}
+                    onClick={() => handleAfficherListeTache(presta)}
+                    className="bt-actif"
+                  />
+                </OverlayTrigger>
+              )}
             </span>
 
             <span className="ms-2">
@@ -975,7 +982,10 @@ const GetJsonArrayOfDocumentForZIP = () => {
               >
                 <FontAwesomeIcon
                   icon={faFileAlt}
-                  onClick={() => handleAfficherDocuments(presta)}
+                  onClick={() => {
+                    presta.IdEtat === 96 && handleAfficherDocuments(presta);
+                  }}
+                  className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
                 />
               </OverlayTrigger>
             </span>
@@ -1000,7 +1010,20 @@ const GetJsonArrayOfDocumentForZIP = () => {
   //#region Events
   const handleLigneClicked = (presta) => {
     handleRowClicked(presta, presta.DateInterventionPrestation);
-    //TODO : Liste des documents
+  };
+
+  const handleligneChangeDoc = (presta) => {
+    if (gridColMDValue === 10) {
+      if (
+        prestaSelected !== null &&
+        prestaSelected.id === presta.id &&
+        prestaDateSelected !== null &&
+        prestaDateSelected === presta.DateInterventionPrestation
+      ) {
+      } else {
+        handleAfficherDocuments(presta);
+      }
+    }
   };
 
   const isRowSelected = (presta) => {
@@ -1016,6 +1039,12 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
   //#endregion
 
+  //#endregion
+
+  useEffect(() => {
+    setIsListeTacheAffiche(true);
+  }, [isDocumentLoaded]);
+
   return (
     <BreakpointProvider>
       <Container fluid>
@@ -1023,7 +1052,13 @@ const GetJsonArrayOfDocumentForZIP = () => {
           <span className="title">Plannification </span>|
           <span className="subtitle">
             {IsLoaded ? (
-              ` ${Prestations.length} prestations`
+              ` ${
+                Prestations.length
+                  ? Prestations.length
+                  : Prestations.IdPrestationContrat
+                  ? 1
+                  : 0
+              } prestations`
             ) : (
               <Placeholder animation="glow">
                 <Placeholder xs={1} />
@@ -1031,7 +1066,7 @@ const GetJsonArrayOfDocumentForZIP = () => {
             )}
           </span>
         </Col>
-        {SearchPrestation()}
+        <SearchPrestation />
 
         <Modal
           dialogClassName="modal-90w"
@@ -1044,36 +1079,27 @@ const GetJsonArrayOfDocumentForZIP = () => {
           <Modal.Header closeButton>
             <Modal.Title> Liste des relevés de tâches </Modal.Title>
           </Modal.Header>
-          <Modal.Body>{CardListeTachesBody()}</Modal.Body>
+          <Modal.Body>
+            <CardListeTachesBody />
+          </Modal.Body>
         </Modal>
 
         <Container fluid className="container-table p-4">
           <Breakpoint large up>
             <Row>
               <Col md={gridColMDValue}>
-                <TableData
-                  IsLoaded={IsLoaded}
-                  placeholdeNbLine={5}
-                  headers={_header}
-                  lData={_Data()}
-                  rawData={Prestations}
-                  handleCheckfilterChange={handleCheckfilterChange}
-                  isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-                  isButtonShouldBeCheck={IsButtonShouldBeCheck}
-                  isRowActive={isRowSelected}
-                  search={search}
-                  Pagination
-                  methodPagination={resetSelection}
-                />
+                <TablePrestation />
               </Col>
               {gridColMDValue !== 12 && (
-                <Col md={12 - gridColMDValue}>{CardDocs()}</Col>
+                <Col md={12 - gridColMDValue}>
+                  <CardDocs />
+                </Col>
               )}
             </Row>
           </Breakpoint>
 
           <Breakpoint medium down>
-            {GridCardPrestation()}
+            <GridCardPrestation />
 
             <Modal
               dialogClassName="modal-90w"
@@ -1086,7 +1112,9 @@ const GetJsonArrayOfDocumentForZIP = () => {
               <Modal.Header closeButton>
                 <Modal.Title> Liste des documents </Modal.Title>
               </Modal.Header>
-              <Modal.Body>{CardDocs()}</Modal.Body>
+              <Modal.Body>
+                <CardDocs />
+              </Modal.Body>
             </Modal>
           </Breakpoint>
         </Container>

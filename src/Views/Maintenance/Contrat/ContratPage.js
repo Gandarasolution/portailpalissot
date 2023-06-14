@@ -1,5 +1,7 @@
 //#region Imports
-import { useEffect, useState } from "react";
+import { useEffect, useState,useContext } from "react";
+import { Breakpoint, BreakpointProvider } from "react-socks";
+
 import dateFormat from "dateformat";
 
 //#region Bootstrap
@@ -17,74 +19,43 @@ import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
 //#region Components
 import ContratPrestation from "./Components/ContratPrestations";
-// import ContratInfo from "./Components/ContratInformation";
+import { GetPrestationContrat } from "../../../axios/WSGandara";
+import { ClientSiteContratContext, TokenContext } from "../../../App";
 
 //#endregion
-import { Breakpoint, BreakpointProvider } from "react-socks";
-// import ContratInfo from "./Components/ContratInformation";
-import { GetPrestationContrat } from "../../../axios/WSGandara";
-import { TokenContext } from "../../../App";
-import { useContext } from "react";
+
 //#endregion
 
 const ContratPage = () => {
-  //#region Data
-
-  const Contrat = {
-    IdContrat: 2557,
-    DateSouscrit: "12/04/2018",
-    TypeContrat: "Classique : Du Lundi au Vendredi aux horaires de bureau",
-    Indice: "Taux fixe",
-    TypeFacturation: "A date d'anniversaire du contrat",
-    Delai: "12h",
-    LibelleContrat: "Entretien annuel",
-  };
-  
-
-
   const tokenCt = useContext(TokenContext);
-
-  const FetchDataPrestation = async () => {
-    SetPrestations([]);
-    await GetPrestationContrat(tokenCt,DateSOAP(dateDebutPeriode), DateSOAP(dateFinPeriode()), 6663  ,PrestationLoad)
-  };
-
-const PrestationLoad = (data) => {
-  SetPrestations(data);
-    setIsLoadedPresta(true);
-}
-
-
-  function DateSOAP(date) {
-    // Get year, month, and day part from the date
-    var year = date.toLocaleString("default", { year: "numeric" });
-    // var month = date.toLocaleString("default", { month: "2-digit" });
-    var month = "01"
-    var day = date.toLocaleString("default", { day: "2-digit" });
-
-    return year + "-" + month + "-" + day;
-  }
-  //#endregion
+  const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   //#region Données
 
   const _dateContrat = new Date(
-    dateFormat(new Date(Contrat.DateSouscrit), "dd/mm/yyyy")
+    // dateFormat(new Date(Contrat.DateSouscrit), "dd/mm/yyyy")
+    dateFormat(new Date(ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat), "dd/mm/yyyy")
   );
 
   const dateFinPeriode = () => {
     let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-    return new Date(_dateEndTmp.setMonth(_dateEndTmp.getMonth() + 11));
+
+    _dateEndTmp = addOneYear(_dateEndTmp);
+
+
+    var day = _dateEndTmp.getDate() - 1;
+    _dateEndTmp.setDate(day);
+
+    return new Date(_dateEndTmp);
+
   };
+
 
   //#endregion
 
   //#region States
-  // const [isLoadedContrat, setIsLoadedContrat] = useState(false);
   const [isLoadedPresta, setIsLoadedPresta] = useState(false);
-
   const [Prestations, SetPrestations] = useState([]);
-
   const [dateDebutPeriode, setDateDebutPeriode] = useState(
     GetDatePeriodeInitial()
   );
@@ -149,6 +120,31 @@ const PrestationLoad = (data) => {
     let _DateRetour = new Date(_year, _monthI, _day);
     return _DateRetour;
   }
+
+
+
+  const FetchDataPrestation = async () => {
+    SetPrestations([]);
+    await GetPrestationContrat(tokenCt,DateSOAP(dateDebutPeriode), DateSOAP(dateFinPeriode()), ClientSiteContratCtx.storedClientSite.IdClientSite  ,PrestationLoad)
+  };
+
+const PrestationLoad = (data) => {
+  SetPrestations(data);
+    setIsLoadedPresta(true);
+}
+
+
+  function DateSOAP(date) {
+    // Get year, month, and day part from the date
+    var year = date.toLocaleString("default", { year: "numeric" });
+    var month = date.toLocaleString("default", { month: "2-digit" });
+    // var month = "01"
+    var day = date.toLocaleString("default", { day: "2-digit" });
+
+
+    return year + "-" + month + "-" + day;
+  }
+
 
   //#endregion
 
@@ -239,24 +235,24 @@ const PrestationLoad = (data) => {
 
   useEffect(() => {
     async function makeRequest() {
+      setIsLoadedPresta(false);
       await FetchDataPrestation();
 
     }
     makeRequest();
     // eslint-disable-next-line
-  }, []);
+  }, [ClientSiteContratCtx.storedClientSite.IdClientSite]);
 
 
 
 
   return (
     <Container fluid className="h-100" > 
-      {/* <ContratInfo Contrat={Contrat} IsLoaded={isLoadedContrat} /> */}
 
       <ContratPrestation
         IsLoaded={isLoadedPresta}
         Prestations={Prestations}
-        datePrestation={new Date(Contrat.DateSouscrit)}
+        datePrestation={new Date(ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat)}
         ParentComponentPeriodeSelect={
           <BreakpointProvider>
             <Breakpoint large up>

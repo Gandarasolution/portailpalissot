@@ -245,9 +245,6 @@ function GetPrestationContrat($token, $dateDebut, $dateFin, $idSite, $ws)
 
 
 
-
-
-
 function GetDocumentPrestation($token, $IdDossierIntervention,$ws)
 {
 	global $URL_API_CCS, $g_useSoapClientV2;
@@ -301,27 +298,27 @@ function File64($b64string = "", $fileName = "")
 
 Function VoirDocument($fileName = "")
 {
+		
+	$fileN = $fileName;
+
+	header('Content-type: application/pdf');
+
+	header('Content-Disposition: inline; filename="' . $fileN . '"');
 	
-$fileN = $fileName;
-
-header('Content-type: application/pdf');
-
-header('Content-Disposition: inline; filename="' . $fileN . '"');
-  
-header('Content-Transfer-Encoding: binary');
-  
-header('Accept-Ranges: bytes');
+	header('Content-Transfer-Encoding: binary');
+	
+	header('Accept-Ranges: bytes');
 
 
-flush(); // this doesn't really matter.
-$fp = fopen($fileName, "r");
-while (!feof($fp))
-{
-	echo fread($fp, 65536);
-	flush(); // this is essential for large downloads
-} 
-fclose($fp); 
-unlink($fileName);
+	flush(); // this doesn't really matter.
+	$fp = fopen($fileName, "r");
+	while (!feof($fp))
+	{
+		echo fread($fp, 65536);
+		flush(); // this is essential for large downloads
+	} 
+	fclose($fp); 
+	unlink($fileName);
 
 }
 
@@ -361,27 +358,117 @@ Function TelechargerDocument($fileName)
 function DownloadZIP($arrayDocs, $fileName)
 {
 
-	$files = array();
-foreach ($arrayDocs as $value) {
+		$files = array();
+	foreach ($arrayDocs as $value) {
 
-	$files[] = File64($value[0], $value[1]);
+		$files[] = File64($value[0], $value[1]);
+
+	}
+
+		$zipname = $fileName.".zip";
+		$zip = new ZipArchive;
+		$zip->open($zipname, ZipArchive::CREATE);
+		foreach ($files as $file) {
+		$zip->addFile($file);
+		}
+		$zip->close();
+		
+		foreach ($files as $file) {
+			unlink($file);
+		}
+
+		echo($zipname);
 
 }
 
-	$zipname = $fileName.".zip";
-	$zip = new ZipArchive;
-	$zip->open($zipname, ZipArchive::CREATE);
-	foreach ($files as $file) {
-	  $zip->addFile($file);
+
+
+
+
+
+function GetClientSiteContrat($token,$ws)
+{
+	global $URL_API_CCS, $g_useSoapClientV2;
+	$request = array("token"=>$token);
+
+	if($g_useSoapClientV2)
+	{
+		$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+		$result = $client->__soapCall("GMAOGetClientSiteContrat",  array("parameters" => $request));
+
+		if (is_object($result)) {
+			$result = json_decode(json_encode($result), true);
+		}
 	}
-	$zip->close();
-	
-	foreach ($files as $file) {
-		unlink($file);
+	else
+	{
+		$client = new nusoap_client($ws, true);
+		$client->soap_defencoding = 'UTF-8';
+		$client->decode_utf8 = false;
+		$result = $client->call("GMAOGetClientSiteContrat", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
 	}
 
-	echo($zipname);
+	$error = $client->getError();
 
+
+    if ($error) {
+		error_log($error);
+		return $error;
+	} else {
+
+		if(isset($result["GMAOGetClientSiteContratResult"]["ClientSiteContrat"]))
+        {
+			return json_encode($result["GMAOGetClientSiteContratResult"]["ClientSiteContrat"]);
+
+        }else{
+            return "500";
+        }
+	}
+}
+
+
+
+
+
+
+function GetListeTaches($token,$IdPrestationContrat,$ws)
+{
+	global $URL_API_CCS, $g_useSoapClientV2;
+	$request = array("token"=>$token,"IdPrestationContrat" => $IdPrestationContrat);
+
+	if($g_useSoapClientV2)
+	{
+		$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+		$result = $client->__soapCall("GMAOGetListeTaches",  array("parameters" => $request));
+
+		if (is_object($result)) {
+			$result = json_decode(json_encode($result), true);
+		}
+	}
+	else
+	{
+		$client = new nusoap_client($ws, true);
+		$client->soap_defencoding = 'UTF-8';
+		$client->decode_utf8 = false;
+		$result = $client->call("GMAOGetListeTaches", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
+	}
+
+	$error = $client->getError();
+
+
+    if ($error) {
+		error_log($error);
+		return $error;
+	} else {
+
+		if(isset($result["GMAOGetListeTachesResult"]["KV"]))
+        {
+			return json_encode($result["GMAOGetListeTachesResult"]["KV"]);
+
+        }else{
+            return "500";
+        }
+	}
 }
 
 
@@ -393,6 +480,13 @@ function CallENDPOINT($url="",$endpoint="", )
     {
         echo(ConnexionGMAO($_POST['login'],$_POST['pass_clear'],$url));
     }
+
+
+	if($endpoint === "GMAOGetClientSiteContrat")
+    {
+        echo(GetClientSiteContrat($_POST['token'],$url));
+    }
+
 
 	if($endpoint === "GMAOGetPrestationContrat")
 	{
@@ -428,8 +522,12 @@ function CallENDPOINT($url="",$endpoint="", )
 		return DownloadZIP($_POST['arrayDocs'], $_POST['filename']);
 	}
 
+	if($endpoint === "GMAOGetListeTaches")
+	{
 
-	
+		echo(GetListeTaches($_POST['token'],$_POST['IdPrestationContrat'],$url));
+	}
+		
 
 }
 

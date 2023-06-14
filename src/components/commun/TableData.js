@@ -28,7 +28,6 @@ const TableData = (props) => {
   const [nbParPages, setNbParPages] = useState(10);
   const [pageActuelle, setPageActuelle] = useState(1);
 
-
   //#endregion
 
   //#region Fonctions
@@ -92,7 +91,7 @@ const TableData = (props) => {
         <tr>
           {props.headers.map((header, index) => {
             return header.filter && props.IsLoaded ? (
-              <th key={index}  >{HeaderCellWithFilter(header)} </th>
+              <th key={index}>{HeaderCellWithFilter(header)} </th>
             ) : (
               HeaderCell(index, header)
             );
@@ -134,7 +133,7 @@ const TableData = (props) => {
           trigger="click"
           rootClose
           overlay={
-            <Popover className="popover-filters"  >
+            <Popover className="popover-filters">
               {_arFilters.map((item, index) => {
                 if (item[0] === "undefined") return null;
                 return (
@@ -167,7 +166,8 @@ const TableData = (props) => {
           <FontAwesomeIcon
             icon={faFilter}
             className={`icon-bt ${
-              (props.isButtonShouldBeCheck && props.isButtonShouldBeCheck(header.filter.fieldname)) &&
+              props.isButtonShouldBeCheck &&
+              props.isButtonShouldBeCheck(header.filter.fieldname) &&
               "filter-actif"
             } `}
           />
@@ -180,6 +180,14 @@ const TableData = (props) => {
 
   //#region Body
   const TableBody = () => {
+    if (props.lData.length === 0) {
+      return (
+        <tr>
+          <td colSpan={props.headers.length} >Aucune prestation</td>
+        </tr>
+      );
+    }
+
     let nombreAffiche = nbParPages * -1 * (pageActuelle - 1);
     return props.lData.map((arr, index) => {
       if (nombreAffiche >= nbParPages || nombreAffiche < 0) {
@@ -213,13 +221,21 @@ const TableData = (props) => {
 
     if (item.onClickMethod) {
       return (
-        <td key={index} onClick={() => item.onClickMethod(data)} style={item.fixedWidth && {width: item.fixedWidth}}  >
+        <td
+          key={index}
+          onClick={() => item.onClickMethod(data)}
+          style={item.fixedWidth && { width: item.fixedWidth }}
+        >
           {_cellText}
         </td>
       );
     }
 
-    return <td key={index} style={item.fixedWidth && {width: item.fixedWidth}} >{_cellText}</td>;
+    return (
+      <td key={index} style={item.fixedWidth && { width: item.fixedWidth }}>
+        {_cellText}
+      </td>
+    );
   };
 
   //#endregion
