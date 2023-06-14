@@ -66,19 +66,19 @@ const LoginPage = (props) => {
 
     const getToken = async (response) => {
       if (isNaN(response)) {
-        const GetListeClientSiteContrat = (data) => {
-
+        const FetchSetListeClientSiteContrat = (data) => {
           ListeClientSiteContratCtx.setListe(data);
           ListeClientSiteContratCtx.setClientSite(data[0]);
         }
 
-      
-        GetListeClientSiteContrat([{IdClientSiteRelation:1391,IdClientSite: 1391, IdContrat: 1366, NomCompletClientSite:"Société John DEERE" ,DateSouscriptionContrat : new Date(2008,0,1) }
-      ,{IdClientSiteRelation:6640,IdClientSite: 6663, IdContrat: 1851, NomCompletClientSite:"JOHN DEERE- Brûleurs PROCESS",DateSouscriptionContrat : new Date(2008,0,1)}
-      
-      ])
 
-        // await GetClientSiteContrat(response,GetListeClientSiteContrat);
+      //   GetListeClientSiteContrat([{IdClientSiteRelation:1391,IdClientSite: 1391, IdContrat: 1366, NomCompletClientSite:"Société John DEERE" ,DateSouscriptionContrat : new Date(2008,0,1) }
+      // ,{IdClientSiteRelation:6640,IdClientSite: 6663, IdContrat: 1851, NomCompletClientSite:"JOHN DEERE- Brûleurs PROCESS",DateSouscriptionContrat : new Date(2008,0,1)}
+      
+      // ])
+
+
+        await GetClientSiteContrat(response,FetchSetListeClientSiteContrat);
 
         props.setToken(response);
 
@@ -86,8 +86,6 @@ const LoginPage = (props) => {
         setIdError(response);
       }
 
-
-       
 
       setIsLoading(false);
     };
@@ -221,8 +219,6 @@ const LoginPage = (props) => {
   const FormSubmit = () => {
     return (
       <Form className="m-4 p-2">
-        {/* <Form className="m-4 p-2" onSubmit={() => handleSubmit()}> */}
-        {/* <Form className="m-4"  onSubmit={()=> console.log(password)} > */}
         <Form.Group className="mb-3" controlId="formLogin">
           <Form.Label>Identifiant</Form.Label>
 
@@ -257,7 +253,7 @@ const LoginPage = (props) => {
             <span className="visually-hidden">Loading...</span>
           </Spinner>)
           }
-          {AlertErrorConnexion()}
+          <AlertErrorConnexion/>
 
           <div className=" d-flex justify-content-end m-2">
             <NavLink
@@ -270,7 +266,6 @@ const LoginPage = (props) => {
         </Form.Group>
 
         <Button variant="primary" onClick={() => handleSubmit()}>
-          {/* <Button variant="primary" onClick={() => setIdError(401)} > */}
           Connexion
         </Button>
       </Form>

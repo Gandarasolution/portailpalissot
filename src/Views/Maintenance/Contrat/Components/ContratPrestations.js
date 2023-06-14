@@ -72,8 +72,6 @@ const ContratPrestation = ({
       arr.push({ name: key, value: groups[key] })
     );
 
-    // console.log(arr[0].value);
-
     setListeTaches(arr);
     setModalLargeShow(true);
     setIsLoadingTache(false);
@@ -249,9 +247,15 @@ const ContratPrestation = ({
       );
     }
 
-    _lPrestation = _lPrestation.sort(
-      (a, b) => a.DateInterventionPrestation - b.DateInterventionPrestation
-    );
+    if (_lPrestation.length) {
+      _lPrestation = _lPrestation.sort(
+        (a, b) => a.DateInterventionPrestation - b.DateInterventionPrestation
+      );
+    } else {
+      if (!_lPrestation.IdPrestationContrat) return [];
+
+      _lPrestation = [_lPrestation];
+    }
 
     return _lPrestation;
   };
@@ -471,30 +475,29 @@ const ContratPrestation = ({
   //#region commun
 
   //#region Panel de recherche
-  const ButtonFilter = ({IdEtat}) => {
+  const ButtonFilter = ({ IdEtat }) => {
     if (IdEtat === -1) {
       return (
         <li
-        className={filterTous ? "li-actif":"li-inactif"}
-        onClick={() => handleTousFilter()}
-          >
+          className={filterTous ? "li-actif" : "li-inactif"}
+          onClick={() => handleTousFilter()}
+        >
           {GetLibEtat(IdEtat)}
         </li>
       );
     } else {
       return (
-        <li className={ GetFilterState(IdEtat) ? "li-actif" : "li-inactif"}
-            onClick={() =>
-              handleEtatsFilter({
-                state: GetFilterState(IdEtat),
-                setState: GetFilterSetState(IdEtat),
-              })
-            }
-          >
-            {GetLibEtat(IdEtat)}
+        <li
+          className={GetFilterState(IdEtat) ? "li-actif" : "li-inactif"}
+          onClick={() =>
+            handleEtatsFilter({
+              state: GetFilterState(IdEtat),
+              setState: GetFilterSetState(IdEtat),
+            })
+          }
+        >
+          {GetLibEtat(IdEtat)}
         </li>
-
-      
       );
     }
   };
@@ -511,13 +514,11 @@ const ContratPrestation = ({
                 <ButtonFilter IdEtat={95} />
                 <ButtonFilter IdEtat={3} />
                 <ButtonFilter IdEtat={96} />
-             
               </ul>
             </nav>
           </div>
-         
         </Col>
-        <Col md={5} className="m-1">
+        <Col className="m-1">
           <Search setSearch={setSearch} />
         </Col>
 
@@ -736,8 +737,10 @@ const ContratPrestation = ({
         <Card.Title>
           <Row>
             <Col>
-              {`${GetNomMois(presta.DateInterventionPrestation.getMonth() + 1)} 
-            ${presta.DateInterventionPrestation.getFullYear()} `}
+              {`${GetNomMois(
+                new Date(presta.DateInterventionPrestation).getMonth() + 1
+              )} 
+            ${new Date(presta.DateInterventionPrestation).getFullYear()} `}
             </Col>
 
             <Col>
@@ -837,7 +840,7 @@ const ContratPrestation = ({
         placeholdeNbLine={5}
         headers={_header}
         lData={_Data()}
-        rawData={Prestations}
+        rawData={Prestations.length ? Prestations : [Prestations]}
         handleCheckfilterChange={handleCheckfilterChange}
         isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
         isButtonShouldBeCheck={IsButtonShouldBeCheck}
@@ -900,14 +903,16 @@ const ContratPrestation = ({
 
     let _lprestations = GetListePrestationPrefiltre();
 
+    if (_lprestations.length === 0) return [];
+
     for (let index = 0; index < _lprestations.length; index++) {
       const presta = _lprestations[index];
       let _cells = [];
 
       let _date = {
         text: `${GetNomMois(
-          presta.DateInterventionPrestation.getMonth() + 1
-        )} ${presta.DateInterventionPrestation.getFullYear()} `,
+          new Date(presta.DateInterventionPrestation).getMonth() + 1
+        )} ${new Date(presta.DateInterventionPrestation).getFullYear()} `,
         isSearchable: true,
         isH1: true,
         onClickMethod: handleligneChangeDoc,
@@ -1047,7 +1052,13 @@ const ContratPrestation = ({
           <span className="title">Plannification </span>|
           <span className="subtitle">
             {IsLoaded ? (
-              ` ${Prestations.length} prestations`
+              ` ${
+                Prestations.length
+                  ? Prestations.length
+                  : Prestations.IdPrestationContrat
+                  ? 1
+                  : 0
+              } prestations`
             ) : (
               <Placeholder animation="glow">
                 <Placeholder xs={1} />
@@ -1102,7 +1113,6 @@ const ContratPrestation = ({
                 <Modal.Title> Liste des documents </Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                {" "}
                 <CardDocs />
               </Modal.Body>
             </Modal>

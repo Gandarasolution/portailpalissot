@@ -4,8 +4,8 @@ import $ from "jquery";
 //#endregion
 
 //#region Données
-//  const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+ const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
@@ -29,7 +29,7 @@ const GetClientSiteContrat = async (token, setClientSiteContrat) => {
     url: urlAction + "GetClientSiteContrat",
     data: { token: token },
     success(data) {
-      setClientSiteContrat(data);
+      setClientSiteContrat(JSON.parse(data));
     },
   });
 }
@@ -68,6 +68,7 @@ const GetPrestationContrat = async (
 
 
 const GetPrestationReleveTache = async (token, IdPrestationContrat, setData) => {
+  console.log(IdPrestationContrat)
   $.ajax({
     type: "POST",
     url: urlAction + "GetListeTaches",
