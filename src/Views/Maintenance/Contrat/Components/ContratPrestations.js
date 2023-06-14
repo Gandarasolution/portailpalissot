@@ -1,5 +1,5 @@
 //#region Imports
-import { useEffect, useState,useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import { Link } from "react-router-dom";
 
@@ -14,9 +14,9 @@ import Form from "react-bootstrap/Form";
 import Placeholder from "react-bootstrap/Placeholder";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
-import Nav from "react-bootstrap/Nav";
 import CloseButton from "react-bootstrap/CloseButton";
 import Stack from "react-bootstrap/Stack";
+import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region FontAwsome
@@ -46,6 +46,7 @@ import {
   TelechargerZIP,
   VoirDocument,
 } from "../../../../axios/WSGandara";
+
 //#endregion
 
 //#endregion
@@ -57,8 +58,6 @@ const ContratPrestation = ({
 }) => {
   //#region Data
   const tokenCt = useContext(TokenContext);
-
-
 
   const FetchSetListeTache = (data) => {
     const groups = data.reduce((groups, item) => {
@@ -77,6 +76,7 @@ const ContratPrestation = ({
 
     setListeTaches(arr);
     setModalLargeShow(true);
+    setIsLoadingTache(false);
   };
 
   const FetchSetDocuments = (data) => {
@@ -115,10 +115,6 @@ const ContratPrestation = ({
 
   //#region States
 
-  //#region Collapses
-  // const [openDocuments, setOpenDocuments] = useState(true);
-  //#endregion
-
   //#region Filters
 
   const [filterTous, setFilterTous] = useState(true);
@@ -130,21 +126,31 @@ const ContratPrestation = ({
   const [arrayFilters, setArrayFilters] = useState([]);
   //#endregion
 
+  const [search, setSearch] = useState("");
+
+  const [gridColMDValue, setGridColMDValue] = useState(12);
+  const [modalLargeShow, setModalLargeShow] = useState(false);
+
   const [prestaSelected, setPrestaSelected] = useState(null);
   const [prestaDateSelected, setPrestaDateSelected] = useState(null);
-  const [gridColMDValue, setGridColMDValue] = useState(12);
-  const [search, setSearch] = useState("");
-  const [modalLargeShow, setModalLargeShow] = useState(false);
 
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   const [documents, setDocuments] = useState([]);
 
-  const [listeTaches, setListeTaches] = useState([]);
   const [isListeTacheAffiche, setIsListeTacheAffiche] = useState(true);
+  const [listeTaches, setListeTaches] = useState([]);
+  const [isLoadingTaches, setIsLoadingTache] = useState(false);
 
   //#endregion
 
   //#region Fonctions
+
+  /**
+   * retourne le nom du mois selon l'index
+   * @param {Number} num L'index du mois
+   * @param {bool} short Si le nom est abrégé ou pas
+   * @returns String le nom du mois
+   */
   function GetNomMois(num, short = false) {
     if (num > 12) {
       num = num - 12;
@@ -355,6 +361,8 @@ const ContratPrestation = ({
 
   //#region Evenements
 
+  //#region Filtres
+
   const handleTousFilter = () => {
     let _valueStart = JSON.parse(JSON.stringify(filterTous));
 
@@ -388,6 +396,9 @@ const ContratPrestation = ({
     }
   };
 
+  //#endregion
+
+  //#region Click
   const handleRowClicked = (presta, date) => {
     if (
       prestaSelected !== null &&
@@ -420,7 +431,9 @@ const ContratPrestation = ({
 
   const handleAfficherListeTache = async (presta) => {
     //Récupère les données
+    if (isLoadingTaches) return;
 
+    setIsLoadingTache(true);
     await GetPrestationReleveTache(
       tokenCt,
       presta.IdPrestationContrat,
@@ -451,40 +464,37 @@ const ContratPrestation = ({
 
   //#endregion
 
+  //#endregion
+
   //#region Composants
 
   //#region commun
 
   //#region Panel de recherche
-  const ButtonFilter = (IdEtat) => {
+  const ButtonFilter = ({IdEtat}) => {
     if (IdEtat === -1) {
       return (
-        <Nav.Link
-          className={
-            filterTous ? "btn-filter-active border " : "btn-filter border"
-          }
-          onClick={() => handleTousFilter()}
-        >
+        <li
+        className={filterTous ? "li-actif":"li-inactif"}
+        onClick={() => handleTousFilter()}
+          >
           {GetLibEtat(IdEtat)}
-        </Nav.Link>
+        </li>
       );
     } else {
       return (
-        <Nav.Link
-          className={
-            GetFilterState(IdEtat)
-              ? "btn-filter-active border"
-              : "btn-filter border"
-          }
-          onClick={() =>
-            handleEtatsFilter({
-              state: GetFilterState(IdEtat),
-              setState: GetFilterSetState(IdEtat),
-            })
-          }
-        >
-          {GetLibEtat(IdEtat)}
-        </Nav.Link>
+        <li className={ GetFilterState(IdEtat) ? "li-actif" : "li-inactif"}
+            onClick={() =>
+              handleEtatsFilter({
+                state: GetFilterState(IdEtat),
+                setState: GetFilterSetState(IdEtat),
+              })
+            }
+          >
+            {GetLibEtat(IdEtat)}
+        </li>
+
+      
       );
     }
   };
@@ -492,14 +502,20 @@ const ContratPrestation = ({
   const SearchPrestation = () => {
     return (
       <Row className="mb-2">
-        <Col className="m-1">
-          <Nav fill>
-            <Nav.Item>{ButtonFilter(-1)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(1)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(95)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(3)}</Nav.Item>
-            <Nav.Item>{ButtonFilter(96)}</Nav.Item>
-          </Nav>
+        <Col className="m-1" md={"auto"}>
+          <div className="project-sort-nav">
+            <nav>
+              <ul>
+                <ButtonFilter IdEtat={-1} />
+                <ButtonFilter IdEtat={1} />
+                <ButtonFilter IdEtat={95} />
+                <ButtonFilter IdEtat={3} />
+                <ButtonFilter IdEtat={96} />
+             
+              </ul>
+            </nav>
+          </div>
+         
         </Col>
         <Col md={5} className="m-1">
           <Search setSearch={setSearch} />
@@ -522,7 +538,7 @@ const ContratPrestation = ({
 
     let _body = (
       <div>
-        {listeTaches.map((Relevetache,index) => {
+        {listeTaches.map((Relevetache, index) => {
           return (
             <span key={index} className="mb-2">
               <Row>
@@ -814,6 +830,25 @@ const ContratPrestation = ({
 
   //#region TableData
 
+  const TablePrestation = () => {
+    return (
+      <TableData
+        IsLoaded={IsLoaded}
+        placeholdeNbLine={5}
+        headers={_header}
+        lData={_Data()}
+        rawData={Prestations}
+        handleCheckfilterChange={handleCheckfilterChange}
+        isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+        isButtonShouldBeCheck={IsButtonShouldBeCheck}
+        isRowActive={isRowSelected}
+        search={search}
+        Pagination
+        methodPagination={resetSelection}
+      />
+    );
+  };
+
   //#region Headers
 
   const _methodeDate = (e) => {
@@ -919,16 +954,20 @@ const ContratPrestation = ({
         text: (
           <Stack direction="horizontal">
             <span>
-              <OverlayTrigger
-                placement="bottom"
-                overlay={<Tooltip>Relevés de tâches</Tooltip>}
-              >
-                <FontAwesomeIcon
-                  icon={faListCheck}
-                  onClick={() => handleAfficherListeTache(presta)}
-                  className="bt-actif"
-                />
-              </OverlayTrigger>
+              {isLoadingTaches ? (
+                <Spinner size="sm" animation="border" role="status"></Spinner>
+              ) : (
+                <OverlayTrigger
+                  placement="bottom"
+                  overlay={<Tooltip>Relevés de tâches</Tooltip>}
+                >
+                  <FontAwesomeIcon
+                    icon={faListCheck}
+                    onClick={() => handleAfficherListeTache(presta)}
+                    className="bt-actif"
+                  />
+                </OverlayTrigger>
+              )}
             </span>
 
             <span className="ms-2">
@@ -1016,7 +1055,7 @@ const ContratPrestation = ({
             )}
           </span>
         </Col>
-        {SearchPrestation()}
+        <SearchPrestation />
 
         <Modal
           dialogClassName="modal-90w"
@@ -1029,36 +1068,27 @@ const ContratPrestation = ({
           <Modal.Header closeButton>
             <Modal.Title> Liste des relevés de tâches </Modal.Title>
           </Modal.Header>
-          <Modal.Body>{CardListeTachesBody()}</Modal.Body>
+          <Modal.Body>
+            <CardListeTachesBody />
+          </Modal.Body>
         </Modal>
 
         <Container fluid className="container-table p-4">
           <Breakpoint large up>
             <Row>
               <Col md={gridColMDValue}>
-                <TableData
-                  IsLoaded={IsLoaded}
-                  placeholdeNbLine={5}
-                  headers={_header}
-                  lData={_Data()}
-                  rawData={Prestations}
-                  handleCheckfilterChange={handleCheckfilterChange}
-                  isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-                  isButtonShouldBeCheck={IsButtonShouldBeCheck}
-                  isRowActive={isRowSelected}
-                  search={search}
-                  Pagination
-                  methodPagination={resetSelection}
-                />
+                <TablePrestation />
               </Col>
               {gridColMDValue !== 12 && (
-                <Col md={12 - gridColMDValue}>{CardDocs()}</Col>
+                <Col md={12 - gridColMDValue}>
+                  <CardDocs />
+                </Col>
               )}
             </Row>
           </Breakpoint>
 
           <Breakpoint medium down>
-            {GridCardPrestation()}
+            <GridCardPrestation />
 
             <Modal
               dialogClassName="modal-90w"
@@ -1071,7 +1101,10 @@ const ContratPrestation = ({
               <Modal.Header closeButton>
                 <Modal.Title> Liste des documents </Modal.Title>
               </Modal.Header>
-              <Modal.Body>{CardDocs()}</Modal.Body>
+              <Modal.Body>
+                {" "}
+                <CardDocs />
+              </Modal.Body>
             </Modal>
           </Breakpoint>
         </Container>
