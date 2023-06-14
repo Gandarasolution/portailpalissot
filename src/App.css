@@ -110,6 +110,14 @@
   margin-bottom: 5px !important;
 }
 
+.bt-actif{
+  color: #01B81A  !important;
+}
+
+.bt-inactif{
+  color: var(--bs-secondary) !important;
+}
+
 .filter-actif{
   color: var(--bs-primary);
 }

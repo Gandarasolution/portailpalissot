@@ -23,29 +23,55 @@ import {
   faFolder,
 } from "@fortawesome/free-solid-svg-icons";
 
+
 import React from "react";
-import { useState } from "react";
+import { useState,createContext } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { createContext } from "react";
 
 
 //#endregion
 
 library.add(faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder);
 
+//#region Context
 export const TokenContext = createContext(null);
 export const SiteContext = createContext(null);
 
+export const ListeClientSiteContratContext = createContext(null);
+export const ClientSiteContratContext = createContext(null);
 
 
+//#endregion
 function App() {
 
-  
-
-const [site, setSite] = useState({IdSite: 2, NomSite: "Madame LUCOT Marguerite"})
 
 
 
+
+  //#region ClientSiteContrat
+
+
+
+const storedListe = JSON.parse(localStorage.getItem("listeClientSiteContrat"));
+// eslint-disable-next-line
+const [listeClientSiteContrat, setListeClientSiteContrat] = useState([]);
+const setListe = (liste)=> {
+  localStorage.setItem("listeClientSiteContrat" , JSON.stringify(liste));
+  setListeClientSiteContrat(liste);
+}
+
+const storedClientSite = JSON.parse(localStorage.getItem("clientSiteContrat"));
+// eslint-disable-next-line
+const [clientSiteContrat, setClientSiteContrat] = useState(null);
+const setClientSite = (clientSite) => {
+  localStorage.setItem("clientSiteContrat",JSON.stringify(clientSite));
+  setClientSiteContrat(clientSite);
+}
+
+  //#endregion
+
+
+  //#region Token
   const storedJwt = sessionStorage.getItem("token");
   const [jwt, setJwt] = useState(storedJwt || null);
 
@@ -56,22 +82,25 @@ const [site, setSite] = useState({IdSite: 2, NomSite: "Madame LUCOT Marguerite"}
 
   if (!jwt) {
     return (
+      <ListeClientSiteContratContext.Provider value={{storedListe, setListe, storedClientSite, setClientSite}} >
+
       <div className="App font-link background">
         <LoginPage setToken={setToken} />
       </div>
+      </ListeClientSiteContratContext.Provider>
     );
   }
 
+  //#endregion
   
   return (
     
     <TokenContext.Provider value={jwt}>
-      
+      <ClientSiteContratContext.Provider value={{storedClientSite, setClientSite, storedListe}} >
+
       <Router>
         <div className="App font-link background">
-          <SiteContext.Provider value={site}>
-            <NavbarMenu setSite={setSite} />
-          </SiteContext.Provider>
+            <NavbarMenu />
 
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -84,6 +113,8 @@ const [site, setSite] = useState({IdSite: 2, NomSite: "Madame LUCOT Marguerite"}
           </Routes>
         </div>
       </Router>
+      </ClientSiteContratContext.Provider>
+
     </TokenContext.Provider>
   );
 }

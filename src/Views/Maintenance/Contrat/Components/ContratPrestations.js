@@ -1,10 +1,10 @@
 //#region Imports
-import { useEffect, useState } from "react";
+import { useEffect, useState,useContext } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
+import { Link } from "react-router-dom";
 
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
-// import Collapse from "react-bootstrap/Collapse";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
@@ -15,6 +15,8 @@ import Placeholder from "react-bootstrap/Placeholder";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import Nav from "react-bootstrap/Nav";
+import CloseButton from "react-bootstrap/CloseButton";
+import Stack from "react-bootstrap/Stack";
 //#endregion
 
 //#region FontAwsome
@@ -35,19 +37,16 @@ import { FiltrerParCollones } from "../../../../functions";
 import Search from "../../../../components/commun/Search";
 import TableData from "../../../../components/commun/TableData";
 import ImageExtension from "../../../../components/commun/ImageExtension";
+import { TokenContext } from "../../../../App";
 
-//#endregion
-import { loremIpsum } from "react-lorem-ipsum";
-import { Link } from "react-router-dom";
-import { CloseButton, Stack } from "react-bootstrap";
 import {
   GetDocumentPrestation,
+  GetPrestationReleveTache,
   TelechargerDocument,
   TelechargerZIP,
   VoirDocument,
 } from "../../../../axios/WSGandara";
-import { TokenContext } from "../../../../App";
-import { useContext } from "react";
+//#endregion
 
 //#endregion
 
@@ -55,50 +54,30 @@ const ContratPrestation = ({
   Prestations,
   ParentComponentPeriodeSelect,
   IsLoaded,
-  // datePrestation,
 }) => {
   //#region Data
   const tokenCt = useContext(TokenContext);
 
 
 
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
+  const FetchSetListeTache = (data) => {
+    const groups = data.reduce((groups, item) => {
+      const k = groups[item.k] || [];
+      k.push(item);
+      groups[item.k] = k;
+      return groups;
+    }, {});
 
-    max = Math.floor(max);
+    const arr = [];
+    Object.keys(groups).forEach((key) =>
+      arr.push({ name: key, value: groups[key] })
+    );
 
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+    // console.log(arr[0].value);
 
-  const MockupListeTache = () => {
-    let _listeTaches = [];
-    let _limit = getRandomInt(1, 20);
-    for (let index = 0; index < _limit; index++) {
-      let _taches = [];
-      for (let indexT = 0; indexT < getRandomInt(1, 8); indexT++) {
-        _taches.push(
-          loremIpsum({
-            avgSentencesPerParagraph: 1,
-            startWithLoremIpsum: false,
-            random: "false",
-          }).join()
-        );
-      }
-
-      _listeTaches.push({
-        id: index + 1,
-        description: loremIpsum({
-          avgSentencesPerParagraph: 1,
-          startWithLoremIpsum: false,
-          random: "false",
-        }).join(),
-        taches: _taches,
-      });
-    }
-    setListeTaches(_listeTaches);
+    setListeTaches(arr);
+    setModalLargeShow(true);
   };
-
-
 
   const FetchSetDocuments = (data) => {
     const _arrDocs = [];
@@ -131,8 +110,6 @@ const ContratPrestation = ({
     setDocuments(_arrDocs);
     setIsDocumentLoaded(true);
   };
-
-
 
   //#endregion
 
@@ -356,21 +333,23 @@ const ContratPrestation = ({
     return characterCount;
   };
   const GetZipName = () => {
-    return `Documents_P${prestaSelected.IdPrestationContrat}_${prestaSelected.DateInterventionPrestation.getMonth() + 1}_${prestaSelected.DateInterventionPrestation.getFullYear()}`
-  }
+    return `Documents_P${prestaSelected.IdPrestationContrat}_${
+      prestaSelected.DateInterventionPrestation.getMonth() + 1
+    }_${prestaSelected.DateInterventionPrestation.getFullYear()}`;
+  };
 
-const GetJsonArrayOfDocumentForZIP = () => {
-  let _arrDocs = JSON.parse(JSON.stringify(documents));
+  const GetJsonArrayOfDocumentForZIP = () => {
+    let _arrDocs = JSON.parse(JSON.stringify(documents));
 
-  let _arrayRetour = [];
+    let _arrayRetour = [];
 
-      //eslint-disable-next-line
-  _arrDocs.map((doc) => {
-    let _arrayDocument = [doc.b64s, doc.title];
-    _arrayRetour.push(_arrayDocument);
-  });
-  return _arrayRetour;
-};
+    //eslint-disable-next-line
+    _arrDocs.map((doc) => {
+      let _arrayDocument = [doc.b64s, doc.title];
+      _arrayRetour.push(_arrayDocument);
+    });
+    return _arrayRetour;
+  };
 
   //#endregion
 
@@ -416,17 +395,9 @@ const GetJsonArrayOfDocumentForZIP = () => {
       prestaDateSelected !== null &&
       prestaDateSelected === date
     ) {
-      //Même sélection (déselection)
-      // setGridColMDValue(12);
-      // setPrestaSelected(null);
-      // setPrestaMoisSelected(null);
-      // setPrestaDateSelected(null);
     } else {
-      // setGridColMDValue(10);
       setPrestaSelected(presta);
-      // setPrestaMoisSelected(mois);
       setPrestaDateSelected(date);
-      MockupListeTache();
     }
   };
 
@@ -447,14 +418,15 @@ const GetJsonArrayOfDocumentForZIP = () => {
     }
   };
 
-  const handleAfficherListeTache = () => {
-    let _value = JSON.parse(JSON.stringify(modalLargeShow));
-    _value = !_value;
+  const handleAfficherListeTache = async (presta) => {
     //Récupère les données
-    MockupListeTache();
-    setModalLargeShow(_value);
-  };
 
+    await GetPrestationReleveTache(
+      tokenCt,
+      presta.IdPrestationContrat,
+      FetchSetListeTache
+    );
+  };
 
   const handleAfficherDocuments = async (presta) => {
     if (prestaSelected === presta) {
@@ -476,8 +448,6 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
     setGridColMDValue(10);
   };
-
- 
 
   //#endregion
 
@@ -552,20 +522,20 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
     let _body = (
       <div>
-        {listeTaches.map((Relevetache) => {
+        {listeTaches.map((Relevetache,index) => {
           return (
-            <span key={Relevetache.id} className="mb-2">
+            <span key={index} className="mb-2">
               <Row>
                 <Col>
-                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
+                  <FontAwesomeIcon icon={faList} /> {Relevetache.name}
                 </Col>
               </Row>
               {isListeTacheAffiche &&
-                Relevetache.taches.map((tache, index) => {
+                Relevetache.value.map((tache, indexT) => {
                   return (
-                    <Row key={index}>
+                    <Row key={indexT}>
                       <Col md={{ offset: 1 }}>
-                        <Form.Check readOnly checked={false} label={tache} />
+                        <Form.Check readOnly checked={false} label={tache.v} />
                       </Col>
                     </Row>
                   );
@@ -598,20 +568,21 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
     let _body = (
       <div>
-        {listeTaches.map((Relevetache) => {
+        {listeTaches.map((Relevetache, index) => {
           return (
-            <span key={Relevetache.id} className="mb-2">
+            <span key={index} className="mb-2">
               <Row>
                 <Col>
-                  <FontAwesomeIcon icon={faList} /> {Relevetache.description}
+                  <FontAwesomeIcon icon={faList} /> {Relevetache.name}
                 </Col>
               </Row>
+
               {isListeTacheAffiche &&
-                Relevetache.taches.map((tache, index) => {
+                Relevetache.value.map((tache, indexT) => {
                   return (
-                    <Row key={index}>
+                    <Row key={indexT}>
                       <Col md={{ offset: 1 }}>
-                        <Form.Check readOnly checked={false} label={tache} />
+                        <Form.Check readOnly checked={false} label={tache.v} />
                       </Col>
                     </Row>
                   );
@@ -629,7 +600,6 @@ const GetJsonArrayOfDocumentForZIP = () => {
   //#region Documents
 
   const CardDocs = () => {
-
     let _DocZIP = {
       title: "Tous les documents",
       extension: "zip",
@@ -655,7 +625,6 @@ const GetJsonArrayOfDocumentForZIP = () => {
             }}
             className="ms-4"
           />
-         
         </Card.Header>
         {isDocumentLoaded ? (
           <Card.Body>
@@ -705,7 +674,11 @@ const GetJsonArrayOfDocumentForZIP = () => {
                 </Link>
               )}
               {props.extension.toUpperCase() === "ZIP" ? (
-                <Link onClick={() => TelechargerZIP(GetJsonArrayOfDocumentForZIP(),GetZipName())}>
+                <Link
+                  onClick={() =>
+                    TelechargerZIP(GetJsonArrayOfDocumentForZIP(), GetZipName())
+                  }
+                >
                   Télécharger
                 </Link>
               ) : (
@@ -721,8 +694,6 @@ const GetJsonArrayOfDocumentForZIP = () => {
       </Row>
     );
   };
-
-
 
   //#endregion
 
@@ -749,7 +720,7 @@ const GetJsonArrayOfDocumentForZIP = () => {
         <Card.Title>
           <Row>
             <Col>
-              {`${GetNomMois(presta.DateInterventionPrestation.getMonth())} 
+              {`${GetNomMois(presta.DateInterventionPrestation.getMonth() + 1)} 
             ${presta.DateInterventionPrestation.getFullYear()} `}
             </Col>
 
@@ -769,16 +740,16 @@ const GetJsonArrayOfDocumentForZIP = () => {
 
           <Button
             className="m-2 p-2"
-            onClick={() =>
-              handleRowClicked(presta, presta.DateInterventionPrestation)
-            }
+            onClick={() => {
+              presta.IdEtat === 96 && handleAfficherDocuments(presta);
+            }}
           >
             <FontAwesomeIcon icon={faFile} /> Liste des documents
           </Button>
 
           <Button
             className="m-2 p-2"
-            onClick={() => handleAfficherListeTache()}
+            onClick={() => handleAfficherListeTache(presta)}
           >
             <FontAwesomeIcon icon={faList} /> Relevés de tâches
           </Button>
@@ -840,15 +811,6 @@ const GetJsonArrayOfDocumentForZIP = () => {
   };
 
   //#endregion
-
-  //#endregion
-
-  useEffect(() => {
-    setIsListeTacheAffiche(true);
-
-    // if (prestaSelected) {
-    // }
-  }, [isDocumentLoaded]);
 
   //#region TableData
 
@@ -913,7 +875,7 @@ const GetJsonArrayOfDocumentForZIP = () => {
         )} ${presta.DateInterventionPrestation.getFullYear()} `,
         isSearchable: true,
         isH1: true,
-        onClickMethod: handleLigneClicked,
+        onClickMethod: handleligneChangeDoc,
       };
       _cells.push(_date);
 
@@ -921,7 +883,7 @@ const GetJsonArrayOfDocumentForZIP = () => {
         text: presta.Secteur,
         isSearchable: true,
         isH1: false,
-        onClickMethod: handleLigneClicked,
+        onClickMethod: handleligneChangeDoc,
       };
       _cells.push(_secteur);
 
@@ -929,7 +891,7 @@ const GetJsonArrayOfDocumentForZIP = () => {
         text: presta.IdPrestationContrat,
         isSearchable: false,
         isH1: false,
-        onClickMethod: handleLigneClicked,
+        onClickMethod: handleligneChangeDoc,
       };
       _cells.push(_id);
 
@@ -963,7 +925,8 @@ const GetJsonArrayOfDocumentForZIP = () => {
               >
                 <FontAwesomeIcon
                   icon={faListCheck}
-                  onClick={() => handleAfficherListeTache()}
+                  onClick={() => handleAfficherListeTache(presta)}
+                  className="bt-actif"
                 />
               </OverlayTrigger>
             </span>
@@ -975,7 +938,10 @@ const GetJsonArrayOfDocumentForZIP = () => {
               >
                 <FontAwesomeIcon
                   icon={faFileAlt}
-                  onClick={() => handleAfficherDocuments(presta)}
+                  onClick={() => {
+                    presta.IdEtat === 96 && handleAfficherDocuments(presta);
+                  }}
+                  className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
                 />
               </OverlayTrigger>
             </span>
@@ -1000,7 +966,20 @@ const GetJsonArrayOfDocumentForZIP = () => {
   //#region Events
   const handleLigneClicked = (presta) => {
     handleRowClicked(presta, presta.DateInterventionPrestation);
-    //TODO : Liste des documents
+  };
+
+  const handleligneChangeDoc = (presta) => {
+    if (gridColMDValue === 10) {
+      if (
+        prestaSelected !== null &&
+        prestaSelected.id === presta.id &&
+        prestaDateSelected !== null &&
+        prestaDateSelected === presta.DateInterventionPrestation
+      ) {
+      } else {
+        handleAfficherDocuments(presta);
+      }
+    }
   };
 
   const isRowSelected = (presta) => {
@@ -1015,6 +994,12 @@ const GetJsonArrayOfDocumentForZIP = () => {
   //#endregion
 
   //#endregion
+
+  //#endregion
+
+  useEffect(() => {
+    setIsListeTacheAffiche(true);
+  }, [isDocumentLoaded]);
 
   return (
     <BreakpointProvider>

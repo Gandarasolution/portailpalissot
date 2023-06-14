@@ -1,5 +1,5 @@
 //#region Imports
-import { useEffect, useState } from "react";
+import { useEffect, useState,useContext } from "react";
 
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,17 +14,20 @@ import NavLink from "react-bootstrap/NavLink";
 import Row from "react-bootstrap/Row";
 import Alert from "react-bootstrap/Alert";
 import Modal from "react-bootstrap/Modal";
+import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region Components
-import { Connexion } from "../../axios/WSGandara";
-import { Spinner } from "react-bootstrap";
+import { Connexion, GetClientSiteContrat } from "../../axios/WSGandara";
+import { ListeClientSiteContratContext } from "../../App";
 
 //#endregion
 
 //#endregion
 
 const LoginPage = (props) => {
+  const ListeClientSiteContratCtx = useContext(ListeClientSiteContratContext);
+
   //#region States
 
   const [revealed, setRevealed] = useState(false);
@@ -37,6 +40,7 @@ const LoginPage = (props) => {
 
   const [idError, setIdError] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
 
 
   //#endregion
@@ -52,17 +56,44 @@ const LoginPage = (props) => {
     setRevealed(_revealed);
   };
 
+
+
+
   const handleSubmit = async () => {
+
     setIsLoading(true);
-    const getToken = (response) => {
+
+
+    const getToken = async (response) => {
       if (isNaN(response)) {
+        const GetListeClientSiteContrat = (data) => {
+
+          ListeClientSiteContratCtx.setListe(data);
+          ListeClientSiteContratCtx.setClientSite(data[0]);
+        }
+
+      
+        GetListeClientSiteContrat([{IdClientSiteRelation:1391,IdClientSite: 1391, IdContrat: 1366, NomCompletClientSite:"Société John DEERE" ,DateSouscriptionContrat : new Date(2008,0,1) }
+      ,{IdClientSiteRelation:6640,IdClientSite: 6663, IdContrat: 1851, NomCompletClientSite:"JOHN DEERE- Brûleurs PROCESS",DateSouscriptionContrat : new Date(2008,0,1)}
+      
+      ])
+
+        // await GetClientSiteContrat(response,GetListeClientSiteContrat);
+
         props.setToken(response);
+
       } else {
         setIdError(response);
       }
+
+
+       
+
       setIsLoading(false);
     };
     await Connexion(login, password, getToken);
+
+
   };
 
 
