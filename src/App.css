@@ -175,6 +175,12 @@ margin: 0px auto;
   cursor: pointer;
 }
 
+.li-actif:hover{
+  color: cornflowerblue !important;
+  cursor: pointer;
+}
+
+
 
 
 .img-bt-filter {
