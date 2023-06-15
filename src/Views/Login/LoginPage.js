@@ -66,21 +66,17 @@ const LoginPage = (props) => {
 
     const getToken = async (response) => {
       if (isNaN(response)) {
+
         const FetchSetListeClientSiteContrat = (data) => {
           ListeClientSiteContratCtx.setListe(data);
           ListeClientSiteContratCtx.setClientSite(data[0]);
+        props.setToken(response);
+
         }
-
-
-      //   GetListeClientSiteContrat([{IdClientSiteRelation:1391,IdClientSite: 1391, IdContrat: 1366, NomCompletClientSite:"Société John DEERE" ,DateSouscriptionContrat : new Date(2008,0,1) }
-      // ,{IdClientSiteRelation:6640,IdClientSite: 6663, IdContrat: 1851, NomCompletClientSite:"JOHN DEERE- Brûleurs PROCESS",DateSouscriptionContrat : new Date(2008,0,1)}
-      
-      // ])
-
 
         await GetClientSiteContrat(response,FetchSetListeClientSiteContrat);
 
-        props.setToken(response);
+        // props.setToken(response);
 
       } else {
         setIdError(response);

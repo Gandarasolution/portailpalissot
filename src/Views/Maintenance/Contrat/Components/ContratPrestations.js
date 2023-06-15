@@ -504,7 +504,8 @@ const ContratPrestation = ({
 
   const SearchPrestation = () => {
     return (
-      <Row className="mb-2">
+
+      <Row  className="mb-2">
         <Col className="m-1" md={"auto"}>
           <div className="project-sort-nav">
             <nav>
@@ -518,21 +519,20 @@ const ContratPrestation = ({
             </nav>
           </div>
         </Col>
-        <Col className="m-1">
+        <Col md={6} className="m-1">
           <Search setSearch={setSearch} />
         </Col>
 
-        <Col className="m-1">{ParentComponentPeriodeSelect}</Col>
+        <Col md={"auto"} className="m-1">{ParentComponentPeriodeSelect}</Col>
       </Row>
+
     );
   };
 
   //#endregion
 
-  //#region pagination
 
-  //#endregion
-
+  
   //#region Liste des tâches
   const CardListeTaches = () => {
     if (listeTaches.length === 0) return null;

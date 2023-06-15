@@ -12,7 +12,6 @@ import Image from "react-bootstrap/Image";
 import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
-import Nav from "react-bootstrap/Nav";
 import Row from "react-bootstrap/Row";
 
 //#endregion
@@ -126,6 +125,14 @@ const AppareilsPage = () => {
     return false;
   }
 
+  function IsButtonShouldBeCheck(fieldname) {
+    if (
+      arrayFilters.findIndex((filter) => filter.fieldname === fieldname) > -1
+    ) {
+      return true;
+    }
+    return false;
+  }
 
   const reactStringReplace = require("react-string-replace");
   /**
@@ -201,8 +208,6 @@ const AppareilsPage = () => {
 
   //#region Evenements
 
-
-
   const handleCheckfilterChange = (checked, key, value) => {
     let _arrTemp = JSON.parse(JSON.stringify(arrayFilters));
 
@@ -230,62 +235,67 @@ const AppareilsPage = () => {
   const AppareilGrey = require("../../../image/bottleGrey.png");
   const AppareilRed = require("../../../image/bottleRed.png");
 
+
+
   const ButtonFilter = (props) => {
     return (
-      <Nav.Item>
-        <Nav.Link
+      <li
+      className={props.state ? "li-actif" : "li-inactif"}
           onClick={() => props.methodState(!props.state)}
-          variant=""
-          className={
-            props.state ? "btn-filter-active border" : "btn-filter border"
-          }
         >
           {GetImageAppareilEtat(props.IdEtat, "img-bt-filter")}
           {props.title} {isLoaded && `(${props.number})`}
-        </Nav.Link>
-      </Nav.Item>
+          </li>
     );
   };
 
   const FilterFindPanel = () => {
     return (
+    
       <Row className="mb-2">
-        <Col className="m-1">
-          <Nav fill>
-            {listeAppareils.filter((appar) => appar.IdEtat === 2).length > 0 &&
-              ButtonFilter({
-                title: "Actif",
-                methodState: SetFilterActif,
-                state: filterActif,
-                number: listeAppareils.filter((appar) => appar.IdEtat === 2)
-                  .length,
-                IdEtat: 2,
-              })}
+        <Col md={"auto"} className="m-1">
+          <div className="project-sort-nav">
+            <nav>
+              <ul>
+                {listeAppareils.filter((appar) => appar.IdEtat === 2).length >
+                  0 &&
+                  ButtonFilter({
+                    title: "Actif",
+                    methodState: SetFilterActif,
+                    state: filterActif,
+                    number: listeAppareils.filter((appar) => appar.IdEtat === 2)
+                      .length,
+                    IdEtat: 2,
+                  })}
 
-            {listeAppareils.filter((appar) => appar.IdEtat === 1).length > 0 &&
-              ButtonFilter({
-                title: "Hors contrat",
-                methodState: SetFilterHorscontrat,
-                state: filterHorscontrat,
-                number: listeAppareils.filter((appar) => appar.IdEtat === 1)
-                  .length,
-                IdEtat: 1,
-              })}
+                {listeAppareils.filter((appar) => appar.IdEtat === 1).length >
+                  0 &&
+                  ButtonFilter({
+                    title: "Hors contrat",
+                    methodState: SetFilterHorscontrat,
+                    state: filterHorscontrat,
+                    number: listeAppareils.filter((appar) => appar.IdEtat === 1)
+                      .length,
+                    IdEtat: 1,
+                  })}
 
-            {listeAppareils.filter((appar) => appar.IdEtat === 3).length > 0 &&
-              ButtonFilter({
-                title: "Détruit",
-                methodState: SetFilterDetruit,
-                state: filterDetruit,
-                number: listeAppareils.filter((appar) => appar.IdEtat === 3)
-                  .length,
-                IdEtat: 3,
-              })}
-          </Nav>
+                {listeAppareils.filter((appar) => appar.IdEtat === 3).length >
+                  0 &&
+                  ButtonFilter({
+                    title: "Détruit",
+                    methodState: SetFilterDetruit,
+                    state: filterDetruit,
+                    number: listeAppareils.filter((appar) => appar.IdEtat === 3)
+                      .length,
+                    IdEtat: 3,
+                  })}
+              </ul>
+            </nav>
+          </div>
         </Col>
 
         <Col md={6} className="m-1">
-         <Search setSearch={setSearch} />
+          <Search setSearch={setSearch} />
         </Col>
       </Row>
     );
@@ -489,6 +499,26 @@ const AppareilsPage = () => {
       <BreakpointProvider>
         <Breakpoint large up>
           <Container fluid className="container-table p-4">
+
+
+
+
+          {/* <TableData
+        IsLoaded={IsLoaded}
+        placeholdeNbLine={5}
+        headers={_header}
+        lData={_Data()}
+        rawData={Prestations.length ? Prestations : [Prestations]}
+        handleCheckfilterChange={handleCheckfilterChange}
+        isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+        isButtonShouldBeCheck={IsButtonShouldBeCheck}
+        isRowActive={isRowSelected}
+        search={search}
+        Pagination
+        methodPagination={resetSelection}
+      /> */}
+
+
             <TableData
               IsLoaded={isLoaded}
               placeholdeNbLine={5}
@@ -497,6 +527,7 @@ const AppareilsPage = () => {
               rawData={listeAppareils}
               handleCheckfilterChange={handleCheckfilterChange}
               isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
+              isButtonShouldBeCheck={IsButtonShouldBeCheck}
               isRowActive={() => {
                 return false;
               }}

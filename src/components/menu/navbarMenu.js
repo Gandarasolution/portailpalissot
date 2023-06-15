@@ -2,51 +2,111 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import Dropdown from "react-bootstrap/Dropdown";
+// import Dropdown from "react-bootstrap/Dropdown";
 import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Button from "react-bootstrap/Button";
+import Offcanvas from "react-bootstrap/Offcanvas";
 
 import logo from "../../image/favicon.ico";
 import { useContext } from "react";
 import { ClientSiteContratContext } from "../../App";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
-
-const NavbarMenu = ({handleDeconnexion}) => {
+const NavbarMenu = ({ handleDeconnexion }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
+  // const NavDropDownListeSite = () => {
+  //   return (
+  //     <Dropdown>
+  //       <Dropdown.Toggle variant=" " id="dropdown-basic">
+  //         {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
+  //       </Dropdown.Toggle>
+  //       <span className="mx-auto">
+  //         <a href="/maintenance/contrat">
+  //           Contrat N°{ClientSiteContratCtx.storedClientSite.IdContrat}
+  //         </a>{" "}
+  //         souscrit le{" "}
+  //         {new Date(
+  //           ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
+  //         ).toLocaleDateString()}
+  //       </span>
+  //       <Dropdown.Menu>
+  //         {ClientSiteContratCtx.storedListe.map((csc, index) => {
+  //           return (
+  //             <Dropdown.Item
+  //               key={index}
+  //               onClick={() => ClientSiteContratCtx.setClientSite(csc)}
+  //             >
+  //               {csc.NomCompletClientSite}
+  //             </Dropdown.Item>
+  //           );
+  //         })}
+  //       </Dropdown.Menu>
+  //     </Dropdown>
+  //   );
+  // };
 
+  const [show, setShow] = useState(false);
 
-  const NavDropDownListeSite = () => {
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const OffcanvasClientSite = () => {
     return (
-      <Dropdown>
-        <Dropdown.Toggle variant=" " id="dropdown-basic">
+      <span>
+        <Button variant="" onClick={handleShow}>
           {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
-        </Dropdown.Toggle>
-        <span className="mx-auto">
-          <a href="/maintenance/contrat">
-            Contrat N°{ClientSiteContratCtx.storedClientSite.IdContrat}
-          </a>{" "}
-          souscrit le{" "}
-          {new Date(
-            ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
-          ).toLocaleDateString()}
-        </span>
-        <Dropdown.Menu>
-          {ClientSiteContratCtx.storedListe.map((csc, index) => {
-            return (
-              <Dropdown.Item
-                key={index}
-                onClick={() => ClientSiteContratCtx.setClientSite(csc)}
-              >
-                {csc.NomCompletClientSite}
-              </Dropdown.Item>
-            );
-          })}
-        </Dropdown.Menu>
-      </Dropdown>
+        </Button>
+
+        <Offcanvas show={show} onHide={handleClose} placement="end">
+          <Offcanvas.Header closeButton>
+            <Offcanvas.Title>
+              <p>
+                {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
+              </p>
+              <p>
+                <a href="/maintenance/contrat">
+                  {`Contrat N°${
+                    ClientSiteContratCtx.storedClientSite.IdContrat
+                  } souscrit le ${new Date(
+                    ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
+                  ).toLocaleDateString()}`}
+                </a>
+              </p>
+            </Offcanvas.Title>
+          </Offcanvas.Header>
+          <Offcanvas.Body>
+            <h6>Liste des sites</h6>
+            <hr />
+            {ClientSiteContratCtx.storedListe.map((csc, index) => {
+              if (
+                csc.IdClientSite ===
+                ClientSiteContratCtx.storedClientSite.IdClientSite
+              )
+                return null;
+              return (
+                <span>
+                  <Button
+                    className="bt-clientsite"
+                    key={index}
+                    onClick={() => ClientSiteContratCtx.setClientSite(csc)}
+                  >
+                    {`S${csc.IdClientSite}-${csc.NomCompletClientSite}`}
+                    <span className="ms-2">
+                      {`Contrat N°${csc.IdContrat} souscrit le ${new Date(
+                        csc.DateSouscriptionContrat
+                      ).toLocaleDateString()}`}
+                    </span>
+                  </Button>
+                </span>
+              );
+            })}
+          </Offcanvas.Body>
+        </Offcanvas>
+      </span>
     );
   };
 
@@ -92,9 +152,14 @@ const NavbarMenu = ({handleDeconnexion}) => {
           </Nav>
         </Navbar.Collapse>
         <Nav>
-          <NavDropDownListeSite />
-
-          <Button variant=" " onClick={() => {handleDeconnexion()}}>
+          {/* <NavDropDownListeSite /> */}
+          <OffcanvasClientSite />
+          <Button
+            variant=" "
+            onClick={() => {
+              handleDeconnexion();
+            }}
+          >
             <OverlayTrigger
               placement="bottom"
               overlay={

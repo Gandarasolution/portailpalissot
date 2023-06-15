@@ -19,6 +19,10 @@ const Connexion = async (login, pass, setToken) => {
     success(data) {
       setToken(data);
     },
+    error(error)
+    {
+      setToken(500);
+    }
   });
 };
 
