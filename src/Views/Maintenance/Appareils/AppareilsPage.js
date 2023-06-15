@@ -1,5 +1,5 @@
 //#region Imports
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 //#region FontAwsome icones
 
@@ -24,7 +24,8 @@ import Search from "../../../components/commun/Search";
 //#endregion
 
 //#region DEV
-import { loremIpsum } from "react-lorem-ipsum";
+import { GetListeAppareils } from "../../../axios/WSGandara";
+import { ClientSiteContratContext, TokenContext } from "../../../App";
 
 //#endregion
 
@@ -32,68 +33,14 @@ import { loremIpsum } from "react-lorem-ipsum";
 
 const AppareilsPage = () => {
 
-
+const tokenCx = useContext(TokenContext);
+const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   //#region Mockup
 
   const [listeAppareils, setListeAppareils] = useState([
-    {
-      Id: 1,
-      Secteur: loremIpsum(),
-      Libelle: loremIpsum(),
-      IdEtat: 4,
-      LibelleEtat: "Accepté",
-    },
   ]);
 
-  const MockupListeappareils = () => {
-    let _listeAppareil = [];
-    for (
-      let index = 0;
-      index < getRandomInt(getRandomInt(0, 4), getRandomInt(15, 26));
-      index++
-    ) {
-      let _idetat = getRandomInt(1, 3);
-      let _app = {
-        Id: index + 1,
-        Secteur: loremIpsum({
-          avgSentencesPerParagraph: 1,
-          startWithLoremIpsum: false,
-          random: "false",
-        }).join(),
-        Libelle: loremIpsum({
-          avgSentencesPerParagraph: 1,
-          startWithLoremIpsum: false,
-          random: "false",
-        }).join(),
-        IdEtat: _idetat,
-        LibelleEtat: GetLibEtatById(_idetat),
-      };
-      _listeAppareil.push(_app);
-    }
-    setListeAppareils(_listeAppareil);
-  };
-
-  function GetLibEtatById(idEtat) {
-    switch (idEtat) {
-      case 1:
-        return "Hors contrat";
-      case 2:
-        return "Actif";
-      case 3:
-        return "Détruit";
-      default:
-        break;
-    }
-  }
-
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-
-    max = Math.floor(max);
-
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
 
   //#endregion
 
@@ -168,13 +115,13 @@ const AppareilsPage = () => {
 
     //Filtres
     if (!filterActif)
-      _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 2);
+      _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 56);
 
     if (!filterHorscontrat)
-      _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 1);
+      _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 206);
 
     if (!filterDetruit)
-      _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 3);
+      _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 57);
 
     //Colonnes
     _listeAppareil = FiltrerParCollones(_listeAppareil,arrayFilters);
@@ -193,17 +140,30 @@ const AppareilsPage = () => {
 
   function GetBGColorAppareilEtat(IdEtat) {
     switch (IdEtat) {
-      case 1:
+      case 206:
         return "bg-secondary";
-      case 2:
+      case 56:
         return "bg-primary";
-      case 3:
+      case 57:
         return "bg-danger";
       default:
         break;
     }
   }
 
+
+  function GetLibelleEtat(IdEtat) {
+    switch (IdEtat) {
+      case 56:
+        return "Actif";   
+          case 57:
+        return "Detruit";  
+           case 206:
+        return "Hors contrat";    
+      default:
+        break;
+    }
+  }
   //#endregion
 
   //#region Evenements
@@ -257,37 +217,37 @@ const AppareilsPage = () => {
           <div className="project-sort-nav">
             <nav>
               <ul>
-                {listeAppareils.filter((appar) => appar.IdEtat === 2).length >
+                {listeAppareils.filter((appar) => appar.IdEtat === 56).length >
                   0 &&
                   ButtonFilter({
                     title: "Actif",
                     methodState: SetFilterActif,
                     state: filterActif,
-                    number: listeAppareils.filter((appar) => appar.IdEtat === 2)
+                    number: listeAppareils.filter((appar) => appar.IdEtat === 56)
                       .length,
-                    IdEtat: 2,
+                    IdEtat: 56,
                   })}
 
-                {listeAppareils.filter((appar) => appar.IdEtat === 1).length >
+                {listeAppareils.filter((appar) => appar.IdEtat === 206).length >
                   0 &&
                   ButtonFilter({
                     title: "Hors contrat",
                     methodState: SetFilterHorscontrat,
                     state: filterHorscontrat,
-                    number: listeAppareils.filter((appar) => appar.IdEtat === 1)
+                    number: listeAppareils.filter((appar) => appar.IdEtat === 206)
                       .length,
-                    IdEtat: 1,
+                    IdEtat: 206,
                   })}
 
-                {listeAppareils.filter((appar) => appar.IdEtat === 3).length >
+                {listeAppareils.filter((appar) => appar.IdEtat === 57).length >
                   0 &&
                   ButtonFilter({
                     title: "Détruit",
                     methodState: SetFilterDetruit,
                     state: filterDetruit,
-                    number: listeAppareils.filter((appar) => appar.IdEtat === 3)
+                    number: listeAppareils.filter((appar) => appar.IdEtat === 57)
                       .length,
-                    IdEtat: 3,
+                    IdEtat: 57,
                   })}
               </ul>
             </nav>
@@ -306,9 +266,9 @@ const AppareilsPage = () => {
       <Image
         className={className}
         src={
-          IdEtat === 1
+          IdEtat === 206
             ? AppareilGrey
-            : IdEtat === 2
+            : IdEtat === 56
             ? AppareilBlue
             : AppareilRed
         }
@@ -353,14 +313,14 @@ const AppareilsPage = () => {
       let _cells = [];
 
       let _secteur = {
-        text: appareil.Secteur,
+        text: appareil.RefClientAppareilSecteur,
         isSearchable: true,
         isH1: false,
       };
 
       _cells.push(_secteur);
       let _code = {
-        text: appareil.Id,
+        text: appareil.IdAppareilSecteur,
         isSearchable: false,
         isH1: false,
       };
@@ -368,7 +328,7 @@ const AppareilsPage = () => {
       _cells.push(_code);
 
       let _lib = {
-        text: appareil.Libelle,
+        text: appareil.DesignationAppareilSecteur,
         isSearchable: true,
         isH1: false,
       };
@@ -379,7 +339,7 @@ const AppareilsPage = () => {
           <span
             className={`badge badge-${GetBGColorAppareilEtat(appareil.IdEtat)}`}
           >
-            {appareil.LibelleEtat}
+            {GetLibelleEtat(appareil.IdEtat)}
           </span>
         ),
         isSearchable: true,
@@ -406,22 +366,22 @@ const AppareilsPage = () => {
     return GetAppareilsSearched().map((appareil) => {
       return (
         <Card
-          key={appareil.Id}
+          key={appareil.IdAppareilSecteur}
           className={`m-2 border border-${GetBGColorAppareilEtat(
             appareil.IdEtat
           )} `}
         >
           <Card.Body>
             <Card.Title>
-              {appareil.Id} - {HighlightTextIfSearch(appareil.Libelle)}
+              {appareil.IdAppareilSecteur} - {HighlightTextIfSearch(appareil.DesignationAppareilSecteur)}
             </Card.Title>
             <Card.Subtitle className="mb-2 text-muted">
-              Secteur : {HighlightTextIfSearch(appareil.Secteur)}
+              Secteur : {HighlightTextIfSearch(appareil.RefClientAppareilSecteur)}
             </Card.Subtitle>
             <Card.Text>
               {GetImageAppareilEtat(appareil.IdEtat)}
               <Badge pill bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
-                {appareil.LibelleEtat}
+                {GetLibelleEtat(appareil.IdEtat)}
               </Badge>
             </Card.Text>
           </Card.Body>
@@ -468,16 +428,21 @@ const AppareilsPage = () => {
 
 
 
+const FetchSetListeAppareils = (data) => {
+  setListeAppareils(data);
+  setIsLoaded(true);
+}
 
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const GetAppareils = async () => {
+
+  await GetListeAppareils(tokenCx,ClientSiteContratCtx.storedClientSite.IdClientSite,FetchSetListeAppareils)
+
+}
+
+
   useEffect(() => {
-    async function makeRequest() {
-      await delay(1000);
-
-      setIsLoaded(true);
-    }
-    makeRequest();
-    MockupListeappareils();
+    GetAppareils();
     // eslint-disable-next-line
   }, [isLoaded]);
 
@@ -503,20 +468,6 @@ const AppareilsPage = () => {
 
 
 
-          {/* <TableData
-        IsLoaded={IsLoaded}
-        placeholdeNbLine={5}
-        headers={_header}
-        lData={_Data()}
-        rawData={Prestations.length ? Prestations : [Prestations]}
-        handleCheckfilterChange={handleCheckfilterChange}
-        isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-        isButtonShouldBeCheck={IsButtonShouldBeCheck}
-        isRowActive={isRowSelected}
-        search={search}
-        Pagination
-        methodPagination={resetSelection}
-      /> */}
 
 
             <TableData

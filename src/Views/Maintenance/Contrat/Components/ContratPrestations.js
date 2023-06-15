@@ -33,7 +33,7 @@ import {
 //#endregion
 
 //#region Components
-import { FiltrerParCollones } from "../../../../functions";
+import { FiltrerParCollones, GetFileSizeFromB64String } from "../../../../functions";
 import Search from "../../../../components/commun/Search";
 import TableData from "../../../../components/commun/TableData";
 import ImageExtension from "../../../../components/commun/ImageExtension";
@@ -87,9 +87,16 @@ const ContratPrestation = ({
       arrData.map((element) => {
         const _obj = {};
 
-        _obj.title = element.k.split("fiche technicien\\").pop();
-        _obj.extension = element.k.split(".").pop();
-        _obj.size = GetFileSizeB64S(element.v);
+        if(element.k.includes("Rapport"))
+        {
+          _obj.title = `${element.k}.pdf`
+          _obj.extension = "pdf"
+        }else {
+
+          _obj.title = element.k.split("fiche technicien\\").pop();
+          _obj.extension = element.k.split(".").pop();
+        }
+        _obj.size = GetFileSizeFromB64String(element.v);
         _obj.b64s = element.v;
 
         _arrDocs.push(_obj);
@@ -97,9 +104,15 @@ const ContratPrestation = ({
     } else {
       const _obj = {};
 
+      if(arrData.k.includes("Rapport"))
+      {
+        _obj.title = `${arrData.k}.pdf`
+        _obj.extension = "pdf"
+      }else {
       _obj.title = arrData.k.split("fiche technicien\\").pop();
       _obj.extension = arrData.k.split(".").pop();
-      _obj.size = GetFileSizeB64S(arrData.v);
+      }
+      _obj.size = GetFileSizeFromB64String(arrData.v);
       _obj.b64s = arrData.v;
 
       _arrDocs.push(_obj);
@@ -335,13 +348,6 @@ const ContratPrestation = ({
     setGridColMDValue(12);
   }
 
-  const GetFileSizeB64S = (b64string) => {
-    if (!b64string || b64string.length === 0) return 0;
-
-    let characterCount = b64string.length;
-
-    return characterCount;
-  };
   const GetZipName = () => {
     return `Documents_P${prestaSelected.IdPrestationContrat}_${
       prestaSelected.DateInterventionPrestation.getMonth() + 1
@@ -404,13 +410,15 @@ const ContratPrestation = ({
 
   //#region Click
   const handleRowClicked = (presta, date) => {
+   
     if (
       prestaSelected !== null &&
       prestaSelected.id === presta.id &&
       prestaDateSelected !== null &&
-      prestaDateSelected === date
-    ) {
-    } else {
+      prestaDateSelected.getTime() === date.getTime()
+      ) {
+      } else {
+
       setPrestaSelected(presta);
       setPrestaDateSelected(date);
     }
@@ -678,11 +686,7 @@ const ContratPrestation = ({
         </Col>
         <Col md={9}>
           <Row>
-            <p className="mb-0 document-title">{`${props.title}${
-              props.extension.toUpperCase() === "ZIP"
-                ? ""
-                : `.${props.extension}`
-            }`}</p>
+                  <p className="mb-0 document-title">{`${props.title}`}</p>
             <span className="document-size">{`${props.size}`}</span>
             <span className="document-links">
               {props.extension.toUpperCase() !== "ZIP" && (
@@ -939,7 +943,7 @@ const ContratPrestation = ({
         text: presta.DescriptionPrestationContrat,
         isSearchable: true,
         isH1: true,
-        onClickMethod: handleLigneClicked,
+        onClickMethod: handleligneChangeDoc,
       };
       _cells.push(_libelle);
 
@@ -951,7 +955,7 @@ const ContratPrestation = ({
         ),
         isSearchable: false,
         isH1: false,
-        onClickMethod: handleLigneClicked,
+        onClickMethod: handleligneChangeDoc,
       };
       _cells.push(_etat);
 

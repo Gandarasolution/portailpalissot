@@ -4,8 +4,8 @@ import $ from "jquery";
 //#endregion
 
 //#region Données
- const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+//  const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
@@ -72,7 +72,6 @@ const GetPrestationContrat = async (
 
 
 const GetPrestationReleveTache = async (token, IdPrestationContrat, setData) => {
-  console.log(IdPrestationContrat)
   $.ajax({
     type: "POST",
     url: urlAction + "GetListeTaches",
@@ -117,7 +116,6 @@ const VoirDocument = (b64, filename) => {
     data: { b64: b64, filename: filename },
     success(data) {
       const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
-
       window.open(urlToOpen, "_blank");
     },
   });
@@ -152,6 +150,27 @@ const TelechargerZIP = (files, filename) => {
 
 
 
+const GetListeAppareils = async (token, IdClientSite, setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetAppareils",
+
+    data: {
+      token: token,
+      IdClientSite: IdClientSite,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+
+
+};
+
 
 //#endregion
 
@@ -164,4 +183,5 @@ export {
   TelechargerDocument,
   TelechargerZIP,
   GetPrestationReleveTache,
+  GetListeAppareils,
 };

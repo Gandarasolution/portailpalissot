@@ -88,7 +88,7 @@ const NavbarMenu = ({ handleDeconnexion }) => {
               )
                 return null;
               return (
-                <span>
+                <span key={csc.IdClientSite}>
                   <Button
                     className="bt-clientsite"
                     key={index}
