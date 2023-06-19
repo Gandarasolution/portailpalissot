@@ -1,5 +1,5 @@
 //#region Imports
-import { useEffect, useState,useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 import dateFormat from "dateformat";
@@ -34,7 +34,10 @@ const ContratPage = () => {
 
   const _dateContrat = new Date(
     // dateFormat(new Date(Contrat.DateSouscrit), "dd/mm/yyyy")
-    dateFormat(new Date(ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat), "dd/mm/yyyy")
+    dateFormat(
+      new Date(ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat),
+      "dd/mm/yyyy"
+    )
   );
 
   const dateFinPeriode = () => {
@@ -42,14 +45,11 @@ const ContratPage = () => {
 
     _dateEndTmp = addOneYear(_dateEndTmp);
 
-
     var day = _dateEndTmp.getDate() - 1;
     _dateEndTmp.setDate(day);
 
     return new Date(_dateEndTmp);
-
   };
-
 
   //#endregion
 
@@ -59,6 +59,7 @@ const ContratPage = () => {
   const [dateDebutPeriode, setDateDebutPeriode] = useState(
     GetDatePeriodeInitial()
   );
+  const [lastPeriode, setLastPeriode] = useState(null);
 
   //#endregion
 
@@ -121,18 +122,23 @@ const ContratPage = () => {
     return _DateRetour;
   }
 
-
-
   const FetchDataPrestation = async () => {
     SetPrestations([]);
-    await GetPrestationContrat(tokenCt,DateSOAP(dateDebutPeriode), DateSOAP(dateFinPeriode()), ClientSiteContratCtx.storedClientSite.IdClientSite  ,PrestationLoad)
+    setLastPeriode(DateSOAP(dateDebutPeriode));
+    await GetPrestationContrat(
+      tokenCt,
+      DateSOAP(dateDebutPeriode),
+      DateSOAP(dateFinPeriode()),
+      ClientSiteContratCtx.storedClientSite.IdClientSite,
+      PrestationLoad
+    );
   };
 
-const PrestationLoad = (data) => {
-  SetPrestations(data);
-    setIsLoadedPresta(true);
-}
+  const PrestationLoad = (data) => {
+    SetPrestations(data);
 
+    if (lastPeriode === DateSOAP(dateDebutPeriode)) setIsLoadedPresta(true);
+  };
 
   function DateSOAP(date) {
     // Get year, month, and day part from the date
@@ -141,10 +147,8 @@ const PrestationLoad = (data) => {
     // var month = "01"
     var day = date.toLocaleString("default", { day: "2-digit" });
 
-
     return year + "-" + month + "-" + day;
   }
-
 
   //#endregion
 
@@ -205,10 +209,7 @@ const PrestationLoad = (data) => {
         drop="down-centered"
         style={{ borderRadius: "10px" }}
         id="dropdown-datePeriode"
-        title={`Période : ${GetNomMois(
-          dateDebutPeriode.getMonth() + 1,
-          small
-        )}
+        title={`Période : ${GetNomMois(dateDebutPeriode.getMonth() + 1, small)}
               ${dateDebutPeriode.getFullYear()} à
               ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
               ${dateFinPeriode().getFullYear()}`}
@@ -231,28 +232,25 @@ const PrestationLoad = (data) => {
     );
   };
 
-
-
   useEffect(() => {
     async function makeRequest() {
       setIsLoadedPresta(false);
       await FetchDataPrestation();
-
     }
     makeRequest();
     // eslint-disable-next-line
-  }, [ClientSiteContratCtx.storedClientSite.IdClientSite]);
-
-
-
+  }, [ClientSiteContratCtx.storedClientSite.IdClientSite, lastPeriode]);
 
   return (
-    <Container fluid className="h-100" > 
-
+    <Container fluid className="h-100">
       <ContratPrestation
         IsLoaded={isLoadedPresta}
         Prestations={Prestations}
-        datePrestation={new Date(ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat)}
+        datePrestation={
+          new Date(
+            ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
+          )
+        }
         ParentComponentPeriodeSelect={
           <BreakpointProvider>
             <Breakpoint large up>

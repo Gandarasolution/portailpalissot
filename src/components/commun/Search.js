@@ -1,7 +1,8 @@
 import { Form } from "react-bootstrap";
 
-const Search = ( {setSearch}) => {
+const Search = ( {setSearch,search}) => {
   const handleSearch = (event) => {
+    event.preventDefault();
     setSearch(event.target.value);
   };
 
@@ -10,8 +11,9 @@ const Search = ( {setSearch}) => {
       type="search"
       placeholder="Rechercher"
       aria-label="Search"
-      onChange={handleSearch}
+      onChange={(e)=> {handleSearch(e)}}
       className="noBorder"
+      value={search}
     />
   );
 };

@@ -12,14 +12,14 @@ import Image from "react-bootstrap/Image";
 import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
 
 //#endregion
 
 //#region Components
-import TableData from "../../../components/commun/TableData";
-import {FiltrerParCollones} from "../../../functions";
-import Search from "../../../components/commun/Search";
+import TableData, {
+  CreateNewCell,
+  CreateNewHeader,
+} from "../../../components/commun/TableData";
 
 //#endregion
 
@@ -32,15 +32,12 @@ import { ClientSiteContratContext, TokenContext } from "../../../App";
 //#endregion
 
 const AppareilsPage = () => {
-
-const tokenCx = useContext(TokenContext);
-const ClientSiteContratCtx = useContext(ClientSiteContratContext);
+  const tokenCx = useContext(TokenContext);
+  const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   //#region Mockup
 
-  const [listeAppareils, setListeAppareils] = useState([
-  ]);
-
+  const [listeAppareils, setListeAppareils] = useState([]);
 
   //#endregion
 
@@ -48,62 +45,75 @@ const ClientSiteContratCtx = useContext(ClientSiteContratContext);
   const [isLoaded, setIsLoaded] = useState(false);
 
   //#region filter/search/sort
-  const [search, setSearch] = useState("");
 
   const [filterActif, SetFilterActif] = useState(true);
   const [filterHorscontrat, SetFilterHorscontrat] = useState(true);
   const [filterDetruit, SetFilterDetruit] = useState(true);
-
-  const [arrayFilters, setArrayFilters] = useState([]);
 
   //#endregion
 
   //#endregion
 
   //#region Fonctions
+  const FetchSetListeAppareils = (data) => {
+    setListeAppareils(data);
+    setIsLoaded(true);
+  };
 
-  function IsFiltercheckboxShouldBeCheck(fieldname, item) {
-    if (
-      arrayFilters.findIndex(
-        (filter) => filter.fieldname === fieldname && filter.item === item
-      ) > -1
-    )
-      return true;
-    return false;
+  const GetAppareils = async () => {
+    await GetListeAppareils(
+      tokenCx,
+      ClientSiteContratCtx.storedClientSite.IdClientSite,
+      FetchSetListeAppareils
+    );
+  };
+
+  function CreateHeaderForTable() {
+    let _headers = [];
+    _headers.push(CreateNewHeader("RefClientAppareilSecteur", true, "Secteur"));
+    _headers.push(CreateNewHeader("IdAppareilSecteur", false, "Code"));
+    _headers.push(
+      CreateNewHeader("DesignationAppareilSecteur", true, "Libelle")
+    );
+    _headers.push(CreateNewHeader("IdEtat", false, "État"));
+
+    return _headers;
   }
 
-  function IsButtonShouldBeCheck(fieldname) {
-    if (
-      arrayFilters.findIndex((filter) => filter.fieldname === fieldname) > -1
-    ) {
-      return true;
-    }
-    return false;
+  function CreateCellsForTable() {
+    let _cells = [];
+    _cells.push(CreateNewCell("RefClientAppareilSecteur", false, true, false));
+    _cells.push(CreateNewCell("IdAppareilSecteur", false, true, false));
+    _cells.push(CreateNewCell("DesignationAppareilSecteur", true, true, false));
+    _cells.push(CreateNewCell("IdEtat", false, false, false, EditorEtat));
+
+    return _cells;
   }
 
-  const reactStringReplace = require("react-string-replace");
+  // const reactStringReplace = require("react-string-replace");
   /**
    *
    * @param {*Le texte qui peut éventuellement contenir 'search'} text
    * @returns Le même texte mais avec le 'search' balisé par <mark></mark>
    */
   function HighlightTextIfSearch(text) {
-    //L'utilisateur à recherché quelque chose et le texte contient ce qu'il à rechercher
-    if (
-      search.length > 0 &&
-      text.toUpperCase().includes(search.toUpperCase())
-    ) {
-      //on remplace le 'search' dans le 'text' par <mark>'match'</mark>
-      return (
-        <span>
-          {reactStringReplace(text, search, (match, i) => (
-            <mark key={i}>{match}</mark>
-          ))}
-        </span>
-      );
-    } else {
-      return text;
-    }
+    // //L'utilisateur à recherché quelque chose et le texte contient ce qu'il à rechercher
+    // if (
+    //   search.length > 0 &&
+    //   text.toUpperCase().includes(search.toUpperCase())
+    // ) {
+    //   //on remplace le 'search' dans le 'text' par <mark>'match'</mark>
+    //   return (
+    //     <span>
+    //       {reactStringReplace(text, search, (match, i) => (
+    //         <mark key={i}>{match}</mark>
+    //       ))}
+    //     </span>
+    //   );
+    // } else {
+    //   return text;
+    // }
+    return text;
   }
 
   /**
@@ -123,19 +133,7 @@ const ClientSiteContratCtx = useContext(ClientSiteContratContext);
     if (!filterDetruit)
       _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 57);
 
-    //Colonnes
-    _listeAppareil = FiltrerParCollones(_listeAppareil,arrayFilters);
-
-    //Search
-    if (search.length > 0) {
-      return _listeAppareil.filter(
-        (item) =>
-          item.Libelle.toUpperCase().includes(search.toUpperCase()) ||
-          item.Secteur.toUpperCase().includes(search.toUpperCase())
-      );
-    } else {
-      return _listeAppareil;
-    }
+    return _listeAppareil;
   };
 
   function GetBGColorAppareilEtat(IdEtat) {
@@ -151,15 +149,14 @@ const ClientSiteContratCtx = useContext(ClientSiteContratContext);
     }
   }
 
-
   function GetLibelleEtat(IdEtat) {
     switch (IdEtat) {
       case 56:
-        return "Actif";   
-          case 57:
-        return "Detruit";  
-           case 206:
-        return "Hors contrat";    
+        return "Actif";
+      case 57:
+        return "Detruit";
+      case 206:
+        return "Hors contrat";
       default:
         break;
     }
@@ -167,24 +164,6 @@ const ClientSiteContratCtx = useContext(ClientSiteContratContext);
   //#endregion
 
   //#region Evenements
-
-  const handleCheckfilterChange = (checked, key, value) => {
-    let _arrTemp = JSON.parse(JSON.stringify(arrayFilters));
-
-    if (checked) {
-      _arrTemp.push({ fieldname: key, item: value });
-      setArrayFilters(_arrTemp);
-    } else {
-      const index = _arrTemp.findIndex(
-        (filter) => filter.fieldname === key && filter.item === value
-      );
-      if (index > -1) {
-        _arrTemp.splice(index, 1);
-        setArrayFilters(_arrTemp);
-      }
-    }
-  };
-
 
   //#endregion
 
@@ -195,69 +174,15 @@ const ClientSiteContratCtx = useContext(ClientSiteContratContext);
   const AppareilGrey = require("../../../image/bottleGrey.png");
   const AppareilRed = require("../../../image/bottleRed.png");
 
-
-
   const ButtonFilter = (props) => {
     return (
       <li
-      className={props.state ? "li-actif" : "li-inactif"}
-          onClick={() => props.methodState(!props.state)}
-        >
-          {GetImageAppareilEtat(props.IdEtat, "img-bt-filter")}
-          {props.title} {isLoaded && `(${props.number})`}
-          </li>
-    );
-  };
-
-  const FilterFindPanel = () => {
-    return (
-    
-      <Row className="mb-2">
-        <Col md={"auto"} className="m-1">
-          <div className="project-sort-nav">
-            <nav>
-              <ul>
-                {listeAppareils.filter((appar) => appar.IdEtat === 56).length >
-                  0 &&
-                  ButtonFilter({
-                    title: "Actif",
-                    methodState: SetFilterActif,
-                    state: filterActif,
-                    number: listeAppareils.filter((appar) => appar.IdEtat === 56)
-                      .length,
-                    IdEtat: 56,
-                  })}
-
-                {listeAppareils.filter((appar) => appar.IdEtat === 206).length >
-                  0 &&
-                  ButtonFilter({
-                    title: "Hors contrat",
-                    methodState: SetFilterHorscontrat,
-                    state: filterHorscontrat,
-                    number: listeAppareils.filter((appar) => appar.IdEtat === 206)
-                      .length,
-                    IdEtat: 206,
-                  })}
-
-                {listeAppareils.filter((appar) => appar.IdEtat === 57).length >
-                  0 &&
-                  ButtonFilter({
-                    title: "Détruit",
-                    methodState: SetFilterDetruit,
-                    state: filterDetruit,
-                    number: listeAppareils.filter((appar) => appar.IdEtat === 57)
-                      .length,
-                    IdEtat: 57,
-                  })}
-              </ul>
-            </nav>
-          </div>
-        </Col>
-
-        <Col md={6} className="m-1">
-          <Search setSearch={setSearch} />
-        </Col>
-      </Row>
+        className={props.state ? "li-actif" : "li-inactif"}
+        onClick={() => props.methodState(!props.state)}
+      >
+        {GetImageAppareilEtat(props.IdEtat, "img-bt-filter")}
+        {props.title} {isLoaded && `(${props.number})`}
+      </li>
     );
   };
 
@@ -278,81 +203,72 @@ const ClientSiteContratCtx = useContext(ClientSiteContratContext);
   //#endregion
 
   //#region TableData
-  const _header = [
-    {
-      title: "Secteur",
-      filter: {
-        fieldname: "Secteur",
-      },
-    },
+  const EditorEtat = (IdEtat) => {
+    return (
+      <span className={`badge badge-${GetBGColorAppareilEtat(IdEtat)}`}>
+        {GetLibelleEtat(IdEtat)}
+      </span>
+    );
+  };
 
-    {
-      title: "Code",
-    },
-    {
-      title: "Libellé de l'appareil",
-      filter: {
-        fieldname: "Libelle",
-      },
-    },
-    {
-      title: "État",
-      filter: {
-        fieldname: "LibelleEtat",
-      },
-    },
-  ];
+  const TableAppareils = () => {
+    const _Headers = CreateHeaderForTable();
+    const _Cells = CreateCellsForTable();
 
-  const _Data = () => {
-    let _body = [];
+    return (
+      <TableData
+        Data={GetAppareilsSearched()}
+        Headers={_Headers}
+        Cells={_Cells}
+        IsLoaded={isLoaded}
+        Pagination
+        TopPannelLeftToSearch={
+          <Col md={"auto"} className="m-1">
+            <div className="project-sort-nav">
+              <nav>
+                <ul>
+                  {listeAppareils.filter((appar) => appar.IdEtat === 56)
+                    .length > 0 &&
+                    ButtonFilter({
+                      title: "Actif",
+                      methodState: SetFilterActif,
+                      state: filterActif,
+                      number: listeAppareils.filter(
+                        (appar) => appar.IdEtat === 56
+                      ).length,
+                      IdEtat: 56,
+                    })}
 
-    let _lAppareils = GetAppareilsSearched();
+                  {listeAppareils.filter((appar) => appar.IdEtat === 206)
+                    .length > 0 &&
+                    ButtonFilter({
+                      title: "Hors contrat",
+                      methodState: SetFilterHorscontrat,
+                      state: filterHorscontrat,
+                      number: listeAppareils.filter(
+                        (appar) => appar.IdEtat === 206
+                      ).length,
+                      IdEtat: 206,
+                    })}
 
-    for (let index = 0; index < _lAppareils.length; index++) {
-      const appareil = _lAppareils[index];
-      let _cells = [];
-
-      let _secteur = {
-        text: appareil.RefClientAppareilSecteur,
-        isSearchable: true,
-        isH1: false,
-      };
-
-      _cells.push(_secteur);
-      let _code = {
-        text: appareil.IdAppareilSecteur,
-        isSearchable: false,
-        isH1: false,
-      };
-
-      _cells.push(_code);
-
-      let _lib = {
-        text: appareil.DesignationAppareilSecteur,
-        isSearchable: true,
-        isH1: false,
-      };
-      _cells.push(_lib);
-
-      let _etat = {
-        text: (
-          <span
-            className={`badge badge-${GetBGColorAppareilEtat(appareil.IdEtat)}`}
-          >
-            {GetLibelleEtat(appareil.IdEtat)}
-          </span>
-        ),
-        isSearchable: true,
-        isH1: false,
-      };
-
-      _cells.push(_etat);
-
-      let _row = { data: appareil, cells: _cells };
-
-      _body.push(_row);
-    }
-    return _body;
+                  {listeAppareils.filter((appar) => appar.IdEtat === 57)
+                    .length > 0 &&
+                    ButtonFilter({
+                      title: "Détruit",
+                      methodState: SetFilterDetruit,
+                      state: filterDetruit,
+                      number: listeAppareils.filter(
+                        (appar) => appar.IdEtat === 57
+                      ).length,
+                      IdEtat: 57,
+                    })}
+                </ul>
+              </nav>
+            </div>
+          </Col>
+        }
+      />
+    );
   };
 
   //#endregion
@@ -373,10 +289,12 @@ const ClientSiteContratCtx = useContext(ClientSiteContratContext);
         >
           <Card.Body>
             <Card.Title>
-              {appareil.IdAppareilSecteur} - {HighlightTextIfSearch(appareil.DesignationAppareilSecteur)}
+              {appareil.IdAppareilSecteur} -{" "}
+              {HighlightTextIfSearch(appareil.DesignationAppareilSecteur)}
             </Card.Title>
             <Card.Subtitle className="mb-2 text-muted">
-              Secteur : {HighlightTextIfSearch(appareil.RefClientAppareilSecteur)}
+              Secteur :{" "}
+              {HighlightTextIfSearch(appareil.RefClientAppareilSecteur)}
             </Card.Subtitle>
             <Card.Text>
               {GetImageAppareilEtat(appareil.IdEtat)}
@@ -426,21 +344,6 @@ const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   //#endregion
 
-
-
-const FetchSetListeAppareils = (data) => {
-  setListeAppareils(data);
-  setIsLoaded(true);
-}
-
-
-const GetAppareils = async () => {
-
-  await GetListeAppareils(tokenCx,ClientSiteContratCtx.storedClientSite.IdClientSite,FetchSetListeAppareils)
-
-}
-
-
   useEffect(() => {
     GetAppareils();
     // eslint-disable-next-line
@@ -460,32 +363,9 @@ const GetAppareils = async () => {
           )}
         </span>
       </Col>
-      {FilterFindPanel()}
       <BreakpointProvider>
         <Breakpoint large up>
-          <Container fluid className="container-table p-4">
-
-
-
-
-
-
-            <TableData
-              IsLoaded={isLoaded}
-              placeholdeNbLine={5}
-              headers={_header}
-              lData={_Data()}
-              rawData={listeAppareils}
-              handleCheckfilterChange={handleCheckfilterChange}
-              isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-              isButtonShouldBeCheck={IsButtonShouldBeCheck}
-              isRowActive={() => {
-                return false;
-              }}
-              search={search}
-              Pagination
-            />
-          </Container>
+          <TableAppareils />
         </Breakpoint>
         <Breakpoint medium down>
           {AppareilsCards()}

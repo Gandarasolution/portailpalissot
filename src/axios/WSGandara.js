@@ -19,15 +19,13 @@ const Connexion = async (login, pass, setToken) => {
     success(data) {
       setToken(data);
     },
-    error(error)
-    {
+    error(error) {
       setToken(500);
-    }
+    },
   });
 };
 
 const GetClientSiteContrat = async (token, setClientSiteContrat) => {
- 
   $.ajax({
     type: "POST",
     url: urlAction + "GetClientSiteContrat",
@@ -36,9 +34,7 @@ const GetClientSiteContrat = async (token, setClientSiteContrat) => {
       setClientSiteContrat(JSON.parse(data));
     },
   });
-}
-
-
+};
 
 const GetPrestationContrat = async (
   token,
@@ -47,8 +43,6 @@ const GetPrestationContrat = async (
   IdSite,
   setData
 ) => {
-
-
   $.ajax({
     type: "POST",
     url: urlAction + "GetPrestationContrat",
@@ -69,9 +63,11 @@ const GetPrestationContrat = async (
   });
 };
 
-
-
-const GetPrestationReleveTache = async (token, IdPrestationContrat, setData) => {
+const GetPrestationReleveTache = async (
+  token,
+  IdPrestationContrat,
+  setData
+) => {
   $.ajax({
     type: "POST",
     url: urlAction + "GetListeTaches",
@@ -88,8 +84,6 @@ const GetPrestationReleveTache = async (token, IdPrestationContrat, setData) => 
       }
     },
   });
-
-
 };
 
 //#region Documents
@@ -147,9 +141,6 @@ const TelechargerZIP = (files, filename) => {
 
 //#endregion
 
-
-
-
 const GetListeAppareils = async (token, IdClientSite, setData) => {
   $.ajax({
     type: "POST",
@@ -167,10 +158,7 @@ const GetListeAppareils = async (token, IdClientSite, setData) => {
       }
     },
   });
-
-
 };
-
 
 //#endregion
 
