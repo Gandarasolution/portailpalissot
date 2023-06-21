@@ -591,7 +591,7 @@ function CallENDPOINT($url="",$endpoint="", )
 
 
 
-    $url = "http://webservices.gandarasolution.fr:8040/WSGandara?wsdl";
+    $url = "http://webservices.gandarasolution.fr:8039/WSGandara?wsdl";
     $terminaison = $_GET["endpoint"];
     $callToWS = CallENDPOINT($url, $terminaison);
     // echo($callToWS);

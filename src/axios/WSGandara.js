@@ -25,6 +25,24 @@ const Connexion = async (login, pass, setToken) => {
   });
 };
 
+const GetListeParametres = async (token, setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetListeParametres",
+
+    data: {
+      token: token,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+};
+
 const GetClientSiteContrat = async (token, setClientSiteContrat) => {
   $.ajax({
     type: "POST",
@@ -36,6 +54,8 @@ const GetClientSiteContrat = async (token, setClientSiteContrat) => {
   });
 };
 
+//#region Contrat
+
 const GetPrestationContrat = async (
   token,
   dateDebut,
@@ -43,7 +63,7 @@ const GetPrestationContrat = async (
   IdSite,
   setData
 ) => {
-  $.ajax({
+  return $.ajax({
     type: "POST",
     url: urlAction + "GetPrestationContrat",
 
@@ -54,6 +74,10 @@ const GetPrestationContrat = async (
       IdSite: IdSite,
     },
     success(data) {
+      if (data==="Erreur de connexion"){
+        setData(500);
+        return
+      }
       if (JSON.parse(JSON.stringify(data)) === "500") {
         setData([]);
       } else {
@@ -85,6 +109,8 @@ const GetPrestationReleveTache = async (
     },
   });
 };
+
+//#endregion
 
 //#region Documents
 
@@ -141,6 +167,7 @@ const TelechargerZIP = (files, filename) => {
 
 //#endregion
 
+//#region Appareils
 const GetListeAppareils = async (token, IdClientSite, setData) => {
   $.ajax({
     type: "POST",
@@ -159,6 +186,69 @@ const GetListeAppareils = async (token, IdClientSite, setData) => {
     },
   });
 };
+//#endregion
+
+//#region Factures
+const GetListeFactures = async (
+  token,
+  IdClientSite,
+  dateDebut,
+  dateFin,
+  setData
+) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetListeFactures",
+
+    data: {
+      token: token,
+      IdClientSite: IdClientSite,
+      dateDebut: dateDebut,
+      dateFin: dateFin,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+};
+
+
+
+//#endregion
+
+//#region Interventions
+const GetListeInterventions = async (
+  token,
+  IdClientSite,
+  dateDebut,
+  dateFin,
+  setData
+) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetListeInterventions",
+
+    data: {
+      token: token,
+      IdClientSite: IdClientSite,
+      dateDebut: dateDebut,
+      dateFin: dateFin,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+};
+
+//#endregion
 
 //#endregion
 
@@ -172,4 +262,7 @@ export {
   TelechargerZIP,
   GetPrestationReleveTache,
   GetListeAppareils,
+  GetListeFactures,
+  GetListeInterventions,
+  GetListeParametres,
 };

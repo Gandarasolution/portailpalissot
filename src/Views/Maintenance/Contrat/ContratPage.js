@@ -21,6 +21,7 @@ import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import ContratPrestation from "./Components/ContratPrestations";
 import { GetPrestationContrat } from "../../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
+import { DateSOAP } from "../../../functions";
 
 //#endregion
 
@@ -31,14 +32,15 @@ const ContratPage = () => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   //#region Données
+ 
+  const _dateContrat = 
+  new Date(
+    ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
+  )
+  // .toLocaleDateString()
+  
 
-  const _dateContrat = new Date(
-    // dateFormat(new Date(Contrat.DateSouscrit), "dd/mm/yyyy")
-    dateFormat(
-      new Date(ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat),
-      "dd/mm/yyyy"
-    )
-  );
+  
 
   const dateFinPeriode = () => {
     let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
@@ -76,7 +78,6 @@ const ContratPage = () => {
   }
 
   function GetNomMois(num, short = false) {
-    // console.log(num)
     if (num > 12) {
       num = num - 12;
     }
@@ -110,29 +111,44 @@ const ContratPage = () => {
     }
   }
 
-  /**
-   * Construit la date de début des preriodes initial
-   * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
-   */
+  // /**
+  //  * Construit la date de début des preriodes initial
+  //  * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
+  //  */
+  // function GetDatePeriodeInitial() {
+  //   let _day = 1;
+  //   let _monthI = _dateContrat.getMonth();
+  //   let _year = new Date().getFullYear();
+  //   let _DateRetour = new Date(_year, _monthI, _day);
+  //   return _DateRetour;
+  // }
+
+
   function GetDatePeriodeInitial() {
     let _day = 1;
-    let _monthI = _dateContrat.getMonth();
+    // let _monthI = _dateContrat.getMonth();
+    let _monthI = 0;
     let _year = new Date().getFullYear();
     let _DateRetour = new Date(_year, _monthI, _day);
     return _DateRetour;
   }
 
+
   const FetchDataPrestation = async () => {
+   
     SetPrestations([]);
     setLastPeriode(DateSOAP(dateDebutPeriode));
-    await GetPrestationContrat(
+    
+    GetPrestationContrat(
       tokenCt,
       DateSOAP(dateDebutPeriode),
       DateSOAP(dateFinPeriode()),
       ClientSiteContratCtx.storedClientSite.IdClientSite,
       PrestationLoad
-    );
+    )
   };
+
+
 
   const PrestationLoad = (data) => {
     SetPrestations(data);
@@ -140,16 +156,7 @@ const ContratPage = () => {
     if (lastPeriode === DateSOAP(dateDebutPeriode)) setIsLoadedPresta(true);
   };
 
-  function DateSOAP(date) {
-    // Get year, month, and day part from the date
-    var year = date.toLocaleString("default", { year: "numeric" });
-    var month = date.toLocaleString("default", { month: "2-digit" });
-    // var month = "01"
-    var day = date.toLocaleString("default", { day: "2-digit" });
-
-    return year + "-" + month + "-" + day;
-  }
-
+ 
   //#endregion
 
   //#region Evenement

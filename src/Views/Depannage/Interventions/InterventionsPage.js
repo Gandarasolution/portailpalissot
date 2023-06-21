@@ -14,10 +14,12 @@ import Card from "react-bootstrap/Card";
 //#endregion
 
 //#region Components
-import { FiltrerParCollones } from "../../../functions";
-import Search from "../../../components/commun/Search";
-import TableData from "../../../components/commun/TableData";
+import {  GetNomMois, addOneYear, subOneYear } from "../../../functions";
+import TableData, { CreateNewCell, CreateNewHeader } from "../../../components/commun/TableData";
 import ImageExtension from "../../../components/commun/ImageExtension";
+import { Button, Dropdown, DropdownButton, Stack } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 //#endregion
 
 //#endregion
@@ -61,13 +63,16 @@ const InterventionPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeInterventions, setListeInterventions] = useState([]);
 
-  const [arrayFilters, setArrayFilters] = useState([]);
 
-  const [search, setSearch] = useState("");
 
   const [gridColMDValue, setGridColMDValue] = useState(12);
   const [interSelected, setInterSelected] = useState(null);
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
+
+
+  const [dateDebutPeriode, setDateDebutPeriode] = useState(
+    GetDatePeriodeInitial())
+
 
   //#endregion
 
@@ -76,216 +81,186 @@ const InterventionPage = () => {
   function GetListeInterventionsPreFiltre() {
     let _lInters = JSON.parse(JSON.stringify(listeInterventions));
 
-    //Filtré par search
-    _lInters = GetIntersSearched();
-    //Filtrés par boutons d'état
 
-    //Filtrés par colonnes
-    _lInters = FiltrerParCollones(_lInters, arrayFilters);
 
     return _lInters;
   }
 
-  const GetIntersSearched = () => {
-    let _llisteInterventions = listeInterventions;
+  /**
+   * Construit la date de début des preriodes initial
+   * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
+   */
+  function GetDatePeriodeInitial() {
+    let _day = 1;
+    // let _monthI = _dateContrat.getMonth();
+    let _monthI = 0;
+    let _year = new Date().getFullYear();
+    let _DateRetour = new Date(_year, _monthI, _day);
+    return _DateRetour;
+  }
 
-    if (search.length > 0) {
-      _llisteInterventions = _llisteInterventions.filter(
-        (item) =>
-          item.LibelleDossierIntervention.toUpperCase().includes(
-            search.toUpperCase()
-          ) ||
-          `DI${item.IdDossierIntervention.toString().toUpperCase()}`.includes(
-            search.toUpperCase()
-          ) ||
-          (item.IdFacture &&
-            `F${item.IdFacture.toString().toUpperCase()}`.includes(
-              search.toUpperCase()
-            ))
-      );
-    }
 
-    _llisteInterventions = _llisteInterventions.sort(
-      (a, b) => a.DateDemande - b.DateDemande
-    );
 
-    return _llisteInterventions;
+  const dateFinPeriode = () => {
+    let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
+
+    _dateEndTmp = addOneYear(_dateEndTmp);
+
+    var day = _dateEndTmp.getDate() - 1;
+    _dateEndTmp.setDate(day);
+
+    return new Date(_dateEndTmp);
   };
 
-  function IsFiltercheckboxShouldBeCheck(fieldname, item) {
-    if (
-      arrayFilters.findIndex(
-        (filter) => filter.fieldname === fieldname && filter.item === item
-      ) > -1
-    )
-      return true;
-    return false;
+  function CreateHeaderForTable() {
+    let _headers = [];
+    _headers.push(
+      CreateNewHeader("DateDemande", true, "Date de la demande",EditorDate)
+    );
+    _headers.push(CreateNewHeader("IdDossierIntervention", true, "Code"));
+    _headers.push(CreateNewHeader("LibelleDossierIntervention", true, "Objet de la demande"));
+    _headers.push(
+      CreateNewHeader("IdEtat", true, "État")
+    );
+    _headers.push(CreateNewHeader("IdFacture", false, "N° facture"));
+    _headers.push(CreateNewHeader("DateFacture", false, "Date de la facture",EditorDate));
+
+    return _headers;
   }
+
+  function CreateCellsForTable() {
+    let _cells = [];
+    _cells.push(
+      CreateNewCell("DateDemande", false, false, false,EditorDate)
+    );
+    _cells.push(CreateNewCell("IdDossierIntervention", true, true, false,));
+    _cells.push(CreateNewCell("LibelleDossierIntervention", true, true, false,));
+    _cells.push(CreateNewCell("IdEtat", false, false, false, EditorEtat));
+    _cells.push(CreateNewCell("IdFacture", true, true, true, ()=>{},"tagInterventionfactures" ));
+    _cells.push(CreateNewCell("DateFacture", false, false, true,EditorDate,"tagInterventionfactures" ));
+
+    
+    return _cells;
+  }
+
+  // const GetIntersSearched = () => {
+  //   let _llisteInterventions = listeInterventions;
+
+  //   if (search.length > 0) {
+  //     _llisteInterventions = _llisteInterventions.filter(
+  //       (item) =>
+  //         item.LibelleDossierIntervention.toUpperCase().includes(
+  //           search.toUpperCase()
+  //         ) ||
+  //         `DI${item.IdDossierIntervention.toString().toUpperCase()}`.includes(
+  //           search.toUpperCase()
+  //         ) ||
+  //         (item.IdFacture &&
+  //           `F${item.IdFacture.toString().toUpperCase()}`.includes(
+  //             search.toUpperCase()
+  //           ))
+  //     );
+  //   }
+
+  //   _llisteInterventions = _llisteInterventions.sort(
+  //     (a, b) => a.DateDemande - b.DateDemande
+  //   );
+
+  //   return _llisteInterventions;
+  // };
+
 
   //#endregion
 
   //#region Evenements
-  const handleCheckfilterChange = (checked, key, value) => {
-    let _arrTemp = JSON.parse(JSON.stringify(arrayFilters));
+  const AjouterUnAnPeriode = async () => {
+    let _dateTMP = dateDebutPeriode;
+    _dateTMP = addOneYear(_dateTMP);
+    let _dateDebutPeriode = new Date(_dateTMP);
+    setDateDebutPeriode(_dateDebutPeriode);
 
-    if (checked) {
-      _arrTemp.push({ fieldname: key, item: value });
-      setArrayFilters(_arrTemp);
-    } else {
-      const index = _arrTemp.findIndex(
-        (filter) => filter.fieldname === key && filter.item === value
-      );
-      if (index > -1) {
-        _arrTemp.splice(index, 1);
-        setArrayFilters(_arrTemp);
-      }
-    }
+    // setIsLoadedPresta(false);
+    // await FetchDataPrestation();
   };
 
-  const handleLigneClicked = (intervention) => {
-    setInterSelected(intervention);
-    setGridColMDValue(10);
-    setIsDocumentLoaded(false);
+  const SoustraireUnAnPeriode = async () => {
+    let _dateTMP = dateDebutPeriode;
+    _dateTMP = subOneYear(_dateTMP);
+    let _dateDebutPeriode = new Date(_dateTMP);
+    setDateDebutPeriode(_dateDebutPeriode);
+    // setIsLoadedPresta(false);
+
+    // await FetchDataPrestation();
+  };
+
+  const HandleDropdownPeriodeSelect = async (dateStart) => {
+    let _dateTemp = new Date(dateStart);
+
+    setDateDebutPeriode(_dateTemp);
+    // setIsLoadedPresta(false);
+
+    // await FetchDataPrestation();
   };
 
   //#endregion
 
   //#region TableData
 
-  const _methodeDate = (e) => {
-    return new Date(e).toLocaleDateString("fr-FR");
-  };
-
-  const _header = [
-    {
-      title: "Date de la demande",
-    },
-
-    {
-      title: "Code",
-      filter: {
-        fieldname: "IdDossierIntervention",
-        affichageMethod: (e) => {
-          return `DI${e}`;
-        },
-      },
-    },
-    {
-      title: "Objet de la demande",
-      filter: {
-        fieldname: "LibelleDossierIntervention",
-      },
-    },
-    {
-      title: "État",
-      filter: {
-        fieldname: "LibelleEtat",
-      },
-    },
-    {
-      title: "N° Facture",
-    },
-    {
-      title: "Date Facture",
-      filter: {
-        fieldname: "DateFacture",
-        affichageMethod: _methodeDate,
-      },
-    },
-  ];
-
-  const _Data = () => {
-    let _body = [];
-
-    let _linters = GetListeInterventionsPreFiltre();
-
-    for (let index = 0; index < _linters.length; index++) {
-      const inter = _linters[index];
-      let _cells = [];
-
-      let _DateDemande = {
-        text: new Date(inter.DateDemande).toLocaleDateString("fr-FR"),
-        isSearchable: false,
-        isH1: false,
-        onClickMethod: handleLigneClicked,
-      };
-      _cells.push(_DateDemande);
-
-      let _code = {
-        text: `DI${inter.IdDossierIntervention}`,
-        isSearchable: true,
-        isH1: true,
-        onClickMethod: handleLigneClicked,
-      };
-      _cells.push(_code);
-
-      let _lib = {
-        text: inter.LibelleDossierIntervention,
-        isSearchable: true,
-        isH1: true,
-        onClickMethod: handleLigneClicked,
-      };
-      _cells.push(_lib);
-
-      let _etat = {
-        text: (
-          <span className="badge badge-bg-success">{inter.LibelleEtat} </span>
-        ),
-        isSearchable: false,
-        isH1: false,
-        onClickMethod: handleLigneClicked,
-      };
-      _cells.push(_etat);
-
-      let _idFacture = {
-        text:
-          inter.IdFacture && inter.IdFacture > 0 ? `F${inter.IdFacture}` : null,
-        isSearchable: true,
-        isH1: true,
-        onClickMethod: handleLigneClicked,
-      };
-      _cells.push(_idFacture);
-
-      let _dateFacture = {
-        text: inter.DateFacture
-          ? new Date(inter.DateFacture).toLocaleDateString("fr-FR")
-          : null,
-        isSearchable: false,
-        isH1: false,
-        onClickMethod: handleLigneClicked,
-      };
-      _cells.push(_dateFacture);
-
-      let _row = { data: inter, cells: _cells };
-
-      _body.push(_row);
-    }
-    return _body;
-  };
-
+ 
   //#endregion
 
   //#region Component
 
-  const Pannel = () => {
-    return (
-      <Row className="mb-2">
-        <Col md={6} className="m-1">
-          <Nav fill>
-            <Nav.Item>
-              <Nav.Link className="btn-filter border">
-                Nouvelle intervention
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Col>
 
-        <Col className="m-1">
-          <Search setSearch={setSearch} />
-        </Col>
-      </Row>
+  const DropDownYears = (small) => {
+    let _dateDebut = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
+    let _dateEnd = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
+    let _arrayPeriodes = [
+      {
+        dateStart: new Date(_dateDebut),
+        dateEnd: new Date(_dateEnd.setMonth(_dateDebut.getMonth() + 11)),
+      },
+    ];
+
+    for (let index = 0; index < 10; index++) {
+      let _dateStart = addOneYear(new Date(_arrayPeriodes[index].dateStart));
+      let _dateEnd = addOneYear(new Date(_arrayPeriodes[index].dateEnd));
+
+      _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
+    }
+
+    return (
+      <DropdownButton
+        variant=""
+        className="button-periode"
+        drop="down-centered"
+        style={{ borderRadius: "10px" }}
+        id="dropdown-datePeriode"
+        title={`Période : ${GetNomMois(dateDebutPeriode.getMonth() + 1, small)}
+              ${dateDebutPeriode.getFullYear()} à
+              ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
+              ${dateFinPeriode().getFullYear()}`}
+        onSelect={(e) => {
+          HandleDropdownPeriodeSelect(e);
+        }}
+      >
+        {_arrayPeriodes.map((periode, index) => {
+          return (
+            <Dropdown.Item key={index} eventKey={periode.dateStart}>
+              {` ${GetNomMois(
+                periode.dateStart.getMonth() + 1
+              )} ${periode.dateStart.getFullYear()} à ${GetNomMois(
+                periode.dateEnd.getMonth() + 1
+              )} ${periode.dateEnd.getFullYear()}`}
+            </Dropdown.Item>
+          );
+        })}
+      </DropdownButton>
     );
   };
+
+
+ 
 
   const CardDocuments = () => {
     if (!interSelected.IdFacture || interSelected.IdFacture <= 0) {
@@ -363,6 +338,101 @@ const InterventionPage = () => {
     MockupListeInterventions();
   }, [isLoaded]);
 
+
+
+
+
+  //#region Editors
+
+const EditorDate = (date) => {
+  if(!date) return "";
+  return `${GetNomMois(new Date(date).getMonth() + 1)}  ${new Date(
+    date
+  ).getFullYear()}`;
+};
+
+
+const EditorEtat = (IdEtat) => {
+return  <span className="badge badge-bg-success">{IdEtat} </span>
+}
+
+//#endregion
+
+
+
+ 
+
+const TableInterventions = () => {
+
+
+  const _Headers = CreateHeaderForTable();
+    const _Cells = CreateCellsForTable();
+
+    // const _CardModel = CreateNewCardModel(
+    //   EditorCardBody,
+    //   EditorCardTitle,
+    //   (presta) =>
+    //     ` ${presta.IdPrestationContrat} - ${presta.DescriptionPrestationContrat}`
+    // );
+
+    return (
+      <TableData
+        Data={GetListeInterventionsPreFiltre()}
+        Headers={_Headers}
+        Cells={_Cells}
+        IsLoaded={isLoaded}
+        Pagination
+        TopPannelLeftToSearch={
+          <Col md={3} className="m-1">
+            <div className="project-sort-nav">
+              <nav>
+                <ul>
+                  <a
+                    className="btn-filter text-decoration-none"
+                    href="/depannage/nouvelleintervention"
+                  >
+                    Nouvelle intervention
+                  </a>
+                </ul>
+              </nav>
+            </div>
+          </Col>
+        }
+        TopPannelRightToSearch={
+          <Col md={"auto"} className="m-1">
+            <Stack direction="horizontal" className="centerStack " gap={1}>
+              <Button
+                variant=""
+                className=" button-periode"
+                onClick={() => SoustraireUnAnPeriode()}
+              >
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </Button>
+
+              {DropDownYears(false)}
+
+              <Button
+                variant=""
+                className="button-periode "
+                onClick={() => AjouterUnAnPeriode()}
+              >
+                <FontAwesomeIcon icon={faArrowRight} />
+              </Button>
+            </Stack>
+          </Col>
+        }
+        // CardModel={_CardModel}
+      />
+    );
+  };
+
+
+
+
+
+
+
+
   return (
     <Container fluid className="h-100">
       <Col md={12} style={{ textAlign: "start" }}>
@@ -380,29 +450,11 @@ const InterventionPage = () => {
         </span>
       </Col>
 
-      {Pannel()}
 
-      <Container fluid className="container-table p-4">
+      <Container fluid >
         <Row>
           <Col md={gridColMDValue}>
-            <TableData
-              IsLoaded={isLoaded}
-              placeholdeNbLine={5}
-              headers={_header}
-              lData={_Data()}
-              rawData={listeInterventions}
-              handleCheckfilterChange={handleCheckfilterChange}
-              isFiltercheckboxShouldBeCheck={IsFiltercheckboxShouldBeCheck}
-              // isRowActive={(inter) => {
-              //   return ( inter ?
-              //     inter.IdDossierIntervention === interSelected.IdDossierIntervention
-              //     : false
-              //   );
-              // }}
-              isRowActive={()=>{return false}}
-              Pagination
-              search={search}
-            />
+           <TableInterventions />
           </Col>
 
           {gridColMDValue !== 12 && (

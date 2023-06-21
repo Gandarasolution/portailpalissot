@@ -50,7 +50,14 @@ const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
   const Data = () => {
-    let _lData = JSON.parse(JSON.stringify(props.Data));
+    let _lData = []
+    if (props.Data === "500")
+    {
+       _lData = [];
+    }else {
+       _lData = JSON.parse(JSON.stringify(props.Data));
+
+    }
 
     for (let index = 0; index < _lData.length; index++) {
       const element = _lData[index];
@@ -263,6 +270,8 @@ const TableData = ({ ...props }) => {
 
     _arFilters = Object.entries(groupBy(props.Data, fieldname));
 
+    const _headerToApply = props.Headers.find((h)=>h.fieldname === fieldname);
+
     return (
       <Popover className="popover-filters">
         {_arFilters.map((item, index) => {
@@ -272,7 +281,7 @@ const TableData = ({ ...props }) => {
               key={index}
               type="checkbox"
               checked={IsFiltercheckboxShouldBeCheck(fieldname, item[0])}
-              label={`${item[0]}`}
+              label={ _headerToApply.editor ? _headerToApply.editor(item[0]) : item[0] }
               onChange={(e) =>
                 HandleCheckfilterChange(e.target.checked, fieldname, item[0])
               }
@@ -651,6 +660,8 @@ const TableData = ({ ...props }) => {
 
   //#endregion
 
+
+  //#region Specifique
   const ModalList = () => {
     return (
       <span>
@@ -667,6 +678,9 @@ const TableData = ({ ...props }) => {
       case "tagListeDocuments":
         HandleAfficherDocuments(item);
         break;
+        case "tagInterventionfactures":
+          HandleAfficherFacture(item);
+          break;
       default:
         break;
     }
@@ -954,6 +968,17 @@ const TableData = ({ ...props }) => {
 
   //#endregion
 
+//#region Intervention
+
+const HandleAfficherFacture = (inter) => {
+  setGridColMDValue(10);
+  //LoadFacture,AffichageFacture comme documeuent
+}
+
+//#endregion
+
+  //#endregion
+
   return (
     <BreakpointProvider>
       {TopPannel()}
@@ -996,11 +1021,12 @@ export default TableData;
 
 //#region Helpers
 
-export const CreateNewHeader = (fieldname, isFilter, caption) => {
+export const CreateNewHeader = (fieldname, isFilter, caption,editor) => {
   let _header = {
     fieldname: fieldname,
     isFilter: isFilter,
     caption: caption,
+    editor: editor
   };
   return _header;
 };
@@ -1010,7 +1036,8 @@ export const CreateNewCell = (
   isH1,
   isSearchable,
   isSelectable,
-  editor
+  editor,
+  tagMethod
 ) => {
   let _cell = {
     fieldname: fieldname,
@@ -1018,6 +1045,7 @@ export const CreateNewCell = (
     isSearchable: isSearchable,
     isSelectable: isSelectable,
     editor: editor,
+    tagMethod: tagMethod
   };
   return _cell;
 };

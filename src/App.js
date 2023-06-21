@@ -25,11 +25,10 @@ import {
 
 import React from "react";
 import { useState, createContext } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import NouvelleInterventionPage from "./Views/Depannage/Interventions/NouvelleInterventionPage";
+import FacturesPage from "./Views/Factures/FacturesPage";
+import { GetListeParametres } from "./axios/WSGandara";
 
 //#endregion
 
@@ -37,11 +36,11 @@ library.add(faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder);
 
 //#region Context
 export const TokenContext = createContext(null);
-export const SiteContext = createContext(null);
 
 export const ListeClientSiteContratContext = createContext(null);
 export const ClientSiteContratContext = createContext(null);
 
+export const ParametresContext = createContext([]);
 //#endregion
 function App() {
   //#region ClientSiteContrat
@@ -68,6 +67,18 @@ function App() {
 
   //#endregion
 
+  //#region Parametres
+
+  const [arrayParams, setArrayParams] = useState([]);
+  const RecupererParams = async () => {
+    const FetchSetParams = (data) => {
+      setArrayParams(data);
+    };
+    await GetListeParametres(jwt, FetchSetParams);
+  };
+
+  //#endregion
+
   //#region Token
   const storedJwt = sessionStorage.getItem("token");
   const [jwt, setJwt] = useState(storedJwt || null);
@@ -76,7 +87,6 @@ function App() {
     sessionStorage.setItem("token", token);
     setJwt(token);
   }
-
 
   const handleDeconnexion = () => {
     sessionStorage.removeItem("token");
@@ -89,7 +99,7 @@ function App() {
         value={{ storedListe, setListe, storedClientSite, setClientSite }}
       >
         <div className="App font-link background">
-          <LoginPage setToken={setToken} />
+          <LoginPage setToken={setToken} getSetParams={RecupererParams} />
         </div>
       </ListeClientSiteContratContext.Provider>
     );
@@ -102,12 +112,14 @@ function App() {
       <ClientSiteContratContext.Provider
         value={{ storedClientSite, setClientSite, storedListe }}
       >
+        <ParametresContext.Provider value={[{k:"TelUrgenceIntervention", v:"01 02 03 04 05"}]}>
         <Router>
           <div className="App font-link background">
             <NavbarMenu handleDeconnexion={handleDeconnexion} />
 
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/factures" element={<FacturesPage />} />
               <Route path="/maintenance/contrat" element={<ContratPage />} />
               <Route
                 path="/maintenance/appareils"
@@ -116,10 +128,16 @@ function App() {
               <Route
                 path="/depannage/interventions"
                 element={<InterventionPage />}
+              />{" "}
+              <Route
+                path="/depannage/nouvelleintervention"
+                element={<NouvelleInterventionPage />}
               />
             </Routes>
           </div>
         </Router>
+        </ParametresContext.Provider>
+
       </ClientSiteContratContext.Provider>
     </TokenContext.Provider>
   );

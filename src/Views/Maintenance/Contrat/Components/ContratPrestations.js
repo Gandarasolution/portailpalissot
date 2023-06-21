@@ -32,6 +32,7 @@ import TableData, {
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
 } from "../../../../components/commun/TableData";
+import { GetNomMois } from "../../../../functions";
 
 //#endregion
 
@@ -58,49 +59,12 @@ const ContratPrestation = ({
 
   //#endregion
 
+
+
+
   //#endregion
 
   //#region Fonctions
-
-  /**
-   * retourne le nom du mois selon l'index
-   * @param {Number} num L'index du mois
-   * @param {bool} short Si le nom est abrégé ou pas
-   * @returns String le nom du mois
-   */
-  function GetNomMois(num, short = false) {
-    if (num > 12) {
-      num = num - 12;
-    }
-    switch (num) {
-      case 1:
-        return short ? "Jan." : "Janvier";
-      case 2:
-        return short ? "Fév." : "Février";
-      case 3:
-        return "Mars";
-      case 4:
-        return short ? "Avr." : "Avril";
-      case 5:
-        return "Mai";
-      case 6:
-        return "Juin";
-      case 7:
-        return short ? "Juil." : "Juillet";
-      case 8:
-        return "Août";
-      case 9:
-        return short ? "Sept." : "Septembre";
-      case 10:
-        return short ? "Oct." : "Octobre";
-      case 11:
-        return short ? "Nov." : "Novembre";
-      case 12:
-        return short ? "Déc." : "Décembre";
-      default:
-        return null;
-    }
-  }
 
   function GetLibEtat(e) {
     switch (e) {
@@ -149,7 +113,6 @@ const ContratPrestation = ({
 
   const GetPrestationTrimmed = () => {
     let _lPrestation = Prestations;
-
     for (let index = 0; index < _lPrestation.length; index++) {
       const element = _lPrestation[index];
       element.DateInterventionPrestation = new Date(
