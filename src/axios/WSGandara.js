@@ -4,8 +4,8 @@ import $ from "jquery";
 //#endregion
 
 //#region Données
-//  const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+ const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
@@ -198,7 +198,7 @@ const GetListeFactures = async (
 ) => {
   $.ajax({
     type: "POST",
-    url: urlAction + "GetListeFactures",
+    url: urlAction + "GetFactures",
 
     data: {
       token: token,
@@ -216,6 +216,31 @@ const GetListeFactures = async (
   });
 };
 
+
+const VoirFactureDocument = async (token,IdFacture,TypeFacture,Avoir) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetFactureDocument",
+    data: { token: token, IdFacture: IdFacture,TypeFacture:TypeFacture,Avoir:Avoir },
+    success(data) {
+      const _kv = JSON.parse(data);
+      VoirDocument(_kv.v,_kv.k);
+    },
+  });
+}
+
+
+const TelechargerFactureDocument = async (token,IdFacture,TypeFacture,Avoir) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetFactureDocument",
+    data: { token: token, IdFacture: IdFacture,TypeFacture:TypeFacture,Avoir:Avoir },
+    success(data) {
+      const _kv = JSON.parse(data);
+      TelechargerDocument(_kv.v,_kv.k);
+    },
+  });
+}
 
 
 //#endregion
@@ -265,4 +290,6 @@ export {
   GetListeFactures,
   GetListeInterventions,
   GetListeParametres,
+  VoirFactureDocument,
+  TelechargerFactureDocument
 };
