@@ -88,7 +88,7 @@ const NavbarMenu = ({ handleDeconnexion }) => {
               )
                 return null;
               return (
-                <span>
+                <span key={csc.IdClientSite}>
                   <Button
                     className="bt-clientsite"
                     key={index}
@@ -135,7 +135,7 @@ const NavbarMenu = ({ handleDeconnexion }) => {
               <NavDropdown.Item href="/maintenance/appareils">
                 Appareils
               </NavDropdown.Item>
-              <NavDropdown.Item href="/maintenance/factures">
+              <NavDropdown.Item href="/factures">
                 Factures
               </NavDropdown.Item>
             </NavDropdown>
@@ -145,7 +145,7 @@ const NavbarMenu = ({ handleDeconnexion }) => {
                 Interventions
               </NavDropdown.Item>
               <NavDropdown.Item href="/Depannage/devis">Devis</NavDropdown.Item>
-              <NavDropdown.Item href="/Depannage/factures">
+              <NavDropdown.Item href="/factures">
                 Factures
               </NavDropdown.Item>
             </NavDropdown>

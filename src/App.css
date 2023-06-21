@@ -277,12 +277,14 @@
   font-weight: 600;
   color: #0a0a0a;
   line-height: 24px;
-  cursor: pointer;
+  /* cursor: pointer; */
 }
 
 .table-presta tr:hover {
   background-color: whitesmoke;
-  cursor: pointer;
+  /* cursor: pointer; */
+  cursor: default;
+
 }
 
 .table-presta th:hover {
@@ -425,3 +427,4 @@
 .popover-filters div {
   margin: 10px !important;
 }
+

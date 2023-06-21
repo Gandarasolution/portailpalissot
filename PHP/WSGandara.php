@@ -301,7 +301,15 @@ Function VoirDocument($fileName = "")
 		
 	$fileN = $fileName;
 
-	header('Content-type: application/pdf');
+
+	$extension = pathinfo($fileN, PATHINFO_EXTENSION);
+
+	if($extension === 'pdf'){
+		header('Content-type: application/pdf');
+	}elseif ($extension === 'jpg') {
+		header('Content-type: image/jpeg');
+	}
+
 
 	header('Content-Disposition: inline; filename="' . $fileN . '"');
 	
@@ -428,9 +436,6 @@ function GetClientSiteContrat($token,$ws)
 
 
 
-
-
-
 function GetListeTaches($token,$IdPrestationContrat,$ws)
 {
 	global $URL_API_CCS, $g_useSoapClientV2;
@@ -464,6 +469,51 @@ function GetListeTaches($token,$IdPrestationContrat,$ws)
 		if(isset($result["GMAOGetListeTachesResult"]["KV"]))
         {
 			return json_encode($result["GMAOGetListeTachesResult"]["KV"]);
+
+        }else{
+            return "500";
+        }
+	}
+}
+
+
+
+
+
+
+function GetAppareils($token,$IdClientSite,$ws)
+{
+	global $URL_API_CCS, $g_useSoapClientV2;
+	$request = array("token"=>$token,"IdClientSite" => $IdClientSite);
+
+	if($g_useSoapClientV2)
+	{
+		$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+		$result = $client->__soapCall("GMAOGetAppareils",  array("parameters" => $request));
+
+		if (is_object($result)) {
+			$result = json_decode(json_encode($result), true);
+		}
+	}
+	else
+	{
+		$client = new nusoap_client($ws, true);
+		$client->soap_defencoding = 'UTF-8';
+		$client->decode_utf8 = false;
+		$result = $client->call("GMAOGetAppareils", $request, "http://tempuri.org/IWSGandara/", "", false, false);		
+	}
+
+	$error = $client->getError();
+
+
+    if ($error) {
+		error_log($error);
+		return $error;
+	} else {
+
+		if(isset($result["GMAOGetAppareilsResult"]["AppareilSecteur"]))
+        {
+			return json_encode($result["GMAOGetAppareilsResult"]["AppareilSecteur"]);
 
         }else{
             return "500";
@@ -527,9 +577,17 @@ function CallENDPOINT($url="",$endpoint="", )
 
 		echo(GetListeTaches($_POST['token'],$_POST['IdPrestationContrat'],$url));
 	}
-		
+
+	if($endpoint === "GMAOGetAppareils")
+	{
+
+		echo(GetAppareils($_POST['token'],$_POST['IdClientSite'],$url));
+	}
+
+	
 
 }
+
 
 
 

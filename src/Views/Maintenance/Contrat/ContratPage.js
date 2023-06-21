@@ -1,5 +1,5 @@
 //#region Imports
-import { useEffect, useState,useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 import dateFormat from "dateformat";
@@ -21,6 +21,7 @@ import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import ContratPrestation from "./Components/ContratPrestations";
 import { GetPrestationContrat } from "../../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
+import { DateSOAP } from "../../../functions";
 
 //#endregion
 
@@ -31,25 +32,26 @@ const ContratPage = () => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   //#region Données
+ 
+  const _dateContrat = 
+  new Date(
+    ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
+  )
+  // .toLocaleDateString()
+  
 
-  const _dateContrat = new Date(
-    // dateFormat(new Date(Contrat.DateSouscrit), "dd/mm/yyyy")
-    dateFormat(new Date(ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat), "dd/mm/yyyy")
-  );
+  
 
   const dateFinPeriode = () => {
     let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
 
     _dateEndTmp = addOneYear(_dateEndTmp);
 
-
     var day = _dateEndTmp.getDate() - 1;
     _dateEndTmp.setDate(day);
 
     return new Date(_dateEndTmp);
-
   };
-
 
   //#endregion
 
@@ -59,6 +61,7 @@ const ContratPage = () => {
   const [dateDebutPeriode, setDateDebutPeriode] = useState(
     GetDatePeriodeInitial()
   );
+  const [lastPeriode, setLastPeriode] = useState(null);
 
   //#endregion
 
@@ -75,7 +78,6 @@ const ContratPage = () => {
   }
 
   function GetNomMois(num, short = false) {
-    // console.log(num)
     if (num > 12) {
       num = num - 12;
     }
@@ -109,43 +111,52 @@ const ContratPage = () => {
     }
   }
 
-  /**
-   * Construit la date de début des preriodes initial
-   * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
-   */
+  // /**
+  //  * Construit la date de début des preriodes initial
+  //  * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
+  //  */
+  // function GetDatePeriodeInitial() {
+  //   let _day = 1;
+  //   let _monthI = _dateContrat.getMonth();
+  //   let _year = new Date().getFullYear();
+  //   let _DateRetour = new Date(_year, _monthI, _day);
+  //   return _DateRetour;
+  // }
+
+
   function GetDatePeriodeInitial() {
     let _day = 1;
-    let _monthI = _dateContrat.getMonth();
+    // let _monthI = _dateContrat.getMonth();
+    let _monthI = 0;
     let _year = new Date().getFullYear();
     let _DateRetour = new Date(_year, _monthI, _day);
     return _DateRetour;
   }
 
 
-
   const FetchDataPrestation = async () => {
+   
     SetPrestations([]);
-    await GetPrestationContrat(tokenCt,DateSOAP(dateDebutPeriode), DateSOAP(dateFinPeriode()), ClientSiteContratCtx.storedClientSite.IdClientSite  ,PrestationLoad)
+    setLastPeriode(DateSOAP(dateDebutPeriode));
+    
+    GetPrestationContrat(
+      tokenCt,
+      DateSOAP(dateDebutPeriode),
+      DateSOAP(dateFinPeriode()),
+      ClientSiteContratCtx.storedClientSite.IdClientSite,
+      PrestationLoad
+    )
   };
 
-const PrestationLoad = (data) => {
-  SetPrestations(data);
-    setIsLoadedPresta(true);
-}
 
 
-  function DateSOAP(date) {
-    // Get year, month, and day part from the date
-    var year = date.toLocaleString("default", { year: "numeric" });
-    var month = date.toLocaleString("default", { month: "2-digit" });
-    // var month = "01"
-    var day = date.toLocaleString("default", { day: "2-digit" });
+  const PrestationLoad = (data) => {
+    SetPrestations(data);
 
+    if (lastPeriode === DateSOAP(dateDebutPeriode)) setIsLoadedPresta(true);
+  };
 
-    return year + "-" + month + "-" + day;
-  }
-
-
+ 
   //#endregion
 
   //#region Evenement
@@ -205,10 +216,7 @@ const PrestationLoad = (data) => {
         drop="down-centered"
         style={{ borderRadius: "10px" }}
         id="dropdown-datePeriode"
-        title={`Période : ${GetNomMois(
-          dateDebutPeriode.getMonth() + 1,
-          small
-        )}
+        title={`Période : ${GetNomMois(dateDebutPeriode.getMonth() + 1, small)}
               ${dateDebutPeriode.getFullYear()} à
               ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
               ${dateFinPeriode().getFullYear()}`}
@@ -231,28 +239,25 @@ const PrestationLoad = (data) => {
     );
   };
 
-
-
   useEffect(() => {
     async function makeRequest() {
       setIsLoadedPresta(false);
       await FetchDataPrestation();
-
     }
     makeRequest();
     // eslint-disable-next-line
-  }, [ClientSiteContratCtx.storedClientSite.IdClientSite]);
-
-
-
+  }, [ClientSiteContratCtx.storedClientSite.IdClientSite, lastPeriode]);
 
   return (
-    <Container fluid className="h-100" > 
-
+    <Container fluid className="h-100">
       <ContratPrestation
         IsLoaded={isLoadedPresta}
         Prestations={Prestations}
-        datePrestation={new Date(ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat)}
+        datePrestation={
+          new Date(
+            ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
+          )
+        }
         ParentComponentPeriodeSelect={
           <BreakpointProvider>
             <Breakpoint large up>
