@@ -1,6 +1,5 @@
 //#region Imports
 import { useState, useEffect, useContext } from "react";
-import { Breakpoint, BreakpointProvider } from "react-socks";
 //#region FontAwsome icones
 
 //#endregion
@@ -9,14 +8,15 @@ import { Breakpoint, BreakpointProvider } from "react-socks";
 import Container from "react-bootstrap/Container";
 import Placeholder from "react-bootstrap/Placeholder";
 import Image from "react-bootstrap/Image";
-import Badge from "react-bootstrap/Badge";
-import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 
 //#endregion
 
 //#region Components
 import TableData, {
+  CreateFilter,
+  CreateNewButtonFilter,
+  CreateNewCardModel,
   CreateNewCell,
   CreateNewHeader,
 } from "../../../components/commun/TableData";
@@ -26,6 +26,7 @@ import TableData, {
 //#region DEV
 import { GetListeAppareils } from "../../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
+import { Badge } from "react-bootstrap";
 
 //#endregion
 
@@ -44,12 +45,6 @@ const AppareilsPage = () => {
   //#region States
   const [isLoaded, setIsLoaded] = useState(false);
 
-  //#region filter/search/sort
-
-  const [filterActif, SetFilterActif] = useState(true);
-  const [filterHorscontrat, SetFilterHorscontrat] = useState(true);
-  const [filterDetruit, SetFilterDetruit] = useState(true);
-
   //#endregion
 
   //#endregion
@@ -61,6 +56,7 @@ const AppareilsPage = () => {
   };
 
   const GetAppareils = async () => {
+    setIsLoaded(false);
     await GetListeAppareils(
       tokenCx,
       ClientSiteContratCtx.storedClientSite.IdClientSite,
@@ -70,12 +66,12 @@ const AppareilsPage = () => {
 
   function CreateHeaderForTable() {
     let _headers = [];
-    _headers.push(CreateNewHeader("RefClientAppareilSecteur", true, "Secteur"));
-    _headers.push(CreateNewHeader("IdAppareilSecteur", false, "Code"));
+    _headers.push(CreateNewHeader("RefClientAppareilSecteur", CreateFilter(true,true,false,true), "Secteur"));
+    _headers.push(CreateNewHeader("IdAppareilSecteur",  CreateFilter(true,true,true,true), "Code"));
     _headers.push(
-      CreateNewHeader("DesignationAppareilSecteur", true, "Libelle")
+      CreateNewHeader("DesignationAppareilSecteur",  CreateFilter(true,true,false,true), "Libelle")
     );
-    _headers.push(CreateNewHeader("IdEtat", false, "État"));
+    _headers.push(CreateNewHeader("IdEtat", CreateFilter(), "État"));
 
     return _headers;
   }
@@ -90,48 +86,20 @@ const AppareilsPage = () => {
     return _cells;
   }
 
-  // const reactStringReplace = require("react-string-replace");
-  /**
-   *
-   * @param {*Le texte qui peut éventuellement contenir 'search'} text
-   * @returns Le même texte mais avec le 'search' balisé par <mark></mark>
-   */
-  function HighlightTextIfSearch(text) {
-    // //L'utilisateur à recherché quelque chose et le texte contient ce qu'il à rechercher
-    // if (
-    //   search.length > 0 &&
-    //   text.toUpperCase().includes(search.toUpperCase())
-    // ) {
-    //   //on remplace le 'search' dans le 'text' par <mark>'match'</mark>
-    //   return (
-    //     <span>
-    //       {reactStringReplace(text, search, (match, i) => (
-    //         <mark key={i}>{match}</mark>
-    //       ))}
-    //     </span>
-    //   );
-    // } else {
-    //   return text;
-    // }
-    return text;
+  function CreateButtonFilters() {
+    let _bt = [];
+    _bt.push(CreateNewButtonFilter("IdEtat", 56, EditorFilter));
+    _bt.push(CreateNewButtonFilter("IdEtat", 57, EditorFilter));
+    _bt.push(CreateNewButtonFilter("IdEtat", 206, EditorFilter));
+    return _bt;
   }
 
   /**
    * Retourne la liste des appareils filtrée
    * @returns La liste des appareils à laquelle on a appliqué les filtres, le search et l'order by
    */
-  const GetAppareilsSearched = () => {
+  const GetAppareilsTrimed = () => {
     let _listeAppareil = listeAppareils;
-
-    //Filtres
-    if (!filterActif)
-      _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 56);
-
-    if (!filterHorscontrat)
-      _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 206);
-
-    if (!filterDetruit)
-      _listeAppareil = _listeAppareil.filter((appar) => appar.IdEtat !== 57);
 
     return _listeAppareil;
   };
@@ -139,11 +107,11 @@ const AppareilsPage = () => {
   function GetBGColorAppareilEtat(IdEtat) {
     switch (IdEtat) {
       case 206:
-        return "bg-secondary";
+        return "secondary";
       case 56:
-        return "bg-primary";
+        return "primary";
       case 57:
-        return "bg-danger";
+        return "danger";
       default:
         break;
     }
@@ -174,19 +142,7 @@ const AppareilsPage = () => {
   const AppareilGrey = require("../../../image/bottleGrey.png");
   const AppareilRed = require("../../../image/bottleRed.png");
 
-  const ButtonFilter = (props) => {
-    return (
-      <li
-        className={props.state ? "li-actif" : "li-inactif"}
-        onClick={() => props.methodState(!props.state)}
-      >
-        {GetImageAppareilEtat(props.IdEtat, "img-bt-filter")}
-        {props.title} {isLoaded && `(${props.number})`}
-      </li>
-    );
-  };
-
-  const GetImageAppareilEtat = (IdEtat, className) => {
+  const GetImageAppareilEtat = ({ IdEtat, className }) => {
     return (
       <Image
         className={className}
@@ -203,142 +159,72 @@ const AppareilsPage = () => {
   //#endregion
 
   //#region TableData
+
+  //#region Editors
   const EditorEtat = (IdEtat) => {
     return (
-      <span className={`badge badge-${GetBGColorAppareilEtat(IdEtat)}`}>
+      <span className={`badge badge-bg-${GetBGColorAppareilEtat(IdEtat)}`}>
         {GetLibelleEtat(IdEtat)}
       </span>
     );
   };
 
+  const EditorFilter = (value) => {
+    return (
+      <span>
+        <GetImageAppareilEtat IdEtat={value} className={"img-bt-filter"} />
+        {GetLibelleEtat(value)}
+      </span>
+    );
+  };
+
+  const EditorCardBody = (appareil) => {
+    return (
+      <span>
+        <GetImageAppareilEtat IdEtat={appareil.IdEtat} />
+        <Badge pill bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
+          {GetLibelleEtat(appareil.IdEtat)}
+        </Badge>
+      </span>
+    );
+  };
+
+  const EditorCardTitle = (appareil) => {
+    return `${appareil.IdAppareilSecteur} - ${appareil.DesignationAppareilSecteur}`;
+  };
+
+  const EditorCardSubtitle = (appareil) => {
+    return `Secteur : ${appareil.RefClientAppareilSecteur}`;
+  };
+
+  //#endregion
+
   const TableAppareils = () => {
     const _Headers = CreateHeaderForTable();
     const _Cells = CreateCellsForTable();
 
+    const _CardModel = CreateNewCardModel(
+      EditorCardBody,
+      EditorCardTitle,
+      EditorCardSubtitle
+    );
+
+    const _ButtonFilters = CreateButtonFilters();
+
     return (
       <TableData
-        Data={GetAppareilsSearched()}
+        Data={GetAppareilsTrimed()}
         Headers={_Headers}
         Cells={_Cells}
         IsLoaded={isLoaded}
         Pagination
-        TopPannelLeftToSearch={
-          <Col md={"auto"} className="m-1">
-            <div className="project-sort-nav">
-              <nav>
-                <ul>
-                  {listeAppareils.filter((appar) => appar.IdEtat === 56)
-                    .length > 0 &&
-                    ButtonFilter({
-                      title: "Actif",
-                      methodState: SetFilterActif,
-                      state: filterActif,
-                      number: listeAppareils.filter(
-                        (appar) => appar.IdEtat === 56
-                      ).length,
-                      IdEtat: 56,
-                    })}
-
-                  {listeAppareils.filter((appar) => appar.IdEtat === 206)
-                    .length > 0 &&
-                    ButtonFilter({
-                      title: "Hors contrat",
-                      methodState: SetFilterHorscontrat,
-                      state: filterHorscontrat,
-                      number: listeAppareils.filter(
-                        (appar) => appar.IdEtat === 206
-                      ).length,
-                      IdEtat: 206,
-                    })}
-
-                  {listeAppareils.filter((appar) => appar.IdEtat === 57)
-                    .length > 0 &&
-                    ButtonFilter({
-                      title: "Détruit",
-                      methodState: SetFilterDetruit,
-                      state: filterDetruit,
-                      number: listeAppareils.filter(
-                        (appar) => appar.IdEtat === 57
-                      ).length,
-                      IdEtat: 57,
-                    })}
-                </ul>
-              </nav>
-            </div>
-          </Col>
-        }
+        ButtonFilters={_ButtonFilters}
+        CardModel={_CardModel}
       />
     );
   };
 
   //#endregion
-
-  //#region small
-  const AppareilsCards = () => {
-    if (!isLoaded) {
-      return <div>{PlaceHolderCards(3)}</div>;
-    }
-
-    return GetAppareilsSearched().map((appareil) => {
-      return (
-        <Card
-          key={appareil.IdAppareilSecteur}
-          className={`m-2 border border-${GetBGColorAppareilEtat(
-            appareil.IdEtat
-          )} `}
-        >
-          <Card.Body>
-            <Card.Title>
-              {appareil.IdAppareilSecteur} -{" "}
-              {HighlightTextIfSearch(appareil.DesignationAppareilSecteur)}
-            </Card.Title>
-            <Card.Subtitle className="mb-2 text-muted">
-              Secteur :{" "}
-              {HighlightTextIfSearch(appareil.RefClientAppareilSecteur)}
-            </Card.Subtitle>
-            <Card.Text>
-              {GetImageAppareilEtat(appareil.IdEtat)}
-              <Badge pill bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
-                {GetLibelleEtat(appareil.IdEtat)}
-              </Badge>
-            </Card.Text>
-          </Card.Body>
-        </Card>
-      );
-    });
-  };
-
-  const PlaceHolderCards = (numberOfLines) => {
-    let _arrayLoading = [];
-    for (let index = 0; index < numberOfLines; index++) {
-      _arrayLoading.push(index + 1);
-    }
-    return _arrayLoading.map((i) => {
-      return (
-        <Card key={i} className="m-2 border border-secondary">
-          <Card.Body>
-            <Card.Title>
-              <Placeholder as="p" animation="glow">
-                <Placeholder xs={6} />
-              </Placeholder>
-            </Card.Title>
-
-            <Card.Subtitle className="mb-2 text-muted">
-              <Placeholder as="p" animation="glow">
-                Secteur : <Placeholder xs={3} />
-              </Placeholder>
-            </Card.Subtitle>
-
-            <div>
-              <Placeholder as="p" animation="glow">
-                <Placeholder xs={1} />
-              </Placeholder>
-            </div>
-          </Card.Body>
-        </Card>
-      );
-    });
-  };
 
   //#endregion
 
@@ -347,7 +233,7 @@ const AppareilsPage = () => {
   useEffect(() => {
     GetAppareils();
     // eslint-disable-next-line
-  }, [isLoaded]);
+  }, [ClientSiteContratCtx.storedClientSite.IdClientSite]);
 
   return (
     <Container fluid className="h-100">
@@ -363,14 +249,7 @@ const AppareilsPage = () => {
           )}
         </span>
       </Col>
-      <BreakpointProvider>
-        <Breakpoint large up>
-          <TableAppareils />
-        </Breakpoint>
-        <Breakpoint medium down>
-          {AppareilsCards()}
-        </Breakpoint>
-      </BreakpointProvider>
+      <TableAppareils />
     </Container>
   );
 };

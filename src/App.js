@@ -28,7 +28,8 @@ import { useState, createContext } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NouvelleInterventionPage from "./Views/Depannage/Interventions/NouvelleInterventionPage";
 import FacturesPage from "./Views/Factures/FacturesPage";
-import { GetListeParametres } from "./axios/WSGandara";
+import WaiterPage from "./Views/Home/Waiter";
+import ErrorPage from "./Views/Home/Error";
 
 //#endregion
 
@@ -68,14 +69,14 @@ function App() {
   //#endregion
 
   //#region Parametres
-
-  const [arrayParams, setArrayParams] = useState([]);
-  const RecupererParams = async () => {
-    const FetchSetParams = (data) => {
-      setArrayParams(data);
-    };
-    await GetListeParametres(jwt, FetchSetParams);
-  };
+  const storedParams = JSON.parse(localStorage.getItem("listeParams"));
+// eslint-disable-next-line
+  const [arrayParams, setArrayParams] = useState(null);
+  const setParams = (params) => {
+    localStorage.setItem("listeParams",JSON.stringify(params));
+    setArrayParams(params)
+  }
+  
 
   //#endregion
 
@@ -99,7 +100,7 @@ function App() {
         value={{ storedListe, setListe, storedClientSite, setClientSite }}
       >
         <div className="App font-link background">
-          <LoginPage setToken={setToken} getSetParams={RecupererParams} />
+          <LoginPage setToken={setToken} setParams={setParams} />
         </div>
       </ListeClientSiteContratContext.Provider>
     );
@@ -112,12 +113,14 @@ function App() {
       <ClientSiteContratContext.Provider
         value={{ storedClientSite, setClientSite, storedListe }}
       >
-        <ParametresContext.Provider value={[{k:"TelUrgenceIntervention", v:"01 02 03 04 05"}]}>
+        <ParametresContext.Provider value={storedParams}>
         <Router>
           <div className="App font-link background">
             <NavbarMenu handleDeconnexion={handleDeconnexion} />
-
+            
             <Routes>
+              <Route path="/waiting" element={<WaiterPage />} />
+              <Route path="/error" element={<ErrorPage />} />
               <Route path="/" element={<HomePage />} />
               <Route path="/factures" element={<FacturesPage />} />
               <Route path="/maintenance/contrat" element={<ContratPage />} />

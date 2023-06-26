@@ -78,7 +78,9 @@
   height: 75vh;
 }
 
-
+.waiting {
+  background-color: gray;
+}
 
 .bt-eye-password {
   background-color: transparent !important;
@@ -292,7 +294,11 @@
 }
 
 
-
+.row-height{
+  height: 3rem !important;
+  overflow: hidden;
+  white-space: nowrap;  
+}
 
 .table-presta-row-selected {
   background-color: whitesmoke;

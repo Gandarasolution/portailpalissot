@@ -1,30 +1,38 @@
 //#region Imports
 
-import { useState } from "react";
-import { Button, Col, Container, Dropdown, DropdownButton, Stack } from "react-bootstrap";
+import { useState, useEffect,useContext, createContext } from "react";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight, faDownload, faEye } from "@fortawesome/free-solid-svg-icons";
+
+//#region Bootstrap
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Stack from "react-bootstrap/Stack";
+//#endregion
+
+//#region Components
+import { GetListeFactures } from "../../axios/WSGandara";
+import { DateSOAP, GetNomMois, addOneYear, subOneYear } from "../../functions";
+import { ClientSiteContratContext, TokenContext } from "../../App";
 import TableData, {
+  CreateFilter,
+  CreateNewButtonFilter,
+  CreateNewCardModel,
   CreateNewCell,
   CreateNewHeader,
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
 } from "../../components/commun/TableData";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight, faDownload, faEye } from "@fortawesome/free-solid-svg-icons";
-import { DateSOAP, GetNomMois, addOneYear, subOneYear } from "../../functions";
-import { GetListeFactures } from "../../axios/WSGandara";
-import { useContext } from "react";
-import { ClientSiteContratContext, TokenContext } from "../../App";
-import { useEffect } from "react";
-
-//#region Bootstrap
-
-//#endregion
-
-//#region Components
-
+import { Placeholder, Row } from "react-bootstrap";
 //#endregion
 
 //#endregion
+
+export const FactureContext = createContext(null);
 
 const FacturesPage = () => {
 
@@ -35,7 +43,12 @@ const FacturesPage = () => {
   const [isFacturesLoaded, setIsFactureLoaded] = useState(false);
   const [listeFactures, setListeFactures] = useState([]);
   const [dateDebutPeriode, setDateDebutPeriode] = useState(
-    GetDatePeriodeInitial())
+    GetDatePeriodeInitial());
+
+
+    const [factureSelected, setFactureSelected] = useState(null);
+    const [voirFacture,setVoirFacture] = useState(false);
+    const [TelechargerFacture, setTelechargerFacture] = useState(false);
 
   //#endregion
 
@@ -52,20 +65,17 @@ const GetListeInterventions = async () => {
 }
 
 
-
   /**
    * Construit la date de début des preriodes initial
    * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
    */
   function GetDatePeriodeInitial() {
     let _day = 1;
-    // let _monthI = _dateContrat.getMonth();
     let _monthI = 0;
     let _year = new Date().getFullYear();
     let _DateRetour = new Date(_year, _monthI, _day);
     return _DateRetour;
   }
-
 
 
   const dateFinPeriode = () => {
@@ -81,26 +91,21 @@ const GetListeInterventions = async () => {
 
 
 
-
-
-
   function CreateHeaderForTable() {
-
     // Date	Code	Libellé	Total HT	Total TTC	Origine	Type
-
     let _headers = [];
     _headers.push(
-      CreateNewHeader("DateFacture", true, "Date")
+      CreateNewHeader("DateFacture", CreateFilter(true,true,false,false), "Date",EditorDateFromDateTime)
     );
-    _headers.push(CreateNewHeader("IdFacture", true, "Facture N°"));
-    _headers.push(CreateNewHeader("LibelleFacture", true, "Libellé"));
+    _headers.push(CreateNewHeader("IdFacture", CreateFilter(true,true,false,true), "Facture N°"));
+    _headers.push(CreateNewHeader("Sujet", CreateFilter(true,true,false,true), "Libellé"));
     _headers.push(
-      CreateNewHeader("TotalHTFacture", true, "Total HT")
+      CreateNewHeader("MontantHT", CreateFilter(true,true,true,true), "Total HT",EditorMontant)
     );
-    _headers.push(CreateNewHeader("TotalTTCFacture", true, "Total TTC"));
-    _headers.push(CreateNewHeader("OrigineFacture", true, "Origine"));
-    _headers.push(CreateNewHeader("TypeFacture", true, "Type"));
-    _headers.push(CreateNewUnboundHeader(false, "Actions"));
+    _headers.push(CreateNewHeader("MontantTTC", CreateFilter(true,true,true,true), "Total TTC",EditorMontant));
+    _headers.push(CreateNewHeader("Dossier", CreateFilter(true,true,false,true), "Origine"));
+    _headers.push(CreateNewHeader("Type", CreateFilter(true,true,false,true), "Type"));
+    _headers.push(CreateNewUnboundHeader(CreateFilter(), "Actions"));
 
     return _headers;
   }
@@ -108,16 +113,16 @@ const GetListeInterventions = async () => {
   function CreateCellsForTable() {
     let _cells = [];
     _cells.push(
-      CreateNewCell("DateFacture", true, true, false)
+      CreateNewCell("DateFacture", true, true, false,EditorDateFromDateTime)
     );
-    _cells.push(CreateNewCell("IdFacture", true, true, false));
-    _cells.push(CreateNewCell("LibelleFacture", false, true, false));
+    _cells.push(CreateNewCell("IdFacture", false, true, false));
+    _cells.push(CreateNewCell("Sujet", true, true, false));
     _cells.push(
-      CreateNewCell("TotalHTFacture", true, true, false)
+      CreateNewCell("MontantHT", false, true, false,EditorMontant)
     );
-    _cells.push(CreateNewCell("TotalTTCFacture", false, true, false));
-    _cells.push(CreateNewCell("OrigineFacture", false, true, false));
-    _cells.push(CreateNewCell("TypeFacture", false, true, false));
+    _cells.push(CreateNewCell("MontantTTC", true, true, false,EditorMontant));
+    _cells.push(CreateNewCell("Dossier", false, true, false));
+    _cells.push(CreateNewCell("Type", false, true, false));
 
     _cells.push(
       CreateNewUnboundCell(
@@ -141,19 +146,82 @@ const GetListeInterventions = async () => {
   }
 
 
+  function CreateButtonFiltersForTable()
+  {
+    let _arrBt = [];
+
+    _arrBt.push(CreateNewButtonFilter("Type","Chantier"));
+    _arrBt.push(CreateNewButtonFilter("Type","Facture Contrat"));
+    _arrBt.push(CreateNewButtonFilter("Type","Facture SAV"));
+    _arrBt.push(CreateNewButtonFilter("Type","Facture SAV Selon Devis"));
+
+
+    return _arrBt;
+  }
+
 //#region Editors
+
+const EditorDateFromDateTime = (data) => {
+  var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+  let _match = data.match(dateRegex)[0]
+  return _match
+}
+
+
+const EditorMontant = (data) => {
+  try {
+    return `${new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+    }).format(data)}`;
+  } catch (error) {
+    return `${data} €`;
+  }
+};
+
 
 const EditorActionVoir = (e) => {
 
     return (
+      <Button variant="" >
         <FontAwesomeIcon icon={faEye}  />
+      </Button>
     )
 }
 
 const EditorActionTelecharger = (e) => {
     return (
+      <Button variant="">
         <FontAwesomeIcon icon={faDownload} />
+      </Button>
     )
+}
+
+
+const EditorCardBody = (facture) => {
+  return (
+    <span>
+
+    <Row>
+      <Col><h3>Montant Hors taxe : {EditorMontant(facture.MontantHT)}</h3></Col>
+      <Col><h3>Montant TTC : {EditorMontant(facture.MontantTTC)}</h3> </Col>
+    </Row>
+    <Row>
+      <Col className="p-4">
+      <Button className="m-2" onClick={()=> {setFactureSelected(facture); setVoirFacture(true);}} >Voir la facture</Button>
+      <Button className="m-2" onClick={()=> {setFactureSelected(facture); setTelechargerFacture(true);}}>Télécharger la facture</Button>
+      </Col>
+    </Row>
+    </span>
+  );
+}
+
+const EditorCardTitle = (facture) => {
+  return `F${facture.IdFacture} du ${EditorDateFromDateTime(facture.DateFacture)}`
+}
+
+const EditorCardSubtitle = (facture) => {
+  return `Origine : ${facture.Type} ${facture.Dossier}`
 }
 
 
@@ -193,7 +261,6 @@ const EditorActionTelecharger = (e) => {
   //#endregion
 
   //#region Composants
-
 
 
   const DropDownYears = (small) => {
@@ -251,36 +318,22 @@ const EditorActionTelecharger = (e) => {
     const _Headers = CreateHeaderForTable();
     const _Cells = CreateCellsForTable();
 
-    // const _CardModel = CreateNewCardModel(
-    //   EditorCardBody,
-    //   EditorCardTitle,
-    //   (presta) =>
-    //     ` ${presta.IdPrestationContrat} - ${presta.DescriptionPrestationContrat}`
-    // );
+    const _ButtonFilters = CreateButtonFiltersForTable();
+    const _CardModel = CreateNewCardModel(
+      EditorCardBody,
+      EditorCardTitle,
+     EditorCardSubtitle
+    );
 
     return (
+      <FactureContext.Provider value={{factureSelected, voirFacture, setVoirFacture, TelechargerFacture, setTelechargerFacture}}>
+
       <TableData
-        // Data={GetListePrestationPrefiltre()}
         Data={listeFactures}
         Headers={_Headers}
         Cells={_Cells}
         IsLoaded={isFacturesLoaded}
         Pagination
-        // TopPannelLeftToSearch={
-        //   <Col className="m-1" md={"auto"}>
-        //     <div className="project-sort-nav">
-        //       <nav>
-        //         <ul>
-        //           <ButtonFilter IdEtat={-1} />
-        //           <ButtonFilter IdEtat={1} />
-        //           <ButtonFilter IdEtat={95} />
-        //           <ButtonFilter IdEtat={3} />
-        //           <ButtonFilter IdEtat={96} />
-        //         </ul>
-        //       </nav>
-        //     </div>
-        //   </Col>
-        // }
         TopPannelRightToSearch={
           <Col md={"auto"} className="m-1">
              <Stack direction="horizontal" className="centerStack " gap={1}>
@@ -298,14 +351,17 @@ const EditorActionTelecharger = (e) => {
                   variant=""
                   className="button-periode "
                   onClick={() => AjouterUnAnPeriode()}
-                >
+                  >
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Button>
               </Stack>
           </Col>
         }
-        // CardModel={_CardModel}
-      />
+        CardModel={_CardModel}
+        
+        ButtonFilters={_ButtonFilters}
+        />
+        </FactureContext.Provider>
     );
   };
 
@@ -313,28 +369,35 @@ const EditorActionTelecharger = (e) => {
   //#endregion
 
 
+
+  const GetFactures = async () => {
+    setIsFactureLoaded(false);
+    const FetchSetData = (data) => {
+      setListeFactures(data);
+      setIsFactureLoaded(true);
+    }
+    await GetListeFactures(tokenCt, clientSiteCt.storedClientSite.IdClientSite,DateSOAP(dateDebutPeriode), DateSOAP(dateFinPeriode()),FetchSetData)
+
+  }
+
 useEffect(()=> {
-  GetListeFactures();
-},[isFacturesLoaded])
+  
+  GetFactures();
+  //eslint-disable-next-line
+},[clientSiteCt.storedClientSite.IdClientSite])
 
   return (
     <Container fluid className="h-100">
       <Col md={12} style={{ textAlign: "start" }}>
         <span className="title">Factures </span>|
         <span className="subtitle">
-          {/* {IsLoaded ? (
-                ` ${
-                  Prestations.length
-                    ? Prestations.length
-                    : Prestations.IdPrestationContrat
-                    ? 1
-                    : 0
-                } prestations`
-              ) : (
-                <Placeholder animation="glow">
-                  <Placeholder xs={1} />
-                </Placeholder>
-              )} */}
+          {isFacturesLoaded ? (
+            ` ${listeFactures.length} factures`
+          ) : (
+            <Placeholder animation="glow">
+              <Placeholder xs={1} />
+            </Placeholder>
+          )}
         </span>
       </Col>
 

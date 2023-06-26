@@ -1,5 +1,5 @@
 //#region Imports
-import { useState } from "react";
+import { createContext,  useState } from "react";
 
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
@@ -26,6 +26,8 @@ import {
 
 //#region Components
 import TableData, {
+  CreateFilter,
+  CreateNewButtonFilter,
   CreateNewCardModel,
   CreateNewCell,
   CreateNewHeader,
@@ -38,36 +40,22 @@ import { GetNomMois } from "../../../../functions";
 
 //#endregion
 
+export const PrestaContext = createContext(null);
+
 const ContratPrestation = ({
   Prestations,
   ParentComponentPeriodeSelect,
   IsLoaded,
 }) => {
-  //#region Data
 
-  //#endregion
-
-  //#region States
-
-  //#region Filters
-
-  const [filterTous, setFilterTous] = useState(true);
-  const [filterNP, setFilterNP] = useState(false);
-  const [filterP, setFilterP] = useState(false);
-  const [filterEC, setFilterEC] = useState(false);
-  const [filterT, setFilterT] = useState(false);
-
-  //#endregion
-
-
-
-
-  //#endregion
+  const [showModalDoc, setShowModalDoc] = useState(false);
+  const [showModalTaches, setShowModalTache] = useState(false);
+  const [prestaSelected, setPrestaSelected] = useState(null);
 
   //#region Fonctions
 
   function GetLibEtat(e) {
-    switch (e) {
+    switch (Number(e)) {
       case 1:
         return "Non planifiée";
       case 95:
@@ -98,18 +86,7 @@ const ContratPrestation = ({
     }
   }
 
-  const GetListePrestationPrefiltre = () => {
-    //Les prestations sont filtrés par le 'search'
-    let _lPrestation = GetPrestationTrimmed();
 
-    //Les prestations sont filtrés par les boutons d'état
-    _lPrestation = FiltrePrestationsBouton(_lPrestation);
-
-    // //Les prestations sont filtrés par les colonnes
-    // _lPrestation = FiltrerParCollones(_lPrestation, arrayFilters);
-
-    return _lPrestation;
-  };
 
   const GetPrestationTrimmed = () => {
     let _lPrestation = Prestations;
@@ -137,51 +114,6 @@ const ContratPrestation = ({
     return _lPrestation;
   };
 
-  function FiltrePrestationsBouton(_lPrestations) {
-    if (!filterTous) {
-      let _arrayFilterIdEtat = [];
-      if (filterNP) _arrayFilterIdEtat.push(1);
-      if (filterP) _arrayFilterIdEtat.push(95);
-      if (filterEC) _arrayFilterIdEtat.push(3);
-      if (filterT) _arrayFilterIdEtat.push(96);
-
-      _lPrestations = _lPrestations.filter((presta) =>
-        _arrayFilterIdEtat.includes(presta.IdEtat)
-      );
-    }
-
-    return _lPrestations;
-  }
-
-  function GetFilterState(idEtat) {
-    switch (idEtat) {
-      case 1:
-        return filterNP;
-      case 95:
-        return filterP;
-      case 3:
-        return filterEC;
-      case 96:
-        return filterT;
-      default:
-        return null;
-    }
-  }
-
-  function GetFilterSetState(idEtat) {
-    switch (idEtat) {
-      case 1:
-        return setFilterNP;
-      case 95:
-        return setFilterP;
-      case 3:
-        return setFilterEC;
-      case 96:
-        return setFilterT;
-      default:
-        return null;
-    }
-  }
 
   const _methodeDate = (e) => {
     return `${GetNomMois(new Date(e).getMonth() + 1)}  ${new Date(
@@ -192,15 +124,15 @@ const ContratPrestation = ({
   function CreateHeaderForTable() {
     let _headers = [];
     _headers.push(
-      CreateNewHeader("DateInterventionPrestationTrimed", true, "Date")
+      CreateNewHeader("DateInterventionPrestationTrimed", CreateFilter(true,true,false,false), "Date")
     );
-    _headers.push(CreateNewHeader("Secteur", true, "Secteur"));
-    _headers.push(CreateNewHeader("IdPrestationContrat", true, "N°"));
+    _headers.push(CreateNewHeader("Secteur", CreateFilter(true,true,false,true), "Secteur"));
+    _headers.push(CreateNewHeader("IdPrestationContrat", CreateFilter(true,true,true,true), "N°"));
     _headers.push(
-      CreateNewHeader("DescriptionPrestationContrat", true, "Libellé")
+      CreateNewHeader("DescriptionPrestationContrat", CreateFilter(true,true,false,true), "Libellé")
     );
-    _headers.push(CreateNewHeader("IdEtat", true, "Etat"));
-    _headers.push(CreateNewUnboundHeader(false, "Actions"));
+    _headers.push(CreateNewHeader("IdEtat", CreateFilter(true,true,false,false), "Etat",(e)=>{return GetLibEtat(e)}));
+    _headers.push(CreateNewUnboundHeader(CreateFilter(false), "Actions"));
 
     return _headers;
   }
@@ -239,46 +171,24 @@ const ContratPrestation = ({
     return _cells;
   }
 
+
+  function CreateButtonFiltersForTable()
+  {
+    let _arrBt = [];
+  
+    _arrBt.push(CreateNewButtonFilter("IdEtat",1,(e)=> {return GetLibEtat(e)}));
+    _arrBt.push(CreateNewButtonFilter("IdEtat",95,(e)=> {return GetLibEtat(e)}));
+    _arrBt.push(CreateNewButtonFilter("IdEtat",3,(e)=> {return GetLibEtat(e)}));
+    _arrBt.push(CreateNewButtonFilter("IdEtat",96,(e)=> {return GetLibEtat(e)}));
+
+    return _arrBt;
+  }
+
+
   //#endregion
 
   //#region Evenements
 
-  //#region Filtres
-
-  const handleTousFilter = () => {
-    let _valueStart = JSON.parse(JSON.stringify(filterTous));
-
-    if (_valueStart) {
-      //on décoche la case tous : vérification qu'il y a au moins 1 filtre actif
-      if (filterEC || filterNP || filterP || filterT) {
-        setFilterTous(false);
-      }
-    } else {
-      //on coche la case tous : on décoche tous les filtres
-
-      setFilterEC(false);
-      setFilterNP(false);
-      setFilterP(false);
-      setFilterT(false);
-
-      setFilterTous(true);
-    }
-  };
-
-  const handleEtatsFilter = (props) => {
-    let _valueStart = JSON.parse(JSON.stringify(props.state));
-
-    if (_valueStart) {
-      //on décoche la case d'un filtre : vérification qu'il y a au moins un autre filtre sinon on coche la case tous
-      props.setState(false);
-    } else {
-      //on coche la case d'un filtre : on décoche la case Tous
-      setFilterTous(false);
-      props.setState(true);
-    }
-  };
-
-  //#endregion
 
   //#region Click
 
@@ -290,36 +200,7 @@ const ContratPrestation = ({
 
   //#region commun
 
-  //#region Panel de recherche
-
-  const ButtonFilter = ({ IdEtat }) => {
-    if (IdEtat === -1) {
-      return (
-        <li
-          className={filterTous ? "li-actif" : "li-inactif"}
-          onClick={() => handleTousFilter()}
-        >
-          {GetLibEtat(IdEtat)}
-        </li>
-      );
-    } else {
-      return (
-        <li
-          className={GetFilterState(IdEtat) ? "li-actif" : "li-inactif"}
-          onClick={() =>
-            handleEtatsFilter({
-              state: GetFilterState(IdEtat),
-              setState: GetFilterSetState(IdEtat),
-            })
-          }
-        >
-          {GetLibEtat(IdEtat)}
-        </li>
-      );
-    }
-  };
-
-  //#endregion
+ 
 
   //#region TableData
 
@@ -333,19 +214,23 @@ const ContratPrestation = ({
     );
   };
 
+
   const EditorCardBody = (presta) => {
+
     return (
       <>
         <h6>{`Secteur : ${presta.Secteur}`}</h6>
-        <Button className="m-2 p-2">
-          <FontAwesomeIcon icon={faFile} /> Liste des documents
+        <Button className={`m-2 p-2 noBorder ${presta.IdEtat === 96 ? "bg-success" : "bg-secondary"} `}
+        onClick={() => { if(presta.IdEtat === 96 ) {setShowModalDoc(true);setPrestaSelected(presta);}}}>
+          <FontAwesomeIcon icon={faFile}  /> Liste des documents
         </Button>
         <Button
-          className="m-2 p-2"
-          // onClick={() => handleAfficerListeTache(presta)}
+          className="m-2 p-2 noBorder bg-success"
+          onClick={() => {setShowModalTache(true);setPrestaSelected(presta);} }
         >
           <FontAwesomeIcon icon={faList} /> Relevés de tâches
         </Button>
+       
       </>
     );
   };
@@ -370,6 +255,8 @@ const ContratPrestation = ({
       </>
     );
   };
+
+
   const EditorActionDocuments = (presta) => {
     return (
       <span className="ms-2">
@@ -406,6 +293,9 @@ const ContratPrestation = ({
   const TablePrestation = () => {
     const _Headers = CreateHeaderForTable();
     const _Cells = CreateCellsForTable();
+    const _ButtonFilters = CreateButtonFiltersForTable();
+
+
 
     const _CardModel = CreateNewCardModel(
       EditorCardBody,
@@ -415,34 +305,26 @@ const ContratPrestation = ({
     );
 
     return (
+      <PrestaContext.Provider value={{showModalDoc, showModalTaches, setShowModalDoc, setShowModalTache, prestaSelected}} >
+
       <TableData
-        Data={GetListePrestationPrefiltre()}
+        Data={GetPrestationTrimmed()}
         Headers={_Headers}
         Cells={_Cells}
         IsLoaded={IsLoaded}
         Pagination
-        TopPannelLeftToSearch={
-          <Col className="m-1" md={"auto"}>
-            <div className="project-sort-nav">
-              <nav>
-                <ul>
-                  <ButtonFilter IdEtat={-1} />
-                  <ButtonFilter IdEtat={1} />
-                  <ButtonFilter IdEtat={95} />
-                  <ButtonFilter IdEtat={3} />
-                  <ButtonFilter IdEtat={96} />
-                </ul>
-              </nav>
-            </div>
-          </Col>
-        }
+        
         TopPannelRightToSearch={
           <Col md={"auto"} className="m-1">
             {ParentComponentPeriodeSelect}
           </Col>
         }
+
         CardModel={_CardModel}
-      />
+        ButtonFilters={_ButtonFilters}
+        
+        />
+        </PrestaContext.Provider>
     );
   };
 

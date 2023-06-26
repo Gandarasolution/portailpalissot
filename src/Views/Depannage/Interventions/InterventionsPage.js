@@ -6,10 +6,13 @@ import { Link } from "react-router-dom";
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
-import Nav from "react-bootstrap/Nav";
 import Placeholder from "react-bootstrap/Placeholder";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Stack from "react-bootstrap/Stack";
 
 //#endregion
 
@@ -17,7 +20,6 @@ import Card from "react-bootstrap/Card";
 import {  GetNomMois, addOneYear, subOneYear } from "../../../functions";
 import TableData, { CreateNewCell, CreateNewHeader } from "../../../components/commun/TableData";
 import ImageExtension from "../../../components/commun/ImageExtension";
-import { Button, Dropdown, DropdownButton, Stack } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 //#endregion
@@ -62,8 +64,6 @@ const InterventionPage = () => {
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeInterventions, setListeInterventions] = useState([]);
-
-
 
   const [gridColMDValue, setGridColMDValue] = useState(12);
   const [interSelected, setInterSelected] = useState(null);

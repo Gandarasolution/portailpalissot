@@ -4,12 +4,14 @@ import $ from "jquery";
 //#endregion
 
 //#region Données
- const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+//  const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
 //#region Fonction publics
+
+//#region Login
 
 const Connexion = async (login, pass, setToken) => {
   $.ajax({
@@ -29,7 +31,6 @@ const GetListeParametres = async (token, setData) => {
   $.ajax({
     type: "POST",
     url: urlAction + "GetListeParametres",
-
     data: {
       token: token,
     },
@@ -41,6 +42,8 @@ const GetListeParametres = async (token, setData) => {
       }
     },
   });
+
+  // setData([{k:"TelUrgenceIntervention", v:"01 02 03 04 05"}]);
 };
 
 const GetClientSiteContrat = async (token, setClientSiteContrat) => {
@@ -53,6 +56,8 @@ const GetClientSiteContrat = async (token, setClientSiteContrat) => {
     },
   });
 };
+
+//#endregion
 
 //#region Contrat
 
@@ -74,9 +79,9 @@ const GetPrestationContrat = async (
       IdSite: IdSite,
     },
     success(data) {
-      if (data==="Erreur de connexion"){
+      if (data === "Erreur de connexion") {
         setData(500);
-        return
+        return;
       }
       if (JSON.parse(JSON.stringify(data)) === "500") {
         setData([]);
@@ -110,10 +115,6 @@ const GetPrestationReleveTache = async (
   });
 };
 
-//#endregion
-
-//#region Documents
-
 const GetDocumentPrestation = async (
   token,
   IdDossierIntervention,
@@ -129,26 +130,43 @@ const GetDocumentPrestation = async (
   });
 };
 
-const VoirDocument = (b64, filename) => {
+//#endregion
+
+//#region Documents
+
+const VoirDocument = (b64, filename, targetWindow) => {
   $.ajax({
     type: "POST",
     url: `${urlAction}File64`,
     data: { b64: b64, filename: filename },
     success(data) {
       const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
-      window.open(urlToOpen, "_blank");
+      if (targetWindow) {
+        //Ouvre dans cette fenêtre
+        targetWindow.location.href = urlToOpen;
+      } else {
+        //Ouvre dans une nouvelle fenetre
+        window.open(urlToOpen, "_blank");
+      }
     },
   });
 };
 
-const TelechargerDocument = (b64, filename) => {
+const TelechargerDocument = (b64, filename, targetWindow) => {
   $.ajax({
     type: "POST",
     url: `${urlAction}File64`,
     data: { b64: b64, filename: filename },
     success(data) {
       const urlToOpen = `${urlAction}DownloadDocument&filename=${data}`;
-      window.open(urlToOpen, "_blank");
+      if (targetWindow) {
+        console.log(urlToOpen);
+        // targetWindow.location.href=urlToOpen;
+        window.open(urlToOpen, "_blank");
+        targetWindow.close();
+      } else {
+        window.open(urlToOpen, "_blank");
+      }
     },
   });
 };
@@ -216,32 +234,52 @@ const GetListeFactures = async (
   });
 };
 
-
-const VoirFactureDocument = async (token,IdFacture,TypeFacture,Avoir) => {
+const VoirFactureDocument = async (token, IdFacture, TypeFacture, Avoir) => {
+  let targetWindow = window.open("/waiting");
   $.ajax({
     type: "POST",
     url: urlAction + "GetFactureDocument",
-    data: { token: token, IdFacture: IdFacture,TypeFacture:TypeFacture,Avoir:Avoir },
+    data: {
+      token: token,
+      IdFacture: IdFacture,
+      TypeFacture: TypeFacture,
+      Avoir: Number(Avoir),
+    },
     success(data) {
       const _kv = JSON.parse(data);
-      VoirDocument(_kv.v,_kv.k);
+      VoirDocument(_kv.v, _kv.k, targetWindow);
+    },
+    error(error) {
+      targetWindow.location.href = `/error?error=${error.status}`;
     },
   });
-}
+};
 
-
-const TelechargerFactureDocument = async (token,IdFacture,TypeFacture,Avoir) => {
+const TelechargerFactureDocument = async (
+  token,
+  IdFacture,
+  TypeFacture,
+  Avoir
+) => {
+  let targetWindow = window.open("/waiting");
   $.ajax({
     type: "POST",
     url: urlAction + "GetFactureDocument",
-    data: { token: token, IdFacture: IdFacture,TypeFacture:TypeFacture,Avoir:Avoir },
+    data: {
+      token: token,
+      IdFacture: IdFacture,
+      TypeFacture: TypeFacture,
+      Avoir: Number(Avoir),
+    },
     success(data) {
       const _kv = JSON.parse(data);
-      TelechargerDocument(_kv.v,_kv.k);
+      TelechargerDocument(_kv.v, _kv.k, targetWindow);
+    },
+    error(error) {
+      targetWindow.location.href = `/error?error=${error.status}`;
     },
   });
-}
-
+};
 
 //#endregion
 
@@ -279,17 +317,17 @@ const GetListeInterventions = async (
 
 export {
   Connexion,
+  GetListeParametres,
   GetClientSiteContrat,
-  GetPrestationContrat,
-  GetDocumentPrestation,
   VoirDocument,
   TelechargerDocument,
   TelechargerZIP,
+  GetPrestationContrat,
   GetPrestationReleveTache,
+  GetDocumentPrestation,
   GetListeAppareils,
   GetListeFactures,
-  GetListeInterventions,
-  GetListeParametres,
   VoirFactureDocument,
-  TelechargerFactureDocument
+  TelechargerFactureDocument,
+  GetListeInterventions,
 };
