@@ -84,7 +84,7 @@ const GetPrestationContrat = async (
         return;
       }
       if (JSON.parse(JSON.stringify(data)) === "500") {
-        window.location.href ="/error"
+        window.location.href =`/error?error=${data}`
         setData([]);
       } else {
         setData(JSON.parse(data));

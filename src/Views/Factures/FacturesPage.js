@@ -34,7 +34,6 @@ import TableData, {
   CreateNewUnboundHeader,
 } from "../../components/commun/TableData";
 import TitreOfPage from "../../components/commun/TitreOfPage";
-import { Badge } from "react-bootstrap";
 //#endregion
 
 //#endregion

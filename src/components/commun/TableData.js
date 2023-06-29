@@ -237,10 +237,14 @@ const TableData = ({ ...props }) => {
 
   const handleTousFilter = () => {
     setBtFilterActif(null);
+    setPageActuelle(1);
+
   };
 
   const handleFilterClick = (filter) => {
     setBtFilterActif(filter);
+    setPageActuelle(1);
+
   };
 
   //#region Pagination
@@ -350,25 +354,25 @@ const TableData = ({ ...props }) => {
 
     //#region RangeDate
 
-    let _arrayDate = _arrayVal.map((date) => {
-      try {
-        if (!date) return date;
-        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
-        let _match = date.match(dateRegex)[0];
+    // let _arrayDate = _arrayVal.map((date) => {
+    //   try {
+    //     if (!date) return date;
+    //     var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+    //     let _match = date.match(dateRegex)[0];
 
-        let _retu = new Date(
-          _match.substring(6),
-          _match.substring(3, 5),
-          _match.substring(0, 2)
-        );
-        return _retu;
-      } catch (error) {
-        return date;
-      }
-    });
+    //     let _retu = new Date(
+    //       _match.substring(6),
+    //       _match.substring(3, 5),
+    //       _match.substring(0, 2)
+    //     );
+    //     return _retu;
+    //   } catch (error) {
+    //     return date;
+    //   }
+    // });
 
-    var maxDate = new Date(Math.max.apply(null, _arrayDate));
-    var minDate = new Date(Math.min.apply(null, _arrayDate));
+    // var maxDate = new Date(Math.max.apply(null, _arrayDate));
+    // var minDate = new Date(Math.min.apply(null, _arrayDate));
 
     //#endregion
 
