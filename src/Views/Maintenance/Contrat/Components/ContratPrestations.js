@@ -6,7 +6,6 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
-import Placeholder from "react-bootstrap/Placeholder";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 //#endregion
@@ -35,6 +34,7 @@ import TableData, {
   CreateNewUnboundHeader,
 } from "../../../../components/commun/TableData";
 import { GetNomMois } from "../../../../functions";
+import TitreOfPage from "../../../../components/commun/TitreOfPage";
 
 //#endregion
 
@@ -334,25 +334,7 @@ const ContratPrestation = ({
 
   return (
     <Container fluid>
-      <Col md={12} style={{ textAlign: "start" }}>
-        <span className="title">Plannification </span>|
-        <span className="subtitle">
-          {IsLoaded ? (
-            ` ${
-              Prestations.length
-                ? Prestations.length
-                : Prestations.IdPrestationContrat
-                ? 1
-                : 0
-            } prestations`
-          ) : (
-            <Placeholder animation="glow">
-              <Placeholder xs={1} />
-            </Placeholder>
-          )}
-        </span>
-      </Col>
-
+      <TitreOfPage titre={"Plannification"} soustitre={`${Prestations.length} prestations`} isLoaded={IsLoaded} />
       <TablePrestation />
     </Container>
   );

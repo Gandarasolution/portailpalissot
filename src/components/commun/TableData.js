@@ -90,11 +90,11 @@ const TableData = ({ ...props }) => {
         (data) => data[_filteractif.fieldname] === _filteractif.value
       );
     }
-    
+
     //Filtres par la recherche par colonne
-        if (arraySearch.length > 0) {
-          _lData = FiltrerParSearch(_lData, arraySearch);
-        }
+    if (arraySearch.length > 0) {
+      _lData = FiltrerParSearch(_lData, arraySearch);
+    }
 
     //Filtres par valeur min & max
     if (arrayFilterSeuis.length > 0) {
@@ -102,7 +102,9 @@ const TableData = ({ ...props }) => {
     }
 
     //Filtres par check
-    return FiltrerParCollones(_lData, arrayFilter);
+    _lData = FiltrerParCollones(_lData, arrayFilter);
+
+    return _lData;
   };
 
   //#region States
@@ -112,7 +114,9 @@ const TableData = ({ ...props }) => {
   const [arrayFilterSeuis, setArrayFilterSeuils] = useState([]);
   const [arraySearch, setArraySearch] = useState([]);
 
-  const [btFilterActif, setBtFilterActif] = useState(null);
+  const [btFilterActif, setBtFilterActif] = useState(
+    props.FilterDefaultValue ? props.FilterDefaultValue : null
+  );
 
   const [nbParPages, setNbParPages] = useState(10);
   const [pageActuelle, setPageActuelle] = useState(1);
@@ -195,7 +199,11 @@ const TableData = ({ ...props }) => {
   }
 
   const isFilterActive = (filter) => {
-    return btFilterActif === filter;
+    if (!btFilterActif) return false;
+    return (
+      btFilterActif.fieldname === filter.fieldname &&
+      btFilterActif.value === filter.value
+    );
   };
 
   //#endregion
@@ -206,6 +214,7 @@ const TableData = ({ ...props }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setPageActuelle(1);
     setSearch(e.target.value);
   };
 
@@ -339,6 +348,30 @@ const TableData = ({ ...props }) => {
 
     const _headerToApply = props.Headers.find((h) => h.fieldname === fieldname);
 
+    //#region RangeDate
+
+    let _arrayDate = _arrayVal.map((date) => {
+      try {
+        if (!date) return date;
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+        let _match = date.match(dateRegex)[0];
+
+        let _retu = new Date(
+          _match.substring(6),
+          _match.substring(3, 5),
+          _match.substring(0, 2)
+        );
+        return _retu;
+      } catch (error) {
+        return date;
+      }
+    });
+
+    var maxDate = new Date(Math.max.apply(null, _arrayDate));
+    var minDate = new Date(Math.min.apply(null, _arrayDate));
+
+    //#endregion
+
     //#region Range
     const minVal = _arrayVal.some(isNaN) ? undefined : Math.min(..._arrayVal);
     const maxVal = _arrayVal.some(isNaN) ? undefined : Math.max(..._arrayVal);
@@ -412,13 +445,21 @@ const TableData = ({ ...props }) => {
     };
 
     //#endregion
+
     return (
       <Popover className="popover-filters">
-        <Tabs defaultActiveKey={"filter"}>
+        <Tabs
+          defaultActiveKey={
+            Object.entries(_headerToApply.filter).find(
+              (value) => value[0] !== "isFilter" && value[1]
+            )[0]
+          }
+        >
           {_headerToApply.filter.isCheckbox && (
-            <Tab title="Valeur" eventKey={"filter"}>
+            <Tab title="Valeur" eventKey={"isCheckbox"}>
               <div id="ppvr-check">
                 {_arFilters.map((item, index) => {
+                  
                   if (item[0] === "undefined") return null;
                   return (
                     <Form.Check
@@ -446,9 +487,44 @@ const TableData = ({ ...props }) => {
               </div>
             </Tab>
           )}
+{/* 
+          <Tab title="Seuils" eventKey={"isRangeDate"}>
+            <div id="ppvr-rangeDate">
+              <Col>
+                <Form.Label>Minimum</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={minValue}
+                  onChange={HandleMinValueChanged}
+                />
+                <Form.Range
+                  min={minVal}
+                  max={maxVal}
+                  value={minValue}
+                  onChange={(e) => setMinvalue(e.target.value)}
+                />
+              </Col>
+              <Col>
+                <Form.Label>Maximum</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={maxValue}
+                  onChange={HandleMaxValueChanged}
+                />
+                <Form.Range
+                  min={minVal}
+                  max={maxVal}
+                  value={maxValue}
+                  onChange={(e) => setMaxValue(e.target.value)}
+                />
+              </Col>
+
+              <Button onClick={HandleFilterSeuilClick}>Appliquer</Button>
+            </div>
+          </Tab> */}
 
           {!_arrayVal.some(isNaN) && _headerToApply.filter.isRange && (
-            <Tab title="Seuils" eventKey={"range"}>
+            <Tab title="Seuils" eventKey={"isRange"}>
               <div id="ppvr-range">
                 <Col>
                   <Form.Label>Minimum</Form.Label>
@@ -485,7 +561,7 @@ const TableData = ({ ...props }) => {
           )}
 
           {_headerToApply.filter.isSearchCol && (
-            <Tab title="Recherche" eventKey={"search"}>
+            <Tab title="Recherche" eventKey={"isSearchCol"}>
               <div id="ppvr-search">
                 <InputGroup className="mb-3">
                   <Form.Control
@@ -664,6 +740,7 @@ const TableData = ({ ...props }) => {
 
     let _lData = Data();
     let _limiter = _lData.length;
+    let _isEllipsisNedded = _limiter / nbParPages + 1 > 10;
 
     _items.push(
       <Pagination.Prev
@@ -672,21 +749,229 @@ const TableData = ({ ...props }) => {
         className="m-1"
       />
     );
+
+    /*< 1 ... x-2 x-1 x x+1 x+2 ... l >
+
+      < 1 x+1 x+2 ... l >
+      if (_limiter / nbParPages + 1) > 10
+      {
+        
+      }
+*/
+
     for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
-      _items.push(
-        <Pagination.Item
-          key={number}
-          active={number === pageActuelle}
-          onClick={() => handlePageChange(number)}
-          className="m-1"
-        >
-          {number}
-        </Pagination.Item>
-      );
+      if (_isEllipsisNedded) {
+               
+        if (number === 1) {
+          // 1
+          _items.push(
+            <Pagination.Item
+              key={number}
+              active={number === pageActuelle}
+              onClick={() => handlePageChange(number)}
+              className="m-1"
+            >
+              {number}
+            </Pagination.Item>
+          );
+
+
+          if(pageActuelle === 1)
+          {
+
+         //x + 1
+         if (number + 1 < _limiter / nbParPages + 1) {
+          _items.push(
+            <Pagination.Item
+              key={number + 1}
+              active={number + 1 === pageActuelle}
+              onClick={() => handlePageChange(number + 1)}
+              className="m-1"
+            >
+              {number + 1}
+            </Pagination.Item>
+          );
+        }
+
+        //x + 2
+        if (number + 2 < _limiter / nbParPages + 1) {
+          _items.push(
+            <Pagination.Item
+              key={number + 2}
+              active={number + 2 === pageActuelle}
+              onClick={() => handlePageChange(number + 2)}
+              className="m-1"
+            >
+              {number + 2}
+            </Pagination.Item>
+          );
+        }
+
+        //Elispsis
+        if (number + 3 < _limiter / nbParPages + 1)
+        {
+          _items.push(<Pagination.Ellipsis className="m-1" key={number + 3} />);
+        }
+          continue;
+        }
+      }
+
+
+
+
+        if (number + 1 > _limiter / nbParPages + 1) {
+
+          if(pageActuelle === number)
+          {
+             //Elipsis
+          if (number - 3 > 1) {
+            _items.push(<Pagination.Ellipsis className="m-1" key={number - 3} />);
+          }
+
+          //x - 2
+          if (number - 2 > 1) {
+            _items.push(
+              <Pagination.Item
+                key={number - 2}
+                active={number - 2 === pageActuelle}
+                onClick={() => handlePageChange(number - 2)}
+                className="m-1"
+              >
+                {number - 2}
+              </Pagination.Item>
+            );
+          }
+
+          // x - 1
+          if (number - 1 > 1) {
+            _items.push(
+              <Pagination.Item
+                key={number - 1}
+                active={number - 1 === pageActuelle}
+                onClick={() => handlePageChange(number - 1)}
+                className="m-1"
+              >
+                {number - 1}
+              </Pagination.Item>
+            );
+          }
+          }
+
+          _items.push(
+            <Pagination.Item
+              key={number}
+              active={number === pageActuelle}
+              onClick={() => handlePageChange(number)}
+              className="m-1"
+            >
+              {number}
+            </Pagination.Item>
+          );
+          continue;
+        }
+
+
+
+        if (number === pageActuelle) {
+          //Elipsis
+          if (number - 3 > 1) {
+            _items.push(<Pagination.Ellipsis className="m-1" key={number - 3} />);
+          }
+
+          //x - 2
+          if (number - 2 > 1) {
+            _items.push(
+              <Pagination.Item
+                key={number - 2}
+                active={number - 2 === pageActuelle}
+                onClick={() => handlePageChange(number - 2)}
+                className="m-1"
+              >
+                {number - 2}
+              </Pagination.Item>
+            );
+          }
+
+          // x - 1
+          if (number - 1 > 1) {
+            _items.push(
+              <Pagination.Item
+                key={number - 1}
+                active={number - 1 === pageActuelle}
+                onClick={() => handlePageChange(number - 1)}
+                className="m-1"
+              >
+                {number - 1}
+              </Pagination.Item>
+            );
+          }
+
+          //x
+          _items.push(
+            <Pagination.Item
+              key={number}
+              active={number === pageActuelle}
+              onClick={() => handlePageChange(number)}
+              className="m-1"
+            >
+              {number}
+            </Pagination.Item>
+          );
+
+          //x + 1
+          if (number + 1 < _limiter / nbParPages) {
+            _items.push(
+              <Pagination.Item
+                key={number + 1}
+                active={number + 1 === pageActuelle}
+                onClick={() => handlePageChange(number + 1)}
+                className="m-1"
+              >
+                {number + 1}
+              </Pagination.Item>
+            );
+          }
+
+          //x + 2
+          if (number + 2 < _limiter / nbParPages ) {
+            _items.push(
+              <Pagination.Item
+                key={number + 2}
+                active={number + 2 === pageActuelle}
+                onClick={() => handlePageChange(number + 2)}
+                className="m-1"
+              >
+                {number + 2}
+              </Pagination.Item>
+            );
+          }
+
+          //Elispsis
+          if (number + 3 < _limiter / nbParPages)
+          {
+            _items.push(<Pagination.Ellipsis className="m-1" key={number + 3} />);
+          }
+
+
+          continue;
+        }
+      } else {
+        _items.push(
+          <Pagination.Item
+            key={number}
+            active={number === pageActuelle}
+            onClick={() => handlePageChange(number)}
+            className="m-1"
+          >
+            {number}
+          </Pagination.Item>
+        );
+      }
     }
+
     _items.push(
       <Pagination.Next
-        key={_items.length + 1}
+        key={-1}
         onClick={() => handlePageNext(_limiter / nbParPages)}
         className="m-1"
       />
@@ -937,7 +1222,7 @@ const TableData = ({ ...props }) => {
       case "tagListeDocuments":
         HandleAfficherDocuments(item);
         break;
-      case "tagInterventionfactures":
+      case "tagInterventionDocuments":
         HandleAfficherFacture(Data()[index]);
         break;
       case "tagFactureVoir":
@@ -1393,6 +1678,9 @@ const TableData = ({ ...props }) => {
                     }
                   />
                 )}
+
+
+
               </Table>
             </Col>
 

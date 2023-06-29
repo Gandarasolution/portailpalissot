@@ -6,9 +6,7 @@ import { useState, useEffect, useContext } from "react";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
-import Placeholder from "react-bootstrap/Placeholder";
 import Image from "react-bootstrap/Image";
-import Col from "react-bootstrap/Col";
 
 //#endregion
 
@@ -27,6 +25,7 @@ import TableData, {
 import { GetListeAppareils } from "../../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
 import { Badge } from "react-bootstrap";
+import TitreOfPage from "../../../components/commun/TitreOfPage";
 
 //#endregion
 
@@ -219,7 +218,9 @@ const AppareilsPage = () => {
         IsLoaded={isLoaded}
         Pagination
         ButtonFilters={_ButtonFilters}
+        FilterDefaultValue={CreateNewButtonFilter("IdEtat", 56, EditorFilter)} 
         CardModel={_CardModel}
+        
       />
     );
   };
@@ -237,18 +238,7 @@ const AppareilsPage = () => {
 
   return (
     <Container fluid className="h-100">
-      <Col md={12} style={{ textAlign: "start" }}>
-        <span className="title">Liste des appareils </span>|
-        <span className="subtitle">
-          {isLoaded ? (
-            ` ${listeAppareils.length} appareils`
-          ) : (
-            <Placeholder animation="glow">
-              <Placeholder xs={1} />
-            </Placeholder>
-          )}
-        </span>
-      </Col>
+      <TitreOfPage titre={"Liste des appareils"} soustitre={` ${listeAppareils.length} appareils`} isLoaded={isLoaded} />
       <TableAppareils />
     </Container>
   );

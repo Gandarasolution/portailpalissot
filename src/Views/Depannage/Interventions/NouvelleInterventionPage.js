@@ -1,41 +1,46 @@
 //#region Imports
-
-import { faBell } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext } from "react";
 import { useState } from "react";
-import {
-  Badge,
-  Button,
-  Col,
-  Container,
-  FloatingLabel,
-  Form,
-  Row,
-} from "react-bootstrap";
-import { ParametresContext } from "../../../App";
+
+//#region FontAwesome
+import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//#endregion
 
 //#region Bootstrap
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
 
 //#endregion
 
 //#region Components
+import TitreOfPage from "../../../components/commun/TitreOfPage";
+import {
+  ClientSiteContratContext,
+  ParametresContext,
+  TokenContext,
+} from "../../../App";
+import { useEffect } from "react";
+import { GetListeSecteur } from "../../../axios/WSGandara";
+import { Placeholder } from "react-bootstrap";
 
 //#endregion
 
 //#endregion
 
 const NouvelleInterventionPage = ({ props }) => {
-
-const ParamsCt = useContext(ParametresContext);
+  const ParamsCt = useContext(ParametresContext);
+  const TokenCt = useContext(TokenContext);
+  const ClientSiteCt = useContext(ClientSiteContratContext);
 
   //#region States
   const [validated, setValidated] = useState(false);
 
-  const [listeSecteurs, setListeSecteurs] = useState([
-    { IdSecteur: 4, LibelleSecteur: "Chaufferie" },
-    { IdSecteur: 8, LibelleSecteur: "Bruleûrs process" },
-  ]);
+  const [listeSecteurs, setListeSecteurs] = useState([]);
 
   const [secteurChoix, setSecteurChoix] = useState(listeSecteurs[0]);
 
@@ -48,10 +53,29 @@ const ParamsCt = useContext(ParametresContext);
   const [telChoix, setTelChoix] = useState(listeTels[0].v);
   const [customTel, setCustomTel] = useState("");
 
-  // const [telUrgence, setTelUrgence] = useState("01 02 03 04 05");
+  const [isLoadedSecteurs, setIsLoadedSecteurs] = useState(false);
+  const [isLoadedTel, setIsLoadedTel] = useState(false);
   //#endregion
 
   //#region Fonctions
+
+  const GetData = () => {
+    const FetchSetSecteurs = (data) => {
+      setListeSecteurs(data);
+      setIsLoadedSecteurs(true);
+    };
+
+    const FetchSetTel = (data) => {
+      setListeTel(JSON.parse(data));
+      setIsLoadedTel(true);
+    };
+
+    GetListeSecteur(
+      TokenCt,
+      ClientSiteCt.storedClientSite.IdClientSiteRelation,
+      FetchSetSecteurs
+    );
+  };
 
   //#endregion
 
@@ -59,7 +83,7 @@ const ParamsCt = useContext(ParametresContext);
 
   const HandleSecteurChoix = (e) => {
     let _choix = listeSecteurs.find((secteur) => {
-      return secteur.IdSecteur === Number(e.target.value);
+      return Number(secteur.k) === Number(e.target.value);
     });
     setSecteurChoix(_choix);
   };
@@ -93,24 +117,36 @@ const ParamsCt = useContext(ParametresContext);
 
   //#endregion
 
+  useEffect(() => {
+    GetData();
+// eslint-disable-next-line 
+  }, [ClientSiteCt.storedClientSite.IdClientSiteRelation]);
+
   return (
     <Container fluid className="p-4 h-100">
+      <TitreOfPage titre={"Nouvelle intervention"} />
       <Container fluid className="container-table ">
         <Form noValidate validated={validated} onSubmit={HandleSubmit}>
           <Row className="m-4">
-            
             <Col md={12} className="mt-2">
-              <FloatingLabel label="Choix du secteur">
-                <Form.Select onChange={HandleSecteurChoix}>
-                  {listeSecteurs.map((secteur) => {
-                    return (
-                      <option value={secteur.IdSecteur} key={secteur.IdSecteur}>
-                        {secteur.LibelleSecteur}
-                      </option>
-                    );
-                  })}
-                </Form.Select>
-              </FloatingLabel>
+              {isLoadedSecteurs ? (
+                <FloatingLabel label="Choix du secteur">
+                  <Form.Select onChange={HandleSecteurChoix}>
+                    {listeSecteurs.map((secteur) => {
+                      return (
+                        <option value={secteur.k} key={secteur.k}>
+                          {secteur.v}
+                        </option>
+                      );
+                    })}
+                  </Form.Select>
+                </FloatingLabel>
+              ) : (
+                <Placeholder as="p" animation="glow">
+                  Choix du secteur
+                  <Placeholder xs={12} />
+                </Placeholder>
+              )}
             </Col>
 
             <Col md={12} className="mt-4 mb-4">
@@ -123,6 +159,7 @@ const ParamsCt = useContext(ParametresContext);
                   as={"textarea"}
                   value={objetDemande}
                   onChange={HandleObjetDemande}
+                  className="h-75"
                 />
                 <Form.Control.Feedback type="invalid">
                   Merci de renseigner l'objet de votre demande.
@@ -134,7 +171,6 @@ const ParamsCt = useContext(ParametresContext);
 
             <Col md={6} className="mt-2">
               <FloatingLabel label="Chosissez un numéro enregistré">
-                {/* <Form.Label>Numéros enregistrés</Form.Label> */}
                 <Form.Select onChange={HandleTelChoix}>
                   {listeTels.map((tel, index) => {
                     return (
@@ -150,7 +186,7 @@ const ParamsCt = useContext(ParametresContext);
             <Col md={6} className="mt-2">
               <FloatingLabel
                 controlId="floatingTextarea2"
-                label="Ou renseignez un atrue numéro"
+                label="Ou renseignez un autre numéro"
               >
                 <Form.Control
                   type="tel"
@@ -172,16 +208,17 @@ const ParamsCt = useContext(ParametresContext);
               <span className=" m-4">
                 <h3 style={{ color: "red" }}>
                   <FontAwesomeIcon icon={faBell} className="me-2" />
-                  En cas d'urgence contactez le{" "}
-                  <Badge bg="danger">
-                    {" "}
-                    <a
-                      className="text-decoration-none"
-                      href={`tel:${ParamsCt.find((p)=> p.k === "TelUrgenceIntervention").v}`}
-                    >
-                      {ParamsCt.find((p)=> p.k === "TelUrgenceIntervention").v}
-                    </a>{" "}
-                  </Badge>
+                  En cas d'urgence contactez le
+                  {/* <Badge bg="danger"> */}{" "}
+                  <a
+                    className="text-decoration-none"
+                    href={`tel:${
+                      ParamsCt.find((p) => p.k === "TelUrgenceIntervention").v
+                    }`}
+                  >
+                    {ParamsCt.find((p) => p.k === "TelUrgenceIntervention").v}
+                  </a>{" "}
+                  {/* </Badge> */}
                   <FontAwesomeIcon icon={faBell} className="ms-2" />
                 </h3>
               </span>

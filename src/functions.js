@@ -105,6 +105,10 @@ function FiltrerParCollones(_lData, arrayFilters) {
       case typeof new Date():
         return (filter) =>
           new Date(filter.item).getTime() === data[fieldname].getTime();
+          case typeof true:
+            
+        return (filter) => (/true/).test(filter.item) === data[fieldname];
+
       default:
         return (filter) => filter.item === data[fieldname];
     }

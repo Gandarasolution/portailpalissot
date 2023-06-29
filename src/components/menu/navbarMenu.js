@@ -168,10 +168,10 @@ const NavbarMenu = ({ handleDeconnexion }) => {
             </NavDropdown> */}
 
 
-            <NavLink href="/maintenance/contrat" >Contrats</NavLink>
-            <NavLink href="/maintenance/appareils">Appareils</NavLink>
-            <NavLink href="/Depannage/interventions">Interventions</NavLink>
-            <NavLink  href="/Depannage/devis">Devis</NavLink>
+            <NavLink href="/contrat" >Contrats</NavLink>
+            <NavLink href="/appareils">Appareils</NavLink>
+            <NavLink href="/interventions">Interventions</NavLink>
+            <NavLink  href="/devis">Devis</NavLink>
             <NavLink  href="/factures">Factures</NavLink>
 
 

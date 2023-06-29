@@ -123,17 +123,17 @@ function App() {
               <Route path="/error" element={<ErrorPage />} />
               <Route path="/" element={<HomePage />} />
               <Route path="/factures" element={<FacturesPage />} />
-              <Route path="/maintenance/contrat" element={<ContratPage />} />
+              <Route path="/contrat" element={<ContratPage />} />
               <Route
-                path="/maintenance/appareils"
+                path="/appareils"
                 element={<AppareilsPage />}
               />
               <Route
-                path="/depannage/interventions"
+                path="/interventions"
                 element={<InterventionPage />}
               />{" "}
               <Route
-                path="/depannage/nouvelleintervention"
+                path="/nouvelleintervention"
                 element={<NouvelleInterventionPage />}
               />
             </Routes>

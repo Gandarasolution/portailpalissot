@@ -84,6 +84,7 @@ const GetPrestationContrat = async (
         return;
       }
       if (JSON.parse(JSON.stringify(data)) === "500") {
+        window.location.href ="/error"
         setData([]);
       } else {
         setData(JSON.parse(data));
@@ -106,7 +107,12 @@ const GetPrestationReleveTache = async (
       IdPrestationContrat: IdPrestationContrat,
     },
     success(data) {
+      if (data === "Erreur de connexion") {
+        setData(500);
+        return;
+      }
       if (JSON.parse(JSON.stringify(data)) === "500") {
+        window.location.href ="/error"
         setData([]);
       } else {
         setData(JSON.parse(data));
@@ -287,8 +293,7 @@ const TelechargerFactureDocument = async (
 const GetListeInterventions = async (
   token,
   IdClientSite,
-  dateDebut,
-  dateFin,
+  
   setData
 ) => {
   $.ajax({
@@ -298,8 +303,6 @@ const GetListeInterventions = async (
     data: {
       token: token,
       IdClientSite: IdClientSite,
-      dateDebut: dateDebut,
-      dateFin: dateFin,
     },
     success(data) {
       if (JSON.parse(JSON.stringify(data)) === "500") {
@@ -310,6 +313,32 @@ const GetListeInterventions = async (
     },
   });
 };
+
+
+
+const GetListeSecteur = async ( token, IdClientSiteRelation,setData ) => {
+
+  return $.ajax({
+    type: "POST",
+    url: urlAction + "GetListeSecteur",
+
+    data: {
+      token: token,
+      IdClientSiteRelation: IdClientSiteRelation,
+    },
+    success(data) {
+      if (data === "Erreur de connexion") {
+        setData(500);
+        return;
+      }
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+}
 
 //#endregion
 
@@ -330,4 +359,5 @@ export {
   VoirFactureDocument,
   TelechargerFactureDocument,
   GetListeInterventions,
+  GetListeSecteur,
 };

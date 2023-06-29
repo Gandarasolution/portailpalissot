@@ -164,6 +164,7 @@
 			return 1;
 		}
 	}
+
 	function ConnexionGMAO($login = "", $pass_clear="", $ws="")
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -236,7 +237,8 @@
 			{
 				return json_encode($result["GMAOGetPrestationContratResult"]["PrestationContrat"]);
 				
-				}else{
+				}
+				else{
 				return "500";
 			}
 		}
@@ -604,6 +606,7 @@
 			}
 		}
 	}
+
 	function GetFactureDocument($token, $IdFacture, $TypeFacture, $Avoir, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -646,6 +649,87 @@
 	
 	
 	
+	function GetListeSecteur($token, $IdClientSiteRelation, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdClientSiteRelation" => $IdClientSiteRelation);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetListeSecteur",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetListeSecteur", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetListeSecteurResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetListeSecteurResult"]["KV"]);
+				
+				}else{
+				return "500";
+			}
+		}
+	}
+	
+
+
+	function GetListeInterventions($token, $IdClientSite, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdClientSite" => $IdClientSite);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetListeInterventions",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetListeInterventions", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetListeInterventionsResult"]["DossierInterventionSAV"]))
+			{
+				return json_encode($result["GMAOGetListeInterventionsResult"]["DossierInterventionSAV"]);
+				
+				}else{
+				return "500";
+			}
+		}
+	}
 	
 	function CallENDPOINT($url="",$endpoint="", )
 	{
@@ -706,6 +790,16 @@
 			echo(GetFactureDocument($_POST['token'],$_POST['IdFacture'],$_POST['TypeFacture'],$_POST['Avoir'],$url));
 			
 			break;
+
+			case "GMAOGetListeSecteur":
+				echo(GetListeSecteur($_POST["token"],$_POST["IdClientSiteRelation"],$url));
+
+				break;
+
+
+				case "GMAOGetListeInterventions":
+					echo(GetListeInterventions($_POST["token"], $_POST["IdClientSite"],$url));
+					break;
 			default:
 			header("HTTP/1.1 500 Internal Server Error");
 			
