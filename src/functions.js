@@ -6,6 +6,71 @@ var groupBy = function (xs, key) {
   };
 
 
+function FiltrerParSearch(_lData, arrayFilters)
+{
+  let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
+
+  for (let index = 0; index < _arFilters.length; index++) {
+    const arrayGroup = _arFilters[index];
+    _lData = FiltrerUnSearch(arrayGroup[0], _lData,arrayFilters);
+  }
+
+ return (_lData)
+}
+
+
+function FiltrerUnSearch(fieldname, _lData, arrayFilters)
+{
+  let _arColonne = arrayFilters.filter(
+    (filter) => filter.fieldname === fieldname
+  );
+  if (_arColonne.length > 0) {
+   
+    _lData = _lData.filter((data) => {
+
+      return (
+        _arColonne.filter((filter) => {return data[fieldname].toString().toLocaleUpperCase().includes(filter.text.toString().toLocaleUpperCase()) }).length >0
+      );
+    });
+  }
+  return _lData;
+}
+
+
+function FiltrerParSeuil(_lData, arrayFilters)
+{
+  let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
+
+  for (let index = 0; index < _arFilters.length; index++) {
+    const arrayGroup = _arFilters[index];
+    _lData = FiltrerUnSeuil(arrayGroup[0], _lData,arrayFilters);
+  }
+
+ return (_lData)
+
+}
+
+function FiltrerUnSeuil(fieldname, _lData, arrayFilters) {
+  let _arColonne = arrayFilters.filter(
+    (filter) => filter.fieldname === fieldname
+  );
+  if (_arColonne.length > 0) {
+   
+    _lData = _lData.filter((data) => {
+
+      return (
+
+        _arColonne.filter((filter) => {return Number(data[fieldname]) <= Number(filter.max) && Number(data[fieldname]) >= Number(filter.min)}).length >0
+      );
+    });
+  }
+  return _lData;
+}
+
+
+
+
+
 function FiltrerParCollones(_lData, arrayFilters) {
     let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
     for (let index = 0; index < _arFilters.length; index++) {
@@ -14,6 +79,7 @@ function FiltrerParCollones(_lData, arrayFilters) {
     }
     return _lData;
   }
+
 
   function FiltreUnecollone(fieldname, _lData, arrayFilters) {
     let _arColonne = arrayFilters.filter(
@@ -39,6 +105,10 @@ function FiltrerParCollones(_lData, arrayFilters) {
       case typeof new Date():
         return (filter) =>
           new Date(filter.item).getTime() === data[fieldname].getTime();
+          case typeof true:
+            
+        return (filter) => (/true/).test(filter.item) === data[fieldname];
+
       default:
         return (filter) => filter.item === data[fieldname];
     }
@@ -159,4 +229,4 @@ function bytesToSize(bytes) {
   }
 
 
-  export  {FiltrerParCollones, groupBy, GetImageExtension, GetFileSizeFromB64String,GetNomMois,addOneYear,subOneYear,DateSOAP}
+  export  {FiltrerParSearch,FiltrerParSeuil,FiltrerParCollones, groupBy, GetImageExtension, GetFileSizeFromB64String,GetNomMois,addOneYear,subOneYear,DateSOAP}

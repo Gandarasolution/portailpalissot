@@ -1,87 +1,74 @@
 //#region Imports
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
-import Nav from "react-bootstrap/Nav";
-import Placeholder from "react-bootstrap/Placeholder";
-import Row from "react-bootstrap/Row";
-import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Stack from "react-bootstrap/Stack";
 
 //#endregion
 
 //#region Components
-import {  GetNomMois, addOneYear, subOneYear } from "../../../functions";
-import TableData, { CreateNewCell, CreateNewHeader } from "../../../components/commun/TableData";
-import ImageExtension from "../../../components/commun/ImageExtension";
-import { Button, Dropdown, DropdownButton, Stack } from "react-bootstrap";
+import { GetNomMois, addOneYear, subOneYear } from "../../../functions";
+import TableData, {
+  CreateFilter,
+  CreateNewCell,
+  CreateNewHeader,
+  CreateNewUnboundCell,
+  CreateNewUnboundHeader,
+} from "../../../components/commun/TableData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import {  faArrowLeft, faArrowRight,faFile,} from "@fortawesome/free-solid-svg-icons";
+import TitreOfPage from "../../../components/commun/TitreOfPage";
+import { GetListeInterventions } from "../../../axios/WSGandara";
+import { useContext } from "react";
+import { ClientSiteContratContext, TokenContext } from "../../../App";
 //#endregion
 
 //#endregion
 
 const InterventionPage = () => {
-  //#region Mockup
-
-  const MockupListeInterventions = () => {
-    let _inters = [];
-    let _intervention = {
-      DateDemande: new Date(2019, 0, 10),
-      IdDossierIntervention: 2128,
-      LibelleDossierIntervention: "Devis diagnostic",
-      IdEtat: 1,
-      LibelleEtat: "En cours",
-      // IdFacture: null,
-      // DateFacture: new Date(2019, 4, 13)
-    };
-
-    _inters.push(_intervention);
-
-    _intervention = {
-      DateDemande: new Date(2019, 1, 12),
-      IdDossierIntervention: 2129,
-      LibelleDossierIntervention: "Travaux sur la chaudière",
-      IdEtat: 1,
-      LibelleEtat: "Réalisé",
-      IdFacture: 400516,
-      DateFacture: new Date(2019, 4, 13),
-    };
-
-    _inters.push(_intervention);
-
-    setListeInterventions(_inters);
-  };
-
-  //#endregion
-
+  const TokenCt = useContext(TokenContext);
+  const ClientSiteCt = useContext(ClientSiteContratContext);
   //#region States
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeInterventions, setListeInterventions] = useState([]);
 
-
-
-  const [gridColMDValue, setGridColMDValue] = useState(12);
-  const [interSelected, setInterSelected] = useState(null);
-  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
-
-
   const [dateDebutPeriode, setDateDebutPeriode] = useState(
-    GetDatePeriodeInitial())
-
+    GetDatePeriodeInitial()
+  );
 
   //#endregion
 
   //#region Fonctions
 
-  function GetListeInterventionsPreFiltre() {
+  const GetData = async () => {
+    const FetchSetData = (data) => {
+      setListeInterventions(data);
+      setIsLoaded(true);
+    };
+
+    await GetListeInterventions(
+      TokenCt,
+      ClientSiteCt.storedClientSite.IdClientSite,
+      FetchSetData
+    );
+  };
+
+  function GetListeInterventionsTrimed() {
     let _lInters = JSON.parse(JSON.stringify(listeInterventions));
+    for (let index = 0; index < _lInters.length; index++) {
+      const element = _lInters[index];
+      element.DateFacture = element.DateFacture ? element.DateFacture : "";
 
+element.LibEtat = JSON.parse(JSON.stringify(element.Etat.LibEtat))
 
+    }
 
     return _lInters;
   }
@@ -99,8 +86,6 @@ const InterventionPage = () => {
     return _DateRetour;
   }
 
-
-
   const dateFinPeriode = () => {
     let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
 
@@ -112,18 +97,70 @@ const InterventionPage = () => {
     return new Date(_dateEndTmp);
   };
 
+  function GetBGColorByVerrouEtat(LibEtat) {
+    const VerrouEtat = JSON.parse(JSON.stringify(listeInterventions)).find((f)=>{return String(f.Etat.LibEtat) === String(LibEtat)}).Etat.VerrouEtat;
+    switch (VerrouEtat) {
+      case 0:
+        return "warning";
+      case 1:
+        return "primary";
+      case 2:
+        return "secondary";
+      case 3:
+        return "success";
+      case 4:
+        return "danger";
+      default:
+        break;
+    }
+  }
+
   function CreateHeaderForTable() {
     let _headers = [];
     _headers.push(
-      CreateNewHeader("DateDemande", true, "Date de la demande",EditorDate)
+      CreateNewHeader(
+        "DateDemandeDossierInterventionSAV",
+        CreateFilter(true, true, false, false),
+        "Date de la demande",
+        EditorDateFromDateTime
+      )
     );
-    _headers.push(CreateNewHeader("IdDossierIntervention", true, "Code"));
-    _headers.push(CreateNewHeader("LibelleDossierIntervention", true, "Objet de la demande"));
+    _headers.push(CreateNewHeader("DescriptionSecteur",CreateFilter(true, true,false,true),"Secteur"));
     _headers.push(
-      CreateNewHeader("IdEtat", true, "État")
+      CreateNewHeader(
+        "IdDossierInterventionSAV",
+        CreateFilter(true, true, false, true),
+        "Code"
+      )
     );
-    _headers.push(CreateNewHeader("IdFacture", false, "N° facture"));
-    _headers.push(CreateNewHeader("DateFacture", false, "Date de la facture",EditorDate));
+    _headers.push(
+      CreateNewHeader(
+        "DescriptionDossierInterventionSAV",
+        CreateFilter(true, true, false, true),
+        "Objet de la demande"
+      )
+    );
+    _headers.push(
+      CreateNewHeader("LibEtat", CreateFilter(true, true, false, false), "État")
+    );
+
+_headers.push(CreateNewUnboundHeader(false,"Action"));
+
+    // _headers.push(
+    //   CreateNewHeader(
+    //     "IdFacture",
+    //     CreateFilter(true, false, false, true),
+    //     "N° facture"
+    //   )
+    // );
+    // _headers.push(
+    //   CreateNewHeader(
+    //     "DateFacture",
+    //     CreateFilter(true, true, false, true),
+    //     "Date de la facture",
+    //     EditorDateFromDateTime
+    //   )
+    // );
 
     return _headers;
   }
@@ -131,15 +168,23 @@ const InterventionPage = () => {
   function CreateCellsForTable() {
     let _cells = [];
     _cells.push(
-      CreateNewCell("DateDemande", false, false, false,EditorDate)
+      CreateNewCell(
+        "DateDemandeDossierInterventionSAV",
+        false,
+        false,
+        false,
+        EditorDateFromDateTime
+      )
     );
-    _cells.push(CreateNewCell("IdDossierIntervention", true, true, false,));
-    _cells.push(CreateNewCell("LibelleDossierIntervention", true, true, false,));
-    _cells.push(CreateNewCell("IdEtat", false, false, false, EditorEtat));
-    _cells.push(CreateNewCell("IdFacture", true, true, true, ()=>{},"tagInterventionfactures" ));
-    _cells.push(CreateNewCell("DateFacture", false, false, true,EditorDate,"tagInterventionfactures" ));
+    _cells.push(CreateNewCell("DescriptionSecteur", false, true,false));
+    _cells.push(CreateNewCell("IdDossierInterventionSAV", true, true, false));
+    _cells.push(
+      CreateNewCell("DescriptionDossierInterventionSAV", true, true, false)
+    );
+    _cells.push(CreateNewCell("LibEtat", false, false, false, EditorEtat));
+    _cells.push(CreateNewUnboundCell(false,false,true,EditorActionDocuments,"tagInterventionDocuments"))
+   
 
-    
     return _cells;
   }
 
@@ -168,7 +213,6 @@ const InterventionPage = () => {
 
   //   return _llisteInterventions;
   // };
-
 
   //#endregion
 
@@ -206,11 +250,9 @@ const InterventionPage = () => {
 
   //#region TableData
 
- 
   //#endregion
 
   //#region Component
-
 
   const DropDownYears = (small) => {
     let _dateDebut = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
@@ -259,113 +301,40 @@ const InterventionPage = () => {
     );
   };
 
-
- 
-
-  const CardDocuments = () => {
-    if (!interSelected.IdFacture || interSelected.IdFacture <= 0) {
-      return (
-        <Card className="mb-2">
-          <Card.Header className="card-document">Facture</Card.Header>
-          <Card.Body></Card.Body>
-          <p>Aucune facture.</p>
-        </Card>
-      );
-    }
-
-    async function makeRequest() {
-      await delay(1000);
-
-      setIsDocumentLoaded(true);
-    }
-    makeRequest();
-    let _facture = { title: "Facture", extension: "pdf", size: "18 MO" };
-    return (
-      <Card className="mb-2">
-        <Card.Header className="card-document">Facture</Card.Header>
-        <Card.Body>
-          {isDocumentLoaded ? (
-            <Row className="mb-1">
-              <Col md={3}>
-                <ImageExtension extension={_facture.extension} />
-              </Col>
-              <Col md={9}>
-                <Row>
-                  <p className="mb-0 document-title">{`${_facture.title}${
-                    _facture.extension.toUpperCase() === "ZIP"
-                      ? ""
-                      : `.${_facture.extension}`
-                  }`}</p>
-                  <span className="document-size">{`${_facture.size}`}</span>
-                  <span className="document-links">
-                    {_facture.extension.toUpperCase() !== "ZIP" && (
-                      <Link to={"#"} target="_blank">
-                        Voir
-                      </Link>
-                    )}
-                    <Link
-                      to={"#"}
-                      target="_blank"
-                      download={`${_facture.title}`}
-                    >
-                      Télécharger
-                    </Link>
-                  </span>
-                </Row>
-              </Col>
-            </Row>
-          ) : (
-            <Placeholder animation="glow">
-              <Placeholder xs={12} />
-            </Placeholder>
-          )}
-        </Card.Body>
-      </Card>
-    );
-  };
-
   //#endregion
 
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
   useEffect(() => {
-    async function makeRequest() {
-      await delay(1000);
-
-      setIsLoaded(true);
-    }
-    makeRequest();
-    MockupListeInterventions();
-  }, [isLoaded]);
-
-
-
-
+    GetData();
+  }, []);
 
   //#region Editors
 
-const EditorDate = (date) => {
-  if(!date) return "";
-  return `${GetNomMois(new Date(date).getMonth() + 1)}  ${new Date(
-    date
-  ).getFullYear()}`;
+const EditorActionDocuments = (inter) => {
+  return (
+    <Button>
+      <FontAwesomeIcon icon={faFile} />
+    </Button>
+  );
 };
 
 
-const EditorEtat = (IdEtat) => {
-return  <span className="badge badge-bg-success">{IdEtat} </span>
-}
 
-//#endregion
+  const EditorDateFromDateTime = (data) => {
+    if (!data) return data;
+    var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+    let _match = data.match(dateRegex)[0];
+    return _match;
+  };
+
+  const EditorEtat = (Etat) => {
+    return <div className={` text-wrap badge badge-bg-${GetBGColorByVerrouEtat(Etat)}`}>{Etat} </div>;
+  };
 
 
+  //#endregion
 
- 
-
-const TableInterventions = () => {
-
-
-  const _Headers = CreateHeaderForTable();
+  const TableInterventions = () => {
+    const _Headers = CreateHeaderForTable();
     const _Cells = CreateCellsForTable();
 
     // const _CardModel = CreateNewCardModel(
@@ -377,27 +346,29 @@ const TableInterventions = () => {
 
     return (
       <TableData
-        Data={GetListeInterventionsPreFiltre()}
+        Data={GetListeInterventionsTrimed()}
         Headers={_Headers}
         Cells={_Cells}
         IsLoaded={isLoaded}
         Pagination
-        TopPannelLeftToSearch={
-          <Col md={3} className="m-1">
-            <div className="project-sort-nav">
-              <nav>
-                <ul>
-                  <a
-                    className="btn-filter text-decoration-none"
-                    href="/depannage/nouvelleintervention"
-                  >
-                    Nouvelle intervention
-                  </a>
-                </ul>
-              </nav>
-            </div>
-          </Col>
-        }
+        // TopPannelLeftToSearch={
+        //   <Col md={"auto"} className="m-1">
+        //     <div className="project-sort-nav">
+        //       <nav>
+        //         <ul>
+        //           <li className="li-actif">
+        //             <a
+        //               className="btn-filter text-decoration-none"
+        //               href="/nouvelleintervention"
+        //             >
+        //               Nouvelle intervention
+        //             </a>
+        //           </li>
+        //         </ul>
+        //       </nav>
+        //     </div>
+        //   </Col>
+        // }
         TopPannelRightToSearch={
           <Col md={"auto"} className="m-1">
             <Stack direction="horizontal" className="centerStack " gap={1}>
@@ -421,46 +392,24 @@ const TableInterventions = () => {
             </Stack>
           </Col>
         }
+        
         // CardModel={_CardModel}
       />
     );
   };
 
-
-
-
-
-
-
-
   return (
     <Container fluid className="h-100">
-      <Col md={12} style={{ textAlign: "start" }}>
-        <span className="title">Interventions </span>|
-        <span className="subtitle">
-          {isLoaded ? (
-            ` ${listeInterventions.length} intervention${
-              listeInterventions.length > 1 ? "s" : ""
-            } `
-          ) : (
-            <Placeholder animation="glow">
-              <Placeholder xs={1} />
-            </Placeholder>
-          )}
-        </span>
-      </Col>
-
-
-      <Container fluid >
-        <Row>
-          <Col md={gridColMDValue}>
-           <TableInterventions />
-          </Col>
-
-          {gridColMDValue !== 12 && (
-            <Col md={12 - gridColMDValue}>{CardDocuments()}</Col>
-          )}
-        </Row>
+      <Button variant="danger mt-2" onClick={()=> window.location.href="/nouvelleintervention"}>Demander une nouvelle intervention</Button>
+      <TitreOfPage
+        titre={"Interventions dépannage"}
+        soustitre={` ${listeInterventions.length} intervention${
+          listeInterventions.length > 1 ? "s" : ""
+        } `}
+        isLoaded={isLoaded}
+      />
+      <Container fluid>
+        <TableInterventions />
       </Container>
     </Container>
   );

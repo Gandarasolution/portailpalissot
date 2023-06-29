@@ -1,19 +1,29 @@
+//#region Imports
+
+//#region Bootstrap
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
+import NavLink from "react-bootstrap/NavLink";
 // import Dropdown from "react-bootstrap/Dropdown";
 import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
+//#enregion
 
-import logo from "../../image/favicon.ico";
-import { useContext } from "react";
-import { ClientSiteContratContext } from "../../App";
+//#region Fontawsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+//#endregion
+
+//#region Components
+import logo from "../../image/favicon.ico";
+import { ClientSiteContratContext } from "../../App";
+//#endregion
+import { useContext,useState } from "react";
+//#endregion
+
 
 const NavbarMenu = ({ handleDeconnexion }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
@@ -125,9 +135,16 @@ const NavbarMenu = ({ handleDeconnexion }) => {
             GANDARA-DEMO
           </Container>
         </Navbar.Brand>
+
+
+
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
+
           <Nav className="me-auto">
+
+
+{/* 
             <NavDropdown title="Maintenance" id="maintenance-nav-dropdown">
               <NavDropdown.Item href="/maintenance/contrat">
                 Contrat
@@ -148,11 +165,24 @@ const NavbarMenu = ({ handleDeconnexion }) => {
               <NavDropdown.Item href="/factures">
                 Factures
               </NavDropdown.Item>
-            </NavDropdown>
+            </NavDropdown> */}
+
+
+            <NavLink href="/contrat" >Contrats</NavLink>
+            <NavLink href="/appareils">Appareils</NavLink>
+            <NavLink href="/interventions">Interventions</NavLink>
+            <NavLink  href="/devis">Devis</NavLink>
+            <NavLink  href="/factures">Factures</NavLink>
+
+
           </Nav>
+
+
+
         </Navbar.Collapse>
         <Nav>
           {/* <NavDropDownListeSite /> */}
+          
           <OffcanvasClientSite />
           <Button
             variant=" "

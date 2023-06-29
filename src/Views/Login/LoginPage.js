@@ -1,5 +1,5 @@
 //#region Imports
-import { useEffect, useState,useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,7 +18,11 @@ import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region Components
-import { Connexion, GetClientSiteContrat } from "../../axios/WSGandara";
+import {
+  Connexion,
+  GetClientSiteContrat,
+  GetListeParametres,
+} from "../../axios/WSGandara";
 import { ListeClientSiteContratContext } from "../../App";
 
 //#endregion
@@ -41,7 +45,7 @@ const LoginPage = (props) => {
   const [idError, setIdError] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-
+  const inputRef = useRef(null);
 
   //#endregion
 
@@ -56,40 +60,58 @@ const LoginPage = (props) => {
     setRevealed(_revealed);
   };
 
+  const handleLoginKeyPress = (event) => {
+    if (event.key === "Enter") {
+      inputRef.current.focus();
+    }
+  };
 
-
+  const handlePasswordKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleSubmit();
+    }
+  };
 
   const handleSubmit = async () => {
-
     setIsLoading(true);
 
-
+    //2 -> Callback de Connexion :
     const getToken = async (response) => {
+      //?2.5 -> On va récupérer la liste des clientSites et les parametres de l'application
       if (isNaN(response)) {
-
-        const FetchSetListeClientSiteContrat = (data) => {
+        //4 -> Callback de GetClientSiteContrat : on enregistre les infos retournées
+        const FetchSetListeClientSiteContrat = async (data) => {
           ListeClientSiteContratCtx.setListe(data);
           ListeClientSiteContratCtx.setClientSite(data[0]);
-        props.setToken(response);
+          props.setToken(response);
 
-        }
+        //6 -> CallBack de GetListeParamètres : on enregistre les infos retournées
+        const FetchSetListeParams = (data) => {
+          props.setParams(data);
+        };
 
-        await GetClientSiteContrat(response,FetchSetListeClientSiteContrat);
+        //5 -> On récupère la liste des paramètres de l'application
+        await GetListeParametres(response, FetchSetListeParams);
 
-        // props.setToken(response);
 
+
+        };
+
+        //3 -> On récupère la liste des clientsSites
+        await GetClientSiteContrat(response, FetchSetListeClientSiteContrat);
+
+
+        //?2.5 -> La connexion a retourné une erreur
       } else {
         setIdError(response);
       }
 
-
       setIsLoading(false);
     };
+
+    //1 -> On envoie les infos pour demander un token
     await Connexion(login, password, getToken);
-
-
   };
-
 
   //#endregion
 
@@ -224,6 +246,7 @@ const LoginPage = (props) => {
             placeholder="identifiant@exemple.com"
             value={login}
             onChange={(e) => setLogin(e.target.value)}
+            onKeyUp={handleLoginKeyPress}
           />
         </Form.Group>
 
@@ -231,11 +254,13 @@ const LoginPage = (props) => {
           <Form.Label>Mot de passe</Form.Label>
           <InputGroup>
             <Form.Control
+              ref={inputRef}
               type={revealed ? "text" : "password"}
               required
               placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyUp={handlePasswordKeyPress}
             />
             <Button
               className="bt-eye-password"
@@ -244,12 +269,12 @@ const LoginPage = (props) => {
               <FontAwesomeIcon icon={revealed ? faEyeSlash : faEye} />
             </Button>
           </InputGroup>
-          {
-            isLoading && ( <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>)
-          }
-          <AlertErrorConnexion/>
+          {isLoading && (
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+          )}
+          <AlertErrorConnexion />
 
           <div className=" d-flex justify-content-end m-2">
             <NavLink

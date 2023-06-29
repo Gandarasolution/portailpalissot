@@ -13,6 +13,12 @@
   }
 }
 
+:root {
+  --color-danger: #FF4D4F;
+  --color-success:  #01B81A;
+  --color-warning: #FA8B0C;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -78,7 +84,9 @@
   height: 75vh;
 }
 
-
+.waiting {
+  background-color: gray;
+}
 
 .bt-eye-password {
   background-color: transparent !important;
@@ -133,9 +141,32 @@
   border-right: 0px none !important;
 }
 
+.content:hover {
+  transform: scale(1.1);
+  transform-origin: bottom;
+}
+
 
 .noBorder {
   border: none !important
+}
+
+
+.circle-success {
+  background: var(--color-success);
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+}
+
+
+
+
+.circle-danger {
+  background: var(--color-danger);
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
 }
 
 
@@ -145,7 +176,7 @@
 }
 
 .bt-actif {
-  color: #01B81A !important;
+  color: var(--color-success) !important;
 }
 
 .bt-inactif {
@@ -292,7 +323,11 @@
 }
 
 
-
+.row-height{
+  height: 3rem !important;
+  overflow: hidden;
+  white-space: nowrap;  
+}
 
 .table-presta-row-selected {
   background-color: whitesmoke;
@@ -383,7 +418,7 @@
 
 
 .badge-bg-success {
-  background-color: #01B81A !important;
+  background-color: var(--color-success) !important;
   display: inline-block;
   width: 100px !important;
   font-weight: 400 !important;
@@ -391,7 +426,7 @@
 
 
 .badge-bg-warning {
-  background-color: #FA8B0C !important;
+  background-color: var(--color-warning) !important;
   display: inline-block;
   width: 100px !important;
   font-weight: 400 !important;
@@ -412,7 +447,7 @@
 }
 
 .badge-bg-danger {
-  background-color: #FF4D4F !important;
+  background-color: var(--color-danger) !important;
   display: inline-block;
   width: 100px !important;
   font-weight: 400 !important;

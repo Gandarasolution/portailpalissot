@@ -18,25 +18,39 @@ import Col from "react-bootstrap/Col";
 //#endregion
 import {
   FiltrerParCollones,
+  FiltrerParSearch,
+  FiltrerParSeuil,
   GetFileSizeFromB64String,
   groupBy,
 } from "../../functions";
 //#region fontAwsome
-import { faFilter, faList } from "@fortawesome/free-solid-svg-icons";
+import { faFilter, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useState } from "react";
-import { Card, CloseButton, Modal } from "react-bootstrap";
+import { useContext, useEffect, useState } from "react";
+import {
+  Button,
+  Card,
+  CloseButton,
+  InputGroup,
+  Modal,
+  Tab,
+  Tabs,
+} from "react-bootstrap";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import {
   GetDocumentPrestation,
   GetPrestationReleveTache,
   TelechargerDocument,
+  TelechargerFactureDocument,
   TelechargerZIP,
   VoirDocument,
+  VoirFactureDocument,
 } from "../../axios/WSGandara";
 import { TokenContext } from "../../App";
 import { Link } from "react-router-dom";
 import ImageExtension from "./ImageExtension";
+import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
+import { FactureContext } from "../../Views/Factures/FacturesPage";
 //#endregion
 
 //#endregion
@@ -50,32 +64,59 @@ const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
   const Data = () => {
-    let _lData = []
-    if (props.Data === "500")
-    {
-       _lData = [];
-    }else {
-       _lData = JSON.parse(JSON.stringify(props.Data));
-
+    let _lData = [];
+    if (props.Data === "500") {
+      _lData = [];
+    } else {
+      _lData = JSON.parse(JSON.stringify(props.Data));
     }
 
+    //Récursion pour colonne unbound
     for (let index = 0; index < _lData.length; index++) {
       const element = _lData[index];
       let _unboundColonne = JSON.parse(JSON.stringify(element));
       element.unboundColonne = _unboundColonne;
     }
 
+    //filtre par la barre de recherche
     if (String(search).length > 0) {
-      _lData = _lData.filter((item) => FiltrerParSearch(item));
+      _lData = _lData.filter((item) => FiltrerParSearchGlobal(item));
     }
 
-    return FiltrerParCollones(_lData, arrayFilter);
+    //Filtre par les boutons
+    if (props.ButtonFilters && btFilterActif) {
+      let _filteractif = JSON.parse(JSON.stringify(btFilterActif));
+      _lData = _lData.filter(
+        (data) => data[_filteractif.fieldname] === _filteractif.value
+      );
+    }
+
+    //Filtres par la recherche par colonne
+    if (arraySearch.length > 0) {
+      _lData = FiltrerParSearch(_lData, arraySearch);
+    }
+
+    //Filtres par valeur min & max
+    if (arrayFilterSeuis.length > 0) {
+      _lData = FiltrerParSeuil(_lData, arrayFilterSeuis);
+    }
+
+    //Filtres par check
+    _lData = FiltrerParCollones(_lData, arrayFilter);
+
+    return _lData;
   };
 
   //#region States
   const [search, setSearch] = useState("");
 
   const [arrayFilter, setArrayFilter] = useState([]);
+  const [arrayFilterSeuis, setArrayFilterSeuils] = useState([]);
+  const [arraySearch, setArraySearch] = useState([]);
+
+  const [btFilterActif, setBtFilterActif] = useState(
+    props.FilterDefaultValue ? props.FilterDefaultValue : null
+  );
 
   const [nbParPages, setNbParPages] = useState(10);
   const [pageActuelle, setPageActuelle] = useState(1);
@@ -103,7 +144,8 @@ const TableData = ({ ...props }) => {
       return text;
     }
   }
-  function FiltrerParSearch(_litem) {
+
+  function FiltrerParSearchGlobal(_litem) {
     // eslint-disable-next-line
     let _arrIs = Object.keys(_litem).map((key) => {
       let _cellToApply = props.Cells.find((c) => c.fieldname === key);
@@ -139,8 +181,30 @@ const TableData = ({ ...props }) => {
     ) {
       return true;
     }
+
+    if (
+      arrayFilterSeuis.findIndex((filter) => filter.fieldname === fieldname) >
+      -1
+    ) {
+      return true;
+    }
+
+    if (
+      arraySearch.findIndex((filter) => filter.fieldname === fieldname) > -1
+    ) {
+      return true;
+    }
+
     return false;
   }
+
+  const isFilterActive = (filter) => {
+    if (!btFilterActif) return false;
+    return (
+      btFilterActif.fieldname === filter.fieldname &&
+      btFilterActif.value === filter.value
+    );
+  };
 
   //#endregion
 
@@ -150,6 +214,7 @@ const TableData = ({ ...props }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setPageActuelle(1);
     setSearch(e.target.value);
   };
 
@@ -168,6 +233,14 @@ const TableData = ({ ...props }) => {
         setArrayFilter(_arrTemp);
       }
     }
+  };
+
+  const handleTousFilter = () => {
+    setBtFilterActif(null);
+  };
+
+  const handleFilterClick = (filter) => {
+    setBtFilterActif(filter);
   };
 
   //#region Pagination
@@ -203,7 +276,7 @@ const TableData = ({ ...props }) => {
    */
   const TableHeaders = () => {
     return (
-      <thead className="m-2">
+      <thead className="m-2 row-height">
         <tr>
           {props.Headers.map((header, i) => {
             return <TableHeader key={i} header={header} />;
@@ -219,7 +292,7 @@ const TableData = ({ ...props }) => {
    * @returns Une en-tête
    */
   const TableHeader = ({ header }) => {
-    return header.isFilter ? (
+    return header.filter.isFilter ? (
       <TableHeaderCellFilter header={header} />
     ) : (
       <TableHeaderCell header={header} />
@@ -237,7 +310,9 @@ const TableData = ({ ...props }) => {
   const TableHeaderCell = ({ header }) => {
     return (
       <th key={header.fieldname} colSpan={GetHeaderColSpan(header.fieldname)}>
-        <div>{header.caption ? header.caption : header.fieldname}</div>
+        <div className="row-height">
+          {header.caption ? header.caption : header.fieldname}
+        </div>
       </th>
     );
   };
@@ -245,7 +320,7 @@ const TableData = ({ ...props }) => {
   const TableHeaderCellFilter = ({ header }) => {
     return (
       <th key={header.fieldname}>
-        <div>
+        <div className="row-height">
           {header.caption ? header.caption : header.fieldname}
           <OverlayTrigger
             trigger="click"
@@ -269,25 +344,245 @@ const TableData = ({ ...props }) => {
     let _arFilters = [];
 
     _arFilters = Object.entries(groupBy(props.Data, fieldname));
+    const _arrayVal = _arFilters.map((x) => x[0]);
 
-    const _headerToApply = props.Headers.find((h)=>h.fieldname === fieldname);
+    const _headerToApply = props.Headers.find((h) => h.fieldname === fieldname);
+
+    //#region RangeDate
+
+    let _arrayDate = _arrayVal.map((date) => {
+      try {
+        if (!date) return date;
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+        let _match = date.match(dateRegex)[0];
+
+        let _retu = new Date(
+          _match.substring(6),
+          _match.substring(3, 5),
+          _match.substring(0, 2)
+        );
+        return _retu;
+      } catch (error) {
+        return date;
+      }
+    });
+
+    var maxDate = new Date(Math.max.apply(null, _arrayDate));
+    var minDate = new Date(Math.min.apply(null, _arrayDate));
+
+    //#endregion
+
+    //#region Range
+    const minVal = _arrayVal.some(isNaN) ? undefined : Math.min(..._arrayVal);
+    const maxVal = _arrayVal.some(isNaN) ? undefined : Math.max(..._arrayVal);
+    const [minValue, setMinvalue] = useState(
+      arrayFilterSeuis.find((f) => f.fieldname === fieldname)
+        ? arrayFilterSeuis.find((f) => f.fieldname === fieldname).min
+        : minVal
+    );
+    const [maxValue, setMaxValue] = useState(
+      arrayFilterSeuis.find((f) => f.fieldname === fieldname)
+        ? arrayFilterSeuis.find((f) => f.fieldname === fieldname).max
+        : maxVal
+    );
+
+    const HandleMinValueChanged = (e) => {
+      e.preventDefault();
+      setMinvalue(e.target.value);
+    };
+
+    const HandleMaxValueChanged = (e) => {
+      setMaxValue(e.target.value);
+    };
+
+    const HandleFilterSeuilClick = () => {
+      let _obj = { fieldname: fieldname, min: minValue, max: maxValue };
+      let _arrayFilterSeuis = JSON.parse(JSON.stringify(arrayFilterSeuis));
+      let _index = _arrayFilterSeuis.findIndex(
+        (f) => f.fieldname === fieldname
+      );
+
+      if (_index > -1) {
+        _arrayFilterSeuis[_index] = _obj;
+      } else {
+        if (minValue !== minVal || maxValue !== maxVal) {
+          _arrayFilterSeuis.push(_obj);
+        }
+      }
+      setArrayFilterSeuils(_arrayFilterSeuis);
+    };
+
+    //#endregion
+
+    //#region Search
+    const _arrSearch = JSON.parse(JSON.stringify(arraySearch));
+    const [searchCol, setSearchCol] = useState(
+      _arrSearch.find((s) => s.fieldname === fieldname)
+        ? _arrSearch.find((s) => s.fieldname === fieldname).text
+        : ""
+    );
+
+    const handleSearchOnChange = (e) => {
+      setSearchCol(e.target.value);
+    };
+
+    const HandleSearchOnClick = () => {
+      let _index = _arrSearch.findIndex((f) => f.fieldname === fieldname);
+      let _obj = { fieldname: fieldname, text: searchCol };
+
+      if (searchCol.length === 0) {
+        if (_index > -1) {
+          _arrSearch.pop(_index);
+        }
+      } else {
+        if (_index > -1) {
+          _arrSearch[_index] = _obj;
+        } else {
+          _arrSearch.push(_obj);
+        }
+      }
+      setArraySearch(_arrSearch);
+    };
+
+    //#endregion
 
     return (
       <Popover className="popover-filters">
-        {_arFilters.map((item, index) => {
-          if (item[0] === "undefined") return null;
-          return (
-            <Form.Check
-              key={index}
-              type="checkbox"
-              checked={IsFiltercheckboxShouldBeCheck(fieldname, item[0])}
-              label={ _headerToApply.editor ? _headerToApply.editor(item[0]) : item[0] }
-              onChange={(e) =>
-                HandleCheckfilterChange(e.target.checked, fieldname, item[0])
-              }
-            />
-          );
-        })}
+        <Tabs
+          defaultActiveKey={
+            Object.entries(_headerToApply.filter).find(
+              (value) => value[0] !== "isFilter" && value[1]
+            )[0]
+          }
+        >
+          {_headerToApply.filter.isCheckbox && (
+            <Tab title="Valeur" eventKey={"isCheckbox"}>
+              <div id="ppvr-check">
+                {_arFilters.map((item, index) => {
+                  
+                  if (item[0] === "undefined") return null;
+                  return (
+                    <Form.Check
+                      key={index}
+                      type="checkbox"
+                      checked={IsFiltercheckboxShouldBeCheck(
+                        fieldname,
+                        item[0]
+                      )}
+                      label={
+                        _headerToApply.editor
+                          ? _headerToApply.editor(item[0])
+                          : item[0]
+                      }
+                      onChange={(e) =>
+                        HandleCheckfilterChange(
+                          e.target.checked,
+                          fieldname,
+                          item[0]
+                        )
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </Tab>
+          )}
+{/* 
+          <Tab title="Seuils" eventKey={"isRangeDate"}>
+            <div id="ppvr-rangeDate">
+              <Col>
+                <Form.Label>Minimum</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={minValue}
+                  onChange={HandleMinValueChanged}
+                />
+                <Form.Range
+                  min={minVal}
+                  max={maxVal}
+                  value={minValue}
+                  onChange={(e) => setMinvalue(e.target.value)}
+                />
+              </Col>
+              <Col>
+                <Form.Label>Maximum</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={maxValue}
+                  onChange={HandleMaxValueChanged}
+                />
+                <Form.Range
+                  min={minVal}
+                  max={maxVal}
+                  value={maxValue}
+                  onChange={(e) => setMaxValue(e.target.value)}
+                />
+              </Col>
+
+              <Button onClick={HandleFilterSeuilClick}>Appliquer</Button>
+            </div>
+          </Tab> */}
+
+          {!_arrayVal.some(isNaN) && _headerToApply.filter.isRange && (
+            <Tab title="Seuils" eventKey={"isRange"}>
+              <div id="ppvr-range">
+                <Col>
+                  <Form.Label>Minimum</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={minValue}
+                    onChange={HandleMinValueChanged}
+                  />
+                  <Form.Range
+                    min={minVal}
+                    max={maxVal}
+                    value={minValue}
+                    onChange={(e) => setMinvalue(e.target.value)}
+                  />
+                </Col>
+                <Col>
+                  <Form.Label>Maximum</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={maxValue}
+                    onChange={HandleMaxValueChanged}
+                  />
+                  <Form.Range
+                    min={minVal}
+                    max={maxVal}
+                    value={maxValue}
+                    onChange={(e) => setMaxValue(e.target.value)}
+                  />
+                </Col>
+
+                <Button onClick={HandleFilterSeuilClick}>Appliquer</Button>
+              </div>
+            </Tab>
+          )}
+
+          {_headerToApply.filter.isSearchCol && (
+            <Tab title="Recherche" eventKey={"isSearchCol"}>
+              <div id="ppvr-search">
+                <InputGroup className="mb-3">
+                  <Form.Control
+                    type="search"
+                    placeholder="Recherchez..."
+                    value={searchCol}
+                    onChange={handleSearchOnChange}
+                  />
+
+                  <Button
+                    onClick={HandleSearchOnClick}
+                    variant="outline-secondary"
+                    id="button-addon2"
+                  >
+                    <FontAwesomeIcon icon={faSearch} />
+                  </Button>
+                </InputGroup>
+              </div>
+            </Tab>
+          )}
+        </Tabs>
       </Popover>
     );
   };
@@ -338,9 +633,7 @@ const TableData = ({ ...props }) => {
     return (
       <tr
         className={
-          rowIndexSelected && index === rowIndexSelected
-            ? "table-presta-row-selected"
-            : ""
+          index === rowIndexSelected ? "table-presta-row-selected" : ""
         }
       >
         {props.Headers.map((header, i) => {
@@ -360,7 +653,7 @@ const TableData = ({ ...props }) => {
   const handleTdClick = (index, _cellToApply, item) => {
     if (_cellToApply.isSelectable) {
       setRowIndexSelected(index);
-      SwitchTagMethod(_cellToApply.tagMethod, item);
+      SwitchTagMethod(_cellToApply.tagMethod, item, index);
     }
   };
 
@@ -389,29 +682,27 @@ const TableData = ({ ...props }) => {
   };
 
   const TableBodyCellBody = ({ _cellToApply, value, index }) => {
-    //Marquage en <mark></mark>
-    let _textWIsSearchable = _cellToApply.isSearchable
-      ? HighlightTextIfSearch(value)
-      : value;
-
-    // Marquage en h1
-    let _textWIsH1 = _cellToApply.isH1 ? (
-      <h1> {_textWIsSearchable} </h1>
-    ) : (
-      _textWIsSearchable
-    );
+    let _textFinal = value;
 
     //Marquage par l'editor
-    let _textWEditor = _cellToApply.editor
-      ? _cellToApply.editor(_textWIsH1)
-      : _textWIsH1;
+    _textFinal = _cellToApply.editor
+      ? _cellToApply.editor(_textFinal)
+      : _textFinal;
+
+    //Marquage en <mark></mark>
+    _textFinal = _cellToApply.isSearchable
+      ? HighlightTextIfSearch(_textFinal)
+      : _textFinal;
+
+    // Marquage en h1
+    _textFinal = _cellToApply.isH1 ? <h1> {_textFinal} </h1> : _textFinal;
 
     return (
       <td
         style={_cellToApply.fixedWidth && { width: _cellToApply.fixedWidth }}
         onClick={() => handleTdClick(index, _cellToApply, value)}
       >
-        {_textWEditor}
+        {_textFinal}
       </td>
     );
   };
@@ -449,6 +740,7 @@ const TableData = ({ ...props }) => {
 
     let _lData = Data();
     let _limiter = _lData.length;
+    let _isEllipsisNedded = _limiter / nbParPages + 1 > 10;
 
     _items.push(
       <Pagination.Prev
@@ -457,21 +749,229 @@ const TableData = ({ ...props }) => {
         className="m-1"
       />
     );
+
+    /*< 1 ... x-2 x-1 x x+1 x+2 ... l >
+
+      < 1 x+1 x+2 ... l >
+      if (_limiter / nbParPages + 1) > 10
+      {
+        
+      }
+*/
+
     for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
-      _items.push(
-        <Pagination.Item
-          key={number}
-          active={number === pageActuelle}
-          onClick={() => handlePageChange(number)}
-          className="m-1"
-        >
-          {number}
-        </Pagination.Item>
-      );
+      if (_isEllipsisNedded) {
+               
+        if (number === 1) {
+          // 1
+          _items.push(
+            <Pagination.Item
+              key={number}
+              active={number === pageActuelle}
+              onClick={() => handlePageChange(number)}
+              className="m-1"
+            >
+              {number}
+            </Pagination.Item>
+          );
+
+
+          if(pageActuelle === 1)
+          {
+
+         //x + 1
+         if (number + 1 < _limiter / nbParPages + 1) {
+          _items.push(
+            <Pagination.Item
+              key={number + 1}
+              active={number + 1 === pageActuelle}
+              onClick={() => handlePageChange(number + 1)}
+              className="m-1"
+            >
+              {number + 1}
+            </Pagination.Item>
+          );
+        }
+
+        //x + 2
+        if (number + 2 < _limiter / nbParPages + 1) {
+          _items.push(
+            <Pagination.Item
+              key={number + 2}
+              active={number + 2 === pageActuelle}
+              onClick={() => handlePageChange(number + 2)}
+              className="m-1"
+            >
+              {number + 2}
+            </Pagination.Item>
+          );
+        }
+
+        //Elispsis
+        if (number + 3 < _limiter / nbParPages + 1)
+        {
+          _items.push(<Pagination.Ellipsis className="m-1" key={number + 3} />);
+        }
+          continue;
+        }
+      }
+
+
+
+
+        if (number + 1 > _limiter / nbParPages + 1) {
+
+          if(pageActuelle === number)
+          {
+             //Elipsis
+          if (number - 3 > 1) {
+            _items.push(<Pagination.Ellipsis className="m-1" key={number - 3} />);
+          }
+
+          //x - 2
+          if (number - 2 > 1) {
+            _items.push(
+              <Pagination.Item
+                key={number - 2}
+                active={number - 2 === pageActuelle}
+                onClick={() => handlePageChange(number - 2)}
+                className="m-1"
+              >
+                {number - 2}
+              </Pagination.Item>
+            );
+          }
+
+          // x - 1
+          if (number - 1 > 1) {
+            _items.push(
+              <Pagination.Item
+                key={number - 1}
+                active={number - 1 === pageActuelle}
+                onClick={() => handlePageChange(number - 1)}
+                className="m-1"
+              >
+                {number - 1}
+              </Pagination.Item>
+            );
+          }
+          }
+
+          _items.push(
+            <Pagination.Item
+              key={number}
+              active={number === pageActuelle}
+              onClick={() => handlePageChange(number)}
+              className="m-1"
+            >
+              {number}
+            </Pagination.Item>
+          );
+          continue;
+        }
+
+
+
+        if (number === pageActuelle) {
+          //Elipsis
+          if (number - 3 > 1) {
+            _items.push(<Pagination.Ellipsis className="m-1" key={number - 3} />);
+          }
+
+          //x - 2
+          if (number - 2 > 1) {
+            _items.push(
+              <Pagination.Item
+                key={number - 2}
+                active={number - 2 === pageActuelle}
+                onClick={() => handlePageChange(number - 2)}
+                className="m-1"
+              >
+                {number - 2}
+              </Pagination.Item>
+            );
+          }
+
+          // x - 1
+          if (number - 1 > 1) {
+            _items.push(
+              <Pagination.Item
+                key={number - 1}
+                active={number - 1 === pageActuelle}
+                onClick={() => handlePageChange(number - 1)}
+                className="m-1"
+              >
+                {number - 1}
+              </Pagination.Item>
+            );
+          }
+
+          //x
+          _items.push(
+            <Pagination.Item
+              key={number}
+              active={number === pageActuelle}
+              onClick={() => handlePageChange(number)}
+              className="m-1"
+            >
+              {number}
+            </Pagination.Item>
+          );
+
+          //x + 1
+          if (number + 1 < _limiter / nbParPages) {
+            _items.push(
+              <Pagination.Item
+                key={number + 1}
+                active={number + 1 === pageActuelle}
+                onClick={() => handlePageChange(number + 1)}
+                className="m-1"
+              >
+                {number + 1}
+              </Pagination.Item>
+            );
+          }
+
+          //x + 2
+          if (number + 2 < _limiter / nbParPages ) {
+            _items.push(
+              <Pagination.Item
+                key={number + 2}
+                active={number + 2 === pageActuelle}
+                onClick={() => handlePageChange(number + 2)}
+                className="m-1"
+              >
+                {number + 2}
+              </Pagination.Item>
+            );
+          }
+
+          //Elispsis
+          if (number + 3 < _limiter / nbParPages)
+          {
+            _items.push(<Pagination.Ellipsis className="m-1" key={number + 3} />);
+          }
+
+
+          continue;
+        }
+      } else {
+        _items.push(
+          <Pagination.Item
+            key={number}
+            active={number === pageActuelle}
+            onClick={() => handlePageChange(number)}
+            className="m-1"
+          >
+            {number}
+          </Pagination.Item>
+        );
+      }
     }
+
     _items.push(
       <Pagination.Next
-        key={_items.length + 1}
+        key={-1}
         onClick={() => handlePageNext(_limiter / nbParPages)}
         className="m-1"
       />
@@ -539,6 +1039,20 @@ const TableData = ({ ...props }) => {
       <Row className="mb-2">
         {props.TopPannelLeftToSearch && props.TopPannelLeftToSearch}
 
+        {props.ButtonFilters && (
+          <Col className="m-1" md={"auto"}>
+            <div className="project-sort-nav">
+              <nav>
+                <ul>
+                  <ButtonFilter />
+                  {props.ButtonFilters.map((filter, index) => {
+                    return <ButtonFilter key={index} filter={filter} />;
+                  })}
+                </ul>
+              </nav>
+            </div>
+          </Col>
+        )}
         <Col className="m-1">
           <Form.Control
             type="search"
@@ -555,6 +1069,31 @@ const TableData = ({ ...props }) => {
       </Row>
     );
   };
+
+  //#region Bouton filtres
+
+  const ButtonFilter = ({ filter }) => {
+    if (!filter) {
+      return (
+        <li
+          className={btFilterActif ? "li-inactif" : "li-actif"}
+          onClick={() => handleTousFilter()}
+        >
+          Tous
+        </li>
+      );
+    }
+    return (
+      <li
+        className={isFilterActive(filter) ? "li-actif" : "li-inactif"}
+        onClick={() => handleFilterClick(filter)}
+      >
+        {filter.editor ? filter.editor(filter.value) : filter.value}
+      </li>
+    );
+  };
+
+  //#endregion
 
   //#endregion
 
@@ -660,17 +1199,22 @@ const TableData = ({ ...props }) => {
 
   //#endregion
 
-
   //#region Specifique
+
   const ModalList = () => {
     return (
       <span>
-        <ModalListeTaches />
+        {PrestaCtx && (
+          <span>
+            <ModalListeTaches />
+            <ModalDocuments />
+          </span>
+        )}
       </span>
     );
   };
 
-  const SwitchTagMethod = (tagMethod, item) => {
+  const SwitchTagMethod = (tagMethod, item, index) => {
     switch (tagMethod) {
       case "tagListeTaches":
         HandleShowModalListeTaches(item);
@@ -678,15 +1222,23 @@ const TableData = ({ ...props }) => {
       case "tagListeDocuments":
         HandleAfficherDocuments(item);
         break;
-        case "tagInterventionfactures":
-          HandleAfficherFacture(item);
-          break;
+      case "tagInterventionDocuments":
+        HandleAfficherFacture(Data()[index]);
+        break;
+      case "tagFactureVoir":
+        HandleVoirFacture(item);
+        break;
+      case "tagFactureTelecharger":
+        HandleTelechargerFacture(item);
+        break;
       default:
         break;
     }
   };
 
   //#region Prestation contrat
+
+  const PrestaCtx = useContext(PrestaContext);
 
   //#region Liste des taches
   const [showModalListeTaches, setShowModalListeTaches] = useState(false);
@@ -771,8 +1323,11 @@ const TableData = ({ ...props }) => {
     return (
       <Modal
         dialogClassName="modal-90w"
-        show={showModalListeTaches}
-        onHide={() => setShowModalListeTaches(false)}
+        show={showModalListeTaches || PrestaCtx.showModalTaches}
+        onHide={() => {
+          setShowModalListeTaches(false);
+          PrestaCtx.setShowModalTache(false);
+        }}
         backdrop="static"
         keyboard={false}
         animation={false}
@@ -788,6 +1343,24 @@ const TableData = ({ ...props }) => {
   };
 
   //#endregion
+
+  useEffect(() => {
+    if (PrestaCtx) {
+      if (PrestaCtx.showModalTaches) {
+        HandleShowModalListeTaches(PrestaCtx.prestaSelected);
+      }
+    }
+    // eslint-disable-next-line
+  }, [PrestaCtx && PrestaCtx.showModalTaches]);
+
+  useEffect(() => {
+    if (PrestaCtx) {
+      if (PrestaCtx.showModalDoc) {
+        HandleAfficherDocuments(PrestaCtx.prestaSelected);
+      }
+    }
+    // eslint-disable-next-line
+  }, [PrestaCtx && PrestaCtx.showModalDoc]);
 
   //#region Documents
 
@@ -889,21 +1462,19 @@ const TableData = ({ ...props }) => {
   };
 
   const GetZipName = () => {
-    return `Documents_P${prestaSelected.IdPrestationContrat}_${
-      prestaSelected.DateInterventionPrestation.getMonth() + 1
-    }_${prestaSelected.DateInterventionPrestation.getFullYear()}`;
+    return `Documents_P${prestaSelected.IdPrestationContrat}_${prestaSelected.DateInterventionPrestationTrimed}`;
   };
 
   const GetJsonArrayOfDocumentForZIP = () => {
     let _arrDocs = JSON.parse(JSON.stringify(documents));
 
     let _arrayRetour = [];
-
     //eslint-disable-next-line
     _arrDocs.map((doc) => {
       let _arrayDocument = [doc.b64s, doc.title];
       _arrayRetour.push(_arrayDocument);
     });
+
     return _arrayRetour;
   };
 
@@ -949,11 +1520,11 @@ const TableData = ({ ...props }) => {
     setIsDocumentLoaded(true);
     setGridColMDValue(10);
   };
-  const HandleAfficherDocuments = async (presta) => {
-    setGridColMDValue(10);
-    setPrestaSelected(presta);
 
-    if (presta.IdDossierIntervention > 0) {
+  const HandleAfficherDocuments = async (presta) => {
+    if (presta.IdDossierIntervention > 0 && presta.IdEtat === 96) {
+      setGridColMDValue(10);
+      setPrestaSelected(presta);
       setIsDocumentLoaded(false);
 
       await GetDocumentPrestation(
@@ -961,21 +1532,130 @@ const TableData = ({ ...props }) => {
         presta.IdDossierIntervention,
         FetchSetDocuments
       );
+    } else {
+      setGridColMDValue(12);
     }
+  };
+
+  const ModalDocuments = () => {
+    let _DocZIP = {
+      title: "Tous les documents",
+      extension: "zip",
+      size: " ",
+    };
+
+    const _arrayDocs = JSON.parse(JSON.stringify(documents));
+
+    return (
+      <Modal
+        dialogClassName="modal-90w"
+        show={PrestaCtx.showModalDoc}
+        onHide={() => {
+          PrestaCtx.setShowModalDoc(false);
+        }}
+        backdrop="static"
+        keyboard={false}
+        animation={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Documents
+            {isDocumentLoaded ? (
+              `(${_arrayDocs.length})`
+            ) : (
+              <Placeholder animation="glow">
+                <Placeholder xs={1} />
+              </Placeholder>
+            )}
+          </Modal.Title>
+        </Modal.Header>
+        {isDocumentLoaded ? (
+          <Modal.Body>
+            <div id="collapse-listeDocuments">
+              {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
+
+              {_arrayDocs.map((doc, index) => {
+                return RowDocument(doc, index);
+              })}
+            </div>
+          </Modal.Body>
+        ) : (
+          <Modal.Body>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+          </Modal.Body>
+        )}
+      </Modal>
+    );
   };
 
   //#endregion
 
   //#endregion
 
-//#region Intervention
+  //#region Factures
 
-const HandleAfficherFacture = (inter) => {
-  setGridColMDValue(10);
-  //LoadFacture,AffichageFacture comme documeuent
-}
+  const FactureCtx = useContext(FactureContext);
 
-//#endregion
+  const HandleVoirFacture = (facture) => {
+    VoirFactureDocument(
+      tokenCt,
+      facture.IdFacture,
+      facture.Type,
+      facture.Avoir
+    );
+    FactureCtx.setVoirFacture(false);
+  };
+
+  const HandleTelechargerFacture = (facture) => {
+    TelechargerFactureDocument(
+      tokenCt,
+      facture.IdFacture,
+      facture.Type,
+      facture.Avoir
+    );
+    FactureCtx.setTelechargerFacture(false);
+  };
+
+  useEffect(() => {
+    if (FactureCtx) {
+      if (FactureCtx.voirFacture) {
+        HandleVoirFacture(FactureCtx.factureSelected);
+      }
+    }
+    // eslint-disable-next-line
+  }, [FactureCtx && FactureCtx.voirFacture]);
+
+  useEffect(() => {
+    if (FactureCtx) {
+      if (FactureCtx.TelechargerFacture) {
+        HandleTelechargerFacture(FactureCtx.factureSelected);
+      }
+    }
+    // eslint-disable-next-line
+  }, [FactureCtx && FactureCtx.TelechargerFacture]);
+
+  //#endregion
+
+  //#region Intervention
+
+  const HandleAfficherFacture = (inter) => {
+    if (inter) {
+      setGridColMDValue(10);
+      //LoadFacture,AffichageFacture comme documeuent
+    } else {
+      setGridColMDValue(12);
+    }
+  };
+
+  //#endregion
 
   //#endregion
 
@@ -998,6 +1678,9 @@ const HandleAfficherFacture = (inter) => {
                     }
                   />
                 )}
+
+
+
               </Table>
             </Col>
 
@@ -1021,14 +1704,23 @@ export default TableData;
 
 //#region Helpers
 
-export const CreateNewHeader = (fieldname, isFilter, caption,editor) => {
+export const CreateNewHeader = (fieldname, filter, caption, editor) => {
   let _header = {
     fieldname: fieldname,
-    isFilter: isFilter,
+    filter: filter,
     caption: caption,
-    editor: editor
+    editor: editor,
   };
   return _header;
+};
+
+export const CreateFilter = (isFilter, isCheckbox, isRange, isSearchCol) => {
+  return {
+    isFilter: isFilter,
+    isCheckbox: isCheckbox,
+    isRange: isRange,
+    isSearchCol: isSearchCol,
+  };
 };
 
 export const CreateNewCell = (
@@ -1045,15 +1737,15 @@ export const CreateNewCell = (
     isSearchable: isSearchable,
     isSelectable: isSelectable,
     editor: editor,
-    tagMethod: tagMethod
+    tagMethod: tagMethod,
   };
   return _cell;
 };
 
-export const CreateNewUnboundHeader = (isFilter, caption) => {
+export const CreateNewUnboundHeader = (filter, caption) => {
   let _header = {
     fieldname: "unboundColonne",
-    isFilter: isFilter,
+    filter: filter,
     caption: caption,
   };
   return _header;
@@ -1075,6 +1767,11 @@ export const CreateNewUnboundCell = (
     tagMethod: tagMethod,
   };
   return _cell;
+};
+
+export const CreateNewButtonFilter = (fieldname, value, editor) => {
+  let _btFilter = { fieldname: fieldname, value: value, editor: editor };
+  return _btFilter;
 };
 
 export const CreateNewCardModel = (CardBody, CardTitle, CardSubtitle) => {

@@ -2,7 +2,6 @@
 import { useEffect, useState, useContext } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
-import dateFormat from "dateformat";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
@@ -32,14 +31,6 @@ const ContratPage = () => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   //#region Données
- 
-  const _dateContrat = 
-  new Date(
-    ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
-  )
-  // .toLocaleDateString()
-  
-
   
 
   const dateFinPeriode = () => {
