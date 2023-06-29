@@ -54,6 +54,7 @@ const NouvelleInterventionPage = ({ props }) => {
   const [customTel, setCustomTel] = useState("");
 
   const [isLoadedSecteurs, setIsLoadedSecteurs] = useState(false);
+  // eslint-disable-next-line
   const [isLoadedTel, setIsLoadedTel] = useState(false);
   //#endregion
 
@@ -65,6 +66,7 @@ const NouvelleInterventionPage = ({ props }) => {
       setIsLoadedSecteurs(true);
     };
 
+    // eslint-disable-next-line
     const FetchSetTel = (data) => {
       setListeTel(JSON.parse(data));
       setIsLoadedTel(true);

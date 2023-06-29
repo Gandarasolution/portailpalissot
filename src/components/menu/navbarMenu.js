@@ -78,14 +78,20 @@ const NavbarMenu = ({ handleDeconnexion }) => {
                 {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
               </p>
               <p>
-                <a href="/maintenance/contrat">
+                {
+ClientSiteContratCtx.storedClientSite.IdContrat > 0 ?
+                <a href="/contrat">
                   {`Contrat N°${
                     ClientSiteContratCtx.storedClientSite.IdContrat
                   } souscrit le ${new Date(
                     ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
                   ).toLocaleDateString()}`}
                 </a>
-              </p>
+              : "Aucun contrat"  
+              
+              }
+
+</p>
             </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
@@ -105,11 +111,15 @@ const NavbarMenu = ({ handleDeconnexion }) => {
                     onClick={() => ClientSiteContratCtx.setClientSite(csc)}
                   >
                     {`S${csc.IdClientSite}-${csc.NomCompletClientSite}`}
+                    {
+                      csc.IdContrat > 0 &&
+
                     <span className="ms-2">
                       {`Contrat N°${csc.IdContrat} souscrit le ${new Date(
                         csc.DateSouscriptionContrat
-                      ).toLocaleDateString()}`}
+                        ).toLocaleDateString()}`}
                     </span>
+                      }
                   </Button>
                 </span>
               );

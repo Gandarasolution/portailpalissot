@@ -126,7 +126,11 @@ const ContratPage = () => {
 
 
   const FetchDataPrestation = async () => {
-   
+   if(ClientSiteContratCtx.storedClientSite.IdContrat === 0)
+   {
+    setIsLoadedPresta(true);
+    return;
+   }
     SetPrestations([]);
     setLastPeriode(DateSOAP(dateDebutPeriode));
     
@@ -231,6 +235,7 @@ const ContratPage = () => {
   };
 
   useEffect(() => {
+    document.title="Contrats"
     async function makeRequest() {
       setIsLoadedPresta(false);
       await FetchDataPrestation();
