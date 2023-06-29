@@ -30,6 +30,7 @@ import NouvelleInterventionPage from "./Views/Depannage/Interventions/NouvelleIn
 import FacturesPage from "./Views/Factures/FacturesPage";
 import WaiterPage from "./Views/Home/Waiter";
 import ErrorPage from "./Views/Home/Error";
+import { useCookies } from "react-cookie";
 
 //#endregion
 
@@ -81,26 +82,49 @@ function App() {
   //#endregion
 
   //#region Token
-  const storedJwt = sessionStorage.getItem("token");
-  const [jwt, setJwt] = useState(storedJwt || null);
 
-  function setToken(token) {
-    sessionStorage.setItem("token", token);
-    setJwt(token);
-  }
+  //Fonction de hash : https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
+  const cyrb53 = (str, seed = 0) => {
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for(let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+};
+
+//Hashage du nom du token pour éviter une récupération mannuelle rapide
+  const tokenName = cyrb53("tokenNameHashed").toString();
+
+const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies([tokenName])
+
+
+
+function setTokenViaCookies(token)
+{
+  setTokenCookie(tokenName,token)
+  
+}
 
   const handleDeconnexion = () => {
-    sessionStorage.removeItem("token");
-    setJwt(null);
+    removeTokenCookie(tokenName);
   };
 
-  if (!jwt) {
+  if (!tokenCookie[tokenName]) {
+
     return (
       <ListeClientSiteContratContext.Provider
         value={{ storedListe, setListe, storedClientSite, setClientSite }}
       >
         <div className="App font-link background">
-          <LoginPage setToken={setToken} setParams={setParams} />
+          {/* <LoginPage setToken={setToken} setParams={setParams} /> */}
+          <LoginPage setToken={setTokenViaCookies} setParams={setParams} />
         </div>
       </ListeClientSiteContratContext.Provider>
     );
@@ -109,7 +133,7 @@ function App() {
   //#endregion
 
   return (
-    <TokenContext.Provider value={jwt}>
+    <TokenContext.Provider value={tokenCookie[tokenName]}>
       <ClientSiteContratContext.Provider
         value={{ storedClientSite, setClientSite, storedListe }}
       >
