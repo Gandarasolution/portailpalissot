@@ -34,6 +34,7 @@ import TableData, {
   CreateNewUnboundHeader,
 } from "../../components/commun/TableData";
 import TitreOfPage from "../../components/commun/TitreOfPage";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 //#endregion
 
 //#endregion
@@ -217,7 +218,13 @@ const FacturesPage = () => {
   const EditorActionVoir = (e) => {
     return (
       <Button variant="">
+        <OverlayTrigger
+          placement="bottom"
+          overlay={<Tooltip>Voir la facture</Tooltip>}
+        >
+
         <FontAwesomeIcon icon={faEye} />
+        </OverlayTrigger>
       </Button>
     );
   };
@@ -225,7 +232,14 @@ const FacturesPage = () => {
   const EditorActionTelecharger = (e) => {
     return (
       <Button variant="">
-        <FontAwesomeIcon icon={faDownload} />
+        <OverlayTrigger
+          placement="bottom"
+          overlay={<Tooltip>Télécharger la facture</Tooltip>}
+        >
+
+<FontAwesomeIcon icon={faDownload} />
+        </OverlayTrigger>
+
       </Button>
     );
   };
@@ -414,7 +428,7 @@ const FacturesPage = () => {
           }
           CardModel={_CardModel}
           ButtonFilters={_ButtonFilters}
-          FilterDefaultValue={CreateNewButtonFilter("Type", "Chantier")}
+          // FilterDefaultValue={CreateNewButtonFilter("Type", "Chantier")}
         />
       </FactureContext.Provider>
     );

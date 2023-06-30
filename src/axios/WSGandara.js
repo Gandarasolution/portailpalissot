@@ -4,8 +4,8 @@ import $ from "jquery";
 //#endregion
 
 //#region Données
- const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+//  const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
@@ -241,6 +241,7 @@ const GetListeFactures = async (
 };
 
 const VoirFactureDocument = async (token, IdFacture, TypeFacture, Avoir) => {
+
   let targetWindow = window.open("/waiting");
   $.ajax({
     type: "POST",
@@ -316,6 +317,44 @@ const GetListeInterventions = async (
 
 
 
+const GetListeFIIntervention = async (token, IdDossierInterventionSAV,setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetListeFIIntervention",
+
+    data: {
+      token: token,
+      IdDossierInterventionSAV: IdDossierInterventionSAV,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+}
+
+
+const GeTListeFactureIntervention = async (token, IdDossierInterventionSAV,setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GeTListeFactureIntervention",
+
+    data: {
+      token: token,
+      IdDossierInterventionSAV: IdDossierInterventionSAV,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+}
 const GetListeSecteur = async ( token, IdClientSiteRelation,setData ) => {
 
   return $.ajax({
@@ -359,5 +398,7 @@ export {
   VoirFactureDocument,
   TelechargerFactureDocument,
   GetListeInterventions,
+  GetListeFIIntervention,
+  GeTListeFactureIntervention,
   GetListeSecteur,
 };

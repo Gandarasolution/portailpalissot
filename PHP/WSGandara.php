@@ -691,6 +691,48 @@
 	
 
 
+
+	
+function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
+{
+	global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdDossierInterventionSAV" => $IdDossierInterventionSAV);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetListeFIIntervention",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetListeFIIntervention", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetListeFIInterventionResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetListeFIInterventionResult"]["KV"]);
+				
+				}else{
+				return "500";
+			}
+		}
+}
+
 	function GetListeInterventions($token, $IdClientSite, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -731,6 +773,64 @@
 		}
 	}
 	
+
+
+
+	function GeTListeFactureIntervention($token, $IdDossierInterventionSAV, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdDossierInterventionSAV" => $IdDossierInterventionSAV);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGeTListeFactureIntervention",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGeTListeFactureIntervention", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGeTListeFactureInterventionResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGeTListeFactureInterventionResult"]["KV"]);
+				
+				}else{
+				return "500";
+			}
+		}
+	}
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	function CallENDPOINT($url="",$endpoint="", )
 	{
 		
@@ -800,6 +900,21 @@
 				case "GMAOGetListeInterventions":
 					echo(GetListeInterventions($_POST["token"], $_POST["IdClientSite"],$url));
 					break;
+
+
+
+			case "GMAOGetListeFIIntervention":
+				echo(GetListeFIIntervention($_POST['token'],$_POST['IdDossierInterventionSAV'], $url));
+				break;
+
+
+
+				case "GMAOGeTListeFactureIntervention":
+					echo(GeTListeFactureIntervention($_POST['token'],$_POST['IdDossierInterventionSAV'], $url));
+					break;
+				
+
+
 			default:
 			header("HTTP/1.1 500 Internal Server Error");
 			

@@ -24,6 +24,7 @@ import TitreOfPage from "../../../components/commun/TitreOfPage";
 import { GetListeInterventions } from "../../../axios/WSGandara";
 import { useContext } from "react";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
+import { Col, OverlayTrigger, Tooltip } from "react-bootstrap";
 //#endregion
 
 //#endregion
@@ -111,10 +112,8 @@ element.VerrouEtat = JSON.parse(JSON.stringify(element.Etat.VerrouEtat));
         return "secondary";
       case 3:
         return "success";
-      case 4:
+        default:
         return "danger";
-      default:
-        break;
     }
   }
 
@@ -336,8 +335,6 @@ const EditorFiltres = (VerrouEtat) => {
     case 3:
       _text = "Facturé";
       break;
-    case 4:
-      _text = "Autres";
     default:
       _text = "Autres";
       break;
@@ -359,7 +356,13 @@ const EditorFiltres = (VerrouEtat) => {
 const EditorActionDocuments = (inter) => {
   return (
     <Button>
+     <OverlayTrigger
+          placement="bottom"
+          overlay={<Tooltip>Voir les documents</Tooltip>}
+        >
+
       <FontAwesomeIcon icon={faFile} />
+      </OverlayTrigger>
     </Button>
   );
 };
@@ -400,48 +403,11 @@ const EditorActionDocuments = (inter) => {
         IsLoaded={isLoaded}
         Pagination
         ButtonFilters={_ButtonFilter}
-        FilterDefaultValue={CreateNewButtonFilter("VerrouEtat",3,EditorFiltres)}
-        // TopPannelLeftToSearch={
-        //   <Col md={"auto"} className="m-1">
-        //     <div className="project-sort-nav">
-        //       <nav>
-        //         <ul>
-        //           <li className="li-actif">
-        //             <a
-        //               className="btn-filter text-decoration-none"
-        //               href="/nouvelleintervention"
-        //             >
-        //               Nouvelle intervention
-        //             </a>
-        //           </li>
-        //         </ul>
-        //       </nav>
-        //     </div>
-        //   </Col>
-        // }
-        // TopPannelRightToSearch={
-        //   <Col md={"auto"} className="m-1">
-        //     <Stack direction="horizontal" className="centerStack " gap={1}>
-        //       <Button
-        //         variant=""
-        //         className=" button-periode"
-        //         onClick={() => SoustraireUnAnPeriode()}
-        //       >
-        //         <FontAwesomeIcon icon={faArrowLeft} />
-        //       </Button>
-
-        //       {DropDownYears(false)}
-
-        //       <Button
-        //         variant=""
-        //         className="button-periode "
-        //         onClick={() => AjouterUnAnPeriode()}
-        //       >
-        //         <FontAwesomeIcon icon={faArrowRight} />
-        //       </Button>
-        //     </Stack>
-        //   </Col>
-        // }
+        TopPannelRightToSearch={
+          <Col md={"auto"} className="m-1">
+          <Button variant="danger" onClick={()=> window.location.href="/nouvelleintervention"}>Demander une nouvelle intervention</Button>
+          </Col>
+        }
         
         // CardModel={_CardModel}
       />
@@ -450,7 +416,6 @@ const EditorActionDocuments = (inter) => {
 
   return (
     <Container fluid className="h-100">
-      <Button variant="danger mt-2" onClick={()=> window.location.href="/nouvelleintervention"}>Demander une nouvelle intervention</Button>
       <TitreOfPage
         titre={"Interventions dépannage"}
         soustitre={` ${listeInterventions.length} intervention${

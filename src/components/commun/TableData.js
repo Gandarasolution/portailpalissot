@@ -38,7 +38,9 @@ import {
 } from "react-bootstrap";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import {
+  GeTListeFactureIntervention,
   GetDocumentPrestation,
+  GetListeFIIntervention,
   GetPrestationReleveTache,
   TelechargerDocument,
   TelechargerFactureDocument,
@@ -206,6 +208,13 @@ const TableData = ({ ...props }) => {
     );
   };
 
+
+  function ResetAffichage(pageActuelle){
+    setGridColMDValue(12);
+    setDocuments([]);
+    setPageActuelle(pageActuelle);
+  }
+
   //#endregion
 
   //#region LARGE
@@ -214,7 +223,7 @@ const TableData = ({ ...props }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setPageActuelle(1);
+    ResetAffichage(1);
     setSearch(e.target.value);
   };
 
@@ -237,32 +246,32 @@ const TableData = ({ ...props }) => {
 
   const handleTousFilter = () => {
     setBtFilterActif(null);
-    setPageActuelle(1);
-
+    ResetAffichage(1);
   };
 
   const handleFilterClick = (filter) => {
     setBtFilterActif(filter);
-    setPageActuelle(1);
+    ResetAffichage(1);
+
 
   };
 
   //#region Pagination
   const handlePagePrev = () => {
     if (pageActuelle > 1) {
-      setPageActuelle(pageActuelle - 1);
+      ResetAffichage(pageActuelle - 1);
       props.methodPagination && props.methodPagination();
     }
   };
 
   const handlePageChange = (number) => {
-    setPageActuelle(number);
+    ResetAffichage(number);
     props.methodPagination && props.methodPagination();
   };
 
   const handlePageNext = (number) => {
     if (pageActuelle < number) {
-      setPageActuelle(pageActuelle + 1);
+      ResetAffichage(pageActuelle + 1);
       props.methodPagination && props.methodPagination();
     }
   };
@@ -1436,7 +1445,7 @@ const TableData = ({ ...props }) => {
         <Col md={9}>
           <Row>
             <p className="mb-0 document-title">{`${props.title}`}</p>
-            <span className="document-size">{`${props.size}`}</span>
+            {props.size && <span className="document-size">{`${props.size}`}</span>}
             <span className="document-links">
               {props.extension.toUpperCase() !== "ZIP" && (
                 <Link onClick={() => VoirDocument(props.b64s, props.title)}>
@@ -1650,10 +1659,100 @@ const TableData = ({ ...props }) => {
 
   //#region Intervention
 
+const GetListeFI = async (IdDossierInterventionSAV) => {
+setIsDocumentLoaded(false);
+
+let _arrDocs = [];
+  const FetchSetDataFIPart= (data) => {
+
+    if(data.length)
+    {
+      //Il y a plusieurs FI
+
+      for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+
+
+        const _obj = {};
+
+          _obj.title = `${element.k}`;
+          _obj.extension = "pdf";
+       
+          // _obj.size = GetFileSizeFromB64String(element.v);
+          _obj.b64s = element.v;
+
+        _arrDocs.push(_obj);
+
+
+        
+        
+      }
+    }else if(data.k) {
+      const _obj = {};
+
+      _obj.title = `${data.k}`;
+      _obj.extension = "pdf";
+   
+      // _obj.size = GetFileSizeFromB64String(element.v);
+      _obj.b64s = data.v;
+
+    _arrDocs.push(_obj);    }
+
+  }
+  
+
+const FetchSetDataFacturePart = (data) => {
+
+  if(data.length)
+    {
+      //Il y a plusieurs factures
+      for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+
+
+        const _obj = {};
+
+          _obj.title = `${element.k}`;
+          _obj.extension = "pdf";
+       
+          // _obj.size = GetFileSizeFromB64String(element.v);
+          _obj.b64s = element.v;
+
+        _arrDocs.push(_obj);
+        
+      }
+    }else if(data.k) {
+      const _obj = {};
+
+      _obj.title = `${data.k}`;
+      _obj.extension = "pdf";
+   
+      // _obj.size = GetFileSizeFromB64String(element.v);
+      _obj.b64s = data.v;
+
+    _arrDocs.push(_obj);    
+
+  }
+
+setDocuments(_arrDocs);
+setIsDocumentLoaded(true);
+
+}
+
+  GetListeFIIntervention(tokenCt,IdDossierInterventionSAV,FetchSetDataFIPart)
+  
+  GeTListeFactureIntervention(tokenCt, IdDossierInterventionSAV, FetchSetDataFacturePart)
+
+}
+
   const HandleAfficherFacture = (inter) => {
     if (inter) {
+      setDocuments([]);
       setGridColMDValue(10);
       //LoadFacture,AffichageFacture comme documeuent
+      GetListeFI(inter.IdDossierInterventionSAV);
+
+
     } else {
       setGridColMDValue(12);
     }

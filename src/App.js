@@ -31,6 +31,7 @@ import FacturesPage from "./Views/Factures/FacturesPage";
 import WaiterPage from "./Views/Home/Waiter";
 import ErrorPage from "./Views/Home/Error";
 import { useCookies } from "react-cookie";
+import PageTest from "./Views/Home/Test";
 
 //#endregion
 
@@ -143,6 +144,7 @@ function setTokenViaCookies(token)
             <NavbarMenu handleDeconnexion={handleDeconnexion} />
             
             <Routes>
+              <Route path="/test" element={<PageTest />} />
               <Route path="/waiting" element={<WaiterPage />} />
               <Route path="/error" element={<ErrorPage />} />
               <Route path="/" element={<HomePage />} />
