@@ -1,5 +1,6 @@
 //#region Imports
 import $ from "jquery";
+import { HTMLEncode } from "../functions";
 
 //#endregion
 
@@ -84,7 +85,7 @@ const GetPrestationContrat = async (
         return;
       }
       if (JSON.parse(JSON.stringify(data)) === "500") {
-        window.location.href =`/error?error=${data}`
+        window.location.href = `/error?error=${data}`;
         setData([]);
       } else {
         setData(JSON.parse(data));
@@ -112,7 +113,7 @@ const GetPrestationReleveTache = async (
         return;
       }
       if (JSON.parse(JSON.stringify(data)) === "500") {
-        window.location.href ="/error"
+        window.location.href = "/error";
         setData([]);
       } else {
         setData(JSON.parse(data));
@@ -124,19 +125,175 @@ const GetPrestationReleveTache = async (
 const GetDocumentPrestation = async (
   token,
   IdDossierIntervention,
-  setDocuments
+  setDocuments,
+  presta
 ) => {
   $.ajax({
     type: "POST",
     url: urlAction + "GetDocumentsPrestation",
     data: { token: token, IdDossierIntervention: IdDossierIntervention },
     success(data) {
-      setDocuments(data);
+      setDocuments(data,presta);
     },
   });
 };
 
+
+const GetDocumentPrestationRapport = async (token, IdMobiliteIntervention,telecharger, returnData) => {
+
+  if(returnData)
+  {
+    let _return = undefined;
+    await $.ajax({
+      type: "POST",
+      url: urlAction + "GetDocumentPrestationRapport",
+      data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
+      success(data) {
+        _return = JSON.parse(data)
+      },
+    });
+
+    return _return;
+  }
+
+  let targetWindow = window.open("/waiting");
+
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetDocumentPrestationRapport",
+    data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
+    success(data) {
+      if (data === "500") {
+        targetWindow.location.href = `/error?error=500`;
+      }
+      const _kv = JSON.parse(data);
+      if (telecharger) {
+        TelechargerDocument(_kv.v, _kv.k, targetWindow);
+      } else {
+        VoirDocument(_kv.v, _kv.k, targetWindow);
+      }
+    },
+    error(error) {
+      targetWindow.location.href = `/error?error=${error.status}`;
+    },
+  });
+
+}
+
+
+const GetDocumentPrestationCERFA = async (token, IdMobiliteIntervention,telecharger, returnData) => {
+
+  if(returnData)
+  {
+    let _return = undefined;
+    await $.ajax({
+      type: "POST",
+      url: urlAction + "GetDocumentPrestationCERFA",
+      data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
+      success(data) {
+        _return = JSON.parse(data)
+      },
+    });
+
+    return _return;
+  }
+
+  let targetWindow = window.open("/waiting");
+
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetDocumentPrestationCERFA",
+    data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
+    success(data) {
+      if (data === "500") {
+        targetWindow.location.href = `/error?error=500`;
+      }
+      const _kv = JSON.parse(data);
+      if (telecharger) {
+        TelechargerDocument(_kv.v, _kv.k, targetWindow);
+      } else {
+        VoirDocument(_kv.v, _kv.k, targetWindow);
+      }
+    },
+    error(error) {
+      targetWindow.location.href = `/error?error=${error.status}`;
+    },
+  });
+
+}
+
+
+
+
+const GetDocumentPrestationTicket = async (token, IdPJ,telecharger, returnData) => {
+
+  if(returnData)
+  {
+    let _return = undefined;
+    await $.ajax({
+      type: "POST",
+      url: urlAction + "GetDocumentPrestationTicket",
+      data: { token: token, IdPJ: IdPJ },
+      success(data) {
+        let _data = JSON.parse(data);
+
+        if( _data.k.substring(0 , _data.k.length - 4).split(".").pop() === "jpg" )
+        {
+          _data.k = _data.k.substring(0,_data.k.length - 4);
+          _return = _data;
+        }
+        else {
+          _return = JSON.parse(data)
+
+        }
+        
+      },
+    });
+
+    return _return;
+  }
+
+  let targetWindow = window.open("/waiting");
+
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetDocumentPrestationTicket",
+    data: { token: token, IdPJ: IdPJ },
+    success(data) {
+      if (data === "500") {
+        targetWindow.location.href = `/error?error=500`;
+      }
+      const _kv = JSON.parse(data);
+      
+
+      if( _kv.k.substring(0 , _kv.k.length - 4).split(".").pop() === "jpg" )
+      {
+        _kv.k = _kv.k.substring(0,_kv.k.length - 4);
+      }
+
+      if (telecharger) {
+
+        // TelechargerDocument(_kv.v, _kv.k, targetWindow);
+        TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
+      } else {
+
+        VoirDocument(_kv.v, _kv.k, targetWindow);
+      }
+    },
+    error(error) {
+      targetWindow.location.href = `/error?error=${error.status}`;
+    },
+  });
+
+}
+
+
+
+
 //#endregion
+
+
+
 
 //#region Documents
 
@@ -144,7 +301,7 @@ const VoirDocument = (b64, filename, targetWindow) => {
   $.ajax({
     type: "POST",
     url: `${urlAction}File64`,
-    data: { b64: b64, filename: filename },
+    data: { b64: b64, filename: HTMLEncode(filename) },
     success(data) {
       const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
       if (targetWindow) {
@@ -166,7 +323,6 @@ const TelechargerDocument = (b64, filename, targetWindow) => {
     success(data) {
       const urlToOpen = `${urlAction}DownloadDocument&filename=${data}`;
       if (targetWindow) {
-        console.log(urlToOpen);
         // targetWindow.location.href=urlToOpen;
         window.open(urlToOpen, "_blank");
         targetWindow.close();
@@ -178,15 +334,19 @@ const TelechargerDocument = (b64, filename, targetWindow) => {
 };
 
 const TelechargerZIP = (files, filename) => {
-  $.ajax({
-    type: "POST",
-    url: `${urlAction}ZIPDocs`,
-    data: { arrayDocs: files, filename: filename },
-    success(data) {
-      const urlToOpen = `${urlAction}DownloadDocument&filename=${data}`;
-      window.open(urlToOpen, "_blank");
-    },
-  });
+ 
+    $.ajax({
+      type: "POST",
+      url: `${urlAction}ZIPDocs`,
+      data: { arrayDocs: files, filename: filename },
+      success(data) {
+        const urlToOpen = `${urlAction}DownloadDocument&filename=${data}`;
+          window.open(urlToOpen, "_blank");
+
+      },
+     
+    });
+ 
 };
 
 //#endregion
@@ -240,7 +400,27 @@ const GetListeFactures = async (
   });
 };
 
-const VoirFactureDocument = async (token, IdFacture, TypeFacture, Avoir) => {
+const VoirFactureDocument = async (token, IdFacture, TypeFacture, Avoir, returnData) => {
+if (returnData)
+{
+  let _return = undefined;
+  await $.ajax({
+    type: "POST",
+    url: urlAction + "GetFactureDocument",
+    data: {
+      token: token,
+      IdFacture: IdFacture,
+      TypeFacture: TypeFacture,
+      Avoir: Number(Avoir),
+    },
+    success(data) {
+      const _kv = JSON.parse(data);
+      _return = _kv;
+    },
+  });
+
+  return _return;
+}else {
 
   let targetWindow = window.open("/waiting");
   $.ajax({
@@ -260,6 +440,9 @@ const VoirFactureDocument = async (token, IdFacture, TypeFacture, Avoir) => {
       targetWindow.location.href = `/error?error=${error.status}`;
     },
   });
+
+}
+
 };
 
 const TelechargerFactureDocument = async (
@@ -294,7 +477,7 @@ const TelechargerFactureDocument = async (
 const GetListeInterventions = async (
   token,
   IdClientSite,
-  
+
   setData
 ) => {
   $.ajax({
@@ -315,10 +498,12 @@ const GetListeInterventions = async (
   });
 };
 
-
-
-const GetListeFIIntervention = async (token, IdDossierInterventionSAV,setData) => {
-  $.ajax({
+const GetListeFIIntervention = async (
+  token,
+  IdDossierInterventionSAV,
+  setData
+) => {
+  await $.ajax({
     type: "POST",
     url: urlAction + "GetListeFIIntervention",
 
@@ -334,10 +519,13 @@ const GetListeFIIntervention = async (token, IdDossierInterventionSAV,setData) =
       }
     },
   });
-}
+};
 
-
-const GeTListeFactureIntervention = async (token, IdDossierInterventionSAV,setData) => {
+const GeTListeFactureIntervention = async (
+  token,
+  IdDossierInterventionSAV,
+  setData
+) => {
   $.ajax({
     type: "POST",
     url: urlAction + "GeTListeFactureIntervention",
@@ -354,9 +542,62 @@ const GeTListeFactureIntervention = async (token, IdDossierInterventionSAV,setDa
       }
     },
   });
-}
-const GetListeSecteur = async ( token, IdClientSiteRelation,setData ) => {
+};
 
+const GetDocumentFISAV = async (
+  token,
+  IdFicheInterventionSAV,
+  telecharger,
+  returnData
+) => {
+  if (returnData) {
+    let _return = undefined;
+    await $.ajax({
+      type: "POST",
+      url: urlAction + "GetDocumentFISAV",
+
+      data: {
+        token: token,
+        IdFicheInterventionSAV: IdFicheInterventionSAV,
+      },
+      success(data) {
+        if (data !== "500") {
+          
+          _return = JSON.parse(data);
+        }
+      },
+    });
+    return _return;
+  }
+
+  let targetWindow = window.open("/waiting");
+
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetDocumentFISAV",
+
+    data: {
+      token: token,
+      IdFicheInterventionSAV: IdFicheInterventionSAV,
+    },
+    success(data) {
+      if (data === "500") {
+        targetWindow.location.href = `/error?error=500`;
+      }
+      const _kv = JSON.parse(data);
+      if (telecharger) {
+        TelechargerDocument(_kv.v, _kv.k, targetWindow);
+      } else {
+        VoirDocument(_kv.v, _kv.k, targetWindow);
+      }
+    },
+    error(error) {
+      targetWindow.location.href = `/error?error=${error.status}`;
+    },
+  });
+};
+
+const GetListeSecteur = async (token, IdClientSiteRelation, setData) => {
   return $.ajax({
     type: "POST",
     url: urlAction + "GetListeSecteur",
@@ -377,7 +618,7 @@ const GetListeSecteur = async ( token, IdClientSiteRelation,setData ) => {
       }
     },
   });
-}
+};
 
 //#endregion
 
@@ -393,6 +634,9 @@ export {
   GetPrestationContrat,
   GetPrestationReleveTache,
   GetDocumentPrestation,
+  GetDocumentPrestationRapport,
+  GetDocumentPrestationCERFA,
+  GetDocumentPrestationTicket,
   GetListeAppareils,
   GetListeFactures,
   VoirFactureDocument,
@@ -400,5 +644,6 @@ export {
   GetListeInterventions,
   GetListeFIIntervention,
   GeTListeFactureIntervention,
+  GetDocumentFISAV,
   GetListeSecteur,
 };

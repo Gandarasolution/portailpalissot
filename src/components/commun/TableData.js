@@ -21,6 +21,7 @@ import {
   FiltrerParSearch,
   FiltrerParSeuil,
   GetFileSizeFromB64String,
+  HTMLEncode,
   groupBy,
 } from "../../functions";
 //#region fontAwsome
@@ -39,7 +40,11 @@ import {
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import {
   GeTListeFactureIntervention,
+  GetDocumentFISAV,
   GetDocumentPrestation,
+  GetDocumentPrestationCERFA,
+  GetDocumentPrestationRapport,
+  GetDocumentPrestationTicket,
   GetListeFIIntervention,
   GetPrestationReleveTache,
   TelechargerDocument,
@@ -88,9 +93,30 @@ const TableData = ({ ...props }) => {
     //Filtre par les boutons
     if (props.ButtonFilters && btFilterActif) {
       let _filteractif = JSON.parse(JSON.stringify(btFilterActif));
+
+
       _lData = _lData.filter(
-        (data) => data[_filteractif.fieldname] === _filteractif.value
+
+        (data) => {
+          if(Array.isArray(_filteractif.value)){
+
+            let _value = false
+
+            for (let index = 0; index < _filteractif.value.length; index++) {
+              const element = _filteractif.value[index];
+              _value = data[_filteractif.fieldname] === element ? true : _value;
+            }
+
+            return _value
+
+          }else {
+            
+            return data[_filteractif.fieldname] === _filteractif.value}
+          }
+
       );
+
+
     }
 
     //Filtres par la recherche par colonne
@@ -208,8 +234,7 @@ const TableData = ({ ...props }) => {
     );
   };
 
-
-  function ResetAffichage(pageActuelle){
+  function ResetAffichage(pageActuelle) {
     setGridColMDValue(12);
     setDocuments([]);
     setPageActuelle(pageActuelle);
@@ -252,8 +277,6 @@ const TableData = ({ ...props }) => {
   const handleFilterClick = (filter) => {
     setBtFilterActif(filter);
     ResetAffichage(1);
-
-
   };
 
   //#region Pagination
@@ -472,7 +495,6 @@ const TableData = ({ ...props }) => {
             <Tab title="Valeur" eventKey={"isCheckbox"}>
               <div id="ppvr-check">
                 {_arFilters.map((item, index) => {
-                  
                   if (item[0] === "undefined") return null;
                   return (
                     <Form.Check
@@ -500,7 +522,7 @@ const TableData = ({ ...props }) => {
               </div>
             </Tab>
           )}
-{/* 
+          {/* 
           <Tab title="Seuils" eventKey={"isRangeDate"}>
             <div id="ppvr-rangeDate">
               <Col>
@@ -774,7 +796,6 @@ const TableData = ({ ...props }) => {
 
     for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
       if (_isEllipsisNedded) {
-               
         if (number === 1) {
           // 1
           _items.push(
@@ -788,86 +809,81 @@ const TableData = ({ ...props }) => {
             </Pagination.Item>
           );
 
+          if (pageActuelle === 1) {
+            //x + 1
+            if (number + 1 < _limiter / nbParPages + 1) {
+              _items.push(
+                <Pagination.Item
+                  key={number + 1}
+                  active={number + 1 === pageActuelle}
+                  onClick={() => handlePageChange(number + 1)}
+                  className="m-1"
+                >
+                  {number + 1}
+                </Pagination.Item>
+              );
+            }
 
-          if(pageActuelle === 1)
-          {
+            //x + 2
+            if (number + 2 < _limiter / nbParPages + 1) {
+              _items.push(
+                <Pagination.Item
+                  key={number + 2}
+                  active={number + 2 === pageActuelle}
+                  onClick={() => handlePageChange(number + 2)}
+                  className="m-1"
+                >
+                  {number + 2}
+                </Pagination.Item>
+              );
+            }
 
-         //x + 1
-         if (number + 1 < _limiter / nbParPages + 1) {
-          _items.push(
-            <Pagination.Item
-              key={number + 1}
-              active={number + 1 === pageActuelle}
-              onClick={() => handlePageChange(number + 1)}
-              className="m-1"
-            >
-              {number + 1}
-            </Pagination.Item>
-          );
+            //Elispsis
+            if (number + 3 < _limiter / nbParPages + 1) {
+              _items.push(
+                <Pagination.Ellipsis className="m-1" key={number + 3} />
+              );
+            }
+            continue;
+          }
         }
-
-        //x + 2
-        if (number + 2 < _limiter / nbParPages + 1) {
-          _items.push(
-            <Pagination.Item
-              key={number + 2}
-              active={number + 2 === pageActuelle}
-              onClick={() => handlePageChange(number + 2)}
-              className="m-1"
-            >
-              {number + 2}
-            </Pagination.Item>
-          );
-        }
-
-        //Elispsis
-        if (number + 3 < _limiter / nbParPages + 1)
-        {
-          _items.push(<Pagination.Ellipsis className="m-1" key={number + 3} />);
-        }
-          continue;
-        }
-      }
-
-
-
 
         if (number + 1 > _limiter / nbParPages + 1) {
+          if (pageActuelle === number) {
+            //Elipsis
+            if (number - 3 > 1) {
+              _items.push(
+                <Pagination.Ellipsis className="m-1" key={number - 3} />
+              );
+            }
 
-          if(pageActuelle === number)
-          {
-             //Elipsis
-          if (number - 3 > 1) {
-            _items.push(<Pagination.Ellipsis className="m-1" key={number - 3} />);
-          }
+            //x - 2
+            if (number - 2 > 1) {
+              _items.push(
+                <Pagination.Item
+                  key={number - 2}
+                  active={number - 2 === pageActuelle}
+                  onClick={() => handlePageChange(number - 2)}
+                  className="m-1"
+                >
+                  {number - 2}
+                </Pagination.Item>
+              );
+            }
 
-          //x - 2
-          if (number - 2 > 1) {
-            _items.push(
-              <Pagination.Item
-                key={number - 2}
-                active={number - 2 === pageActuelle}
-                onClick={() => handlePageChange(number - 2)}
-                className="m-1"
-              >
-                {number - 2}
-              </Pagination.Item>
-            );
-          }
-
-          // x - 1
-          if (number - 1 > 1) {
-            _items.push(
-              <Pagination.Item
-                key={number - 1}
-                active={number - 1 === pageActuelle}
-                onClick={() => handlePageChange(number - 1)}
-                className="m-1"
-              >
-                {number - 1}
-              </Pagination.Item>
-            );
-          }
+            // x - 1
+            if (number - 1 > 1) {
+              _items.push(
+                <Pagination.Item
+                  key={number - 1}
+                  active={number - 1 === pageActuelle}
+                  onClick={() => handlePageChange(number - 1)}
+                  className="m-1"
+                >
+                  {number - 1}
+                </Pagination.Item>
+              );
+            }
           }
 
           _items.push(
@@ -883,12 +899,12 @@ const TableData = ({ ...props }) => {
           continue;
         }
 
-
-
         if (number === pageActuelle) {
           //Elipsis
           if (number - 3 > 1) {
-            _items.push(<Pagination.Ellipsis className="m-1" key={number - 3} />);
+            _items.push(
+              <Pagination.Ellipsis className="m-1" key={number - 3} />
+            );
           }
 
           //x - 2
@@ -946,7 +962,7 @@ const TableData = ({ ...props }) => {
           }
 
           //x + 2
-          if (number + 2 < _limiter / nbParPages ) {
+          if (number + 2 < _limiter / nbParPages) {
             _items.push(
               <Pagination.Item
                 key={number + 2}
@@ -960,11 +976,11 @@ const TableData = ({ ...props }) => {
           }
 
           //Elispsis
-          if (number + 3 < _limiter / nbParPages)
-          {
-            _items.push(<Pagination.Ellipsis className="m-1" key={number + 3} />);
+          if (number + 3 < _limiter / nbParPages) {
+            _items.push(
+              <Pagination.Ellipsis className="m-1" key={number + 3} />
+            );
           }
-
 
           continue;
         }
@@ -1096,6 +1112,7 @@ const TableData = ({ ...props }) => {
         </li>
       );
     }
+
     return (
       <li
         className={isFilterActive(filter) ? "li-actif" : "li-inactif"}
@@ -1378,25 +1395,21 @@ const TableData = ({ ...props }) => {
   //#region Documents
 
   const [documents, setDocuments] = useState([]);
-  const [prestaSelected, setPrestaSelected] = useState(null);
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   const [gridColMDValue, setGridColMDValue] = useState(12);
 
   const CardDocs = () => {
-    let _DocZIP = {
-      title: "Tous les documents",
-      extension: "zip",
-      size: " ",
-    };
-
-    const _arrayDocs = JSON.parse(JSON.stringify(documents));
+    // const _arrayDocs = JSON.parse(JSON.stringify(documents));
+    const _arrayDocs = documents;
 
     return (
       <Card className="mb-2">
         <Card.Header className="card-document">
           Documents{" "}
           {isDocumentLoaded ? (
-            `(${_arrayDocs.length})`
+            `(${
+              _arrayDocs.length > 1 ? _arrayDocs.length - 1 : _arrayDocs.length
+            })`
           ) : (
             <Placeholder animation="glow">
               <Placeholder xs={1} />
@@ -1412,11 +1425,11 @@ const TableData = ({ ...props }) => {
         {isDocumentLoaded ? (
           <Card.Body>
             <div id="collapse-listeDocuments">
-              {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
-
-              {_arrayDocs.map((doc, index) => {
-                return RowDocument(doc, index);
-              })}
+              {_arrayDocs.length > 0
+                ? _arrayDocs.map((doc, index) => {
+                    return RowDocument(doc, index);
+                  })
+                : "Aucun document."}
             </div>
           </Card.Body>
         ) : (
@@ -1445,28 +1458,17 @@ const TableData = ({ ...props }) => {
         <Col md={9}>
           <Row>
             <p className="mb-0 document-title">{`${props.title}`}</p>
-            {props.size && <span className="document-size">{`${props.size}`}</span>}
+            {props.size && (
+              <span className="document-size">{`${props.size}`}</span>
+            )}
             <span className="document-links">
               {props.extension.toUpperCase() !== "ZIP" && (
-                <Link onClick={() => VoirDocument(props.b64s, props.title)}>
-                  Voir
-                </Link>
+                <Link onClick={() => props.VoirDocumentSup()}>Voir</Link>
               )}
-              {props.extension.toUpperCase() === "ZIP" ? (
-                <Link
-                  onClick={() =>
-                    TelechargerZIP(GetJsonArrayOfDocumentForZIP(), GetZipName())
-                  }
-                >
-                  Télécharger
-                </Link>
-              ) : (
-                <Link
-                  onClick={() => TelechargerDocument(props.b64s, props.title)}
-                >
-                  Télécharger
-                </Link>
-              )}
+
+              <Link onClick={() => props.TelechargerDocumentSup()}>
+                Télécharger
+              </Link>
             </span>
           </Row>
         </Col>
@@ -1474,59 +1476,141 @@ const TableData = ({ ...props }) => {
     );
   };
 
-  const GetZipName = () => {
-    return `Documents_P${prestaSelected.IdPrestationContrat}_${prestaSelected.DateInterventionPrestationTrimed}`;
+  const CreatePropsDocPresta = (element) => {
+    const _obj = {};
+
+    _obj.title = element.k;
+    _obj.extension = element.k.split(".").pop();
+
+    _obj.VoirDocumentSup = () => {
+      switch (element.v.split(".").pop()) {
+        case "CERFA":
+          GetDocumentPrestationCERFA(tokenCt, element.v.split(".").shift());
+
+          break;
+        case "RAPPORT":
+          GetDocumentPrestationRapport(tokenCt, element.v.split(".").shift());
+
+          break;
+        case "TICKET":
+          GetDocumentPrestationTicket(tokenCt, element.v.split(".").shift());
+          break;
+        default:
+          break;
+      }
+    };
+    _obj.TelechargerDocumentSup = () => {
+      switch (element.v.split(".").pop()) {
+        case "CERFA":
+          GetDocumentPrestationCERFA(
+            tokenCt,
+            element.v.split(".").shift(),
+            true
+          );
+
+          break;
+        case "RAPPORT":
+          GetDocumentPrestationRapport(
+            tokenCt,
+            element.v.split(".").shift(),
+            true
+          );
+
+          break;
+        case "TICKET":
+          GetDocumentPrestationTicket(
+            tokenCt,
+            element.v.split(".").shift(),
+            true
+          );
+          break;
+        default:
+          break;
+      }
+    };
+
+    _obj.data = element;
+
+    return _obj;
   };
 
-  const GetJsonArrayOfDocumentForZIP = () => {
-    let _arrDocs = JSON.parse(JSON.stringify(documents));
+  const CreatePropsDocPrestaZIP = async (_arrDocT, presta) => {
+    const _obj = {};
+    _obj.title = "Tous les documents";
+    _obj.extension = "zip";
 
-    let _arrayRetour = [];
-    //eslint-disable-next-line
-    _arrDocs.map((doc) => {
-      let _arrayDocument = [doc.b64s, doc.title];
-      _arrayRetour.push(_arrayDocument);
-    });
+    const TelechargerZIPSup = async (presta) => {
+      let _arrDocs = [];
+      let _targetWindow = window.open("/waiting");
 
-    return _arrayRetour;
+      for (let index = 0; index < _arrDocT.length; index++) {
+        const element = _arrDocT[index];
+        switch (element.data.v.split(".").pop()) {
+          case "CERFA":
+            let _kvc = await GetDocumentPrestationCERFA(
+              tokenCt,
+              element.data.v.split(".").shift(),
+              false,
+              true
+            );
+            _arrDocs.push([_kvc.v, _kvc.k]);
+            break;
+          case "RAPPORT":
+            let _kvr = await GetDocumentPrestationRapport(
+              tokenCt,
+              element.data.v.split(".").shift(),
+              false,
+              true
+            );
+
+            _arrDocs.push([_kvr.v, _kvr.k]);
+
+            break;
+          case "TICKET":
+            let _kvt = await GetDocumentPrestationTicket(
+              tokenCt,
+              element.data.v.split(".").shift(),
+              false,
+              true
+            );
+            _arrDocs.push([_kvt.v, HTMLEncode(_kvt.k)]);
+
+            break;
+          default:
+            break;
+        }
+      }
+
+      await TelechargerZIP(
+        _arrDocs,
+        `Documents PC${presta.IdPrestationContrat}_${presta.DateInterventionPrestationTrimed}`
+      );
+      _targetWindow.close();
+    };
+
+    _obj.TelechargerDocumentSup = () => TelechargerZIPSup(presta);
+
+    return _obj;
   };
 
-  const FetchSetDocuments = (data) => {
-    const _arrDocs = [];
+  const FetchSetDocuments = async (data, presta) => {
+    let _arrDocs = [];
 
     const arrData = JSON.parse(data);
 
     if (arrData.length) {
-      //eslint-disable-next-line
-      arrData.map((element) => {
-        const _obj = {};
-
-        if (element.k.includes("Rapport")) {
-          _obj.title = `${element.k}.pdf`;
-          _obj.extension = "pdf";
-        } else {
-          _obj.title = element.k.split("fiche technicien\\").pop();
-          _obj.extension = element.k.split(".").pop();
-        }
-        _obj.size = GetFileSizeFromB64String(element.v);
-        _obj.b64s = element.v;
-
-        _arrDocs.push(_obj);
-      });
-    } else {
-      const _obj = {};
-
-      if (arrData.k.includes("Rapport")) {
-        _obj.title = `${arrData.k}.pdf`;
-        _obj.extension = "pdf";
-      } else {
-        _obj.title = arrData.k.split("fiche technicien\\").pop();
-        _obj.extension = arrData.k.split(".").pop();
+      for (let index = 0; index < arrData.length; index++) {
+        const element = arrData[index];
+        _arrDocs.push(CreatePropsDocPresta(element));
       }
-      _obj.size = GetFileSizeFromB64String(arrData.v);
-      _obj.b64s = arrData.v;
+    } else {
+      _arrDocs.push(CreatePropsDocPresta(arrData));
+    }
 
-      _arrDocs.push(_obj);
+    if (_arrDocs.length > 1) {
+      let tempDocs = [];
+      tempDocs.push(await CreatePropsDocPrestaZIP(_arrDocs, presta));
+      _arrDocs = [...tempDocs, ..._arrDocs];
     }
 
     setDocuments(_arrDocs);
@@ -1537,13 +1621,13 @@ const TableData = ({ ...props }) => {
   const HandleAfficherDocuments = async (presta) => {
     if (presta.IdDossierIntervention > 0 && presta.IdEtat === 96) {
       setGridColMDValue(10);
-      setPrestaSelected(presta);
       setIsDocumentLoaded(false);
 
       await GetDocumentPrestation(
         tokenCt,
         presta.IdDossierIntervention,
-        FetchSetDocuments
+        FetchSetDocuments,
+        presta
       );
     } else {
       setGridColMDValue(12);
@@ -1659,100 +1743,161 @@ const TableData = ({ ...props }) => {
 
   //#region Intervention
 
-const GetListeFI = async (IdDossierInterventionSAV) => {
-setIsDocumentLoaded(false);
+  const CreatePropsDocumentInterventionFI = (element) => {
+    const _obj = {};
+    _obj.title = `${element.k}`;
+    _obj.extension = "pdf";
 
-let _arrDocs = [];
-  const FetchSetDataFIPart= (data) => {
+    _obj.VoirDocumentSup = () => {
+      GetDocumentFISAV(tokenCt, element.v);
+    };
+    _obj.TelechargerDocumentSup = () => {
+      GetDocumentFISAV(tokenCt, element.v, true);
+    };
+    _obj.data = element;
+    return _obj;
+  };
 
-    if(data.length)
-    {
-      //Il y a plusieurs FI
+  const CreatePropsDocumentInterventionFacture = (element) => {
+    const _obj = {};
 
-      for (let index = 0; index < data.length; index++) {
-        const element = data[index];
+    _obj.title = `${element.k}`;
+    _obj.extension = "pdf";
 
+    _obj.VoirDocumentSup = () => {
+      VoirFactureDocument(tokenCt, element.v, "Facture SAV", false);
+    };
 
-        const _obj = {};
+    _obj.TelechargerDocumentSup = () => {
+      TelechargerFactureDocument(tokenCt, element.v, "Facture SAV", false);
+    };
+    _obj.data = element;
+    return _obj;
+  };
 
-          _obj.title = `${element.k}`;
-          _obj.extension = "pdf";
-       
-          // _obj.size = GetFileSizeFromB64String(element.v);
-          _obj.b64s = element.v;
+  const CreatePropsDocumentInterventionZIP = (_arrDocsFI, _arrDocsFA) => {
+    const _obj = {};
+    _obj.title = "Tous les documents";
+    _obj.extension = "zip";
 
-        _arrDocs.push(_obj);
+    const TelechargerZIPSup = async (IdDossierInterventionSAV) => {
+      let _arrDocs = [];
+      let _targetWindow = window.open("/waiting");
 
-
-        
-        
+      for (let index = 0; index < _arrDocsFI.length; index++) {
+        const element = _arrDocsFI[index];
+        const _kv = await GetDocumentFISAV(
+          tokenCt,
+          element.data.v,
+          false,
+          true
+        );
+        const _arrDocFI = [_kv.v, _kv.k];
+        _arrDocs.push(_arrDocFI);
       }
-    }else if(data.k) {
-      const _obj = {};
 
-      _obj.title = `${data.k}`;
-      _obj.extension = "pdf";
-   
-      // _obj.size = GetFileSizeFromB64String(element.v);
-      _obj.b64s = data.v;
+      for (let index = 0; index < _arrDocsFA.length; index++) {
+        const element = _arrDocsFA[index];
+        const _kv = await VoirFactureDocument(
+          tokenCt,
+          element.data.v,
+          "Facture SAV",
+          false,
+          true
+        );
+        const _arrDocFA = [_kv.v, _kv.k];
 
-    _arrDocs.push(_obj);    }
-
-  }
-  
-
-const FetchSetDataFacturePart = (data) => {
-
-  if(data.length)
-    {
-      //Il y a plusieurs factures
-      for (let index = 0; index < data.length; index++) {
-        const element = data[index];
-
-
-        const _obj = {};
-
-          _obj.title = `${element.k}`;
-          _obj.extension = "pdf";
-       
-          // _obj.size = GetFileSizeFromB64String(element.v);
-          _obj.b64s = element.v;
-
-        _arrDocs.push(_obj);
-        
+        _arrDocs.push(_arrDocFA);
       }
-    }else if(data.k) {
-      const _obj = {};
+      await TelechargerZIP(
+        _arrDocs,
+        `Intervention N° ${IdDossierInterventionSAV}`
+      );
+      _targetWindow.close();
+    };
 
-      _obj.title = `${data.k}`;
-      _obj.extension = "pdf";
-   
-      // _obj.size = GetFileSizeFromB64String(element.v);
-      _obj.b64s = data.v;
+    _obj.TelechargerDocumentSup = TelechargerZIPSup;
 
-    _arrDocs.push(_obj);    
+    return _obj;
+  };
 
-  }
+  const GetListeDocIntervention = async (IdDossierInterventionSAV) => {
+    setIsDocumentLoaded(false);
 
-setDocuments(_arrDocs);
-setIsDocumentLoaded(true);
+    let _arrDocs = [];
 
-}
+    let _arrFI = [];
+    let _arrFA = [];
+    // 2 - Set les FI
+    const FetchSetDataFIPart = (data) => {
+      if (data.length) {
+        //Il y a plusieurs FI
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+          const _obj = CreatePropsDocumentInterventionFI(element);
+          _arrFI.push(_obj);
+        }
+      } else if (data.k) {
+        const _obj = CreatePropsDocumentInterventionFI(JSON.PARSE(data));
 
-  GetListeFIIntervention(tokenCt,IdDossierInterventionSAV,FetchSetDataFIPart)
-  
-  GeTListeFactureIntervention(tokenCt, IdDossierInterventionSAV, FetchSetDataFacturePart)
+        _arrFI.push(_obj);
+      }
+    };
 
-}
+    //4 - Set les factures
+    const FetchSetDataFacturePart = (data) => {
+      if (data.length) {
+        //Il y a plusieurs factures
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+
+          const _obj = CreatePropsDocumentInterventionFacture(element);
+
+          _arrFA.push(_obj);
+        }
+      } else if (data.k) {
+        const _obj = CreatePropsDocumentInterventionFacture(JSON.parse(data));
+
+        _arrFA.push(_obj);
+      }
+
+      if (_arrFA.length + _arrFI.length > 1) {
+        _arrDocs.push(
+          CreatePropsDocumentInterventionZIP(
+            _arrFI,
+            _arrFA,
+            IdDossierInterventionSAV
+          )
+        );
+      }
+
+      _arrDocs = [..._arrDocs, ..._arrFI, ..._arrFA];
+
+      setDocuments(_arrDocs);
+      setIsDocumentLoaded(true);
+    };
+
+    //1 - Demande les FI
+    GetListeFIIntervention(
+      tokenCt,
+      IdDossierInterventionSAV,
+      FetchSetDataFIPart
+    );
+
+    //3 - Demande les factures
+    GeTListeFactureIntervention(
+      tokenCt,
+      IdDossierInterventionSAV,
+      FetchSetDataFacturePart
+    );
+  };
 
   const HandleAfficherFacture = (inter) => {
     if (inter) {
       setDocuments([]);
       setGridColMDValue(10);
       //LoadFacture,AffichageFacture comme documeuent
-      GetListeFI(inter.IdDossierInterventionSAV);
-
-
+      GetListeDocIntervention(inter.IdDossierInterventionSAV);
     } else {
       setGridColMDValue(12);
     }
@@ -1781,9 +1926,6 @@ setIsDocumentLoaded(true);
                     }
                   />
                 )}
-
-
-
               </Table>
             </Col>
 

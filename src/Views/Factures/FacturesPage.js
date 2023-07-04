@@ -177,13 +177,17 @@ const FacturesPage = () => {
 
     _arrBt.push(CreateNewButtonFilter("Type", "Chantier"));
     _arrBt.push(CreateNewButtonFilter("Type", "Facture Contrat"));
-    _arrBt.push(CreateNewButtonFilter("Type", "Facture SAV"));
-    _arrBt.push(CreateNewButtonFilter("Type", "Facture SAV Selon Devis"));
+    _arrBt.push(CreateNewButtonFilter("Type", ["Facture SAV","Facture SAV Selon Devis"],EditorBtFilterFSAV));
+    // _arrBt.push(CreateNewButtonFilter("Type", "Facture SAV Selon Devis"));
 
     return _arrBt;
   }
 
   //#region Editors
+
+  const EditorBtFilterFSAV = (type) => {
+    return "Facture SAV";
+  }
 
   const EditorTypeAvoirFacture = (data) => {
     if(data === true)
