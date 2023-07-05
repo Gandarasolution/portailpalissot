@@ -32,7 +32,8 @@ import { Placeholder } from "react-bootstrap";
 
 //#endregion
 
-const NouvelleInterventionPage = ({ props }) => {
+const NouvelleInterventionPage = () => {
+
   const ParamsCt = useContext(ParametresContext);
   const TokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);

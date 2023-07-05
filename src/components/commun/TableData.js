@@ -14,56 +14,77 @@ import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
+import CloseButton from "react-bootstrap/CloseButton";
+import InputGroup from "react-bootstrap/InputGroup";
+import Modal from "react-bootstrap/Modal";
+import Tab from "react-bootstrap/Tab";
+import Tabs from "react-bootstrap/Tabs";
+import Card from "react-bootstrap/Card";
 
 //#endregion
+
+
+//#region fontAwsome
+import { faFilter, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//#endregion
+
+//#region Composants
 import {
   FiltrerParCollones,
   FiltrerParSearch,
   FiltrerParSeuil,
-  GetFileSizeFromB64String,
+  FiltrerParSeuilDate,
   groupBy,
 } from "../../functions";
-//#region fontAwsome
-import { faFilter, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useEffect, useState } from "react";
+
+
 import {
-  Button,
-  Card,
-  CloseButton,
-  InputGroup,
-  Modal,
-  Tab,
-  Tabs,
-} from "react-bootstrap";
-import { Breakpoint, BreakpointProvider } from "react-socks";
-import {
+  GeTListeFactureIntervention,
+  GetDocumentFISAV,
   GetDocumentPrestation,
+  GetDocumentPrestationCERFA,
+  GetDocumentPrestationExtranet,
+  GetDocumentPrestationRapport,
+  GetDocumentPrestationTicket,
+  GetListeFIIntervention,
   GetPrestationReleveTache,
-  TelechargerDocument,
   TelechargerFactureDocument,
   TelechargerZIP,
-  VoirDocument,
   VoirFactureDocument,
 } from "../../axios/WSGandara";
-import { TokenContext } from "../../App";
-import { Link } from "react-router-dom";
+
 import ImageExtension from "./ImageExtension";
+
+//#region Contexts
+import { TokenContext } from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
 import { FactureContext } from "../../Views/Factures/FacturesPage";
-//#endregion
+
+//#endregion 
 
 //#endregion
+
+
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+import { Breakpoint, BreakpointProvider } from "react-socks";
+
+//#endregion
+
+
 
 /**
- *
- * @param {*} {Data : [], Headers: [], Cells: [], IsLoaded: bool, Pagination: bool, ?placeholdeNbLine; int,}
+ * @param {*} {Data : [], Headers: [], Cells: [], CardModel:{},  IsLoaded: bool,  Pagination: bool, ?ButtonFilters: [], ?FilterDefaultValue: {}, ?TopPannelRightToSearch: <></>, ?TopPannelLeftToSearch: <></>  ,?placeholdeNbLine; int,  }
  * @returns Une table
  */
 const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
   const Data = () => {
+
     let _lData = [];
     if (props.Data === "500") {
       _lData = [];
@@ -86,9 +107,30 @@ const TableData = ({ ...props }) => {
     //Filtre par les boutons
     if (props.ButtonFilters && btFilterActif) {
       let _filteractif = JSON.parse(JSON.stringify(btFilterActif));
+
+
       _lData = _lData.filter(
-        (data) => data[_filteractif.fieldname] === _filteractif.value
+
+        (data) => {
+          if(Array.isArray(_filteractif.value)){
+
+            let _value = false
+
+            for (let index = 0; index < _filteractif.value.length; index++) {
+              const element = _filteractif.value[index];
+              _value = data[_filteractif.fieldname] === element ? true : _value;
+            }
+
+            return _value
+
+          }else {
+            
+            return data[_filteractif.fieldname] === _filteractif.value}
+          }
+
       );
+
+
     }
 
     //Filtres par la recherche par colonne
@@ -100,6 +142,11 @@ const TableData = ({ ...props }) => {
     if (arrayFilterSeuis.length > 0) {
       _lData = FiltrerParSeuil(_lData, arrayFilterSeuis);
     }
+//Filtres par valeur date du & au
+if(arrayFilterRangeDate.length > 0) {
+  _lData = FiltrerParSeuilDate(_lData, arrayFilterRangeDate);
+}
+
 
     //Filtres par check
     _lData = FiltrerParCollones(_lData, arrayFilter);
@@ -112,6 +159,7 @@ const TableData = ({ ...props }) => {
 
   const [arrayFilter, setArrayFilter] = useState([]);
   const [arrayFilterSeuis, setArrayFilterSeuils] = useState([]);
+  const [arrayFilterRangeDate, setArrayFilterRangeDate] = useState([]);
   const [arraySearch, setArraySearch] = useState([]);
 
   const [btFilterActif, setBtFilterActif] = useState(
@@ -195,6 +243,14 @@ const TableData = ({ ...props }) => {
       return true;
     }
 
+    if (
+      arrayFilterRangeDate.findIndex(
+        (filter) => filter.fieldname === fieldname
+      ) > -1
+    ) {
+      return true;
+    }
+
     return false;
   }
 
@@ -206,6 +262,12 @@ const TableData = ({ ...props }) => {
     );
   };
 
+  function ResetAffichage(pageActuelle) {
+    setGridColMDValue(12);
+    setDocuments([]);
+    setPageActuelle(pageActuelle);
+  }
+
   //#endregion
 
   //#region LARGE
@@ -214,7 +276,7 @@ const TableData = ({ ...props }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setPageActuelle(1);
+    ResetAffichage(1);
     setSearch(e.target.value);
   };
 
@@ -237,32 +299,30 @@ const TableData = ({ ...props }) => {
 
   const handleTousFilter = () => {
     setBtFilterActif(null);
-    setPageActuelle(1);
-
+    ResetAffichage(1);
   };
 
   const handleFilterClick = (filter) => {
     setBtFilterActif(filter);
-    setPageActuelle(1);
-
+    ResetAffichage(1);
   };
 
   //#region Pagination
   const handlePagePrev = () => {
     if (pageActuelle > 1) {
-      setPageActuelle(pageActuelle - 1);
+      ResetAffichage(pageActuelle - 1);
       props.methodPagination && props.methodPagination();
     }
   };
 
   const handlePageChange = (number) => {
-    setPageActuelle(number);
+    ResetAffichage(number);
     props.methodPagination && props.methodPagination();
   };
 
   const handlePageNext = (number) => {
     if (pageActuelle < number) {
-      setPageActuelle(pageActuelle + 1);
+      ResetAffichage(pageActuelle + 1);
       props.methodPagination && props.methodPagination();
     }
   };
@@ -354,25 +414,112 @@ const TableData = ({ ...props }) => {
 
     //#region RangeDate
 
-    // let _arrayDate = _arrayVal.map((date) => {
-    //   try {
-    //     if (!date) return date;
-    //     var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
-    //     let _match = date.match(dateRegex)[0];
+    let _arrayDate = _arrayVal.map((date) => {
+      try {
+        if (!date) return date;
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+        let _match = date.match(dateRegex)[0];
 
-    //     let _retu = new Date(
-    //       _match.substring(6),
-    //       _match.substring(3, 5),
-    //       _match.substring(0, 2)
-    //     );
-    //     return _retu;
-    //   } catch (error) {
-    //     return date;
-    //   }
-    // });
+        let _retu = new Date(
+          _match.substring(6),
+          _match.substring(3, 5) - 1,
+          _match.substring(0, 2)
+        );
+        return _retu;
+      } catch (error) {
+        return date;
+      }
+    });
 
-    // var maxDate = new Date(Math.max.apply(null, _arrayDate));
-    // var minDate = new Date(Math.min.apply(null, _arrayDate));
+    const minDate = new Date(Math.min.apply(null, _arrayDate));
+    const maxDate = new Date(Math.max.apply(null, _arrayDate));
+
+    const ParseDateFormat = (text) => {
+      
+      try {
+        
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+        let _match = text.match(dateRegex)[0];
+
+        return `${_match.substring(6)}-${_match.substring(3, 5)}-${_match.substring(0, 2)}`
+        
+        
+      } catch {
+        return text;
+      }
+      
+    }
+
+    const GetTimeFromTextDateParsed = (text) => {
+      try {
+        var dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/g;
+        
+        let _match = text.match(dateRegex)[0];
+
+        
+        let _retu = new Date(
+          _match.substring(0,4),
+          _match.substring(5, 7) - 1,
+          _match.substring(8)
+          );
+        return _retu.getTime();
+          
+        } catch  {
+          return text;
+        }
+      }
+      
+      
+    const [minDateValue, setMinDateValue] = useState(
+      arrayFilterRangeDate.find((f)=> f.fieldname === fieldname)
+      ? arrayFilterRangeDate.find((f) => f.fieldname === fieldname).min
+      : ParseDateFormat(minDate.toLocaleDateString("fr-FR")));
+
+    const [maxDateValue, setMaxDateValue] = useState(
+      
+      arrayFilterRangeDate.find((f)=>f.fieldname===fieldname) 
+      ? arrayFilterRangeDate.find((f)=>f.fieldname === fieldname).max
+      : ParseDateFormat(maxDate.toLocaleDateString("fr-FR")));
+
+    const HandleMinDateValueChanged = (e) => {
+      e.preventDefault();
+      setMinDateValue(e.target.value);
+    }
+    
+    const HandleMinDateRangeValueChanged = (e) => {
+      e.preventDefault();
+      setMinDateValue(ParseDateFormat(new Date(Number(e.target.value)).toLocaleDateString("us-US")));
+    }
+    
+    
+    const HandleMaxDateValueChanged = (e) => {
+      e.preventDefault();
+      setMaxDateValue(e.target.value);
+    }
+    
+    const HandleMaxDateRangeValueChanged = (e) => {
+      e.preventDefault();
+      setMaxDateValue(ParseDateFormat(new Date(Number(e.target.value)).toLocaleDateString("us-US")));
+    }
+    
+
+    const HandleFilterDateClick = () => {
+      let _obj = {fieldname: fieldname, min: minDateValue, max: maxDateValue};
+      let _arrayFilterDate = JSON.parse(JSON.stringify(arrayFilterRangeDate));
+      let _index = _arrayFilterDate.findIndex((f)=> f.fieldname === fieldname);
+      if(_index > -1)
+      {
+        _arrayFilterDate[_index] = _obj;
+      }else{
+
+        if(new Date(minDateValue).getTime() !== minDate.getTime() || new Date(maxDateValue).getTime() !== maxDate.getTime() )
+        {
+          _arrayFilterDate.push(_obj);
+        }
+      }
+      setArrayFilterRangeDate(_arrayFilterDate);
+
+    }
 
     //#endregion
 
@@ -463,7 +610,6 @@ const TableData = ({ ...props }) => {
             <Tab title="Valeur" eventKey={"isCheckbox"}>
               <div id="ppvr-check">
                 {_arFilters.map((item, index) => {
-                  
                   if (item[0] === "undefined") return null;
                   return (
                     <Form.Check
@@ -491,42 +637,46 @@ const TableData = ({ ...props }) => {
               </div>
             </Tab>
           )}
-{/* 
-          <Tab title="Seuils" eventKey={"isRangeDate"}>
+          {
+            _headerToApply.filter.isRangeDate && (
+          <Tab title="Date" eventKey={"isRangeDate"}>
             <div id="ppvr-rangeDate">
               <Col>
-                <Form.Label>Minimum</Form.Label>
+                <Form.Label>Du</Form.Label>
                 <Form.Control
-                  type="number"
-                  value={minValue}
-                  onChange={HandleMinValueChanged}
+                  type="date"
+                  value={minDateValue}
+                  onChange={HandleMinDateValueChanged}
                 />
+
+
                 <Form.Range
-                  min={minVal}
-                  max={maxVal}
-                  value={minValue}
-                  onChange={(e) => setMinvalue(e.target.value)}
+                  min={minDate && minDate.getTime()}
+                  max={maxDate && maxDate.getTime()}
+                  value={GetTimeFromTextDateParsed(minDateValue)}
+                  onChange={HandleMinDateRangeValueChanged}
                 />
               </Col>
               <Col>
-                <Form.Label>Maximum</Form.Label>
+                <Form.Label>Au</Form.Label>
                 <Form.Control
-                  type="number"
-                  value={maxValue}
-                  onChange={HandleMaxValueChanged}
+                  type="date"
+                  value={maxDateValue}
+                  onChange={HandleMaxDateValueChanged}
                 />
                 <Form.Range
-                  min={minVal}
-                  max={maxVal}
-                  value={maxValue}
-                  onChange={(e) => setMaxValue(e.target.value)}
+                 min={minDate && minDate.getTime()}
+                 max={maxDate && maxDate.getTime()}
+                 value={GetTimeFromTextDateParsed(maxDateValue)}
+                 onChange={HandleMaxDateRangeValueChanged}
                 />
               </Col>
 
-              <Button onClick={HandleFilterSeuilClick}>Appliquer</Button>
+              <Button onClick={HandleFilterDateClick}>Appliquer</Button>
             </div>
-          </Tab> */}
-
+          </Tab>
+            )
+}
           {!_arrayVal.some(isNaN) && _headerToApply.filter.isRange && (
             <Tab title="Seuils" eventKey={"isRange"}>
               <div id="ppvr-range">
@@ -765,7 +915,6 @@ const TableData = ({ ...props }) => {
 
     for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
       if (_isEllipsisNedded) {
-               
         if (number === 1) {
           // 1
           _items.push(
@@ -779,86 +928,81 @@ const TableData = ({ ...props }) => {
             </Pagination.Item>
           );
 
+          if (pageActuelle === 1) {
+            //x + 1
+            if (number + 1 < _limiter / nbParPages + 1) {
+              _items.push(
+                <Pagination.Item
+                  key={number + 1}
+                  active={number + 1 === pageActuelle}
+                  onClick={() => handlePageChange(number + 1)}
+                  className="m-1"
+                >
+                  {number + 1}
+                </Pagination.Item>
+              );
+            }
 
-          if(pageActuelle === 1)
-          {
+            //x + 2
+            if (number + 2 < _limiter / nbParPages + 1) {
+              _items.push(
+                <Pagination.Item
+                  key={number + 2}
+                  active={number + 2 === pageActuelle}
+                  onClick={() => handlePageChange(number + 2)}
+                  className="m-1"
+                >
+                  {number + 2}
+                </Pagination.Item>
+              );
+            }
 
-         //x + 1
-         if (number + 1 < _limiter / nbParPages + 1) {
-          _items.push(
-            <Pagination.Item
-              key={number + 1}
-              active={number + 1 === pageActuelle}
-              onClick={() => handlePageChange(number + 1)}
-              className="m-1"
-            >
-              {number + 1}
-            </Pagination.Item>
-          );
+            //Elispsis
+            if (number + 3 < _limiter / nbParPages + 1) {
+              _items.push(
+                <Pagination.Ellipsis className="m-1" key={number + 3} />
+              );
+            }
+            continue;
+          }
         }
-
-        //x + 2
-        if (number + 2 < _limiter / nbParPages + 1) {
-          _items.push(
-            <Pagination.Item
-              key={number + 2}
-              active={number + 2 === pageActuelle}
-              onClick={() => handlePageChange(number + 2)}
-              className="m-1"
-            >
-              {number + 2}
-            </Pagination.Item>
-          );
-        }
-
-        //Elispsis
-        if (number + 3 < _limiter / nbParPages + 1)
-        {
-          _items.push(<Pagination.Ellipsis className="m-1" key={number + 3} />);
-        }
-          continue;
-        }
-      }
-
-
-
 
         if (number + 1 > _limiter / nbParPages + 1) {
+          if (pageActuelle === number) {
+            //Elipsis
+            if (number - 3 > 1) {
+              _items.push(
+                <Pagination.Ellipsis className="m-1" key={number - 3} />
+              );
+            }
 
-          if(pageActuelle === number)
-          {
-             //Elipsis
-          if (number - 3 > 1) {
-            _items.push(<Pagination.Ellipsis className="m-1" key={number - 3} />);
-          }
+            //x - 2
+            if (number - 2 > 1) {
+              _items.push(
+                <Pagination.Item
+                  key={number - 2}
+                  active={number - 2 === pageActuelle}
+                  onClick={() => handlePageChange(number - 2)}
+                  className="m-1"
+                >
+                  {number - 2}
+                </Pagination.Item>
+              );
+            }
 
-          //x - 2
-          if (number - 2 > 1) {
-            _items.push(
-              <Pagination.Item
-                key={number - 2}
-                active={number - 2 === pageActuelle}
-                onClick={() => handlePageChange(number - 2)}
-                className="m-1"
-              >
-                {number - 2}
-              </Pagination.Item>
-            );
-          }
-
-          // x - 1
-          if (number - 1 > 1) {
-            _items.push(
-              <Pagination.Item
-                key={number - 1}
-                active={number - 1 === pageActuelle}
-                onClick={() => handlePageChange(number - 1)}
-                className="m-1"
-              >
-                {number - 1}
-              </Pagination.Item>
-            );
-          }
+            // x - 1
+            if (number - 1 > 1) {
+              _items.push(
+                <Pagination.Item
+                  key={number - 1}
+                  active={number - 1 === pageActuelle}
+                  onClick={() => handlePageChange(number - 1)}
+                  className="m-1"
+                >
+                  {number - 1}
+                </Pagination.Item>
+              );
+            }
           }
 
           _items.push(
@@ -874,12 +1018,12 @@ const TableData = ({ ...props }) => {
           continue;
         }
 
-
-
         if (number === pageActuelle) {
           //Elipsis
           if (number - 3 > 1) {
-            _items.push(<Pagination.Ellipsis className="m-1" key={number - 3} />);
+            _items.push(
+              <Pagination.Ellipsis className="m-1" key={number - 3} />
+            );
           }
 
           //x - 2
@@ -937,7 +1081,7 @@ const TableData = ({ ...props }) => {
           }
 
           //x + 2
-          if (number + 2 < _limiter / nbParPages ) {
+          if (number + 2 < _limiter / nbParPages) {
             _items.push(
               <Pagination.Item
                 key={number + 2}
@@ -951,11 +1095,11 @@ const TableData = ({ ...props }) => {
           }
 
           //Elispsis
-          if (number + 3 < _limiter / nbParPages)
-          {
-            _items.push(<Pagination.Ellipsis className="m-1" key={number + 3} />);
+          if (number + 3 < _limiter / nbParPages) {
+            _items.push(
+              <Pagination.Ellipsis className="m-1" key={number + 3} />
+            );
           }
-
 
           continue;
         }
@@ -1087,6 +1231,7 @@ const TableData = ({ ...props }) => {
         </li>
       );
     }
+
     return (
       <li
         className={isFilterActive(filter) ? "li-actif" : "li-inactif"}
@@ -1369,25 +1514,21 @@ const TableData = ({ ...props }) => {
   //#region Documents
 
   const [documents, setDocuments] = useState([]);
-  const [prestaSelected, setPrestaSelected] = useState(null);
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   const [gridColMDValue, setGridColMDValue] = useState(12);
 
   const CardDocs = () => {
-    let _DocZIP = {
-      title: "Tous les documents",
-      extension: "zip",
-      size: " ",
-    };
-
-    const _arrayDocs = JSON.parse(JSON.stringify(documents));
+    // const _arrayDocs = JSON.parse(JSON.stringify(documents));
+    const _arrayDocs = documents;
 
     return (
       <Card className="mb-2">
         <Card.Header className="card-document">
           Documents{" "}
           {isDocumentLoaded ? (
-            `(${_arrayDocs.length})`
+            `(${
+              _arrayDocs.length > 1 ? _arrayDocs.length - 1 : _arrayDocs.length
+            })`
           ) : (
             <Placeholder animation="glow">
               <Placeholder xs={1} />
@@ -1403,11 +1544,11 @@ const TableData = ({ ...props }) => {
         {isDocumentLoaded ? (
           <Card.Body>
             <div id="collapse-listeDocuments">
-              {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
-
-              {_arrayDocs.map((doc, index) => {
-                return RowDocument(doc, index);
-              })}
+              {_arrayDocs.length > 0
+                ? _arrayDocs.map((doc, index) => {
+                    return RowDocument(doc, index);
+                  })
+                : "Aucun document."}
             </div>
           </Card.Body>
         ) : (
@@ -1436,28 +1577,17 @@ const TableData = ({ ...props }) => {
         <Col md={9}>
           <Row>
             <p className="mb-0 document-title">{`${props.title}`}</p>
-            <span className="document-size">{`${props.size}`}</span>
+            {props.size && (
+              <span className="document-size">{`${props.size}`}</span>
+            )}
             <span className="document-links">
               {props.extension.toUpperCase() !== "ZIP" && (
-                <Link onClick={() => VoirDocument(props.b64s, props.title)}>
-                  Voir
-                </Link>
+                <Link onClick={() => props.VoirDocumentSup()}>Voir</Link>
               )}
-              {props.extension.toUpperCase() === "ZIP" ? (
-                <Link
-                  onClick={() =>
-                    TelechargerZIP(GetJsonArrayOfDocumentForZIP(), GetZipName())
-                  }
-                >
-                  Télécharger
-                </Link>
-              ) : (
-                <Link
-                  onClick={() => TelechargerDocument(props.b64s, props.title)}
-                >
-                  Télécharger
-                </Link>
-              )}
+
+              <Link onClick={() => props.TelechargerDocumentSup()}>
+                Télécharger
+              </Link>
             </span>
           </Row>
         </Col>
@@ -1465,59 +1595,93 @@ const TableData = ({ ...props }) => {
     );
   };
 
-  const GetZipName = () => {
-    return `Documents_P${prestaSelected.IdPrestationContrat}_${prestaSelected.DateInterventionPrestationTrimed}`;
+  const CreatePropsDocPresta = (element) => {
+    
+    const _obj = {};
+
+    _obj.title = element.k;
+    _obj.extension = element.k.split(".").pop();
+
+    _obj.VoirDocumentSup = () => GetMethodFetchDataDocumentPresta(element.v);
+   
+    _obj.TelechargerDocumentSup = () => GetMethodFetchDataDocumentPresta(element.v,true)
+
+
+    _obj.data = element;
+
+    return _obj;
   };
 
-  const GetJsonArrayOfDocumentForZIP = () => {
-    let _arrDocs = JSON.parse(JSON.stringify(documents));
+const GetMethodFetchDataDocumentPresta = async (v,telecharger,returnData) => {
 
-    let _arrayRetour = [];
-    //eslint-disable-next-line
-    _arrDocs.map((doc) => {
-      let _arrayDocument = [doc.b64s, doc.title];
-      _arrayRetour.push(_arrayDocument);
-    });
+  const splitPop = v.split("|").pop()
+      const splitShift = v.split("|").shift()
+      switch (splitPop) {
+        case "CERFA":
+           return await  GetDocumentPrestationCERFA(tokenCt,splitShift,telecharger,returnData);
+        case "RAPPORT":
+           return await GetDocumentPrestationRapport(tokenCt, splitShift,telecharger,returnData);
+        case "TICKET":
+          return await GetDocumentPrestationTicket(tokenCt, splitShift,telecharger,returnData);
+          case "EXTRANET":
+          return await GetDocumentPrestationExtranet(tokenCt, splitShift,telecharger,returnData);
+        default:
+          break;
+      }
 
-    return _arrayRetour;
+
+}
+
+  const CreatePropsDocPrestaZIP = async (_arrDocT, presta) => {
+    const _obj = {};
+    _obj.title = "Tous les documents";
+    _obj.extension = "zip";
+
+    const TelechargerZIPSup = async (presta) => {
+      let _arrDocs = [];
+      let _targetWindow = window.open("/waiting");
+
+      for (let index = 0; index < _arrDocT.length; index++) {
+        const element = _arrDocT[index];
+
+        let _kv = await GetMethodFetchDataDocumentPresta(element.data.v,false,true);
+        if(_kv)
+        {
+          _arrDocs.push([_kv.v,_kv.k]);
+        }
+
+      }
+
+      await TelechargerZIP(
+        _arrDocs,
+        `Documents PC${presta.IdPrestationContrat}_${presta.DateInterventionPrestationTrimed}`
+      );
+      _targetWindow.close();
+    };
+
+    _obj.TelechargerDocumentSup = () => TelechargerZIPSup(presta);
+
+    return _obj;
   };
 
-  const FetchSetDocuments = (data) => {
-    const _arrDocs = [];
+  const FetchSetDocuments = async (data, presta) => {
+    let _arrDocs = [];
 
     const arrData = JSON.parse(data);
 
     if (arrData.length) {
-      //eslint-disable-next-line
-      arrData.map((element) => {
-        const _obj = {};
-
-        if (element.k.includes("Rapport")) {
-          _obj.title = `${element.k}.pdf`;
-          _obj.extension = "pdf";
-        } else {
-          _obj.title = element.k.split("fiche technicien\\").pop();
-          _obj.extension = element.k.split(".").pop();
-        }
-        _obj.size = GetFileSizeFromB64String(element.v);
-        _obj.b64s = element.v;
-
-        _arrDocs.push(_obj);
-      });
-    } else {
-      const _obj = {};
-
-      if (arrData.k.includes("Rapport")) {
-        _obj.title = `${arrData.k}.pdf`;
-        _obj.extension = "pdf";
-      } else {
-        _obj.title = arrData.k.split("fiche technicien\\").pop();
-        _obj.extension = arrData.k.split(".").pop();
+      for (let index = 0; index < arrData.length; index++) {
+        const element = arrData[index];
+        _arrDocs.push(CreatePropsDocPresta(element));
       }
-      _obj.size = GetFileSizeFromB64String(arrData.v);
-      _obj.b64s = arrData.v;
+    } else {
+      _arrDocs.push(CreatePropsDocPresta(arrData));
+    }
 
-      _arrDocs.push(_obj);
+    if (_arrDocs.length > 1) {
+      let tempDocs = [];
+      tempDocs.push(await CreatePropsDocPrestaZIP(_arrDocs, presta));
+      _arrDocs = [...tempDocs, ..._arrDocs];
     }
 
     setDocuments(_arrDocs);
@@ -1528,13 +1692,13 @@ const TableData = ({ ...props }) => {
   const HandleAfficherDocuments = async (presta) => {
     if (presta.IdDossierIntervention > 0 && presta.IdEtat === 96) {
       setGridColMDValue(10);
-      setPrestaSelected(presta);
       setIsDocumentLoaded(false);
 
       await GetDocumentPrestation(
         tokenCt,
         presta.IdDossierIntervention,
-        FetchSetDocuments
+        FetchSetDocuments,
+        presta
       );
     } else {
       setGridColMDValue(12);
@@ -1650,10 +1814,161 @@ const TableData = ({ ...props }) => {
 
   //#region Intervention
 
+  const CreatePropsDocumentInterventionFI = (element) => {
+    const _obj = {};
+    _obj.title = `${element.k}`;
+    _obj.extension = "pdf";
+
+    _obj.VoirDocumentSup = () => {
+      GetDocumentFISAV(tokenCt, element.v);
+    };
+    _obj.TelechargerDocumentSup = () => {
+      GetDocumentFISAV(tokenCt, element.v, true);
+    };
+    _obj.data = element;
+    return _obj;
+  };
+
+  const CreatePropsDocumentInterventionFacture = (element) => {
+    const _obj = {};
+
+    _obj.title = `${element.k}`;
+    _obj.extension = "pdf";
+
+    _obj.VoirDocumentSup = () => {
+      VoirFactureDocument(tokenCt, element.v, "Facture SAV", false);
+    };
+
+    _obj.TelechargerDocumentSup = () => {
+      TelechargerFactureDocument(tokenCt, element.v, "Facture SAV", false);
+    };
+    _obj.data = element;
+    return _obj;
+  };
+
+  const CreatePropsDocumentInterventionZIP = (_arrDocsFI, _arrDocsFA) => {
+    const _obj = {};
+    _obj.title = "Tous les documents";
+    _obj.extension = "zip";
+
+    const TelechargerZIPSup = async (IdDossierInterventionSAV) => {
+      let _arrDocs = [];
+      let _targetWindow = window.open("/waiting");
+
+      for (let index = 0; index < _arrDocsFI.length; index++) {
+        const element = _arrDocsFI[index];
+        const _kv = await GetDocumentFISAV(
+          tokenCt,
+          element.data.v,
+          false,
+          true
+        );
+        const _arrDocFI = [_kv.v, _kv.k];
+        _arrDocs.push(_arrDocFI);
+      }
+
+      for (let index = 0; index < _arrDocsFA.length; index++) {
+        const element = _arrDocsFA[index];
+        const _kv = await VoirFactureDocument(
+          tokenCt,
+          element.data.v,
+          "Facture SAV",
+          false,
+          true
+        );
+        const _arrDocFA = [_kv.v, _kv.k];
+
+        _arrDocs.push(_arrDocFA);
+      }
+      await TelechargerZIP(
+        _arrDocs,
+        `Intervention N° ${IdDossierInterventionSAV}`
+      );
+      _targetWindow.close();
+    };
+
+    _obj.TelechargerDocumentSup = TelechargerZIPSup;
+
+    return _obj;
+  };
+
+  const GetListeDocIntervention = async (IdDossierInterventionSAV) => {
+    setIsDocumentLoaded(false);
+
+    let _arrDocs = [];
+
+    let _arrFI = [];
+    let _arrFA = [];
+    // 2 - Set les FI
+    const FetchSetDataFIPart = (data) => {
+      if (data.length) {
+        //Il y a plusieurs FI
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+          const _obj = CreatePropsDocumentInterventionFI(element);
+          _arrFI.push(_obj);
+        }
+      } else if (data.k) {
+        const _obj = CreatePropsDocumentInterventionFI(JSON.PARSE(data));
+
+        _arrFI.push(_obj);
+      }
+    };
+
+    //4 - Set les factures
+    const FetchSetDataFacturePart = (data) => {
+      if (data.length) {
+        //Il y a plusieurs factures
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+
+          const _obj = CreatePropsDocumentInterventionFacture(element);
+
+          _arrFA.push(_obj);
+        }
+      } else if (data.k) {
+        const _obj = CreatePropsDocumentInterventionFacture(JSON.parse(data));
+
+        _arrFA.push(_obj);
+      }
+
+      if (_arrFA.length + _arrFI.length > 1) {
+        _arrDocs.push(
+          CreatePropsDocumentInterventionZIP(
+            _arrFI,
+            _arrFA,
+            IdDossierInterventionSAV
+          )
+        );
+      }
+
+      _arrDocs = [..._arrDocs, ..._arrFI, ..._arrFA];
+
+      setDocuments(_arrDocs);
+      setIsDocumentLoaded(true);
+    };
+
+    //1 - Demande les FI
+    GetListeFIIntervention(
+      tokenCt,
+      IdDossierInterventionSAV,
+      FetchSetDataFIPart
+    );
+
+    //3 - Demande les factures
+    GeTListeFactureIntervention(
+      tokenCt,
+      IdDossierInterventionSAV,
+      FetchSetDataFacturePart
+    );
+  };
+
   const HandleAfficherFacture = (inter) => {
     if (inter) {
+      setDocuments([]);
       setGridColMDValue(10);
       //LoadFacture,AffichageFacture comme documeuent
+      GetListeDocIntervention(inter.IdDossierInterventionSAV);
     } else {
       setGridColMDValue(12);
     }
@@ -1682,9 +1997,6 @@ const TableData = ({ ...props }) => {
                     }
                   />
                 )}
-
-
-
               </Table>
             </Col>
 
@@ -1718,12 +2030,13 @@ export const CreateNewHeader = (fieldname, filter, caption, editor) => {
   return _header;
 };
 
-export const CreateFilter = (isFilter, isCheckbox, isRange, isSearchCol) => {
+export const CreateFilter = (isFilter, isCheckbox, isRange, isSearchCol, isRangeDate) => {
   return {
     isFilter: isFilter,
     isCheckbox: isCheckbox,
     isRange: isRange,
     isSearchCol: isSearchCol,
+    isRangeDate: isRangeDate
   };
 };
 

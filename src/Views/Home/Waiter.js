@@ -4,6 +4,7 @@ import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
 
 const WaiterPage = () => {
+  document.title="Un instant..."
   return (
     <Container fluid className="h-100">
       <Row className="align-items-center viewport-height ">

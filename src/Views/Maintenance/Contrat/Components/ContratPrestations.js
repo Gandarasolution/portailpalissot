@@ -19,6 +19,7 @@ import {
   faList,
   faFile,
   faFileAlt,
+  faBan,
 } from "@fortawesome/free-solid-svg-icons";
 
 //#endregion
@@ -187,20 +188,6 @@ const ContratPrestation = ({
 
   //#endregion
 
-  //#region Evenements
-
-
-  //#region Click
-
-  //#endregion
-
-  //#endregion
-
-  //#region Composants
-
-  //#region commun
-
- 
 
   //#region TableData
 
@@ -259,32 +246,41 @@ const ContratPrestation = ({
 
   const EditorActionDocuments = (presta) => {
     return (
-      <span className="ms-2">
+      <Button className="ms-2">
         <OverlayTrigger
           placement="bottom"
           overlay={<Tooltip>Liste des documents</Tooltip>}
         >
-          <FontAwesomeIcon
+          {
+            presta.IdEtat === 96 ?
+            <FontAwesomeIcon
             icon={faFileAlt}
-            className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
+            // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
           />
+          :
+          <FontAwesomeIcon
+          icon={faBan}
+          // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
+        />
+          }
+       
         </OverlayTrigger>
-      </span>
+      </Button>
     );
   };
 
   const EditorActionTaches = () => {
     return (
-      <span>
+      <Button>
         <OverlayTrigger
           placement="bottom"
           overlay={<Tooltip>Relevés de tâches</Tooltip>}
         >
           <span>
-            <FontAwesomeIcon icon={faListCheck} className="bt-actif" />
+            <FontAwesomeIcon icon={faListCheck}  />
           </span>
         </OverlayTrigger>
-      </span>
+      </Button>
     );
   };
 
@@ -330,7 +326,7 @@ const ContratPrestation = ({
 
   //#endregion
 
-  //#endregion
+
 
   return (
     <Container fluid>

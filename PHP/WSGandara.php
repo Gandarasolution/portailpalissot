@@ -164,7 +164,7 @@
 			return 1;
 		}
 	}
-
+	
 	function ConnexionGMAO($login = "", $pass_clear="", $ws="")
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -237,8 +237,8 @@
 			{
 				return json_encode($result["GMAOGetPrestationContratResult"]["PrestationContrat"]);
 				
-				}
-				else{
+			}
+			else{
 				return "500";
 			}
 		}
@@ -306,28 +306,45 @@
 		
 		$extension = pathinfo($fileN, PATHINFO_EXTENSION);
 		
-		if($extension === 'pdf'){
+		//Ajoute le header du documents selon son extension
+		switch ($extension) {
+			case 'pdf':
 			header('Content-type: application/pdf');
-			}elseif ($extension === 'jpg') {
+			break;
+			case 'jpg':
+			case 'png':
 			header('Content-type: image/jpeg');
+			break;
+			case 'doc':
+			case 'docx':
+			header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+			break;
+			case 'xlsx':
+			case 'xls':
+			case 'cls':
+			header('Content-type: application/vnd.ms-excel');
+			break;
+			default:
+			break;
 		}
 		
-		
 		header('Content-Disposition: inline; filename="' . $fileN . '"');
-		
 		header('Content-Transfer-Encoding: binary');
-		
 		header('Accept-Ranges: bytes');
 		
+		flush(); // Pas nécessaire mais peut gagner a peine de temps
 		
-		flush(); // this doesn't really matter.
+		//lire le fichier 
 		$fp = fopen($fileName, "r");
 		while (!feof($fp))
 		{
+			//La ligne en binaire 65536 octets
 			echo fread($fp, 65536);
-			flush(); // this is essential for large downloads
+			flush(); // Obligatoire pour fichier un peu volumineux
 		}
+		
 		fclose($fp);
+		//Supprime le fichier car il ne sera plus utilisé
 		unlink($fileName);
 		
 	}
@@ -351,15 +368,21 @@
 		header("Content-Length: " . filesize($fileN));
 		
 		
-		flush(); // this doesn't really matter.
+		flush(); // Pas nécessaire mais peut gagner a peine de temps
+		
+		//lire le fichier 
 		$fp = fopen($fileName, "r");
 		while (!feof($fp))
 		{
+			//La ligne en binaire 65536 octets
 			echo fread($fp, 65536);
-			flush(); // this is essential for large downloads
+			flush(); // Obligatoire pour fichier un peu volumineux
 		}
+		
 		fclose($fp);
+		//Supprime le fichier car il ne sera plus utilisé
 		unlink($fileName);
+		
 		
 	}
 	
@@ -606,7 +629,7 @@
 			}
 		}
 	}
-
+	
 	function GetFactureDocument($token, $IdFacture, $TypeFacture, $Avoir, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -689,8 +712,50 @@
 		}
 	}
 	
-
-
+	
+	
+	
+	
+	function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdDossierInterventionSAV" => $IdDossierInterventionSAV);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetListeFIIntervention",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetListeFIIntervention", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetListeFIInterventionResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetListeFIInterventionResult"]["KV"]);
+				
+				}else{
+				return "500";
+			}
+		}
+	}
+	
 	function GetListeInterventions($token, $IdClientSite, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -731,6 +796,272 @@
 		}
 	}
 	
+	
+	
+	
+	function GeTListeFactureIntervention($token, $IdDossierInterventionSAV, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdDossierInterventionSAV" => $IdDossierInterventionSAV);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGeTListeFactureIntervention",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGeTListeFactureIntervention", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGeTListeFactureInterventionResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGeTListeFactureInterventionResult"]["KV"]);
+				
+				}else{
+				return "500";
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	function GetDocumentFISAV($token, $IdFicheInterventionSAV, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdFicheInterventionSAV" => $IdFicheInterventionSAV);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetDocumentFISAV",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetDocumentFISAV", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetDocumentFISAVResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetDocumentFISAVResult"]["KV"]);
+				}elseif(isset($result["GMAOGetDocumentFISAVResult"])){
+				return json_encode($result["GMAOGetDocumentFISAVResult"]);
+				}else{
+				return "500";
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	function GetDocumentPrestationRapport($token, $IdMobiliteIntervention, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdMobiliteIntervention" => $IdMobiliteIntervention);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetDocumentPrestationRapport",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetDocumentPrestationRapport", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetDocumentPrestationRapportResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetDocumentPrestationRapportResult"]["KV"]);
+				}elseif(isset($result["GMAOGetDocumentPrestationRapportResult"])){
+				return json_encode($result["GMAOGetDocumentPrestationRapportResult"]);
+				}else{
+				return "500";
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	function GetDocumentPrestationCERFA($token, $IdMobiliteIntervention, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdMobiliteIntervention" => $IdMobiliteIntervention);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetDocumentPrestationCERFA",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetDocumentPrestationCERFA", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetDocumentPrestationCERFAResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetDocumentPrestationCERFAResult"]["KV"]);
+				}elseif(isset($result["GMAOGetDocumentPrestationCERFAResult"])){
+				return json_encode($result["GMAOGetDocumentPrestationCERFAResult"]);
+				}else{
+				return "500";
+			}
+		}
+	}
+	
+	
+	function GetDocumentPrestationTicket($token, $IdPJ, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdPJ" => $IdPJ);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetDocumentPrestationTicket",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetDocumentPrestationTicket", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetDocumentPrestationTicketResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetDocumentPrestationTicketResult"]["KV"]);
+				}elseif(isset($result["GMAOGetDocumentPrestationTicketResult"])){
+				return json_encode($result["GMAOGetDocumentPrestationTicketResult"]);
+				}else{
+				return "500";
+			}
+		}
+	}
+	
+	
+	
+	function GetDocumentPrestationExtranet($token, $fullPath, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "fullPath" => $fullPath);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetDocumentPrestationExtranet",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetDocumentPrestationExtranet", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetDocumentPrestationExtranetResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetDocumentPrestationExtranetResult"]["KV"]);
+				}elseif(isset($result["GMAOGetDocumentPrestationExtranetResult"])){
+				return json_encode($result["GMAOGetDocumentPrestationExtranetResult"]);
+				}else{
+				return "500";
+			}
+		}
+	}
+	
 	function CallENDPOINT($url="",$endpoint="", )
 	{
 		
@@ -759,6 +1090,10 @@
 			break;
 			case "GMAOSeeDocument":
 			return VoirDocument($_GET['filename']);
+			
+			break;
+			case "GMAOSeeDocumentOffice":
+			return VoirDocumentOffice($_GET['filename']);
 			
 			break;
 			case "GMAODownloadDocument":
@@ -790,16 +1125,53 @@
 			echo(GetFactureDocument($_POST['token'],$_POST['IdFacture'],$_POST['TypeFacture'],$_POST['Avoir'],$url));
 			
 			break;
-
+			
 			case "GMAOGetListeSecteur":
-				echo(GetListeSecteur($_POST["token"],$_POST["IdClientSiteRelation"],$url));
-
-				break;
-
-
-				case "GMAOGetListeInterventions":
-					echo(GetListeInterventions($_POST["token"], $_POST["IdClientSite"],$url));
-					break;
+			echo(GetListeSecteur($_POST["token"],$_POST["IdClientSiteRelation"],$url));
+			
+			break;
+			
+			
+			case "GMAOGetListeInterventions":
+			echo(GetListeInterventions($_POST["token"], $_POST["IdClientSite"],$url));
+			break;
+			
+			
+			
+			case "GMAOGetListeFIIntervention":
+			echo(GetListeFIIntervention($_POST['token'],$_POST['IdDossierInterventionSAV'], $url));
+			break;
+			
+			
+			
+			case "GMAOGeTListeFactureIntervention":
+			echo(GeTListeFactureIntervention($_POST['token'],$_POST['IdDossierInterventionSAV'], $url));
+			break;
+			case "GMAOGetDocumentFISAV": 
+			echo(GetDocumentFISAV($_POST['token'], $_POST['IdFicheInterventionSAV'], $url));
+			break;
+			
+			
+			case "GMAOGetDocumentPrestationRapport":
+			echo(GetDocumentPrestationRapport($_POST['token'], $_POST['IdMobiliteIntervention'],$url));
+			break;
+			
+			
+			
+			case "GMAOGetDocumentPrestationCERFA":
+			echo(GetDocumentPrestationCERFA($_POST['token'], $_POST['IdMobiliteIntervention'],$url));
+			break;
+			
+			
+			
+			case "GMAOGetDocumentPrestationTicket":
+			echo(GetDocumentPrestationTicket($_POST['token'],$_POST['IdPJ'],$url));
+			break;
+			
+			case "GMAOGetDocumentPrestationExtranet":
+			echo(GetDocumentPrestationExtranet($_POST['token'],$_POST['fullPath'],$url));
+			break;
+			
 			default:
 			header("HTTP/1.1 500 Internal Server Error");
 			

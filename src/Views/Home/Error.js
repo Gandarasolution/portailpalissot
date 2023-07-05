@@ -14,7 +14,7 @@ import React from "react";
 //#endregion
 
 const ErrorPage = () => {
-  
+  document.title="Une erreur est survenue";
   return (
     <Container fluid>
       <WhiteShadowCard icon="yin-yang" title="Portail GMAO">

@@ -2,25 +2,24 @@
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
+import Image from "react-bootstrap/Image";
+import Nav from "react-bootstrap/Nav";
+import NavLink from "react-bootstrap/NavLink";
 // import Button from "react-bootstrap/Button";
 
 //#endregion
 
 //#region Components
 import TitreOfPage from "../../components/commun/TitreOfPage";
+// import { VoirDocument } from "../../axios/WSGandara";
 
 //#endregion
 
 import React from "react";
-import { Image, Nav, NavLink } from "react-bootstrap";
-// import { VoirDocument } from "../../axios/WSGandara";
 //#endregion
 
 const HomePage = () => {
-  // const handleClick = () => {
-  //   // const name = "CERFA.pdf";
-  //   // VoirDocument(b64, name);
-  // };
+  
 
   const ImgAppareil = require("../../image/appareilImage.jpg");
   const ImgPresta = require("../../image/PrestaContraImage.jpg");
@@ -45,6 +44,7 @@ const HomePage = () => {
   return (
     <Container fluid className="p-4 h-100">
       <TitreOfPage titre={"Portail client"} />
+      {/* <Button onClick={handleClick}>Clikc</Button> */}
       <Container fluid className="container-table ">
         <h2>Bienvenue sur l'espace client de</h2>
 
