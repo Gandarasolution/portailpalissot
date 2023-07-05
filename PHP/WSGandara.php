@@ -164,7 +164,7 @@
 			return 1;
 		}
 	}
-
+	
 	function ConnexionGMAO($login = "", $pass_clear="", $ws="")
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -237,8 +237,8 @@
 			{
 				return json_encode($result["GMAOGetPrestationContratResult"]["PrestationContrat"]);
 				
-				}
-				else{
+			}
+			else{
 				return "500";
 			}
 		}
@@ -302,38 +302,38 @@
 	{
 		
 		$fileN = $fileName;
-
+		
 		
 		$extension = pathinfo($fileN, PATHINFO_EXTENSION);
-
+		
 		//Ajoute le header du documents selon son extension
 		switch ($extension) {
 			case 'pdf':
-				header('Content-type: application/pdf');
-				break;
+			header('Content-type: application/pdf');
+			break;
 			case 'jpg':
 			case 'png':
-				header('Content-type: image/jpeg');
-				break;
+			header('Content-type: image/jpeg');
+			break;
 			case 'doc':
 			case 'docx':
-				header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-				break;
+			header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+			break;
 			case 'xlsx':
 			case 'xls':
 			case 'cls':
-				header('Content-type: application/vnd.ms-excel');
-				break;
+			header('Content-type: application/vnd.ms-excel');
+			break;
 			default:
-				break;
+			break;
 		}
-
+		
 		header('Content-Disposition: inline; filename="' . $fileN . '"');
 		header('Content-Transfer-Encoding: binary');
 		header('Accept-Ranges: bytes');
 		
 		flush(); // Pas nécessaire mais peut gagner a peine de temps
-
+		
 		//lire le fichier 
 		$fp = fopen($fileName, "r");
 		while (!feof($fp))
@@ -342,7 +342,7 @@
 			echo fread($fp, 65536);
 			flush(); // Obligatoire pour fichier un peu volumineux
 		}
-
+		
 		fclose($fp);
 		//Supprime le fichier car il ne sera plus utilisé
 		unlink($fileName);
@@ -362,14 +362,14 @@
 		header("Content-type: application/pdf");
 		
 		header('Content-Type: application/zip');
-
+		
 		
 		header("Content-Description: File Transfer");
 		header("Content-Length: " . filesize($fileN));
 		
 		
 		flush(); // Pas nécessaire mais peut gagner a peine de temps
-
+		
 		//lire le fichier 
 		$fp = fopen($fileName, "r");
 		while (!feof($fp))
@@ -378,7 +378,7 @@
 			echo fread($fp, 65536);
 			flush(); // Obligatoire pour fichier un peu volumineux
 		}
-
+		
 		fclose($fp);
 		//Supprime le fichier car il ne sera plus utilisé
 		unlink($fileName);
@@ -629,7 +629,7 @@
 			}
 		}
 	}
-
+	
 	function GetFactureDocument($token, $IdFacture, $TypeFacture, $Avoir, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -712,13 +712,13 @@
 		}
 	}
 	
-
-
-
 	
-function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
-{
-	global $URL_API_CCS, $g_useSoapClientV2;
+	
+	
+	
+	function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
 		$request = array("token"=>$token, "IdDossierInterventionSAV" => $IdDossierInterventionSAV);
 		
 		if($g_useSoapClientV2)
@@ -754,8 +754,8 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 				return "500";
 			}
 		}
-}
-
+	}
+	
 	function GetListeInterventions($token, $IdClientSite, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -796,9 +796,9 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 		}
 	}
 	
-
-
-
+	
+	
+	
 	function GeTListeFactureIntervention($token, $IdDossierInterventionSAV, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -838,13 +838,13 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 			}
 		}
 	}
-
 	
-
-
-
-
-
+	
+	
+	
+	
+	
+	
 	function GetDocumentFISAV($token, $IdFicheInterventionSAV, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -878,19 +878,19 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 			if(isset($result["GMAOGetDocumentFISAVResult"]["KV"]))
 			{
 				return json_encode($result["GMAOGetDocumentFISAVResult"]["KV"]);
-			}elseif(isset($result["GMAOGetDocumentFISAVResult"])){
+				}elseif(isset($result["GMAOGetDocumentFISAVResult"])){
 				return json_encode($result["GMAOGetDocumentFISAVResult"]);
 				}else{
 				return "500";
 			}
 		}
 	}
-
-
-
 	
 	
-
+	
+	
+	
+	
 	function GetDocumentPrestationRapport($token, $IdMobiliteIntervention, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -924,18 +924,18 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 			if(isset($result["GMAOGetDocumentPrestationRapportResult"]["KV"]))
 			{
 				return json_encode($result["GMAOGetDocumentPrestationRapportResult"]["KV"]);
-			}elseif(isset($result["GMAOGetDocumentPrestationRapportResult"])){
+				}elseif(isset($result["GMAOGetDocumentPrestationRapportResult"])){
 				return json_encode($result["GMAOGetDocumentPrestationRapportResult"]);
 				}else{
 				return "500";
 			}
 		}
 	}
-
-
-
-		
-
+	
+	
+	
+	
+	
 	function GetDocumentPrestationCERFA($token, $IdMobiliteIntervention, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -969,14 +969,14 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 			if(isset($result["GMAOGetDocumentPrestationCERFAResult"]["KV"]))
 			{
 				return json_encode($result["GMAOGetDocumentPrestationCERFAResult"]["KV"]);
-			}elseif(isset($result["GMAOGetDocumentPrestationCERFAResult"])){
+				}elseif(isset($result["GMAOGetDocumentPrestationCERFAResult"])){
 				return json_encode($result["GMAOGetDocumentPrestationCERFAResult"]);
 				}else{
 				return "500";
 			}
 		}
 	}
-
+	
 	
 	function GetDocumentPrestationTicket($token, $IdPJ, $ws)
 	{
@@ -1011,16 +1011,16 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 			if(isset($result["GMAOGetDocumentPrestationTicketResult"]["KV"]))
 			{
 				return json_encode($result["GMAOGetDocumentPrestationTicketResult"]["KV"]);
-			}elseif(isset($result["GMAOGetDocumentPrestationTicketResult"])){
+				}elseif(isset($result["GMAOGetDocumentPrestationTicketResult"])){
 				return json_encode($result["GMAOGetDocumentPrestationTicketResult"]);
 				}else{
 				return "500";
 			}
 		}
 	}
-
-
-
+	
+	
+	
 	function GetDocumentPrestationExtranet($token, $fullPath, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
@@ -1054,14 +1054,14 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 			if(isset($result["GMAOGetDocumentPrestationExtranetResult"]["KV"]))
 			{
 				return json_encode($result["GMAOGetDocumentPrestationExtranetResult"]["KV"]);
-			}elseif(isset($result["GMAOGetDocumentPrestationExtranetResult"])){
+				}elseif(isset($result["GMAOGetDocumentPrestationExtranetResult"])){
 				return json_encode($result["GMAOGetDocumentPrestationExtranetResult"]);
 				}else{
 				return "500";
 			}
 		}
 	}
-
+	
 	function CallENDPOINT($url="",$endpoint="", )
 	{
 		
@@ -1093,9 +1093,9 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 			
 			break;
 			case "GMAOSeeDocumentOffice":
-				return VoirDocumentOffice($_GET['filename']);
-				
-				break;
+			return VoirDocumentOffice($_GET['filename']);
+			
+			break;
 			case "GMAODownloadDocument":
 			return TelechargerDocument($_GET['filename']);
 			
@@ -1125,53 +1125,53 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 			echo(GetFactureDocument($_POST['token'],$_POST['IdFacture'],$_POST['TypeFacture'],$_POST['Avoir'],$url));
 			
 			break;
-
+			
 			case "GMAOGetListeSecteur":
-				echo(GetListeSecteur($_POST["token"],$_POST["IdClientSiteRelation"],$url));
-
-				break;
-
-
-				case "GMAOGetListeInterventions":
-					echo(GetListeInterventions($_POST["token"], $_POST["IdClientSite"],$url));
-					break;
-
-
-
+			echo(GetListeSecteur($_POST["token"],$_POST["IdClientSiteRelation"],$url));
+			
+			break;
+			
+			
+			case "GMAOGetListeInterventions":
+			echo(GetListeInterventions($_POST["token"], $_POST["IdClientSite"],$url));
+			break;
+			
+			
+			
 			case "GMAOGetListeFIIntervention":
-				echo(GetListeFIIntervention($_POST['token'],$_POST['IdDossierInterventionSAV'], $url));
-				break;
-
-
-
+			echo(GetListeFIIntervention($_POST['token'],$_POST['IdDossierInterventionSAV'], $url));
+			break;
+			
+			
+			
 			case "GMAOGeTListeFactureIntervention":
-				echo(GeTListeFactureIntervention($_POST['token'],$_POST['IdDossierInterventionSAV'], $url));
-				break;
+			echo(GeTListeFactureIntervention($_POST['token'],$_POST['IdDossierInterventionSAV'], $url));
+			break;
 			case "GMAOGetDocumentFISAV": 
-				echo(GetDocumentFISAV($_POST['token'], $_POST['IdFicheInterventionSAV'], $url));
-				break;
-
-
+			echo(GetDocumentFISAV($_POST['token'], $_POST['IdFicheInterventionSAV'], $url));
+			break;
+			
+			
 			case "GMAOGetDocumentPrestationRapport":
-				echo(GetDocumentPrestationRapport($_POST['token'], $_POST['IdMobiliteIntervention'],$url));
-				break;
-
-
-
-				case "GMAOGetDocumentPrestationCERFA":
-					echo(GetDocumentPrestationCERFA($_POST['token'], $_POST['IdMobiliteIntervention'],$url));
-					break;
-	
-
-
+			echo(GetDocumentPrestationRapport($_POST['token'], $_POST['IdMobiliteIntervention'],$url));
+			break;
+			
+			
+			
+			case "GMAOGetDocumentPrestationCERFA":
+			echo(GetDocumentPrestationCERFA($_POST['token'], $_POST['IdMobiliteIntervention'],$url));
+			break;
+			
+			
+			
 			case "GMAOGetDocumentPrestationTicket":
-				echo(GetDocumentPrestationTicket($_POST['token'],$_POST['IdPJ'],$url));
-				break;
-
+			echo(GetDocumentPrestationTicket($_POST['token'],$_POST['IdPJ'],$url));
+			break;
+			
 			case "GMAOGetDocumentPrestationExtranet":
-				echo(GetDocumentPrestationExtranet($_POST['token'],$_POST['fullPath'],$url));
-				break;
-				
+			echo(GetDocumentPrestationExtranet($_POST['token'],$_POST['fullPath'],$url));
+			break;
+			
 			default:
 			header("HTTP/1.1 500 Internal Server Error");
 			
