@@ -14,57 +14,69 @@ import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
+import CloseButton from "react-bootstrap/CloseButton";
+import InputGroup from "react-bootstrap/InputGroup";
+import Modal from "react-bootstrap/Modal";
+import Tab from "react-bootstrap/Tab";
+import Tabs from "react-bootstrap/Tabs";
+import Card from "react-bootstrap/Card";
 
 //#endregion
+
+
+//#region fontAwsome
+import { faFilter, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//#endregion
+
+//#region Composants
 import {
   FiltrerParCollones,
   FiltrerParSearch,
   FiltrerParSeuil,
-  GetFileSizeFromB64String,
-  HTMLEncode,
   groupBy,
 } from "../../functions";
-//#region fontAwsome
-import { faFilter, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useEffect, useState } from "react";
-import {
-  Button,
-  Card,
-  CloseButton,
-  InputGroup,
-  Modal,
-  Tab,
-  Tabs,
-} from "react-bootstrap";
-import { Breakpoint, BreakpointProvider } from "react-socks";
+
+
 import {
   GeTListeFactureIntervention,
   GetDocumentFISAV,
   GetDocumentPrestation,
   GetDocumentPrestationCERFA,
+  GetDocumentPrestationExtranet,
   GetDocumentPrestationRapport,
   GetDocumentPrestationTicket,
   GetListeFIIntervention,
   GetPrestationReleveTache,
-  TelechargerDocument,
   TelechargerFactureDocument,
   TelechargerZIP,
-  VoirDocument,
   VoirFactureDocument,
 } from "../../axios/WSGandara";
-import { TokenContext } from "../../App";
-import { Link } from "react-router-dom";
+
 import ImageExtension from "./ImageExtension";
+
+//#region Contexts
+import { TokenContext } from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
 import { FactureContext } from "../../Views/Factures/FacturesPage";
-//#endregion
+
+//#endregion 
 
 //#endregion
+
+
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+import { Breakpoint, BreakpointProvider } from "react-socks";
+
+//#endregion
+
+
 
 /**
- *
- * @param {*} {Data : [], Headers: [], Cells: [], IsLoaded: bool, Pagination: bool, ?placeholdeNbLine; int,}
+ * @param {*} {Data : [], Headers: [], Cells: [], CardModel:{},  IsLoaded: bool,  Pagination: bool, ?ButtonFilters: [], ?FilterDefaultValue: {}, ?TopPannelRightToSearch: <></>, ?TopPannelLeftToSearch: <></>  ,?placeholdeNbLine; int,  }
  * @returns Une table
  */
 const TableData = ({ ...props }) => {
@@ -1477,62 +1489,41 @@ const TableData = ({ ...props }) => {
   };
 
   const CreatePropsDocPresta = (element) => {
+    
     const _obj = {};
 
     _obj.title = element.k;
     _obj.extension = element.k.split(".").pop();
 
-    _obj.VoirDocumentSup = () => {
-      switch (element.v.split(".").pop()) {
-        case "CERFA":
-          GetDocumentPrestationCERFA(tokenCt, element.v.split(".").shift());
+    _obj.VoirDocumentSup = () => GetMethodFetchDataDocumentPresta(element.v);
+   
+    _obj.TelechargerDocumentSup = () => GetMethodFetchDataDocumentPresta(element.v,true)
 
-          break;
-        case "RAPPORT":
-          GetDocumentPrestationRapport(tokenCt, element.v.split(".").shift());
-
-          break;
-        case "TICKET":
-          GetDocumentPrestationTicket(tokenCt, element.v.split(".").shift());
-          break;
-        default:
-          break;
-      }
-    };
-    _obj.TelechargerDocumentSup = () => {
-      switch (element.v.split(".").pop()) {
-        case "CERFA":
-          GetDocumentPrestationCERFA(
-            tokenCt,
-            element.v.split(".").shift(),
-            true
-          );
-
-          break;
-        case "RAPPORT":
-          GetDocumentPrestationRapport(
-            tokenCt,
-            element.v.split(".").shift(),
-            true
-          );
-
-          break;
-        case "TICKET":
-          GetDocumentPrestationTicket(
-            tokenCt,
-            element.v.split(".").shift(),
-            true
-          );
-          break;
-        default:
-          break;
-      }
-    };
 
     _obj.data = element;
 
     return _obj;
   };
+
+const GetMethodFetchDataDocumentPresta = async (v,telecharger,returnData) => {
+
+  const splitPop = v.split("|").pop()
+      const splitShift = v.split("|").shift()
+      switch (splitPop) {
+        case "CERFA":
+           return await  GetDocumentPrestationCERFA(tokenCt,splitShift,telecharger,returnData);
+        case "RAPPORT":
+           return await GetDocumentPrestationRapport(tokenCt, splitShift,telecharger,returnData);
+        case "TICKET":
+          return await GetDocumentPrestationTicket(tokenCt, splitShift,telecharger,returnData);
+          case "EXTRANET":
+          return await GetDocumentPrestationExtranet(tokenCt, splitShift,telecharger,returnData);
+        default:
+          break;
+      }
+
+
+}
 
   const CreatePropsDocPrestaZIP = async (_arrDocT, presta) => {
     const _obj = {};
@@ -1545,40 +1536,13 @@ const TableData = ({ ...props }) => {
 
       for (let index = 0; index < _arrDocT.length; index++) {
         const element = _arrDocT[index];
-        switch (element.data.v.split(".").pop()) {
-          case "CERFA":
-            let _kvc = await GetDocumentPrestationCERFA(
-              tokenCt,
-              element.data.v.split(".").shift(),
-              false,
-              true
-            );
-            _arrDocs.push([_kvc.v, _kvc.k]);
-            break;
-          case "RAPPORT":
-            let _kvr = await GetDocumentPrestationRapport(
-              tokenCt,
-              element.data.v.split(".").shift(),
-              false,
-              true
-            );
 
-            _arrDocs.push([_kvr.v, _kvr.k]);
-
-            break;
-          case "TICKET":
-            let _kvt = await GetDocumentPrestationTicket(
-              tokenCt,
-              element.data.v.split(".").shift(),
-              false,
-              true
-            );
-            _arrDocs.push([_kvt.v, HTMLEncode(_kvt.k)]);
-
-            break;
-          default:
-            break;
+        let _kv = await GetMethodFetchDataDocumentPresta(element.data.v,false,true);
+        if(_kv)
+        {
+          _arrDocs.push([_kv.v,_kv.k]);
         }
+
       }
 
       await TelechargerZIP(

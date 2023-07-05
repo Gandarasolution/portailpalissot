@@ -222,7 +222,44 @@ const GetDocumentPrestationCERFA = async (token, IdMobiliteIntervention,telechar
 
 }
 
+const GetDocumentPrestationExtranet = async (token, fullPath,telecharger,returnData) => {
+  if(returnData)
+  {
+    let _return = undefined;
+    await $.ajax({
+      type: "POST",
+      url: urlAction + "GetDocumentPrestationExtranet",
+      data: { token: token, fullPath: fullPath },
+      success(data) {
+        _return = JSON.parse(data)
+      },
+    });
 
+    return _return;
+  }
+
+  let targetWindow = window.open("/waiting");
+
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetDocumentPrestationExtranet",
+    data: { token: token, fullPath: fullPath },
+    success(data) {
+      if (data === "500") {
+        targetWindow.location.href = `/error?error=500`;
+      }
+      const _kv = JSON.parse(data);
+      if (telecharger) {
+        TelechargerDocument(_kv.v, _kv.k, targetWindow);
+      } else {
+        VoirDocument(_kv.v, _kv.k, targetWindow);
+      }
+    },
+    error(error) {
+      targetWindow.location.href = `/error?error=${error.status}`;
+    },
+  });
+}
 
 
 const GetDocumentPrestationTicket = async (token, IdPJ,telecharger, returnData) => {
@@ -314,6 +351,21 @@ const VoirDocument = (b64, filename, targetWindow) => {
     },
   });
 };
+
+const VoirDocumentOffice = async (b64, filename) => {
+  let _urlRetour = undefined;
+  await $.ajax({
+    type: "POST",
+    url: `${urlAction}File64`,
+    data: { b64: b64, filename: HTMLEncode(filename) },
+    success(data) {
+      const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
+      _urlRetour = urlToOpen;
+    },
+  });
+  return _urlRetour;
+}
+
 
 const TelechargerDocument = (b64, filename, targetWindow) => {
   $.ajax({
@@ -637,6 +689,7 @@ export {
   GetDocumentPrestationRapport,
   GetDocumentPrestationCERFA,
   GetDocumentPrestationTicket,
+  GetDocumentPrestationExtranet,
   GetListeAppareils,
   GetListeFactures,
   VoirFactureDocument,
@@ -646,4 +699,5 @@ export {
   GeTListeFactureIntervention,
   GetDocumentFISAV,
   GetListeSecteur,
+  VoirDocumentOffice,
 };

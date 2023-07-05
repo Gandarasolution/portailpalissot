@@ -302,32 +302,49 @@
 	{
 		
 		$fileN = $fileName;
-		
+
 		
 		$extension = pathinfo($fileN, PATHINFO_EXTENSION);
-		
-		if($extension === 'pdf'){
-			header('Content-type: application/pdf');
-			}elseif ($extension === 'jpg') {
-			header('Content-type: image/jpeg');
+
+		//Ajoute le header du documents selon son extension
+		switch ($extension) {
+			case 'pdf':
+				header('Content-type: application/pdf');
+				break;
+			case 'jpg':
+			case 'png':
+				header('Content-type: image/jpeg');
+				break;
+			case 'doc':
+			case 'docx':
+				header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+				break;
+			case 'xlsx':
+			case 'xls':
+			case 'cls':
+				header('Content-type: application/vnd.ms-excel');
+				break;
+			default:
+				break;
 		}
-		
-		
+
 		header('Content-Disposition: inline; filename="' . $fileN . '"');
-		
 		header('Content-Transfer-Encoding: binary');
-		
 		header('Accept-Ranges: bytes');
 		
-		
-		flush(); // this doesn't really matter.
+		flush(); // Pas nécessaire mais peut gagner a peine de temps
+
+		//lire le fichier 
 		$fp = fopen($fileName, "r");
 		while (!feof($fp))
 		{
+			//La ligne en binaire 65536 octets
 			echo fread($fp, 65536);
-			flush(); // this is essential for large downloads
+			flush(); // Obligatoire pour fichier un peu volumineux
 		}
+
 		fclose($fp);
+		//Supprime le fichier car il ne sera plus utilisé
 		unlink($fileName);
 		
 	}
@@ -345,21 +362,27 @@
 		header("Content-type: application/pdf");
 		
 		header('Content-Type: application/zip');
-		
+
 		
 		header("Content-Description: File Transfer");
 		header("Content-Length: " . filesize($fileN));
 		
 		
-		flush(); // this doesn't really matter.
+		flush(); // Pas nécessaire mais peut gagner a peine de temps
+
+		//lire le fichier 
 		$fp = fopen($fileName, "r");
 		while (!feof($fp))
 		{
+			//La ligne en binaire 65536 octets
 			echo fread($fp, 65536);
-			flush(); // this is essential for large downloads
+			flush(); // Obligatoire pour fichier un peu volumineux
 		}
+
 		fclose($fp);
+		//Supprime le fichier car il ne sera plus utilisé
 		unlink($fileName);
+		
 		
 	}
 	
@@ -996,6 +1019,49 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 		}
 	}
 
+
+
+	function GetDocumentPrestationExtranet($token, $fullPath, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "fullPath" => $fullPath);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetDocumentPrestationExtranet",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetDocumentPrestationExtranet", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetDocumentPrestationExtranetResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetDocumentPrestationExtranetResult"]["KV"]);
+			}elseif(isset($result["GMAOGetDocumentPrestationExtranetResult"])){
+				return json_encode($result["GMAOGetDocumentPrestationExtranetResult"]);
+				}else{
+				return "500";
+			}
+		}
+	}
+
 	function CallENDPOINT($url="",$endpoint="", )
 	{
 		
@@ -1026,6 +1092,10 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 			return VoirDocument($_GET['filename']);
 			
 			break;
+			case "GMAOSeeDocumentOffice":
+				return VoirDocumentOffice($_GET['filename']);
+				
+				break;
 			case "GMAODownloadDocument":
 			return TelechargerDocument($_GET['filename']);
 			
@@ -1098,6 +1168,9 @@ function GetListeFIIntervention($token, $IdDossierInterventionSAV, $ws)
 				echo(GetDocumentPrestationTicket($_POST['token'],$_POST['IdPJ'],$url));
 				break;
 
+			case "GMAOGetDocumentPrestationExtranet":
+				echo(GetDocumentPrestationExtranet($_POST['token'],$_POST['fullPath'],$url));
+				break;
 				
 			default:
 			header("HTTP/1.1 500 Internal Server Error");
