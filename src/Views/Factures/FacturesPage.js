@@ -4,8 +4,6 @@ import { useState, useEffect, useContext, createContext } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faArrowLeft,
-  faArrowRight,
   faDownload,
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
@@ -14,15 +12,13 @@ import {
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
 import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
 //#endregion
 
 //#region Components
 import { GetListeFactures } from "../../axios/WSGandara";
-import { DateSOAP, GetNomMois, addOneYear, subOneYear } from "../../functions";
+import { DateSOAP } from "../../functions";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 import TableData, {
   CreateFilter,
@@ -48,9 +44,6 @@ const FacturesPage = () => {
   //#region States
   const [isFacturesLoaded, setIsFactureLoaded] = useState(false);
   const [listeFactures, setListeFactures] = useState([]);
-  const [dateDebutPeriode, setDateDebutPeriode] = useState(
-    GetDatePeriodeInitial()
-  );
 
   const [factureSelected, setFactureSelected] = useState(null);
   const [voirFacture, setVoirFacture] = useState(false);
@@ -60,28 +53,17 @@ const FacturesPage = () => {
 
   //#region Fonctions
 
-  /**
-   * Construit la date de début des preriodes initial
-   * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
-   */
-  function GetDatePeriodeInitial() {
-    let _day = 1;
-    let _monthI = 0;
-    let _year = new Date().getFullYear();
-    let _DateRetour = new Date(_year, _monthI, _day);
-    return _DateRetour;
+
+  function GetListeFactureTrimed(){
+    let _arrayFacture = JSON.parse(JSON.stringify(listeFactures));
+    _arrayFacture = _arrayFacture.filter((fa)=> fa.Type !=="Chantier")
+
+    return _arrayFacture;
+
   }
 
-  const dateFinPeriode = () => {
-    let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
 
-    _dateEndTmp = addOneYear(_dateEndTmp);
 
-    var day = _dateEndTmp.getDate() - 1;
-    _dateEndTmp.setDate(day);
-
-    return new Date(_dateEndTmp);
-  };
 
   function CreateHeaderForTable() {
     // Date	Code	Libellé	Total HT	Total TTC	Origine	Type
@@ -89,7 +71,7 @@ const FacturesPage = () => {
     _headers.push(
       CreateNewHeader(
         "DateFacture",
-        CreateFilter(true, true, false, false,true),
+        CreateFilter(true, false, false, false,true),
         "Date",
         EditorDateFromDateTime
       )
@@ -131,7 +113,7 @@ const FacturesPage = () => {
       )
     );
     _headers.push(
-      CreateNewHeader("Type", CreateFilter(true, true, false, true), "Type")
+      CreateNewHeader("Type", CreateFilter(true, true, false, true), "Type",EditorType)
     );
     _headers.push(CreateNewUnboundHeader(CreateFilter(), "Actions"));
 
@@ -149,7 +131,7 @@ const FacturesPage = () => {
     _cells.push(CreateNewCell("MontantHT", false, true, false, EditorMontant));
     _cells.push(CreateNewCell("MontantTTC", false, true, false, EditorMontant));
     _cells.push(CreateNewCell("Dossier", false, true, false));
-    _cells.push(CreateNewCell("Type", false, true, false));
+    _cells.push(CreateNewCell("Type", false, true, false,EditorType));
 
     _cells.push(
       CreateNewUnboundCell(
@@ -175,9 +157,9 @@ const FacturesPage = () => {
   function CreateButtonFiltersForTable() {
     let _arrBt = [];
 
-    _arrBt.push(CreateNewButtonFilter("Type", "Chantier"));
-    _arrBt.push(CreateNewButtonFilter("Type", "Facture Contrat"));
-    _arrBt.push(CreateNewButtonFilter("Type", ["Facture SAV","Facture SAV Selon Devis"],EditorBtFilterFSAV));
+    // _arrBt.push(CreateNewButtonFilter("Type", "Chantier"));
+    _arrBt.push(CreateNewButtonFilter("Type", "Facture Contrat",()=>"Contrat"));
+    _arrBt.push(CreateNewButtonFilter("Type", ["Facture SAV","Facture SAV Selon Devis"],()=>"Dépannage"));
     // _arrBt.push(CreateNewButtonFilter("Type", "Facture SAV Selon Devis"));
 
     return _arrBt;
@@ -185,9 +167,16 @@ const FacturesPage = () => {
 
   //#region Editors
 
-  const EditorBtFilterFSAV = (type) => {
-    return "Facture SAV";
+  const EditorType = (type) => {
+
+    if(type.includes("SAV")) return "Dépannage";
+    if(type.includes("Contrat")) return "Contrat";
+    
+    return type;
+    
   }
+
+  
 
   const EditorTypeAvoirFacture = (data) => {
     if(data === true)
@@ -299,88 +288,14 @@ const FacturesPage = () => {
 
   //#endregion
 
-  //#region Evenements
-
-  const AjouterUnAnPeriode = async () => {
-    let _dateTMP = dateDebutPeriode;
-    _dateTMP = addOneYear(_dateTMP);
-    let _dateDebutPeriode = new Date(_dateTMP);
-    setDateDebutPeriode(_dateDebutPeriode);
-
-    setIsFactureLoaded(false);
-    await GetFactures();
-  };
-
-  const SoustraireUnAnPeriode = async () => {
-    let _dateTMP = dateDebutPeriode;
-    _dateTMP = subOneYear(_dateTMP);
-    let _dateDebutPeriode = new Date(_dateTMP);
-    setDateDebutPeriode(_dateDebutPeriode);
-    setIsFactureLoaded(false);
-    await GetFactures();
-  };
-
-  const HandleDropdownPeriodeSelect = async (dateStart) => {
-    let _dateTemp = new Date(dateStart);
-
-    setDateDebutPeriode(_dateTemp);
-    setIsFactureLoaded(false);
-    await GetFactures();
-  };
-  //#endregion
 
   //#region Composants
 
-  const DropDownYears = (small) => {
-    let _dateDebut = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-    let _dateEnd = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-    let _arrayPeriodes = [
-      {
-        dateStart: new Date(_dateDebut),
-        dateEnd: new Date(_dateEnd.setMonth(_dateDebut.getMonth() + 11)),
-      },
-    ];
-
-    for (let index = 0; index < 10; index++) {
-      let _dateStart = addOneYear(new Date(_arrayPeriodes[index].dateStart));
-      let _dateEnd = addOneYear(new Date(_arrayPeriodes[index].dateEnd));
-
-      _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
-    }
-
-    return (
-      <DropdownButton
-        variant=""
-        className="button-periode"
-        drop="down-centered"
-        style={{ borderRadius: "10px" }}
-        id="dropdown-datePeriode"
-        title={`Période : ${GetNomMois(dateDebutPeriode.getMonth() + 1, small)}
-              ${dateDebutPeriode.getFullYear()} à
-              ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
-              ${dateFinPeriode().getFullYear()}`}
-        onSelect={(e) => {
-          HandleDropdownPeriodeSelect(e);
-        }}
-      >
-        {_arrayPeriodes.map((periode, index) => {
-          return (
-            <Dropdown.Item key={index} eventKey={periode.dateStart}>
-              {` ${GetNomMois(
-                periode.dateStart.getMonth() + 1
-              )} ${periode.dateStart.getFullYear()} à ${GetNomMois(
-                periode.dateEnd.getMonth() + 1
-              )} ${periode.dateEnd.getFullYear()}`}
-            </Dropdown.Item>
-          );
-        })}
-      </DropdownButton>
-    );
-  };
 
   //#region TableData
 
   const TableFactures = () => {
+    
     const _Headers = CreateHeaderForTable();
     const _Cells = CreateCellsForTable();
 
@@ -402,37 +317,13 @@ const FacturesPage = () => {
         }}
       >
         <TableData
-          Data={listeFactures}
+          Data={GetListeFactureTrimed()}
           Headers={_Headers}
           Cells={_Cells}
           IsLoaded={isFacturesLoaded}
           Pagination
-          TopPannelRightToSearch={
-            <Col md={"auto"} className="m-1">
-              <Stack direction="horizontal" className="centerStack " gap={1}>
-                <Button
-                  variant=""
-                  className=" button-periode"
-                  onClick={() => SoustraireUnAnPeriode()}
-                >
-                  <FontAwesomeIcon icon={faArrowLeft} />
-                </Button>
-
-                {DropDownYears(false)}
-
-                <Button
-                  variant=""
-                  className="button-periode "
-                  onClick={() => AjouterUnAnPeriode()}
-                >
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </Button>
-              </Stack>
-            </Col>
-          }
           CardModel={_CardModel}
           ButtonFilters={_ButtonFilters}
-          // FilterDefaultValue={CreateNewButtonFilter("Type", "Chantier")}
         />
       </FactureContext.Provider>
     );
@@ -451,8 +342,8 @@ const FacturesPage = () => {
     await GetListeFactures(
       tokenCt,
       clientSiteCt.storedClientSite.IdClientSite,
-      DateSOAP(dateDebutPeriode),
-      DateSOAP(dateFinPeriode()),
+      DateSOAP(new Date()),
+      DateSOAP(new Date()),
       FetchSetData
     );
   };
@@ -466,7 +357,7 @@ const FacturesPage = () => {
     <Container fluid className="h-100">
       <TitreOfPage
         titre={"Factures"}
-        soustitre={` ${listeFactures.length} factures`}
+        soustitre={` ${GetListeFactureTrimed().length} factures`}
         isLoaded={isFacturesLoaded}
       />
       <TableFactures />
