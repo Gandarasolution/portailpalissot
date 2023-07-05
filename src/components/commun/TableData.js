@@ -35,6 +35,7 @@ import {
   FiltrerParCollones,
   FiltrerParSearch,
   FiltrerParSeuil,
+  FiltrerParSeuilDate,
   groupBy,
 } from "../../functions";
 
@@ -83,6 +84,7 @@ const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
   const Data = () => {
+
     let _lData = [];
     if (props.Data === "500") {
       _lData = [];
@@ -140,6 +142,11 @@ const TableData = ({ ...props }) => {
     if (arrayFilterSeuis.length > 0) {
       _lData = FiltrerParSeuil(_lData, arrayFilterSeuis);
     }
+//Filtres par valeur date du & au
+if(arrayFilterRangeDate.length > 0) {
+  _lData = FiltrerParSeuilDate(_lData, arrayFilterRangeDate);
+}
+
 
     //Filtres par check
     _lData = FiltrerParCollones(_lData, arrayFilter);
@@ -152,6 +159,7 @@ const TableData = ({ ...props }) => {
 
   const [arrayFilter, setArrayFilter] = useState([]);
   const [arrayFilterSeuis, setArrayFilterSeuils] = useState([]);
+  const [arrayFilterRangeDate, setArrayFilterRangeDate] = useState([]);
   const [arraySearch, setArraySearch] = useState([]);
 
   const [btFilterActif, setBtFilterActif] = useState(
@@ -231,6 +239,14 @@ const TableData = ({ ...props }) => {
 
     if (
       arraySearch.findIndex((filter) => filter.fieldname === fieldname) > -1
+    ) {
+      return true;
+    }
+
+    if (
+      arrayFilterRangeDate.findIndex(
+        (filter) => filter.fieldname === fieldname
+      ) > -1
     ) {
       return true;
     }
@@ -398,25 +414,112 @@ const TableData = ({ ...props }) => {
 
     //#region RangeDate
 
-    // let _arrayDate = _arrayVal.map((date) => {
-    //   try {
-    //     if (!date) return date;
-    //     var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
-    //     let _match = date.match(dateRegex)[0];
+    let _arrayDate = _arrayVal.map((date) => {
+      try {
+        if (!date) return date;
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+        let _match = date.match(dateRegex)[0];
 
-    //     let _retu = new Date(
-    //       _match.substring(6),
-    //       _match.substring(3, 5),
-    //       _match.substring(0, 2)
-    //     );
-    //     return _retu;
-    //   } catch (error) {
-    //     return date;
-    //   }
-    // });
+        let _retu = new Date(
+          _match.substring(6),
+          _match.substring(3, 5) - 1,
+          _match.substring(0, 2)
+        );
+        return _retu;
+      } catch (error) {
+        return date;
+      }
+    });
 
-    // var maxDate = new Date(Math.max.apply(null, _arrayDate));
-    // var minDate = new Date(Math.min.apply(null, _arrayDate));
+    const minDate = new Date(Math.min.apply(null, _arrayDate));
+    const maxDate = new Date(Math.max.apply(null, _arrayDate));
+
+    const ParseDateFormat = (text) => {
+      
+      try {
+        
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+        let _match = text.match(dateRegex)[0];
+
+        return `${_match.substring(6)}-${_match.substring(3, 5)}-${_match.substring(0, 2)}`
+        
+        
+      } catch {
+        return text;
+      }
+      
+    }
+
+    const GetTimeFromTextDateParsed = (text) => {
+      try {
+        var dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/g;
+        
+        let _match = text.match(dateRegex)[0];
+
+        
+        let _retu = new Date(
+          _match.substring(0,4),
+          _match.substring(5, 7) - 1,
+          _match.substring(8)
+          );
+        return _retu.getTime();
+          
+        } catch  {
+          return text;
+        }
+      }
+      
+      
+    const [minDateValue, setMinDateValue] = useState(
+      arrayFilterRangeDate.find((f)=> f.fieldname === fieldname)
+      ? arrayFilterRangeDate.find((f) => f.fieldname === fieldname).min
+      : ParseDateFormat(minDate.toLocaleDateString("fr-FR")));
+
+    const [maxDateValue, setMaxDateValue] = useState(
+      
+      arrayFilterRangeDate.find((f)=>f.fieldname===fieldname) 
+      ? arrayFilterRangeDate.find((f)=>f.fieldname === fieldname).max
+      : ParseDateFormat(maxDate.toLocaleDateString("fr-FR")));
+
+    const HandleMinDateValueChanged = (e) => {
+      e.preventDefault();
+      setMinDateValue(e.target.value);
+    }
+    
+    const HandleMinDateRangeValueChanged = (e) => {
+      e.preventDefault();
+      setMinDateValue(ParseDateFormat(new Date(Number(e.target.value)).toLocaleDateString("us-US")));
+    }
+    
+    
+    const HandleMaxDateValueChanged = (e) => {
+      e.preventDefault();
+      setMaxDateValue(e.target.value);
+    }
+    
+    const HandleMaxDateRangeValueChanged = (e) => {
+      e.preventDefault();
+      setMaxDateValue(ParseDateFormat(new Date(Number(e.target.value)).toLocaleDateString("us-US")));
+    }
+    
+
+    const HandleFilterDateClick = () => {
+      let _obj = {fieldname: fieldname, min: minDateValue, max: maxDateValue};
+      let _arrayFilterDate = JSON.parse(JSON.stringify(arrayFilterRangeDate));
+      let _index = _arrayFilterDate.findIndex((f)=> f.fieldname === fieldname);
+      if(_index > -1)
+      {
+        _arrayFilterDate[_index] = _obj;
+      }else{
+
+        if(new Date(minDateValue).getTime() !== minDate.getTime() || new Date(maxDateValue).getTime() !== maxDate.getTime() )
+        {
+          _arrayFilterDate.push(_obj);
+        }
+      }
+      setArrayFilterRangeDate(_arrayFilterDate);
+
+    }
 
     //#endregion
 
@@ -534,42 +637,46 @@ const TableData = ({ ...props }) => {
               </div>
             </Tab>
           )}
-          {/* 
-          <Tab title="Seuils" eventKey={"isRangeDate"}>
+          {
+            _headerToApply.filter.isRangeDate && (
+          <Tab title="Date" eventKey={"isRangeDate"}>
             <div id="ppvr-rangeDate">
               <Col>
-                <Form.Label>Minimum</Form.Label>
+                <Form.Label>Du</Form.Label>
                 <Form.Control
-                  type="number"
-                  value={minValue}
-                  onChange={HandleMinValueChanged}
+                  type="date"
+                  value={minDateValue}
+                  onChange={HandleMinDateValueChanged}
                 />
+
+
                 <Form.Range
-                  min={minVal}
-                  max={maxVal}
-                  value={minValue}
-                  onChange={(e) => setMinvalue(e.target.value)}
+                  min={minDate && minDate.getTime()}
+                  max={maxDate && maxDate.getTime()}
+                  value={GetTimeFromTextDateParsed(minDateValue)}
+                  onChange={HandleMinDateRangeValueChanged}
                 />
               </Col>
               <Col>
-                <Form.Label>Maximum</Form.Label>
+                <Form.Label>Au</Form.Label>
                 <Form.Control
-                  type="number"
-                  value={maxValue}
-                  onChange={HandleMaxValueChanged}
+                  type="date"
+                  value={maxDateValue}
+                  onChange={HandleMaxDateValueChanged}
                 />
                 <Form.Range
-                  min={minVal}
-                  max={maxVal}
-                  value={maxValue}
-                  onChange={(e) => setMaxValue(e.target.value)}
+                 min={minDate && minDate.getTime()}
+                 max={maxDate && maxDate.getTime()}
+                 value={GetTimeFromTextDateParsed(maxDateValue)}
+                 onChange={HandleMaxDateRangeValueChanged}
                 />
               </Col>
 
-              <Button onClick={HandleFilterSeuilClick}>Appliquer</Button>
+              <Button onClick={HandleFilterDateClick}>Appliquer</Button>
             </div>
-          </Tab> */}
-
+          </Tab>
+            )
+}
           {!_arrayVal.some(isNaN) && _headerToApply.filter.isRange && (
             <Tab title="Seuils" eventKey={"isRange"}>
               <div id="ppvr-range">
@@ -1923,12 +2030,13 @@ export const CreateNewHeader = (fieldname, filter, caption, editor) => {
   return _header;
 };
 
-export const CreateFilter = (isFilter, isCheckbox, isRange, isSearchCol) => {
+export const CreateFilter = (isFilter, isCheckbox, isRange, isSearchCol, isRangeDate) => {
   return {
     isFilter: isFilter,
     isCheckbox: isCheckbox,
     isRange: isRange,
     isSearchCol: isSearchCol,
+    isRangeDate: isRangeDate
   };
 };
 

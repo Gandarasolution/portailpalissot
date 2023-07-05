@@ -1,4 +1,4 @@
-import { Button } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { VoirDocument } from "../../axios/WSGandara";
 
 const PageTest = () => {
@@ -15,7 +15,14 @@ const b64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAAR
 
   return (
     <div>
-      <Button onClick={handleClick}>Click</Button>
+      <Button onClick={handleClick}>Click</Button>*
+
+      <Form.Control
+                  type="date"
+                  value={"2007-01-06"}
+                  // onChange={HandleMinDateValueChanged}
+                />
+
     </div>
   );
 };

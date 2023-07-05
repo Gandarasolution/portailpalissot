@@ -37,6 +37,58 @@ function FiltrerUnSearch(fieldname, _lData, arrayFilters) {
   return _lData;
 }
 
+
+function FiltrerParSeuilDate(_lData, arrayFilters)
+{
+  let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
+
+  for (let index = 0; index < _arFilters.length; index++) {
+    const arrayGroup = _arFilters[index];
+    _lData = FiltrerUnSeuilDate(arrayGroup[0], _lData, arrayFilters);
+  }
+
+  return _lData;
+}
+
+
+function FiltrerUnSeuilDate(fieldname, _lData, arrayFilters)
+{
+  let _arColonne = arrayFilters.filter(
+    (filter) => filter.fieldname === fieldname
+  );
+  if (_arColonne.length > 0) {
+    _lData = _lData.filter((data) => {
+      return (
+        _arColonne.filter((filter) => {
+          return (
+            ParseDateFormat(data[fieldname]).getTime() <= new Date(filter.max).getTime() &&
+            ParseDateFormat(data[fieldname]).getTime() >= new Date(filter.min).getTime()
+          );
+        }).length > 0
+      );
+    });
+  }
+  return _lData;
+}
+
+
+const ParseDateFormat = (text) => {
+      
+  try {
+    
+    var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+    let _match = text.match(dateRegex)[0];
+
+    return new Date(_match.substring(6),_match.substring(3, 5) -1 ,_match.substring(0, 2))
+    
+    
+  } catch {
+    return text;
+  }
+  
+}
+
+
 function FiltrerParSeuil(_lData, arrayFilters) {
   let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
 
@@ -255,6 +307,7 @@ function ULRDeplace(text){
 }
 
 export {
+  FiltrerParSeuilDate,
   FiltrerParSearch,
   FiltrerParSeuil,
   FiltrerParCollones,

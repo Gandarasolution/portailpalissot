@@ -141,9 +141,7 @@ const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies([tokenName])
 
 function setTokenViaCookies(token)
 {
-  console.log("Hey !")
   setTokenCookie(tokenName,token)
-  
 }
 
   const handleDeconnexion = () => {

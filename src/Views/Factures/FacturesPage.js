@@ -89,7 +89,7 @@ const FacturesPage = () => {
     _headers.push(
       CreateNewHeader(
         "DateFacture",
-        CreateFilter(true, true, false, false),
+        CreateFilter(true, true, false, false,true),
         "Date",
         EditorDateFromDateTime
       )

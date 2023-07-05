@@ -122,7 +122,7 @@ element.VerrouEtat = JSON.parse(JSON.stringify(element.Etat.VerrouEtat));
     _headers.push(
       CreateNewHeader(
         "DateDemandeDossierInterventionSAV",
-        CreateFilter(true, true, false, false),
+        CreateFilter(true, false, false, false,true),
         "Date de la demande",
         EditorDateFromDateTime
       )
