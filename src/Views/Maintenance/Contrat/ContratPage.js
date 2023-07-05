@@ -125,6 +125,9 @@ const ContratPage = () => {
   }
 
 
+
+  const [ajaxRequest, setAjaxRequest] = useState(undefined);
+
   const FetchDataPrestation = async () => {
    if(ClientSiteContratCtx.storedClientSite.IdContrat === 0)
    {
@@ -134,21 +137,33 @@ const ContratPage = () => {
     SetPrestations([]);
     setLastPeriode(DateSOAP(dateDebutPeriode));
     
-    GetPrestationContrat(
+ 
+if(ajaxRequest)
+{
+  ajaxRequest.abort();
+}
+
+
+    var _ajx = GetPrestationContrat(
       tokenCt,
       DateSOAP(dateDebutPeriode),
       DateSOAP(dateFinPeriode()),
       ClientSiteContratCtx.storedClientSite.IdClientSite,
       PrestationLoad
     )
+    setAjaxRequest(_ajx)
+    
   };
 
 
 
   const PrestationLoad = (data) => {
     SetPrestations(data);
-
-    if (lastPeriode === DateSOAP(dateDebutPeriode)) setIsLoadedPresta(true);
+    if (lastPeriode === DateSOAP(dateDebutPeriode))
+    {
+      setAjaxRequest(undefined);
+      setIsLoadedPresta(true);
+    }
   };
 
  
@@ -236,11 +251,9 @@ const ContratPage = () => {
 
   useEffect(() => {
     document.title="Contrats"
-    async function makeRequest() {
       setIsLoadedPresta(false);
-      await FetchDataPrestation();
-    }
-    makeRequest();
+       FetchDataPrestation();
+    
     // eslint-disable-next-line
   }, [ClientSiteContratCtx.storedClientSite.IdClientSite, lastPeriode]);
 

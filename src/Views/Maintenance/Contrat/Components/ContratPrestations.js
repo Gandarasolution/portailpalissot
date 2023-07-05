@@ -188,20 +188,6 @@ const ContratPrestation = ({
 
   //#endregion
 
-  //#region Evenements
-
-
-  //#region Click
-
-  //#endregion
-
-  //#endregion
-
-  //#region Composants
-
-  //#region commun
-
- 
 
   //#region TableData
 
@@ -340,7 +326,7 @@ const ContratPrestation = ({
 
   //#endregion
 
-  //#endregion
+
 
   return (
     <Container fluid>
