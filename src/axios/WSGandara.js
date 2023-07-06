@@ -1,12 +1,12 @@
 //#region Imports
-import $, { ajax } from "jquery";
+import $ from "jquery";
 import { HTMLEncode } from "../functions";
 
 //#endregion
 
 //#region Données
- const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+//  const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
@@ -65,38 +65,38 @@ const GetClientSiteContrat = async (token, setClientSiteContrat) => {
 
 
 
-const GetPrestationContratOriginal = async (
-  token,
-  dateDebut,
-  dateFin,
-  IdSite,
-  setData
-) => {
+// const GetPrestationContratOriginal = async (
+//   token,
+//   dateDebut,
+//   dateFin,
+//   IdSite,
+//   setData
+// ) => {
   
-  $.ajax({
-    type: "POST",
-    url: urlAction + "GetPrestationContrat",
+//   $.ajax({
+//     type: "POST",
+//     url: urlAction + "GetPrestationContrat",
 
-    data: {
-      token: token,
-      dateDebut: dateDebut,
-      dateFin: dateFin,
-      IdSite: IdSite,
-    },
-    success(data) {
-      if (data === "Erreur de connexion") {
-        setData(500);
-        return;
-      }
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        window.location.href = `/error?error=${data}`;
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
-};
+//     data: {
+//       token: token,
+//       dateDebut: dateDebut,
+//       dateFin: dateFin,
+//       IdSite: IdSite,
+//     },
+//     success(data) {
+//       if (data === "Erreur de connexion") {
+//         setData(500);
+//         return;
+//       }
+//       if (JSON.parse(JSON.stringify(data)) === "500") {
+//         window.location.href = `/error?error=${data}`;
+//         setData([]);
+//       } else {
+//         setData(JSON.parse(data));
+//       }
+//     },
+//   });
+// };
 
 
 

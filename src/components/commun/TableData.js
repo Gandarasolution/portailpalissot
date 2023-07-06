@@ -26,7 +26,7 @@ import Card from "react-bootstrap/Card";
 
 
 //#region fontAwsome
-import { faFilter, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faDownload, faEye, faFilter, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
@@ -36,6 +36,7 @@ import {
   FiltrerParSearch,
   FiltrerParSeuil,
   FiltrerParSeuilDate,
+  RegexTestAndReturnMatch,
   groupBy,
 } from "../../functions";
 
@@ -71,6 +72,7 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Breakpoint, BreakpointProvider } from "react-socks";
+import { Tooltip } from "react-bootstrap";
 
 //#endregion
 
@@ -596,7 +598,6 @@ if(arrayFilterRangeDate.length > 0) {
     };
 
     //#endregion
-
     return (
       <Popover className="popover-filters">
         <Tabs
@@ -2017,6 +2018,69 @@ const GetMethodFetchDataDocumentPresta = async (v,telecharger,returnData) => {
 };
 
 export default TableData;
+
+
+//#region Editor commun
+
+export const EditorMontant = (data) => {
+  try {
+    return `${new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+    }).format(data)}`;
+  } catch (error) {
+    return `${data} €`;
+  }
+};
+
+export const EditorDateFromDateTime = (data) => {
+  let dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/;
+  let _match = RegexTestAndReturnMatch(data, dateRegex);
+if(_match !== data)
+{
+  return _match;
+}
+dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2} /;
+_match = RegexTestAndReturnMatch(data, dateRegex);
+if(_match !== data)
+{
+  return _match;
+}
+
+  return data;
+};
+
+export const EditorActionVoir = (e) => {
+  return (
+    <Button variant="">
+      <OverlayTrigger
+        placement="bottom"
+        overlay={<Tooltip>Voir</Tooltip>}
+      >
+
+      <FontAwesomeIcon icon={faEye} />
+      </OverlayTrigger>
+    </Button>
+  );
+};
+
+export const EditorActionTelecharger = (e) => {
+  return (
+    <Button variant="">
+      <OverlayTrigger
+        placement="bottom"
+        overlay={<Tooltip>Télécharger</Tooltip>}
+      >
+
+<FontAwesomeIcon icon={faDownload} />
+      </OverlayTrigger>
+
+    </Button>
+  );
+};
+
+//#endregion
+
 
 //#region Helpers
 

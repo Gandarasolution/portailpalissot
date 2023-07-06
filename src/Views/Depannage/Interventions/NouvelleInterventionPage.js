@@ -121,6 +121,7 @@ const NouvelleInterventionPage = () => {
   //#endregion
 
   useEffect(() => {
+    document.title="Demande de dépannage"
     GetData();
 // eslint-disable-next-line 
   }, [ClientSiteCt.storedClientSite.IdClientSiteRelation]);

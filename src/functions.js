@@ -306,6 +306,20 @@ function ULRDeplace(text){
   .replace(/;amp;/g,"&")
 }
 
+
+function RegexTestAndReturnMatch(data,regex){
+  let _test  = regex.test(data);
+  if(_test)
+  {
+    let _match = data.match(regex)[0];
+    return _match;
+  }
+  return data;
+
+}
+
+
+
 export {
   FiltrerParSeuilDate,
   FiltrerParSearch,
@@ -321,4 +335,5 @@ export {
   HTMLEncode,
   URLReplace,
   ULRDeplace,
+  RegexTestAndReturnMatch,
 };
