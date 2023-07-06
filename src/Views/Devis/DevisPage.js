@@ -21,12 +21,17 @@ import TableData, {
   EditorDateFromDateTime,
   EditorMontant,
 } from "../../components/commun/TableData";
+import { GetListeDevis } from "../../axios/WSGandara";
+import { useContext } from "react";
+import { ClientSiteContratContext, TokenContext } from "../../App";
 
 //#endregion
 
 //#endregion
 
 const DevisPage = () => {
+  const tokenCt = useContext(TokenContext);
+  const clientSiteCt = useContext(ClientSiteContratContext);
   //#region States
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeDevis, setListeDevis] = useState([]);
@@ -43,28 +48,11 @@ const DevisPage = () => {
       setIsLoaded(true);
     };
 
-    FetchSetDevis([
-      {
-        IdDevis: 74714,
-        DescriptionDevis:
-          "Remplacement d'un servomoteur sur une vanne d'eau glacée.",
-        Etat: { IdEtat: 9, LibEtat: "En Attente Client", VerrouEtat: 0 },
-        TotalHT: 651.0,
-        TotalTTC: 781.2,
-        DateDemandeDossierInterventionSAV: "2023-06-20 17:15:00.000",
-        DescriptionSecteur: "Métrologie",
-      },
-      {
-        IdDevis: 73522,
-        DescriptionDevis:
-          "Fourniture d'un circuit imprimé sur des aérothermes WINTERWARM pour EH 50-18 et EH 50 le 24.03.2023  COMMANDE N°2023300593 DU 08.03.2023",
-        Etat: { IdEtat: 12, LibEtat: "Accepté", VerrouEtat: 2 },
-        TotalHT: 1282.5,
-        TotalTTC: 1539.0,
-        DateDemandeDossierInterventionSAV: "2023-03-07 08:37:00.000",
-        DescriptionSecteur: "Expédition PF",
-      },
-    ]);
+    GetListeDevis(
+      tokenCt,
+      clientSiteCt.storedClientSite.IdClientSiteRelation,
+      FetchSetDevis
+    );
   };
 
   const GetDevisTrimmed = () => {
@@ -74,9 +62,6 @@ const DevisPage = () => {
       const element = _lDevis[index];
       element.LibEtat = element.Etat.LibEtat;
       element.IdEtat = element.Etat.IdEtat;
-      element.DateDemandeDossierInterventionSAV = new Date(
-        element.DateDemandeDossierInterventionSAV
-      ).toLocaleDateString("fr-FR");
     }
     return _lDevis;
   };
@@ -127,17 +112,17 @@ const DevisPage = () => {
       CreateNewCell(
         "DateDemandeDossierInterventionSAV",
         false,
-        false,
+        true,
         false,
         EditorDateFromDateTime
       )
     );
-    _cells.push(CreateNewCell("DescriptionSecteur", false, false, false));
-    _cells.push(CreateNewCell("IdDevis", false, false, false));
-    _cells.push(CreateNewCell("DescriptionDevis", false, false, false));
+    _cells.push(CreateNewCell("DescriptionSecteur", false, true, false));
+    _cells.push(CreateNewCell("IdDevis", false, true, false));
+    _cells.push(CreateNewCell("DescriptionDevis", false, true, false));
 
-    _cells.push(CreateNewCell("TotalHT", false, false, false, EditorMontant));
-    _cells.push(CreateNewCell("TotalTTC", false, false, false, EditorMontant));
+    _cells.push(CreateNewCell("TotalHT", false, true, false, EditorMontant));
+    _cells.push(CreateNewCell("TotalTTC", false, true, false, EditorMontant));
     _cells.push(CreateNewCell("LibEtat", false, false, false, EditorEtat));
 
     _cells.push(
@@ -155,7 +140,7 @@ const DevisPage = () => {
         false,
         true,
         EditorActionTelecharger,
-        "tagDevisAccesSAV"
+        "tagDevisTelechargerDevis"
       )
     );
 
@@ -215,7 +200,10 @@ const DevisPage = () => {
         Cells={_Cells}
         IsLoaded={isLoaded}
         ButtonFilters={_ButtonFilters}
-        FilterDefaultValue={CreateNewButtonFilter("IdEtat", 9, EditorFilter)}
+        FilterDefaultValue={
+          _Data.find((d) => d.Etat.IdEtat === 9) &&
+          CreateNewButtonFilter("IdEtat", 9, EditorFilter)
+        }
         Pagination
       />
     );
@@ -226,7 +214,7 @@ const DevisPage = () => {
   useEffect(() => {
     document.title = "Devis";
     GetDevis();
-  }, []);
+  }, [clientSiteCt.storedClientSite]);
 
   return (
     <Container fluid className="h-100">

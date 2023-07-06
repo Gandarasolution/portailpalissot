@@ -716,30 +716,99 @@ const GetListeSecteur = async (token, IdClientSiteRelation, setData) => {
 
 //#endregion
 
+
+//#region Devis
+
+
+const GetListeDevis = (token, IdClientSiteRelation, setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetListeDevis",
+
+    data: {
+      token: token,
+      IdClientSiteRelation: IdClientSiteRelation,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+}
+
+const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
+  if(returnData)
+  {
+    let _return = undefined;
+    await $.ajax({
+      type: "POST",
+      url: urlAction + "GetdocumentDevis",
+      data: { token: token, IdDevis: IdDevis },
+      success(data) {
+          _return = JSON.parse(data)
+      },
+    });
+
+    return _return;
+  }
+
+  let targetWindow = window.open("/waiting");
+
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetdocumentDevis",
+    data: { token: token, IdDevis: IdDevis },
+    success(data) {
+      if (data === "500") {
+        targetWindow.location.href = `/error?error=500`;
+      }
+      const _kv = JSON.parse(data);
+      if (telecharger) {
+        TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
+      } else {
+        VoirDocument(_kv.v, _kv.k, targetWindow);
+      }
+    },
+    error(error) {
+      targetWindow.location.href = `/error?error=${error.status}`;
+    },
+  });
+
+}
+
+
+//#endregion
+
+
 //#endregion
 
 export {
-  Connexion,
-  GetListeParametres,
-  GetClientSiteContrat,
-  VoirDocument,
-  TelechargerDocument,
-  TelechargerZIP,
-  GetPrestationContrat,
-  GetPrestationReleveTache,
-  GetDocumentPrestation,
-  GetDocumentPrestationRapport,
-  GetDocumentPrestationCERFA,
-  GetDocumentPrestationTicket,
-  GetDocumentPrestationExtranet,
-  GetListeAppareils,
-  GetListeFactures,
-  VoirFactureDocument,
-  TelechargerFactureDocument,
-  GetListeInterventions,
-  GetListeFIIntervention,
-  GeTListeFactureIntervention,
-  GetDocumentFISAV,
-  GetListeSecteur,
-  VoirDocumentOffice,
+  Connexion
+  ,GetListeParametres
+  ,GetClientSiteContrat
+  ,VoirDocument
+  ,TelechargerDocument
+  ,TelechargerZIP
+ , GetPrestationContrat
+  ,GetPrestationReleveTache
+  ,GetDocumentPrestation
+  ,GetDocumentPrestationRapport
+  ,GetDocumentPrestationCERFA
+ , GetDocumentPrestationTicket
+ , GetDocumentPrestationExtranet
+ , GetListeAppareils
+  ,GetListeFactures
+ , VoirFactureDocument
+  ,TelechargerFactureDocument
+  ,GetListeInterventions
+  ,GetListeFIIntervention
+  ,GeTListeFactureIntervention
+  ,GetDocumentFISAV
+  ,GetListeSecteur
+  ,VoirDocumentOffice
+  ,GetListeDevis
+  ,GetdocumentDevis
 };
