@@ -5,7 +5,6 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavLink from "react-bootstrap/NavLink";
-// import Dropdown from "react-bootstrap/Dropdown";
 import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Button from "react-bootstrap/Button";
@@ -14,13 +13,24 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 
 //#region Fontawsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBook,
+  faHome,
+  faMobile,
+  faRightFromBracket,
+  faWrench,
+} from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faFile } from "@fortawesome/free-regular-svg-icons";
 //#endregion
 
 //#region Components
 import { ClientSiteContratContext } from "../../App";
+import logo from "../../image/favicon.ico";
+
 //#endregion
 import { useContext, useState } from "react";
+
+import { NavItem } from "react-bootstrap";
 //#endregion
 
 const NavbarMenu = ({ handleDeconnexion }) => {
@@ -93,10 +103,72 @@ const NavbarMenu = ({ handleDeconnexion }) => {
     );
   };
 
+  const [showMenu, setShowMenu] = useState(false);
+  const handleCloseMenu = () => setShowMenu(false);
+
+  const MenuNavLink = ({ href, text, icon }) => {
+    return (
+      <NavItem>
+        <NavLink href={href}>
+          <FontAwesomeIcon icon={icon} />
+          {text}
+        </NavLink>
+      </NavItem>
+    );
+  };
+
+  const OffcanvasMenu = () => {
+    return (
+      <Offcanvas show={showMenu} onHide={handleCloseMenu} placement="start">
+        <Offcanvas.Header closeButton>
+          <a
+            href="/"
+            className="text-decoration-none"
+            style={{ color: "inherit" }}
+          >
+            <Container>
+              <img
+                alt=""
+                src={logo}
+                width="30"
+                height="30"
+                className="d-inline-block align-top"
+              />
+              GMAO
+            </Container>
+          </a>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <Nav></Nav>
+
+          <MenuNavLink href={"/"} icon={faHome} text={"Accueil"} />
+          <MenuNavLink href={"/contrat"} icon={faCalendar} text={"Contrat"} />
+          <MenuNavLink href={"/appareils"} icon={faMobile} text={"Appareils"} />
+          <MenuNavLink
+            href={"/interventions"}
+            icon={faWrench}
+            text={"Interventions"}
+          />
+          <MenuNavLink href={"/devis"} icon={faBook} text={"Devis"} />
+          <MenuNavLink href={"/factures"} icon={faFile} text={"Factures"} />
+        </Offcanvas.Body>
+
+      </Offcanvas>
+    );
+  };
+
   return (
     <span>
       <Navbar bg="light" expand="lg" sticky="top">
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle
+          onClick={() => setShowMenu(true)}
+          aria-controls="basic-navbar-nav"
+        />
+        <Navbar.Collapse id="basic-navbar-nav">
+          {/* <SideBarMenuLeft /> */}
+          <OffcanvasMenu />
+        </Navbar.Collapse>
+        {/* 
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <NavLink href="/contrat">Contrats</NavLink>
@@ -105,7 +177,7 @@ const NavbarMenu = ({ handleDeconnexion }) => {
             <NavLink href="/devis">Devis</NavLink>
             <NavLink href="/factures">Factures</NavLink>
           </Nav>
-        </Navbar.Collapse>
+        </Navbar.Collapse> */}
         <Nav>
           <OffcanvasClientSite />
           <Button

@@ -25,7 +25,7 @@ import ErrorPage from "./Views/Home/Error";
 
 //#region Composants
 import NavbarMenu from "./components/menu/NavbarMenu";
-import SideBarMenu from "./components/menu/SideBarMenu";
+import SideBarMenuLeft from "./components/menu/SideBarMenuLeft";
 
 //#endregion
 
@@ -46,6 +46,7 @@ import PageTest from "./Views/Home/Test";
 import ViewerWord from "./Views/Viewer/ViewerWord";
 import DevisPage from "./Views/Devis/DevisPage";
 import { Breakpoint, BreakpointProvider } from "react-socks";
+import { Navbar } from "react-bootstrap";
 
 //#endregion
 
@@ -181,16 +182,21 @@ function App() {
             <BreakpointProvider>
               <Breakpoint small down>
                 <NavbarMenu handleDeconnexion={handleDeconnexion} />
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
+
+
                 <AppRoutes />
               </Breakpoint>
 
               <Breakpoint medium up>
                 <Row className="background">
                   <Col md={"auto"}>
-                    <SideBarMenu />
+                    <SideBarMenuLeft />
                   </Col>
 
                   <Col className="App font-link ">
+
                     <NavbarMenu handleDeconnexion={handleDeconnexion} />
                     <AppRoutes />
                   </Col>
