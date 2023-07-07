@@ -17,6 +17,8 @@
   --color-danger: #FF4D4F;
   --color-success:  #01B81A;
   --color-warning: #FA8B0C;
+  --color-dark:  #282c34;
+  --color-darker: #3e4148;
 }
 
 .App-header {
@@ -50,6 +52,10 @@
   font-family: 'Jost', sans-serif;
 }
 
+
+
+
+
 .align-left {
   display: flex !important;
   justify-content: left !important;
@@ -62,10 +68,40 @@
 }
 
 
+
+.active li {
+  background-color: var(--color-darker)!important;
+}
+
+
+
+nav ul li:hover
+{
+  /* color: lightgray  !important; */
+  background-color: var(--color-darker)!important;
+
+}
+
+/* 
 .nav-link.active {
   background-color: whitesmoke !important;
 }
+ */
 
+.navLeftMenu a{
+  font-family: 'Roboto', sans-serif;
+  color: black !important;
+  text-decoration: none;
+  margin: 3px;
+}
+
+.navLeftMenu div{
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+}
 
 .h-100 {
   min-height: 100vh !important;

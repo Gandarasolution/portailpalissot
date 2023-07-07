@@ -5,7 +5,6 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavLink from "react-bootstrap/NavLink";
-// import Dropdown from "react-bootstrap/Dropdown";
 import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Button from "react-bootstrap/Button";
@@ -14,50 +13,28 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 
 //#region Fontawsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBook,
+  faHome,
+  faMobile,
+  faRightFromBracket,
+  faWrench,
+} from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faFile } from "@fortawesome/free-regular-svg-icons";
 //#endregion
 
 //#region Components
-import logo from "../../image/favicon.ico";
 import { ClientSiteContratContext } from "../../App";
-//#endregion
-import { useContext,useState } from "react";
-//#endregion
+import logo from "../../image/favicon.ico";
 
+//#endregion
+import { useContext, useState } from "react";
+
+import { NavItem } from "react-bootstrap";
+//#endregion
 
 const NavbarMenu = ({ handleDeconnexion }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
-
-  // const NavDropDownListeSite = () => {
-  //   return (
-  //     <Dropdown>
-  //       <Dropdown.Toggle variant=" " id="dropdown-basic">
-  //         {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
-  //       </Dropdown.Toggle>
-  //       <span className="mx-auto">
-  //         <a href="/maintenance/contrat">
-  //           Contrat N°{ClientSiteContratCtx.storedClientSite.IdContrat}
-  //         </a>{" "}
-  //         souscrit le{" "}
-  //         {new Date(
-  //           ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
-  //         ).toLocaleDateString()}
-  //       </span>
-  //       <Dropdown.Menu>
-  //         {ClientSiteContratCtx.storedListe.map((csc, index) => {
-  //           return (
-  //             <Dropdown.Item
-  //               key={index}
-  //               onClick={() => ClientSiteContratCtx.setClientSite(csc)}
-  //             >
-  //               {csc.NomCompletClientSite}
-  //             </Dropdown.Item>
-  //           );
-  //         })}
-  //       </Dropdown.Menu>
-  //     </Dropdown>
-  //   );
-  // };
 
   const [show, setShow] = useState(false);
 
@@ -78,20 +55,18 @@ const NavbarMenu = ({ handleDeconnexion }) => {
                 {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
               </p>
               <p>
-                {
-ClientSiteContratCtx.storedClientSite.IdContrat > 0 ?
-                <a href="/contrat">
-                  {`Contrat N°${
-                    ClientSiteContratCtx.storedClientSite.IdContrat
-                  } souscrit le ${new Date(
-                    ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
-                  ).toLocaleDateString()}`}
-                </a>
-              : "Aucun contrat"  
-              
-              }
-
-</p>
+                {ClientSiteContratCtx.storedClientSite.IdContrat > 0 ? (
+                  <a href="/contrat">
+                    {`Contrat N°${
+                      ClientSiteContratCtx.storedClientSite.IdContrat
+                    } souscrit le ${new Date(
+                      ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
+                    ).toLocaleDateString()}`}
+                  </a>
+                ) : (
+                  "Aucun contrat"
+                )}
+              </p>
             </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
@@ -111,15 +86,13 @@ ClientSiteContratCtx.storedClientSite.IdContrat > 0 ?
                     onClick={() => ClientSiteContratCtx.setClientSite(csc)}
                   >
                     {`S${csc.IdClientSite}-${csc.NomCompletClientSite}`}
-                    {
-                      csc.IdContrat > 0 &&
-
-                    <span className="ms-2">
-                      {`Contrat N°${csc.IdContrat} souscrit le ${new Date(
-                        csc.DateSouscriptionContrat
+                    {csc.IdContrat > 0 && (
+                      <span className="ms-2">
+                        {`Contrat N°${csc.IdContrat} souscrit le ${new Date(
+                          csc.DateSouscriptionContrat
                         ).toLocaleDateString()}`}
-                    </span>
-                      }
+                      </span>
+                    )}
                   </Button>
                 </span>
               );
@@ -130,69 +103,82 @@ ClientSiteContratCtx.storedClientSite.IdContrat > 0 ?
     );
   };
 
+  const [showMenu, setShowMenu] = useState(false);
+  const handleCloseMenu = () => setShowMenu(false);
+
+  const MenuNavLink = ({ href, text, icon }) => {
+    return (
+      <NavItem>
+        <NavLink href={href}>
+          <FontAwesomeIcon icon={icon} />
+          {text}
+        </NavLink>
+      </NavItem>
+    );
+  };
+
+  const OffcanvasMenu = () => {
+    return (
+      <Offcanvas show={showMenu} onHide={handleCloseMenu} placement="start">
+        <Offcanvas.Header closeButton>
+          <a
+            href="/"
+            className="text-decoration-none"
+            style={{ color: "inherit" }}
+          >
+            <Container>
+              <img
+                alt=""
+                src={logo}
+                width="30"
+                height="30"
+                className="d-inline-block align-top"
+              />
+              GMAO
+            </Container>
+          </a>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <Nav></Nav>
+
+          <MenuNavLink href={"/"} icon={faHome} text={"Accueil"} />
+          <MenuNavLink href={"/contrat"} icon={faCalendar} text={"Contrat"} />
+          <MenuNavLink href={"/appareils"} icon={faMobile} text={"Appareils"} />
+          <MenuNavLink
+            href={"/interventions"}
+            icon={faWrench}
+            text={"Interventions"}
+          />
+          <MenuNavLink href={"/devis"} icon={faBook} text={"Devis"} />
+          <MenuNavLink href={"/factures"} icon={faFile} text={"Factures"} />
+        </Offcanvas.Body>
+
+      </Offcanvas>
+    );
+  };
+
   return (
     <span>
       <Navbar bg="light" expand="lg" sticky="top">
-        <Navbar.Brand href="/">
-          <Container>
-            <img
-              alt=""
-              src={logo}
-              width="30"
-              height="30"
-              className="d-inline-block align-top"
-            />
-            GANDARA-DEMO
-          </Container>
-        </Navbar.Brand>
-
-
-
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle
+          onClick={() => setShowMenu(true)}
+          aria-controls="basic-navbar-nav"
+        />
         <Navbar.Collapse id="basic-navbar-nav">
-
+          {/* <SideBarMenuLeft /> */}
+          <OffcanvasMenu />
+        </Navbar.Collapse>
+        {/* 
+        <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-
-
-{/* 
-            <NavDropdown title="Maintenance" id="maintenance-nav-dropdown">
-              <NavDropdown.Item href="/maintenance/contrat">
-                Contrat
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/maintenance/appareils">
-                Appareils
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/factures">
-                Factures
-              </NavDropdown.Item>
-            </NavDropdown>
-
-            <NavDropdown title="Dépannage" id="maintenance-nav-dropdown">
-              <NavDropdown.Item href="/Depannage/interventions">
-                Interventions
-              </NavDropdown.Item>
-              <NavDropdown.Item href="/Depannage/devis">Devis</NavDropdown.Item>
-              <NavDropdown.Item href="/factures">
-                Factures
-              </NavDropdown.Item>
-            </NavDropdown> */}
-
-
-            <NavLink href="/contrat" >Contrats</NavLink>
+            <NavLink href="/contrat">Contrats</NavLink>
             <NavLink href="/appareils">Appareils</NavLink>
             <NavLink href="/interventions">Interventions</NavLink>
-            <NavLink  href="/devis">Devis</NavLink>
-            <NavLink  href="/factures">Factures</NavLink>
-
-
+            <NavLink href="/devis">Devis</NavLink>
+            <NavLink href="/factures">Factures</NavLink>
           </Nav>
-
-
-
-        </Navbar.Collapse>
+        </Navbar.Collapse> */}
         <Nav>
-          {/* <NavDropDownListeSite /> */}
-          
           <OffcanvasClientSite />
           <Button
             variant=" "

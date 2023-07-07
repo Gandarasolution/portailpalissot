@@ -17,6 +17,7 @@ import TableData, {
   CreateNewHeader,
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
+  EditorDateFromDateTime,
 } from "../../../components/commun/TableData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faFile,} from "@fortawesome/free-solid-svg-icons";
@@ -314,6 +315,8 @@ function CreateButtonFilters(){
   //#endregion
 
   useEffect(() => {
+    document.title="Interventions"
+
     GetData();
     // eslint-disable-next-line
   }, [ClientSiteCt.storedClientSite.IdClientSite]);
@@ -369,12 +372,12 @@ const EditorActionDocuments = (inter) => {
 
 
 
-  const EditorDateFromDateTime = (data) => {
-    if (!data) return data;
-    var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
-    let _match = data.match(dateRegex)[0];
-    return _match;
-  };
+  // const EditorDateFromDateTime = (data) => {
+  //   if (!data) return data;
+  //   var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+  //   let _match = data.match(dateRegex)[0];
+  //   return _match;
+  // };
 
   const EditorEtat = (Etat) => {
     return <div className={` text-wrap badge badge-bg-${GetBGColorByLibEtat(Etat)}`}>{Etat} </div>;

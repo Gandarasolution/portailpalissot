@@ -24,9 +24,15 @@ import Card from "react-bootstrap/Card";
 
 //#endregion
 
-
 //#region fontAwsome
-import { faFilter, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {
+  faDownload,
+  faEye,
+  faFilter,
+  faFilterCircleXmark,
+  faList,
+  faSearch,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
@@ -36,9 +42,9 @@ import {
   FiltrerParSearch,
   FiltrerParSeuil,
   FiltrerParSeuilDate,
+  RegexTestAndReturnMatch,
   groupBy,
 } from "../../functions";
-
 
 import {
   GeTListeFactureIntervention,
@@ -50,6 +56,7 @@ import {
   GetDocumentPrestationTicket,
   GetListeFIIntervention,
   GetPrestationReleveTache,
+  GetdocumentDevis,
   TelechargerFactureDocument,
   TelechargerZIP,
   VoirFactureDocument,
@@ -62,19 +69,17 @@ import { TokenContext } from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
 import { FactureContext } from "../../Views/Factures/FacturesPage";
 
-//#endregion 
-
 //#endregion
 
+//#endregion
 
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Breakpoint, BreakpointProvider } from "react-socks";
+import { Tooltip } from "react-bootstrap";
 
 //#endregion
-
-
 
 /**
  * @param {*} {Data : [], Headers: [], Cells: [], CardModel:{},  IsLoaded: bool,  Pagination: bool, ?ButtonFilters: [], ?FilterDefaultValue: {}, ?TopPannelRightToSearch: <></>, ?TopPannelLeftToSearch: <></>  ,?placeholdeNbLine; int,  }
@@ -84,7 +89,6 @@ const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
   const Data = () => {
-
     let _lData = [];
     if (props.Data === "500") {
       _lData = [];
@@ -108,29 +112,20 @@ const TableData = ({ ...props }) => {
     if (props.ButtonFilters && btFilterActif) {
       let _filteractif = JSON.parse(JSON.stringify(btFilterActif));
 
+      _lData = _lData.filter((data) => {
+        if (Array.isArray(_filteractif.value)) {
+          let _value = false;
 
-      _lData = _lData.filter(
-
-        (data) => {
-          if(Array.isArray(_filteractif.value)){
-
-            let _value = false
-
-            for (let index = 0; index < _filteractif.value.length; index++) {
-              const element = _filteractif.value[index];
-              _value = data[_filteractif.fieldname] === element ? true : _value;
-            }
-
-            return _value
-
-          }else {
-            
-            return data[_filteractif.fieldname] === _filteractif.value}
+          for (let index = 0; index < _filteractif.value.length; index++) {
+            const element = _filteractif.value[index];
+            _value = data[_filteractif.fieldname] === element ? true : _value;
           }
 
-      );
-
-
+          return _value;
+        } else {
+          return data[_filteractif.fieldname] === _filteractif.value;
+        }
+      });
     }
 
     //Filtres par la recherche par colonne
@@ -142,11 +137,10 @@ const TableData = ({ ...props }) => {
     if (arrayFilterSeuis.length > 0) {
       _lData = FiltrerParSeuil(_lData, arrayFilterSeuis);
     }
-//Filtres par valeur date du & au
-if(arrayFilterRangeDate.length > 0) {
-  _lData = FiltrerParSeuilDate(_lData, arrayFilterRangeDate);
-}
-
+    //Filtres par valeur date du & au
+    if (arrayFilterRangeDate.length > 0) {
+      _lData = FiltrerParSeuilDate(_lData, arrayFilterRangeDate);
+    }
 
     //Filtres par check
     _lData = FiltrerParCollones(_lData, arrayFilter);
@@ -435,91 +429,92 @@ if(arrayFilterRangeDate.length > 0) {
     const maxDate = new Date(Math.max.apply(null, _arrayDate));
 
     const ParseDateFormat = (text) => {
-      
       try {
-        
         var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
         let _match = text.match(dateRegex)[0];
 
-        return `${_match.substring(6)}-${_match.substring(3, 5)}-${_match.substring(0, 2)}`
-        
-        
+        return `${_match.substring(6)}-${_match.substring(
+          3,
+          5
+        )}-${_match.substring(0, 2)}`;
       } catch {
         return text;
       }
-      
-    }
+    };
 
     const GetTimeFromTextDateParsed = (text) => {
       try {
         var dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/g;
-        
+
         let _match = text.match(dateRegex)[0];
 
-        
         let _retu = new Date(
-          _match.substring(0,4),
+          _match.substring(0, 4),
           _match.substring(5, 7) - 1,
           _match.substring(8)
-          );
+        );
         return _retu.getTime();
-          
-        } catch  {
-          return text;
-        }
+      } catch {
+        return text;
       }
-      
-      
+    };
+
     const [minDateValue, setMinDateValue] = useState(
-      arrayFilterRangeDate.find((f)=> f.fieldname === fieldname)
-      ? arrayFilterRangeDate.find((f) => f.fieldname === fieldname).min
-      : ParseDateFormat(minDate.toLocaleDateString("fr-FR")));
+      arrayFilterRangeDate.find((f) => f.fieldname === fieldname)
+        ? arrayFilterRangeDate.find((f) => f.fieldname === fieldname).min
+        : ParseDateFormat(minDate.toLocaleDateString("fr-FR"))
+    );
 
     const [maxDateValue, setMaxDateValue] = useState(
-      
-      arrayFilterRangeDate.find((f)=>f.fieldname===fieldname) 
-      ? arrayFilterRangeDate.find((f)=>f.fieldname === fieldname).max
-      : ParseDateFormat(maxDate.toLocaleDateString("fr-FR")));
+      arrayFilterRangeDate.find((f) => f.fieldname === fieldname)
+        ? arrayFilterRangeDate.find((f) => f.fieldname === fieldname).max
+        : ParseDateFormat(maxDate.toLocaleDateString("fr-FR"))
+    );
 
     const HandleMinDateValueChanged = (e) => {
       e.preventDefault();
       setMinDateValue(e.target.value);
-    }
-    
+    };
+
     const HandleMinDateRangeValueChanged = (e) => {
       e.preventDefault();
-      setMinDateValue(ParseDateFormat(new Date(Number(e.target.value)).toLocaleDateString("us-US")));
-    }
-    
-    
+      setMinDateValue(
+        ParseDateFormat(
+          new Date(Number(e.target.value)).toLocaleDateString("us-US")
+        )
+      );
+    };
+
     const HandleMaxDateValueChanged = (e) => {
       e.preventDefault();
       setMaxDateValue(e.target.value);
-    }
-    
+    };
+
     const HandleMaxDateRangeValueChanged = (e) => {
       e.preventDefault();
-      setMaxDateValue(ParseDateFormat(new Date(Number(e.target.value)).toLocaleDateString("us-US")));
-    }
-    
+      setMaxDateValue(
+        ParseDateFormat(
+          new Date(Number(e.target.value)).toLocaleDateString("us-US")
+        )
+      );
+    };
 
     const HandleFilterDateClick = () => {
-      let _obj = {fieldname: fieldname, min: minDateValue, max: maxDateValue};
+      let _obj = { fieldname: fieldname, min: minDateValue, max: maxDateValue };
       let _arrayFilterDate = JSON.parse(JSON.stringify(arrayFilterRangeDate));
-      let _index = _arrayFilterDate.findIndex((f)=> f.fieldname === fieldname);
-      if(_index > -1)
-      {
+      let _index = _arrayFilterDate.findIndex((f) => f.fieldname === fieldname);
+      if (_index > -1) {
         _arrayFilterDate[_index] = _obj;
-      }else{
-
-        if(new Date(minDateValue).getTime() !== minDate.getTime() || new Date(maxDateValue).getTime() !== maxDate.getTime() )
-        {
+      } else {
+        if (
+          new Date(minDateValue).getTime() !== minDate.getTime() ||
+          new Date(maxDateValue).getTime() !== maxDate.getTime()
+        ) {
           _arrayFilterDate.push(_obj);
         }
       }
       setArrayFilterRangeDate(_arrayFilterDate);
-
-    }
+    };
 
     //#endregion
 
@@ -593,19 +588,37 @@ if(arrayFilterRangeDate.length > 0) {
         }
       }
       setArraySearch(_arrSearch);
+      ResetAffichage(1);
+
     };
 
     //#endregion
-
+    
+    const SupprimerFiltreColonne = () => {
+  
+      function removeValue(array,setArray){
+        let _array = JSON.parse(JSON.stringify(array));
+        _array = _array.filter((f) => f.fieldname !== fieldname);
+        setArray(_array);
+      }
+      removeValue(arrayFilter, setArrayFilter);
+      removeValue(arrayFilterRangeDate, setArrayFilterRangeDate);
+      removeValue(arrayFilterSeuis, setArrayFilterSeuils);
+      removeValue(arraySearch, setArraySearch);
+    }
+    
     return (
+      
       <Popover className="popover-filters">
-        <Tabs
+        <Tabs fill
           defaultActiveKey={
             Object.entries(_headerToApply.filter).find(
               (value) => value[0] !== "isFilter" && value[1]
             )[0]
           }
         >
+          
+          {/* Checkbox */}
           {_headerToApply.filter.isCheckbox && (
             <Tab title="Valeur" eventKey={"isCheckbox"}>
               <div id="ppvr-check">
@@ -637,46 +650,45 @@ if(arrayFilterRangeDate.length > 0) {
               </div>
             </Tab>
           )}
-          {
-            _headerToApply.filter.isRangeDate && (
-          <Tab title="Date" eventKey={"isRangeDate"}>
-            <div id="ppvr-rangeDate">
-              <Col>
-                <Form.Label>Du</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={minDateValue}
-                  onChange={HandleMinDateValueChanged}
-                />
+          {/* Date du au */}
+          {_headerToApply.filter.isRangeDate && (
+            <Tab title="Date" eventKey={"isRangeDate"}>
+              <div id="ppvr-rangeDate">
+                <Col>
+                  <Form.Label>Du</Form.Label>
+                  <Form.Control
+                    type="date"
+                    value={minDateValue}
+                    onChange={HandleMinDateValueChanged}
+                  />
 
+                  <Form.Range
+                    min={minDate && minDate.getTime()}
+                    max={maxDate && maxDate.getTime()}
+                    value={GetTimeFromTextDateParsed(minDateValue)}
+                    onChange={HandleMinDateRangeValueChanged}
+                  />
+                </Col>
+                <Col>
+                  <Form.Label>Au</Form.Label>
+                  <Form.Control
+                    type="date"
+                    value={maxDateValue}
+                    onChange={HandleMaxDateValueChanged}
+                  />
+                  <Form.Range
+                    min={minDate && minDate.getTime()}
+                    max={maxDate && maxDate.getTime()}
+                    value={GetTimeFromTextDateParsed(maxDateValue)}
+                    onChange={HandleMaxDateRangeValueChanged}
+                  />
+                </Col>
 
-                <Form.Range
-                  min={minDate && minDate.getTime()}
-                  max={maxDate && maxDate.getTime()}
-                  value={GetTimeFromTextDateParsed(minDateValue)}
-                  onChange={HandleMinDateRangeValueChanged}
-                />
-              </Col>
-              <Col>
-                <Form.Label>Au</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={maxDateValue}
-                  onChange={HandleMaxDateValueChanged}
-                />
-                <Form.Range
-                 min={minDate && minDate.getTime()}
-                 max={maxDate && maxDate.getTime()}
-                 value={GetTimeFromTextDateParsed(maxDateValue)}
-                 onChange={HandleMaxDateRangeValueChanged}
-                />
-              </Col>
-
-              <Button onClick={HandleFilterDateClick}>Appliquer</Button>
-            </div>
-          </Tab>
-            )
-}
+                <Button onClick={HandleFilterDateClick}>Appliquer</Button>
+              </div>
+            </Tab>
+          )}
+          {/* Num max min */}
           {!_arrayVal.some(isNaN) && _headerToApply.filter.isRange && (
             <Tab title="Seuils" eventKey={"isRange"}>
               <div id="ppvr-range">
@@ -713,7 +725,7 @@ if(arrayFilterRangeDate.length > 0) {
               </div>
             </Tab>
           )}
-
+          {/* Recherche sur cette colonne */}
           {_headerToApply.filter.isSearchCol && (
             <Tab title="Recherche" eventKey={"isSearchCol"}>
               <div id="ppvr-search">
@@ -736,7 +748,14 @@ if(arrayFilterRangeDate.length > 0) {
               </div>
             </Tab>
           )}
+
+          <Tab  title={<span> <OverlayTrigger overlay={<Popover>Supprimer les filtres</Popover>}>
+              <FontAwesomeIcon onClick={SupprimerFiltreColonne} icon={faFilterCircleXmark} />
+            
+            </OverlayTrigger>
+               </span>} />
         </Tabs>
+
       </Popover>
     );
   };
@@ -1380,6 +1399,12 @@ if(arrayFilterRangeDate.length > 0) {
       case "tagFactureTelecharger":
         HandleTelechargerFacture(item);
         break;
+      case "tagDevisVoirDevis":
+        HandleDocumentDevis(item);
+        break;
+      case "tagDevisTelechargerDevis":
+        HandleDocumentDevis(item, true);
+        break;
       default:
         break;
     }
@@ -1596,41 +1621,61 @@ if(arrayFilterRangeDate.length > 0) {
   };
 
   const CreatePropsDocPresta = (element) => {
-    
     const _obj = {};
 
     _obj.title = element.k;
     _obj.extension = element.k.split(".").pop();
 
     _obj.VoirDocumentSup = () => GetMethodFetchDataDocumentPresta(element.v);
-   
-    _obj.TelechargerDocumentSup = () => GetMethodFetchDataDocumentPresta(element.v,true)
 
+    _obj.TelechargerDocumentSup = () =>
+      GetMethodFetchDataDocumentPresta(element.v, true);
 
     _obj.data = element;
 
     return _obj;
   };
 
-const GetMethodFetchDataDocumentPresta = async (v,telecharger,returnData) => {
-
-  const splitPop = v.split("|").pop()
-      const splitShift = v.split("|").shift()
-      switch (splitPop) {
-        case "CERFA":
-           return await  GetDocumentPrestationCERFA(tokenCt,splitShift,telecharger,returnData);
-        case "RAPPORT":
-           return await GetDocumentPrestationRapport(tokenCt, splitShift,telecharger,returnData);
-        case "TICKET":
-          return await GetDocumentPrestationTicket(tokenCt, splitShift,telecharger,returnData);
-          case "EXTRANET":
-          return await GetDocumentPrestationExtranet(tokenCt, splitShift,telecharger,returnData);
-        default:
-          break;
-      }
-
-
-}
+  const GetMethodFetchDataDocumentPresta = async (
+    v,
+    telecharger,
+    returnData
+  ) => {
+    const splitPop = v.split("|").pop();
+    const splitShift = v.split("|").shift();
+    switch (splitPop) {
+      case "CERFA":
+        return await GetDocumentPrestationCERFA(
+          tokenCt,
+          splitShift,
+          telecharger,
+          returnData
+        );
+      case "RAPPORT":
+        return await GetDocumentPrestationRapport(
+          tokenCt,
+          splitShift,
+          telecharger,
+          returnData
+        );
+      case "TICKET":
+        return await GetDocumentPrestationTicket(
+          tokenCt,
+          splitShift,
+          telecharger,
+          returnData
+        );
+      case "EXTRANET":
+        return await GetDocumentPrestationExtranet(
+          tokenCt,
+          splitShift,
+          telecharger,
+          returnData
+        );
+      default:
+        break;
+    }
+  };
 
   const CreatePropsDocPrestaZIP = async (_arrDocT, presta) => {
     const _obj = {};
@@ -1644,12 +1689,14 @@ const GetMethodFetchDataDocumentPresta = async (v,telecharger,returnData) => {
       for (let index = 0; index < _arrDocT.length; index++) {
         const element = _arrDocT[index];
 
-        let _kv = await GetMethodFetchDataDocumentPresta(element.data.v,false,true);
-        if(_kv)
-        {
-          _arrDocs.push([_kv.v,_kv.k]);
+        let _kv = await GetMethodFetchDataDocumentPresta(
+          element.data.v,
+          false,
+          true
+        );
+        if (_kv) {
+          _arrDocs.push([_kv.v, _kv.k]);
         }
-
       }
 
       await TelechargerZIP(
@@ -1976,6 +2023,14 @@ const GetMethodFetchDataDocumentPresta = async (v,telecharger,returnData) => {
 
   //#endregion
 
+  //#region Devis
+
+  const HandleDocumentDevis = (devis, telecharger) => {
+    GetdocumentDevis(tokenCt, devis.IdDevis, telecharger);
+  };
+
+  //#endregion
+
   //#endregion
 
   return (
@@ -2018,6 +2073,59 @@ const GetMethodFetchDataDocumentPresta = async (v,telecharger,returnData) => {
 
 export default TableData;
 
+//#region Editor commun
+
+export const EditorMontant = (data) => {
+  try {
+    return `${new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+    }).format(data)}`;
+  } catch (error) {
+    return `${data} €`;
+  }
+};
+
+export const EditorDateFromDateTime = (data) => {
+  let dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/;
+  let _match = RegexTestAndReturnMatch(data, dateRegex);
+  if (_match !== data) {
+    return _match;
+  }
+  dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2} /;
+  _match = RegexTestAndReturnMatch(data, dateRegex);
+  if (_match !== data) {
+    return _match;
+  }
+
+  return data;
+};
+
+export const EditorActionVoir = (e) => {
+  return (
+    <Button variant="">
+      <OverlayTrigger placement="bottom" overlay={<Tooltip>Voir</Tooltip>}>
+        <FontAwesomeIcon icon={faEye} />
+      </OverlayTrigger>
+    </Button>
+  );
+};
+
+export const EditorActionTelecharger = (e) => {
+  return (
+    <Button variant="">
+      <OverlayTrigger
+        placement="bottom"
+        overlay={<Tooltip>Télécharger</Tooltip>}
+      >
+        <FontAwesomeIcon icon={faDownload} />
+      </OverlayTrigger>
+    </Button>
+  );
+};
+
+//#endregion
+
 //#region Helpers
 
 export const CreateNewHeader = (fieldname, filter, caption, editor) => {
@@ -2030,13 +2138,19 @@ export const CreateNewHeader = (fieldname, filter, caption, editor) => {
   return _header;
 };
 
-export const CreateFilter = (isFilter, isCheckbox, isRange, isSearchCol, isRangeDate) => {
+export const CreateFilter = (
+  isFilter,
+  isCheckbox,
+  isRange,
+  isSearchCol,
+  isRangeDate
+) => {
   return {
     isFilter: isFilter,
     isCheckbox: isCheckbox,
     isRange: isRange,
     isSearchCol: isSearchCol,
-    isRangeDate: isRangeDate
+    isRangeDate: isRangeDate,
   };
 };
 

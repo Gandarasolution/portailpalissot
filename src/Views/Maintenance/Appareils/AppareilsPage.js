@@ -232,6 +232,8 @@ const AppareilsPage = () => {
   //#endregion
 
   useEffect(() => {
+    document.title="Appareils"
+
     GetAppareils();
     // eslint-disable-next-line
   }, [ClientSiteContratCtx.storedClientSite.IdClientSite]);
