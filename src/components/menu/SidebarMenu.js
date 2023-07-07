@@ -1,187 +1,104 @@
 //#region Imports
-
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-//#region cdb React
+//#region Contrast
 import {
   CDBSidebar,
   CDBSidebarContent,
-  // CDBSidebarFooter,
   CDBSidebarHeader,
   CDBSidebarMenu,
   CDBSidebarMenuItem,
 } from 'cdbreact';
+//#endregion
+
+//#region Bootstrap
+
+import Container  from 'react-bootstrap/Container';
 
 //#endregion
 
-//#region React bootstrap
-import { Container } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
-import Collapse from 'react-bootstrap/Collapse';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-//#endregion
-//#endregion
 
-const Sidebar = (props) => {
+//#region Interne
 
-  
-//#region Mokup
-
-const Sites = [{ "id": 1, "nom": "Agence" }, { "id": 2, "nom": "Immeuble" }, { "id": 3, "nom": "Maison" }];
+import logo from "../../image/favicon.ico";
+import  OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import  Tooltip  from 'react-bootstrap/Tooltip';
+import { useState } from 'react';
 
 //#endregion
+
+
+//#endregion
+
+
+
+
+//#endregion
+
+const SideBarMenu = () => {
   //#region States
-
-  
-// const [itemSelected, setItemSelected] = useState(null);
-
-
-  const [siteSelect, setSiteSelect] = useState(Sites.at(0));
-
-  
-
-  const [openMaintenance, setOpenMaintenance] = useState(false);
-  const [openDepannage, setOpenDepannage] = useState(false);
-  
 
   //#endregion
 
-
-
-  //#region Fonction
-
+  //#region Fonctions
 
   //#endregion
 
   //#region Evenements
-  const OnDropdownSiteChanged = (e) => {
-    setSiteSelect(Sites.find(s => s.id === Number(e)));
-    
 
-  };
-//#endregion
+  //#endregion
 
+  //#region Components
 
+  const MenuNavLink = ({href,text,icon}) => {
+    console.log(CDBSidebar.toggled);
+    return (<NavLink to={href}  >
+        <CDBSidebarMenuItem className={"test"}  icon={icon}  iconSize='xl' >{text}</CDBSidebarMenuItem>
+    </NavLink>)
+  }
 
+  //#endregion
 
   return (
-    <div style={{ display: "flex", direction: "row" }} >
-      <div>
 
-        <CDBSidebar textColor="#333" backgroundColor="#fff"  >
-          <CDBSidebarHeader prefix={<i className="fa fa-bars fa-large"></i>}>
-            <a href="/" className="text-decoration-none" style={{ color: 'primary' }}  >
-              GANDARA - DEMO
-            </a>
-          </CDBSidebarHeader>
-
-          <CDBSidebarContent className="sidebar-content">
-            <CDBSidebarMenu>
-
-              <DropdownButton
-                variant=''
-                title={`Site : ${siteSelect.nom}`}
-                id="dropdown-Site"
-                onSelect={(e) => OnDropdownSiteChanged(e)}
-              >
-                {Sites.map((site) => {
-                  return (
-                    <Dropdown.Item key={site.id} eventKey={site.id}>{site.nom}</Dropdown.Item>
-                  )
-                })}
-
-              </DropdownButton>
-
-              <Button variant='btCollapseMenu' onClick={() => setOpenMaintenance(!openMaintenance)} aria-controls="collapse-maintenance" aria-expanded={openMaintenance}>
-
-                <CDBSidebarMenuItem icon="cog">
-                  Maintenance
-
-                </CDBSidebarMenuItem>
-              </Button>
-
-
-              <Collapse in={openMaintenance}>
-                <div id="collapse-maintenance" className='container' >
-                  <NavLink exact="true" to="/maintenance/contrat" activeclassname="activeClicked"   >
-                    <CDBSidebarMenuItem icon="file-alt">Contrat</CDBSidebarMenuItem>
-                  </NavLink>
-
-                  <NavLink exact="true" to="/maintenance/documents" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="folder">Documents</CDBSidebarMenuItem>
-                  </NavLink>
-                  <NavLink exact="true" to="/maintenance/appareils" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="mobile-alt">Appareils</CDBSidebarMenuItem>
-                  </NavLink>
-                  <NavLink exact="true" to="/maintenance/prestations" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="chart-bar">Suivi des prestations</CDBSidebarMenuItem>
-                  </NavLink>
-                  <NavLink exact="true" to="/maintenance/factures" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="list-alt">Factures</CDBSidebarMenuItem>
-                  </NavLink>
-                </div>
-              </Collapse>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'scroll initial' }}>
+    <CDBSidebar backgroundColor={"#282c34"}  breakpoint={992} >
 
 
 
-              <Button variant='btCollapseMenu' onClick={() => setOpenDepannage(!openDepannage)} aria-controls="collapse-depannage" aria-expanded={openDepannage}>
-                <CDBSidebarMenuItem icon="wrench">Dépannage              </CDBSidebarMenuItem>
+      <CDBSidebarHeader prefix={<i className="fa fa-bars fa-large"></i>}>
+        <a href="/" className="text-decoration-none" style={{ color: 'inherit' }}>
+        <Container>
+            <img
+              alt=""
+              src={logo}
+              width="30"
+              height="30"
+              className="d-inline-block align-top"
+            />
+            GMAO
+          </Container>
+        </a>
+      </CDBSidebarHeader>
 
 
-
-              </Button>
-
-              <Collapse in={openDepannage}>
-                <div id="collapse-depannage" className='container' >
-                  <NavLink exact="true" to="/depannage/demandes" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="phone">Demandes</CDBSidebarMenuItem>
-                  </NavLink>
-                  <NavLink exact="true" to="/depannage/interventions" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="truck">Interventions</CDBSidebarMenuItem>
-                  </NavLink>
-                  <NavLink exact="true" to="/depannage/appareils" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="mobile-alt">Appareils</CDBSidebarMenuItem>
-                  </NavLink>
-                  <NavLink exact="true" to="/depannage/devis" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="clock">Devis en attente</CDBSidebarMenuItem>
-                  </NavLink>
-                  <NavLink exact="true" to="/depannage/factures" activeclassname="activeClicked">
-                    <CDBSidebarMenuItem icon="list-alt">Factures</CDBSidebarMenuItem>
-                  </NavLink>
-                </div>
-              </Collapse>
+ <CDBSidebarContent className="sidebar-content" >
+          <CDBSidebarMenu>
+            <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
+            <MenuNavLink href={"/contrat"} icon={"calendar"} text={"Contrat"} />
+            <MenuNavLink href={"/appareils"} icon={"mobile"} text={"Appareils"} />
+            <MenuNavLink href={"/interventions"} icon={"wrench"} text={"Interventions"} />
+            <MenuNavLink href={"/devis"} icon={"book"} text={"Devis"} />
+            <MenuNavLink href={"/factures"} icon={"file"} text={"Factures"} />
+          </CDBSidebarMenu>
+        </CDBSidebarContent>
 
 
+    </CDBSidebar>
+  </div>
+);
 
-
-            </CDBSidebarMenu>
-          </CDBSidebarContent>
-
-          {/* <CDBSidebarFooter style={{ textAlign: 'center' }}>
-          <div
-          style={{
-            padding: '20px 5px',
-          }}
-          >
-          powered by Gandarasolution
-          </div>
-        </CDBSidebarFooter> */}
-        </CDBSidebar>
-      </div>
-      <Container fluid>
-
-
-        {props.children}
-      </Container>
-
-    </div>
-
-
-
-  );
 };
 
-
-export default Sidebar;
+export default SideBarMenu;

@@ -2,6 +2,9 @@
 import "./App.css";
 //#region Bootstrap
 import "bootstrap/dist/css/bootstrap.min.css";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+
 //#endregion
 
 //#region in-projet
@@ -21,23 +24,14 @@ import ErrorPage from "./Views/Home/Error";
 //#endregion
 
 //#region Composants
-import NavbarMenu from "./components/menu/navbarMenu";
+import NavbarMenu from "./components/menu/NavbarMenu";
+import SideBarMenu from "./components/menu/SideBarMenu";
 
 //#endregion
 
 //#endregion
 
-//#region Fontawsome
-import { library } from "@fortawesome/fontawesome-svg-core";
-import {
-  faFileAlt,
-  faSearch,
-  faClock,
-  faCalendarPlus,
-  faYinYang,
-  faFolder,
-} from "@fortawesome/free-solid-svg-icons";
-//#endregion
+
 
 //#region React
 import { React, useState, createContext } from "react";
@@ -51,10 +45,11 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import PageTest from "./Views/Home/Test";
 import ViewerWord from "./Views/Viewer/ViewerWord";
 import DevisPage from "./Views/Devis/DevisPage";
+import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#endregion
 
-library.add(faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder);
+// library.add(faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder);
 
 //#region Context
 export const TokenContext = createContext(null);
@@ -109,14 +104,6 @@ function App() {
 
   //#region Parametres
 
-  //   const storedParams = JSON.parse(localStorage.getItem("listeParams"));
-  // // eslint-disable-next-line
-  //   const [arrayParams, setArrayParams] = useState(null);
-  //   const setParams = (params) => {
-  //     localStorage.setItem("listeParams",JSON.stringify(params));
-  //     setArrayParams(params)
-  //   }
-
   const listParamName = cyrb53("listeParamsHashed").toString();
   const [listeParamsCookie, setListeParamsCookie, removeListeParamsCookie] =
     useCookies([listParamName]);
@@ -151,7 +138,6 @@ function App() {
         value={{ storedListe, setListe, storedClientSite, setClientSite }}
       >
         <div className="App font-link background">
-          {/* <LoginPage setToken={setToken} setParams={setParams} /> */}
           <LoginPage
             setToken={setTokenViaCookies}
             setParams={setListeParamsViaCookies}
@@ -163,6 +149,28 @@ function App() {
 
   //#endregion
 
+  const AppRoutes = () => {
+    return (
+      <Routes>
+        <Route path="/test" element={<PageTest />} />
+        <Route path="/:lerest" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/waiting" element={<WaiterPage />} />
+        <Route path="/error" element={<ErrorPage />} />
+        <Route path="/viewerWord" element={<ViewerWord />} />
+        <Route path="/contrat" element={<ContratPage />} />
+        <Route path="/appareils" element={<AppareilsPage />} />
+        <Route path="/interventions" element={<InterventionPage />} />
+        <Route
+          path="/nouvelleintervention"
+          element={<NouvelleInterventionPage />}
+        />
+        <Route path="/devis" element={<DevisPage />} />
+        <Route path="/factures" element={<FacturesPage />} />
+      </Routes>
+    );
+  };
+
   return (
     <TokenContext.Provider value={tokenCookie[tokenName]}>
       <ClientSiteContratContext.Provider
@@ -170,26 +178,25 @@ function App() {
       >
         <ParametresContext.Provider value={listeParamsCookie[listParamName]}>
           <Router>
-            <div className="App font-link background">
-              <NavbarMenu handleDeconnexion={handleDeconnexion} />
+            <BreakpointProvider>
+              <Breakpoint small down>
+                <NavbarMenu handleDeconnexion={handleDeconnexion} />
+                <AppRoutes />
+              </Breakpoint>
 
-              <Routes>
-                <Route path="/viewerWord" element={<ViewerWord />} />
-                <Route path="/test" element={<PageTest />} />
-                <Route path="/waiting" element={<WaiterPage />} />
-                <Route path="/error" element={<ErrorPage />} />
-                <Route path="/" element={<HomePage />} />
-                <Route path="/contrat" element={<ContratPage />} />
-                <Route path="/appareils" element={<AppareilsPage />} />
-                <Route path="/interventions" element={<InterventionPage />} />
-                <Route
-                  path="/nouvelleintervention"
-                  element={<NouvelleInterventionPage />}
-                />
-                <Route path="/devis" element={<DevisPage />} />
-                <Route path="/factures" element={<FacturesPage />} />
-              </Routes>
-            </div>
+              <Breakpoint medium up>
+                <Row className="background">
+                  <Col md={"auto"}>
+                    <SideBarMenu />
+                  </Col>
+
+                  <Col className="App font-link ">
+                    <NavbarMenu handleDeconnexion={handleDeconnexion} />
+                    <AppRoutes />
+                  </Col>
+                </Row>
+              </Breakpoint>
+            </BreakpointProvider>
           </Router>
         </ParametresContext.Provider>
       </ClientSiteContratContext.Provider>

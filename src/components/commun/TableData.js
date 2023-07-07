@@ -26,7 +26,6 @@ import Card from "react-bootstrap/Card";
 
 //#region fontAwsome
 import {
-  faDeleteLeft,
   faDownload,
   faEye,
   faFilter,

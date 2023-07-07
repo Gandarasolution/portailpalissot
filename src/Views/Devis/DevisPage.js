@@ -214,6 +214,7 @@ const DevisPage = () => {
   useEffect(() => {
     document.title = "Devis";
     GetDevis();
+    // eslint-disable-next-line
   }, [clientSiteCt.storedClientSite]);
 
   return (
