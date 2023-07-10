@@ -320,7 +320,7 @@ const FacturesPage = () => {
   }, [clientSiteCt.storedClientSite.IdClientSite]);
 
   return (
-    <Container fluid className="h-100">
+    <Container fluid >
       <TitreOfPage
         titre={"Factures"}
         soustitre={` ${GetListeFactureTrimed().length} factures`}

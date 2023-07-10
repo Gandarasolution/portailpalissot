@@ -2,7 +2,6 @@
 import { useEffect, useState, useContext } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
-
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
@@ -31,7 +30,6 @@ const ContratPage = () => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   //#region Données
-  
 
   const dateFinPeriode = () => {
     let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
@@ -102,18 +100,6 @@ const ContratPage = () => {
     }
   }
 
-  // /**
-  //  * Construit la date de début des preriodes initial
-  //  * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
-  //  */
-  // function GetDatePeriodeInitial() {
-  //   let _day = 1;
-  //   let _monthI = _dateContrat.getMonth();
-  //   let _year = new Date().getFullYear();
-  //   let _DateRetour = new Date(_year, _monthI, _day);
-  //   return _DateRetour;
-  // }
-
 
   function GetDatePeriodeInitial() {
     let _day = 1;
@@ -124,25 +110,19 @@ const ContratPage = () => {
     return _DateRetour;
   }
 
-
-
   const [ajaxRequest, setAjaxRequest] = useState(undefined);
 
   const FetchDataPrestation = async () => {
-   if(ClientSiteContratCtx.storedClientSite.IdContrat === 0)
-   {
-    setIsLoadedPresta(true);
-    return;
-   }
+    if (ClientSiteContratCtx.storedClientSite.IdContrat === 0) {
+      setIsLoadedPresta(true);
+      return;
+    }
     SetPrestations([]);
     setLastPeriode(DateSOAP(dateDebutPeriode));
-    
- 
-if(ajaxRequest)
-{
-  ajaxRequest.abort();
-}
 
+    if (ajaxRequest) {
+      ajaxRequest.abort();
+    }
 
     var _ajx = GetPrestationContrat(
       tokenCt,
@@ -150,23 +130,18 @@ if(ajaxRequest)
       DateSOAP(dateFinPeriode()),
       ClientSiteContratCtx.storedClientSite.IdClientSite,
       PrestationLoad
-    )
-    setAjaxRequest(_ajx)
-    
+    );
+    setAjaxRequest(_ajx);
   };
-
-
 
   const PrestationLoad = (data) => {
     SetPrestations(data);
-    if (lastPeriode === DateSOAP(dateDebutPeriode))
-    {
+    if (lastPeriode === DateSOAP(dateDebutPeriode)) {
       setAjaxRequest(undefined);
       setIsLoadedPresta(true);
     }
   };
 
- 
   //#endregion
 
   //#region Evenement
@@ -250,15 +225,15 @@ if(ajaxRequest)
   };
 
   useEffect(() => {
-    document.title="Contrats"
-      setIsLoadedPresta(false);
-       FetchDataPrestation();
-    
+    document.title = "Contrat";
+    setIsLoadedPresta(false);
+    FetchDataPrestation();
+
     // eslint-disable-next-line
   }, [ClientSiteContratCtx.storedClientSite.IdClientSite, lastPeriode]);
 
   return (
-    <Container fluid className="h-100">
+    <Container fluid>
       <ContratPrestation
         IsLoaded={isLoadedPresta}
         Prestations={Prestations}

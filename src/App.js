@@ -45,6 +45,7 @@ import ViewerWord from "./Views/Viewer/ViewerWord";
 import DevisPage from "./Views/Devis/DevisPage";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import { Navbar } from "react-bootstrap";
+import ClientSitePage from "./Views/Home/ClientSitePage";
 
 //#endregion
 
@@ -153,11 +154,18 @@ function App() {
     return (
       <Routes>
         <Route path="/test" element={<PageTest />} />
+
+
         <Route path="/:lerest" element={<HomePage />} />
         <Route path="/" element={<HomePage />} />
+
         <Route path="/waiting" element={<WaiterPage />} />
         <Route path="/error" element={<ErrorPage />} />
+
         <Route path="/viewerWord" element={<ViewerWord />} />
+
+        <Route path="/clientsite" element={<ClientSitePage />} />
+        
         <Route path="/contrat" element={<ContratPage />} />
         <Route path="/appareils" element={<AppareilsPage />} />
         <Route path="/interventions" element={<InterventionPage />} />

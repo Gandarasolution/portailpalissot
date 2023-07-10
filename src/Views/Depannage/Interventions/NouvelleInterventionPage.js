@@ -33,7 +33,6 @@ import { Placeholder } from "react-bootstrap";
 //#endregion
 
 const NouvelleInterventionPage = () => {
-
   const ParamsCt = useContext(ParametresContext);
   const TokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
@@ -121,13 +120,13 @@ const NouvelleInterventionPage = () => {
   //#endregion
 
   useEffect(() => {
-    document.title="Demande de dépannage"
+    document.title = "Demande de dépannage";
     GetData();
-// eslint-disable-next-line 
+    // eslint-disable-next-line
   }, [ClientSiteCt.storedClientSite.IdClientSiteRelation]);
 
   return (
-    <Container fluid className="p-4 h-100">
+    <Container fluid>
       <TitreOfPage titre={"Nouvelle intervention"} />
       <Container fluid className="container-table ">
         <Form noValidate validated={validated} onSubmit={HandleSubmit}>
@@ -203,17 +202,17 @@ const NouvelleInterventionPage = () => {
               </FloatingLabel>
             </Col>
 
-            <Col md={6} className="mt-2">
+            <Col md={2} className="mt-2">
               <Button variant="success" className="mx-auto m-4" type="submit">
                 Envoyer
               </Button>
             </Col>
-            <Col md={6} className="mt-2 ">
+            <Col md={10} className="mt-2 ">
               <span className=" m-4">
                 <h3 style={{ color: "red" }}>
                   <FontAwesomeIcon icon={faBell} className="me-2" />
                   En cas d'urgence contactez le
-                  {/* <Badge bg="danger"> */}{" "}
+                  {" "}
                   <a
                     className="text-decoration-none"
                     href={`tel:${
@@ -222,7 +221,6 @@ const NouvelleInterventionPage = () => {
                   >
                     {ParamsCt.find((p) => p.k === "TelUrgenceIntervention").v}
                   </a>{" "}
-                  {/* </Badge> */}
                   <FontAwesomeIcon icon={faBell} className="ms-2" />
                 </h3>
               </span>
