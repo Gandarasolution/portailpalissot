@@ -31,7 +31,7 @@ import logo from "../../image/favicon.ico";
 
 //#endregion
 
-const SideBarMenuLeft = ({Offcanvas}) => {
+const SideBarMenuLeft = () => {
   //#region States
 
   //#endregion
@@ -91,9 +91,6 @@ const Sidebar = ()=> {
 }
 
   return (
-
-  Offcanvas ? <Sidebar /> 
-  : 
     <div style={{ display: 'flex', height: '100vh', overflow: 'scroll initial' }}>
 <Sidebar /> 
   </div>

@@ -55,7 +55,6 @@
 
 
 
-
 .align-left {
   display: flex !important;
   justify-content: left !important;
@@ -264,11 +263,14 @@ justify-content: center;
 .li-inactif:hover {
   color: cornflowerblue !important;
   cursor: pointer;
+  background-color: white !important;
+
 }
 
 .li-actif:hover {
   color: cornflowerblue !important;
   cursor: pointer;
+  background-color: white !important;
 }
 
 

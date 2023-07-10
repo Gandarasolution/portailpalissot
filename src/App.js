@@ -18,8 +18,8 @@ import AppareilsPage from "./Views/Maintenance/Appareils/AppareilsPage";
 import InterventionPage from "./Views/Depannage/Interventions/InterventionsPage";
 import NouvelleInterventionPage from "./Views/Depannage/Interventions/NouvelleInterventionPage";
 import FacturesPage from "./Views/Factures/FacturesPage";
-import WaiterPage from "./Views/Home/Waiter";
-import ErrorPage from "./Views/Home/Error";
+import WaiterPage from "./Views/ErrorHandling/Waiter";
+import ErrorPage from "./Views/ErrorHandling/Error";
 
 //#endregion
 
@@ -30,8 +30,6 @@ import SideBarMenuLeft from "./components/menu/SideBarMenuLeft";
 //#endregion
 
 //#endregion
-
-
 
 //#region React
 import { React, useState, createContext } from "react";
@@ -150,6 +148,7 @@ function App() {
 
   //#endregion
 
+  //#region Composants
   const AppRoutes = () => {
     return (
       <Routes>
@@ -172,6 +171,35 @@ function App() {
     );
   };
 
+  const SmallDown = () => {
+    return (
+      <Breakpoint small down>
+        <NavbarMenu handleDeconnexion={handleDeconnexion} />
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <AppRoutes />
+      </Breakpoint>
+    );
+  };
+
+  const LargeUp = () => {
+    return (
+      <Breakpoint medium up className="p-0 m-0">
+        <Row className="background m-0">
+          <Col md={"auto"} className="p-0">
+            <SideBarMenuLeft />
+          </Col>
+
+          <Col className="App font-link p-0">
+            <NavbarMenu handleDeconnexion={handleDeconnexion} />
+            <AppRoutes />
+          </Col>
+        </Row>
+      </Breakpoint>
+    );
+  };
+
+  //#endregion
+
   return (
     <TokenContext.Provider value={tokenCookie[tokenName]}>
       <ClientSiteContratContext.Provider
@@ -180,28 +208,9 @@ function App() {
         <ParametresContext.Provider value={listeParamsCookie[listParamName]}>
           <Router>
             <BreakpointProvider>
-              <Breakpoint small down>
-                <NavbarMenu handleDeconnexion={handleDeconnexion} />
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
-
-
-                <AppRoutes />
-              </Breakpoint>
-
-              <Breakpoint medium up>
-                <Row className="background">
-                  <Col md={"auto"}>
-                    <SideBarMenuLeft />
-                  </Col>
-
-                  <Col className="App font-link ">
-
-                    <NavbarMenu handleDeconnexion={handleDeconnexion} />
-                    <AppRoutes />
-                  </Col>
-                </Row>
-              </Breakpoint>
+            <SmallDown />
+            <LargeUp />
+            
             </BreakpointProvider>
           </Router>
         </ParametresContext.Provider>
