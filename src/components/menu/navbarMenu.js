@@ -158,7 +158,7 @@ const NavbarMenu = ({ handleDeconnexion }) => {
   };
 
   return (
-    <span>
+    // <span>
       <Navbar bg="light" expand="lg" sticky="top">
         <Navbar.Toggle
           onClick={() => setShowMenu(true)}
@@ -199,7 +199,7 @@ const NavbarMenu = ({ handleDeconnexion }) => {
           </Button>
         </Nav>
       </Navbar>
-    </span>
+    // </span>
   );
 };
 
