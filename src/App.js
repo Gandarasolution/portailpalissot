@@ -24,7 +24,7 @@ import ErrorPage from "./Views/ErrorHandling/Error";
 //#endregion
 
 //#region Composants
-import NavbarMenu from "./components/menu/NavbarMenu";
+import NavbarMenu from "./components/menu/ToBarMenu";
 import SideBarMenuLeft from "./components/menu/SideBarMenuLeft";
 
 //#endregion

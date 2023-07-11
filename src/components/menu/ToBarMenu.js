@@ -152,55 +152,55 @@ const NavbarMenu = ({ handleDeconnexion }) => {
           <MenuNavLink href={"/devis"} icon={faBook} text={"Devis"} />
           <MenuNavLink href={"/factures"} icon={faFile} text={"Factures"} />
         </Offcanvas.Body>
-
       </Offcanvas>
     );
   };
 
   return (
     // <span>
-      // <Navbar bg="light" expand="lg" sticky="top">
-      <Navbar bg="light" expand="lg" >
-        <Navbar.Toggle
-          onClick={() => setShowMenu(true)}
-          aria-controls="basic-navbar-nav"
-          className="m-2"
-        />
+    // <Navbar bg="light" expand="lg" sticky="top">
+    <Navbar bg="light" expand="lg">
+      <Navbar.Toggle
+        onClick={() => setShowMenu(true)}
+        aria-controls="basic-navbar-nav"
+        className="m-2"
+      />
 
-<Container>
-
-    <NavLink href="/clientSite" >
-      {
-        ClientSiteContratCtx.storedClientSite.NomCompletClientSite
-      }  <Button variant="" className="border"> Changer de site</Button>
-    </NavLink>
-    </Container>
-
-        <Navbar.Collapse  id="basic-navbar-nav">
-          <OffcanvasMenu />
-        </Navbar.Collapse>
-       
-        <Nav>
-          <OffcanvasClientSite />
-          <Button
-            variant=" "
-            onClick={() => {
-              handleDeconnexion();
-            }}
-          >
-            <OverlayTrigger
-              placement="bottom"
-              overlay={
-                <Tooltip placement="bottom" className="in" id="tooltip-right">
-                  Déconnexion
-                </Tooltip>
-              }
-            >
-              <FontAwesomeIcon icon={faRightFromBracket} />
-            </OverlayTrigger>
+      <Container>
+        <NavLink href="/clientSite">
+          {ClientSiteContratCtx.storedClientSite.NomCompletClientSite}{" "}
+          <Button variant="" className="border">
+            {" "}
+            Changer de site
           </Button>
-        </Nav>
-      </Navbar>
+        </NavLink>
+      </Container>
+
+      <Navbar.Collapse id="basic-navbar-nav">
+        <OffcanvasMenu />
+      </Navbar.Collapse>
+
+      <Nav>
+        <OffcanvasClientSite />
+        <Button
+          variant=" "
+          onClick={() => {
+            handleDeconnexion();
+          }}
+        >
+          <OverlayTrigger
+            placement="bottom"
+            overlay={
+              <Tooltip placement="bottom" className="in" id="tooltip-right">
+                Déconnexion
+              </Tooltip>
+            }
+          >
+            <FontAwesomeIcon icon={faRightFromBracket} />
+          </OverlayTrigger>
+        </Button>
+      </Nav>
+    </Navbar>
     // </span>
   );
 };
