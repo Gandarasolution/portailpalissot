@@ -451,6 +451,34 @@ justify-content: center;
 }
 
 
+.badge-bg-success-nowrap {
+  background-color: var(--color-success) !important;
+  font-weight: 400 !important;
+}
+
+
+.badge-bg-warning-nowrap {
+  background-color: var(--color-warning) !important;
+  font-weight: 400 !important;
+}
+
+.badge-bg-primary-nowrap {
+  background-color: var(--bs-primary) !important;
+  font-weight: 400 !important;
+}
+
+.badge-bg-secondary-nowrap {
+  background-color: var(--bs-secondary) !important;
+  font-weight: 400 !important;
+}
+
+
+.badge-bg-danger-nowrap {
+  background-color: var(--color-danger) !important;
+  font-weight: 400 !important;
+}
+
+
 
 .badge-bg-success {
   background-color: var(--color-success) !important;

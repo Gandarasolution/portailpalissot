@@ -167,11 +167,14 @@ const NavbarMenu = ({ handleDeconnexion }) => {
           className="m-2"
         />
 
+<Container>
+
     <NavLink href="/clientSite" >
       {
         ClientSiteContratCtx.storedClientSite.NomCompletClientSite
       }  <Button variant="" className="border"> Changer de site</Button>
     </NavLink>
+    </Container>
 
         <Navbar.Collapse  id="basic-navbar-nav">
           <OffcanvasMenu />

@@ -1153,11 +1153,100 @@
 	
 	
 	
+
 	
+	function ListeTelsSelect($token, $IdClientSite, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdClientSite" => $IdClientSite);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOListeTelsSelect",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOListeTelsSelect", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOListeTelsSelectResult"]["KV"]))
+			{
+				return json_encode($result["GMAOListeTelsSelectResult"]["KV"]);
+				}elseif(isset($result["GMAOListeTelsSelectResult"])){
+				return json_encode($result["GMAOListeTelsSelectResult"]);
+				}else{
+				return "500";
+			}
+		}
+	}
+
 	
+
+
+
 	
+
 	
-	
+	function ListeMailsSelect($token, $IdClientSite, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "IdClientSite" => $IdClientSite);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOListeMailsSelect",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOListeMailsSelect", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOListeMailsSelectResult"]["KV"]))
+			{
+				return json_encode($result["GMAOListeMailsSelectResult"]["KV"]);
+				}elseif(isset($result["GMAOListeMailsSelectResult"])){
+				return json_encode($result["GMAOListeMailsSelectResult"]);
+				}else{
+				return "500";
+			}
+		}
+	}
+
+
+
+
 	
 	function CallENDPOINT($url="",$endpoint="", )
 	{
@@ -1280,6 +1369,18 @@
 			echo(GetdocumentDevis($_POST['token'],$_POST['IdDevis'],$url));
 			break;
 			
+
+			case "GMAOListeTelsSelect":
+			echo(ListeTelsSelect($_POST['token'],$_POST['IdClientSite'],$url));
+			break;
+
+			
+			case "GMAOListeMailsSelect":
+				echo(ListeMailsSelect($_POST['token'],$_POST['IdClientSite'],$url));
+				break;
+
+			
+
 			default:
 			header("HTTP/1.1 500 Internal Server Error");
 			
