@@ -5,8 +5,8 @@ import { HTMLEncode } from "../functions";
 //#endregion
 
 //#region Données
-//  const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+ const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
