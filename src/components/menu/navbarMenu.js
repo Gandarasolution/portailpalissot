@@ -159,25 +159,27 @@ const NavbarMenu = ({ handleDeconnexion }) => {
 
   return (
     // <span>
-      <Navbar bg="light" expand="lg" sticky="top">
+      // <Navbar bg="light" expand="lg" sticky="top">
+      <Navbar bg="light" expand="lg" >
         <Navbar.Toggle
           onClick={() => setShowMenu(true)}
           aria-controls="basic-navbar-nav"
+          className="m-2"
         />
-        <Navbar.Collapse id="basic-navbar-nav">
-          {/* <SideBarMenuLeft /> */}
+
+<Container>
+
+    <NavLink href="/clientSite" >
+      {
+        ClientSiteContratCtx.storedClientSite.NomCompletClientSite
+      }  <Button variant="" className="border"> Changer de site</Button>
+    </NavLink>
+    </Container>
+
+        <Navbar.Collapse  id="basic-navbar-nav">
           <OffcanvasMenu />
         </Navbar.Collapse>
-        {/* 
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <NavLink href="/contrat">Contrats</NavLink>
-            <NavLink href="/appareils">Appareils</NavLink>
-            <NavLink href="/interventions">Interventions</NavLink>
-            <NavLink href="/devis">Devis</NavLink>
-            <NavLink href="/factures">Factures</NavLink>
-          </Nav>
-        </Navbar.Collapse> */}
+       
         <Nav>
           <OffcanvasClientSite />
           <Button

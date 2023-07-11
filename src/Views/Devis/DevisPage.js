@@ -218,7 +218,7 @@ const DevisPage = () => {
   }, [clientSiteCt.storedClientSite]);
 
   return (
-    <Container fluid className="h-100">
+    <Container fluid>
       <TitreOfPage
         titre={"Liste des devis"}
         soustitre={` ${listeDevis.length} devis`}

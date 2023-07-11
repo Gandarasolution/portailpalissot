@@ -65,10 +65,26 @@ const AppareilsPage = () => {
 
   function CreateHeaderForTable() {
     let _headers = [];
-    _headers.push(CreateNewHeader("RefClientAppareilSecteur", CreateFilter(true,true,false,true), "Secteur"));
-    _headers.push(CreateNewHeader("IdAppareilSecteur",  CreateFilter(true,true,true,true), "Code"));
     _headers.push(
-      CreateNewHeader("DesignationAppareilSecteur",  CreateFilter(true,true,false,true), "Libelle")
+      CreateNewHeader(
+        "RefClientAppareilSecteur",
+        CreateFilter(true, true, false, true),
+        "Secteur"
+      )
+    );
+    _headers.push(
+      CreateNewHeader(
+        "IdAppareilSecteur",
+        CreateFilter(true, true, true, true),
+        "Code"
+      )
+    );
+    _headers.push(
+      CreateNewHeader(
+        "DesignationAppareilSecteur",
+        CreateFilter(true, true, false, true),
+        "Libelle"
+      )
     );
     _headers.push(CreateNewHeader("IdEtat", CreateFilter(), "État"));
 
@@ -218,9 +234,8 @@ const AppareilsPage = () => {
         IsLoaded={isLoaded}
         Pagination
         ButtonFilters={_ButtonFilters}
-        FilterDefaultValue={CreateNewButtonFilter("IdEtat", 56, EditorFilter)} 
+        FilterDefaultValue={CreateNewButtonFilter("IdEtat", 56, EditorFilter)}
         CardModel={_CardModel}
-        
       />
     );
   };
@@ -232,15 +247,19 @@ const AppareilsPage = () => {
   //#endregion
 
   useEffect(() => {
-    document.title="Appareils"
+    document.title = "Appareils";
 
     GetAppareils();
     // eslint-disable-next-line
   }, [ClientSiteContratCtx.storedClientSite.IdClientSite]);
 
   return (
-    <Container fluid className="h-100">
-      <TitreOfPage titre={"Liste des appareils"} soustitre={` ${listeAppareils.length} appareils`} isLoaded={isLoaded} />
+    <Container fluid>
+      <TitreOfPage
+        titre={"Liste des appareils"}
+        soustitre={` ${listeAppareils.length} appareils`}
+        isLoaded={isLoaded}
+      />
       <TableAppareils />
     </Container>
   );

@@ -102,9 +102,6 @@ justify-content: center;
 
 }
 
-.h-100 {
-  min-height: 100vh !important;
-}
 
 
 
@@ -451,6 +448,34 @@ justify-content: center;
   color: var(--bs-primary);
   text-align: start;
   margin-right: 10px;
+}
+
+
+.badge-bg-success-nowrap {
+  background-color: var(--color-success) !important;
+  font-weight: 400 !important;
+}
+
+
+.badge-bg-warning-nowrap {
+  background-color: var(--color-warning) !important;
+  font-weight: 400 !important;
+}
+
+.badge-bg-primary-nowrap {
+  background-color: var(--bs-primary) !important;
+  font-weight: 400 !important;
+}
+
+.badge-bg-secondary-nowrap {
+  background-color: var(--bs-secondary) !important;
+  font-weight: 400 !important;
+}
+
+
+.badge-bg-danger-nowrap {
+  background-color: var(--color-danger) !important;
+  font-weight: 400 !important;
 }
 
 

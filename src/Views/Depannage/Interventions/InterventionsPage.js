@@ -1,15 +1,17 @@
 //#region Imports
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 
 //#endregion
 
 //#region Components
-// import { GetNomMois, addOneYear, subOneYear } from "../../../functions";
 import TableData, {
   CreateFilter,
   CreateNewButtonFilter,
@@ -20,12 +22,10 @@ import TableData, {
   EditorDateFromDateTime,
 } from "../../../components/commun/TableData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faFile,} from "@fortawesome/free-solid-svg-icons";
+import { faFile } from "@fortawesome/free-solid-svg-icons";
 import TitreOfPage from "../../../components/commun/TitreOfPage";
 import { GetListeInterventions } from "../../../axios/WSGandara";
-import { useContext } from "react";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
-import { Col, OverlayTrigger, Tooltip } from "react-bootstrap";
 //#endregion
 
 //#endregion
@@ -37,10 +37,6 @@ const InterventionPage = () => {
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeInterventions, setListeInterventions] = useState([]);
-
-  // const [dateDebutPeriode, setDateDebutPeriode] = useState(
-  //   GetDatePeriodeInitial()
-  // );
 
   //#endregion
 
@@ -66,41 +62,19 @@ const InterventionPage = () => {
       const element = _lInters[index];
       element.DateFacture = element.DateFacture ? element.DateFacture : "";
 
-element.LibEtat = JSON.parse(JSON.stringify(element.Etat.LibEtat));
-element.VerrouEtat = JSON.parse(JSON.stringify(element.Etat.VerrouEtat));
+      element.LibEtat = JSON.parse(JSON.stringify(element.Etat.LibEtat));
+      element.VerrouEtat = JSON.parse(JSON.stringify(element.Etat.VerrouEtat));
     }
 
     return _lInters;
   }
 
-  // /**
-  //  * Construit la date de début des preriodes initial
-  //  * @returns ([1] / [DateContratSouscrit.getMonth] / [Date.Now.getYear])
-  //  */
-  // function GetDatePeriodeInitial() {
-  //   let _day = 1;
-  //   // let _monthI = _dateContrat.getMonth();
-  //   let _monthI = 0;
-  //   let _year = new Date().getFullYear();
-  //   let _DateRetour = new Date(_year, _monthI, _day);
-  //   return _DateRetour;
-  // }
-
-  // const dateFinPeriode = () => {
-  //   let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-
-  //   _dateEndTmp = addOneYear(_dateEndTmp);
-
-  //   var day = _dateEndTmp.getDate() - 1;
-  //   _dateEndTmp.setDate(day);
-
-  //   return new Date(_dateEndTmp);
-  // };
-
-
-  function GetBGColorByLibEtat(LibEtat)
-  {
-    const  VerrouEtat = JSON.parse(JSON.stringify(listeInterventions)).find((f)=>{return String(f.Etat.LibEtat) === String(LibEtat)}).Etat.VerrouEtat;
+  function GetBGColorByLibEtat(LibEtat) {
+    const VerrouEtat = JSON.parse(JSON.stringify(listeInterventions)).find(
+      (f) => {
+        return String(f.Etat.LibEtat) === String(LibEtat);
+      }
+    ).Etat.VerrouEtat;
     return GetBGColorByVerrouEtat(VerrouEtat);
   }
   function GetBGColorByVerrouEtat(VerrouEtat) {
@@ -113,7 +87,7 @@ element.VerrouEtat = JSON.parse(JSON.stringify(element.Etat.VerrouEtat));
         return "secondary";
       case 3:
         return "success";
-        default:
+      default:
         return "danger";
     }
   }
@@ -123,12 +97,18 @@ element.VerrouEtat = JSON.parse(JSON.stringify(element.Etat.VerrouEtat));
     _headers.push(
       CreateNewHeader(
         "DateDemandeDossierInterventionSAV",
-        CreateFilter(true, false, false, false,true),
+        CreateFilter(true, false, false, false, true),
         "Date de la demande",
         EditorDateFromDateTime
       )
     );
-    _headers.push(CreateNewHeader("DescriptionSecteur",CreateFilter(true, true,false,true),"Secteur"));
+    _headers.push(
+      CreateNewHeader(
+        "DescriptionSecteur",
+        CreateFilter(true, true, false, true),
+        "Secteur"
+      )
+    );
     _headers.push(
       CreateNewHeader(
         "IdDossierInterventionSAV",
@@ -147,24 +127,7 @@ element.VerrouEtat = JSON.parse(JSON.stringify(element.Etat.VerrouEtat));
       CreateNewHeader("LibEtat", CreateFilter(true, true, false, false), "État")
     );
 
-_headers.push(CreateNewUnboundHeader(false,"Action"));
-
-    // _headers.push(
-    //   CreateNewHeader(
-    //     "IdFacture",
-    //     CreateFilter(true, false, false, true),
-    //     "N° facture"
-    //   )
-    // );
-    // _headers.push(
-    //   CreateNewHeader(
-    //     "DateFacture",
-    //     CreateFilter(true, true, false, true),
-    //     "Date de la facture",
-    //     EditorDateFromDateTime
-    //   )
-    // );
-
+    _headers.push(CreateNewUnboundHeader(false, "Action"));
     return _headers;
   }
 
@@ -179,87 +142,35 @@ _headers.push(CreateNewUnboundHeader(false,"Action"));
         EditorDateFromDateTime
       )
     );
-    _cells.push(CreateNewCell("DescriptionSecteur", false, true,false));
+    _cells.push(CreateNewCell("DescriptionSecteur", false, true, false));
     _cells.push(CreateNewCell("IdDossierInterventionSAV", true, true, false));
     _cells.push(
       CreateNewCell("DescriptionDossierInterventionSAV", true, true, false)
     );
     _cells.push(CreateNewCell("LibEtat", false, false, false, EditorEtat));
-    _cells.push(CreateNewUnboundCell(false,false,true,EditorActionDocuments,"tagInterventionDocuments"))
-   
+    _cells.push(
+      CreateNewUnboundCell(
+        false,
+        false,
+        true,
+        EditorActionDocuments,
+        "tagInterventionDocuments"
+      )
+    );
 
     return _cells;
   }
 
-function CreateButtonFilters(){
-  let _bt = [];
-  _bt.push(CreateNewButtonFilter("VerrouEtat",3,EditorFiltres));
-  _bt.push(CreateNewButtonFilter("VerrouEtat",2,EditorFiltres));
-  _bt.push(CreateNewButtonFilter("VerrouEtat",1,EditorFiltres));
-      _bt.push(CreateNewButtonFilter("VerrouEtat",0,EditorFiltres));
-      _bt.push(CreateNewButtonFilter("VerrouEtat",4,EditorFiltres));
+  function CreateButtonFilters() {
+    let _bt = [];
+    _bt.push(CreateNewButtonFilter("VerrouEtat", 3, EditorFiltres));
+    _bt.push(CreateNewButtonFilter("VerrouEtat", 2, EditorFiltres));
+    _bt.push(CreateNewButtonFilter("VerrouEtat", 1, EditorFiltres));
+    _bt.push(CreateNewButtonFilter("VerrouEtat", 0, EditorFiltres));
+    _bt.push(CreateNewButtonFilter("VerrouEtat", 4, EditorFiltres));
 
-   
-  return _bt;
-}
-
-  // const GetIntersSearched = () => {
-  //   let _llisteInterventions = listeInterventions;
-
-  //   if (search.length > 0) {
-  //     _llisteInterventions = _llisteInterventions.filter(
-  //       (item) =>
-  //         item.LibelleDossierIntervention.toUpperCase().includes(
-  //           search.toUpperCase()
-  //         ) ||
-  //         `DI${item.IdDossierIntervention.toString().toUpperCase()}`.includes(
-  //           search.toUpperCase()
-  //         ) ||
-  //         (item.IdFacture &&
-  //           `F${item.IdFacture.toString().toUpperCase()}`.includes(
-  //             search.toUpperCase()
-  //           ))
-  //     );
-  //   }
-
-  //   _llisteInterventions = _llisteInterventions.sort(
-  //     (a, b) => a.DateDemande - b.DateDemande
-  //   );
-
-  //   return _llisteInterventions;
-  // };
-
-  //#endregion
-
-  //#region Evenements
-  // const AjouterUnAnPeriode = async () => {
-  //   let _dateTMP = dateDebutPeriode;
-  //   _dateTMP = addOneYear(_dateTMP);
-  //   let _dateDebutPeriode = new Date(_dateTMP);
-  //   setDateDebutPeriode(_dateDebutPeriode);
-
-  //   // setIsLoadedPresta(false);
-  //   // await FetchDataPrestation();
-  // };
-
-  // const SoustraireUnAnPeriode = async () => {
-  //   let _dateTMP = dateDebutPeriode;
-  //   _dateTMP = subOneYear(_dateTMP);
-  //   let _dateDebutPeriode = new Date(_dateTMP);
-  //   setDateDebutPeriode(_dateDebutPeriode);
-  //   // setIsLoadedPresta(false);
-
-  //   // await FetchDataPrestation();
-  // };
-
-  // const HandleDropdownPeriodeSelect = async (dateStart) => {
-  //   let _dateTemp = new Date(dateStart);
-
-  //   setDateDebutPeriode(_dateTemp);
-  //   // setIsLoadedPresta(false);
-
-  //   // await FetchDataPrestation();
-  // };
+    return _bt;
+  }
 
   //#endregion
 
@@ -315,7 +226,7 @@ function CreateButtonFilters(){
   //#endregion
 
   useEffect(() => {
-    document.title="Interventions"
+    document.title = "Dépannage";
 
     GetData();
     // eslint-disable-next-line
@@ -323,54 +234,50 @@ function CreateButtonFilters(){
 
   //#region Editors
 
-const EditorFiltres = (VerrouEtat) => {
-  let _text = "";
-  switch (VerrouEtat) {
-    case 0:
-      _text = "En attente";
-      break;
-    case 1:
-      _text = "En cours";
-      break;
-    case 2:
-      _text = "Attente facturation";
-      break;
-    case 3:
-      _text = "Facturé";
-      break;
-    default:
-      _text = "Autres";
-      break;
-  }
+  const EditorFiltres = (VerrouEtat) => {
+    let _text = "";
+    switch (VerrouEtat) {
+      case 0:
+        _text = "En attente";
+        break;
+      case 1:
+        _text = "En cours";
+        break;
+      case 2:
+        _text = "Attente facturation";
+        break;
+      case 3:
+        _text = "Facturé";
+        break;
+      default:
+        _text = "Autres";
+        break;
+    }
 
-  return (
-    <span>
-    {/* <div
+    return (
+      <span>
+        {/* <div
       className={` text-wrap badge badge-bg-${GetBGColorByVerrouEtat(
         VerrouEtat
         )}`}
         >{" "}</div> */}
-      {_text}
+        {_text}
       </span>
-  );
-};
+    );
+  };
 
-
-const EditorActionDocuments = (inter) => {
-  return (
-    <Button>
-     <OverlayTrigger
+  const EditorActionDocuments = (inter) => {
+    return (
+      <Button>
+        <OverlayTrigger
           placement="bottom"
           overlay={<Tooltip>Voir les documents</Tooltip>}
         >
-
-      <FontAwesomeIcon icon={faFile} />
-      </OverlayTrigger>
-    </Button>
-  );
-};
-
-
+          <FontAwesomeIcon icon={faFile} />
+        </OverlayTrigger>
+      </Button>
+    );
+  };
 
   // const EditorDateFromDateTime = (data) => {
   //   if (!data) return data;
@@ -380,9 +287,12 @@ const EditorActionDocuments = (inter) => {
   // };
 
   const EditorEtat = (Etat) => {
-    return <div className={` text-wrap badge badge-bg-${GetBGColorByLibEtat(Etat)}`}>{Etat} </div>;
+    return (
+      <div className={` text-wrap badge badge-bg-${GetBGColorByLibEtat(Etat)}`}>
+        {Etat}{" "}
+      </div>
+    );
   };
-
 
   //#endregion
 
@@ -408,17 +318,22 @@ const EditorActionDocuments = (inter) => {
         ButtonFilters={_ButtonFilter}
         TopPannelRightToSearch={
           <Col md={"auto"} className="m-1">
-          <Button variant="danger" onClick={()=> window.location.href="/nouvelleintervention"}>Demander une nouvelle intervention</Button>
+            <Button
+              variant="danger"
+              onClick={() => (window.location.href = "/nouvelleintervention")}
+            >
+              Demander une nouvelle intervention
+            </Button>
           </Col>
         }
-        
+
         // CardModel={_CardModel}
       />
     );
   };
 
   return (
-    <Container fluid className="h-100">
+    <Container fluid>
       <TitreOfPage
         titre={"Interventions dépannage"}
         soustitre={` ${listeInterventions.length} intervention${

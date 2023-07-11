@@ -80,7 +80,7 @@ const Sidebar = ()=> {
         <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
         <MenuNavLink href={"/contrat"} icon={"calendar"} text={"Contrat"} />
         <MenuNavLink href={"/appareils"} icon={"mobile"} text={"Appareils"} />
-        <MenuNavLink href={"/interventions"} icon={"wrench"} text={"Interventions"} />
+        <MenuNavLink href={"/interventions"} icon={"wrench"} text={"Dépannage"} />
         <MenuNavLink href={"/devis"} icon={"book"} text={"Devis"} />
         <MenuNavLink href={"/factures"} icon={"file"} text={"Factures"} />
       </CDBSidebarMenu>

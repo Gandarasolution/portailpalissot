@@ -5,13 +5,11 @@ import Container from "react-bootstrap/Container";
 import Image from "react-bootstrap/Image";
 import Nav from "react-bootstrap/Nav";
 import NavLink from "react-bootstrap/NavLink";
-// import Button from "react-bootstrap/Button";
 
 //#endregion
 
 //#region Components
 import TitreOfPage from "../../components/commun/TitreOfPage";
-// import { VoirDocument } from "../../axios/WSGandara";
 
 //#endregion
 
@@ -19,8 +17,7 @@ import React from "react";
 //#endregion
 
 const HomePage = () => {
-  
-
+  document.title="Portail GMAO";
   const ImgAppareil = require("../../image/appareilImage.jpg");
   const ImgPresta = require("../../image/PrestaContraImage.jpg");
   const ImgMaintenance = require("../../image/MaintenanceImage.jpg");
@@ -42,9 +39,8 @@ const HomePage = () => {
   };
 
   return (
-    <Container fluid className="p-4 h-100">
+    <Container fluid>
       <TitreOfPage titre={"Portail client"} />
-      {/* <Button onClick={handleClick}>Clikc</Button> */}
       <Container fluid className="container-table ">
         <h2>Bienvenue sur l'espace client de</h2>
 

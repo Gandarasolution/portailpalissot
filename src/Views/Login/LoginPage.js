@@ -85,21 +85,17 @@ const LoginPage = (props) => {
           ListeClientSiteContratCtx.setClientSite(data[0]);
           props.setToken(response);
 
-        //6 -> CallBack de GetListeParamètres : on enregistre les infos retournées
-        const FetchSetListeParams = (data) => {
-          props.setParams(data);
-        };
+          //6 -> CallBack de GetListeParamètres : on enregistre les infos retournées
+          const FetchSetListeParams = (data) => {
+            props.setParams(data);
+          };
 
-        //5 -> On récupère la liste des paramètres de l'application
-        await GetListeParametres(response, FetchSetListeParams);
-
-
-
+          //5 -> On récupère la liste des paramètres de l'application
+          await GetListeParametres(response, FetchSetListeParams);
         };
 
         //3 -> On récupère la liste des clientsSites
         await GetClientSiteContrat(response, FetchSetListeClientSiteContrat);
-
 
         //?2.5 -> La connexion a retourné une erreur
       } else {
@@ -232,7 +228,7 @@ const LoginPage = (props) => {
 
   //#endregion
 
-  useEffect(() => {}, [login]);
+  useEffect(() => {document.title="Connexion"}, [login]);
 
   const FormSubmit = () => {
     return (
@@ -296,8 +292,8 @@ const LoginPage = (props) => {
   //#endregion
 
   return (
-    <Container fluid className="h-100">
-      <Row className="align-items-center viewport-height">
+    <Container fluid >
+      <Row className="align-items-center viewport-height ">
         <Col md={{ span: 4, offset: 4 }} className="container-login-content">
           <div>
             <h1>Connexion</h1>

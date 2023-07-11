@@ -4,13 +4,14 @@ import { ULRDeplace } from "../../functions";
 
 
 const ViewerWord = () => {
+    document.title="Document WORD";
     const queryParameters = new URLSearchParams(window.location.search)
     let _urlToOpen = ULRDeplace(queryParameters.get("urlToOpen"))
 
     _urlToOpen= _urlToOpen.replace(/"/g,"");
    
 
-return <Container fluid className="h-100">
+return <Container fluid >
 
         Viewer ! 
        

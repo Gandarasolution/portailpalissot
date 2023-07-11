@@ -5,8 +5,8 @@ import { HTMLEncode } from "../functions";
 //#endregion
 
 //#region Données
- const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+//  const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
@@ -783,6 +783,48 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
 //#endregion
 
 
+
+const GetListeTels = (token, IdClientSite, setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "ListeTelsSelect",
+
+    data: {
+      token: token,
+      IdClientSite: IdClientSite,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+}
+
+
+
+const GetListeMails = (token, IdClientSite, setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "ListeMailsSelect",
+
+    data: {
+      token: token,
+      IdClientSite: IdClientSite,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+}
+
+
 //#endregion
 
 export {
@@ -811,4 +853,6 @@ export {
   ,VoirDocumentOffice
   ,GetListeDevis
   ,GetdocumentDevis
+  ,GetListeTels
+  ,GetListeMails
 };
