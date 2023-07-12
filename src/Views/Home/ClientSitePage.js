@@ -69,27 +69,6 @@ const ClientSitePage = () => {
   function GetDataTrimed() {
     let _data = JSON.parse(JSON.stringify(listeClientSite));
 
-    // if (search.length > 0) {
-    //   const sortedData = []
-    //     .concat(
-    //       _data.map(
-    //         (e) =>
-    //           e.NomCompletClientSite.toUpperCase().includes(
-    //             search.toUpperCase()
-    //           ) && e
-    //       ),
-    //       _data.map(
-    //         (e) =>
-    //           !e.NomCompletClientSite.toUpperCase().includes(
-    //             search.toUpperCase()
-    //           ) && e
-    //       )
-    //     )
-    //     .filter((e) => e);
-
-    //   _data = sortedData;
-    // }
-
     if(search.length > 0)
     {
       const filteredData = _data.filter((f) => f.NomCompletClientSite.toUpperCase().includes(search.toUpperCase()));
@@ -495,16 +474,20 @@ const ClientSitePage = () => {
   }, []);
 
   useEffect(() => {
-    
     const FetchSetNombrePortail = (data) => {
       setNbPortails(data);
       setIsLoadedNbPortails(true);
     }
     setIsLoadedNbPortails(false);
-    GetNombrePortails(tokenCt,ClientSiteCt.storedClientSite.IdClientSiteRelation, FetchSetNombrePortail)
+
+    if(ClientSiteCt.storedClientSite)
+    {
+      GetNombrePortails(tokenCt,ClientSiteCt.storedClientSite.IdClientSiteRelation, FetchSetNombrePortail)
+
+    }
 
 
-  },[ ClientSiteCt.storedClientSite])
+  },[ClientSiteCt.storedClientSite])
   return (
     <Container fluid>
       <TitreOfPage
@@ -512,12 +495,16 @@ const ClientSitePage = () => {
         isLoaded={isLoaded}
         soustitre={`${listeClientSite.length} sites `}
       />
-      <ActualClientSite />
+      {ClientSiteCt.storedClientSite && (
+        <ActualClientSite />
+
+      )}
       <div className="m-2">{SearchBar()}</div>
       <Row>
         {isLoaded ? (
           GetDataTrimed().map((clientSite) => {
             if (
+              ClientSiteCt.storedClientSite &&
               clientSite.IdClientSite ===
               ClientSiteCt.storedClientSite.IdClientSite
             )

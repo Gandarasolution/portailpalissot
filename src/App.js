@@ -80,25 +80,34 @@ function App() {
 
   //#region ClientSiteContrat
 
-  const storedListe = JSON.parse(
-    localStorage.getItem("listeClientSiteContrat")
-  );
-  // eslint-disable-next-line
-  const [listeClientSiteContrat, setListeClientSiteContrat] = useState([]);
-  const setListe = (liste) => {
-    localStorage.setItem("listeClientSiteContrat", JSON.stringify(liste));
-    setListeClientSiteContrat(liste);
-  };
+  // const storedListe = JSON.parse(
+  //   localStorage.getItem("listeClientSiteContrat")
+  // );
+  // // eslint-disable-next-line
+  // const [listeClientSiteContrat, setListeClientSiteContrat] = useState([]);
+  // const setListe = (liste) => {
+  //   localStorage.setItem("listeClientSiteContrat", JSON.stringify(liste));
+  //   setListeClientSiteContrat(liste);
+  // };
 
-  const storedClientSite = JSON.parse(
-    localStorage.getItem("clientSiteContrat")
-  );
-  // eslint-disable-next-line
-  const [clientSiteContrat, setClientSiteContrat] = useState(null);
-  const setClientSite = (clientSite) => {
-    localStorage.setItem("clientSiteContrat", JSON.stringify(clientSite));
-    setClientSiteContrat(clientSite);
-  };
+  // const storedClientSite = JSON.parse(
+  //   localStorage.getItem("clientSiteContrat")
+  // );
+  // // eslint-disable-next-line
+  // const [clientSiteContrat, setClientSiteContrat] = useState(null);
+  // const setClientSite = (clientSite) => {
+  //   localStorage.setItem("clientSiteContrat", JSON.stringify(clientSite));
+  //   setClientSiteContrat(clientSite);
+  // };
+
+  const clientSiteName = cyrb53("clientSiteHashed").toString();
+  const [clientSiteCookie, setClientSiteCookie, removeClientSiteCookie] =
+    useCookies([clientSiteName]);
+
+  function setClientSite(clientSite) {
+    setClientSiteCookie(clientSiteName, clientSite);
+  }
+  const storedClientSite = clientSiteCookie[clientSiteName];
 
   //#endregion
 
@@ -130,12 +139,13 @@ function App() {
   const handleDeconnexion = () => {
     removeTokenCookie(tokenName);
     removeListeParamsCookie(listParamName);
+    removeClientSiteCookie(clientSiteName);
   };
 
   if (!tokenCookie[tokenName]) {
     return (
       <ListeClientSiteContratContext.Provider
-        value={{ storedListe, setListe, storedClientSite, setClientSite }}
+        value={{ storedClientSite, setClientSite }}
       >
         <div className="App font-link background">
           <LoginPage
@@ -151,13 +161,14 @@ function App() {
 
   //#region Composants
   const AppRoutes = () => {
+   
     return (
       <Routes>
         <Route path="/test" element={<PageTest />} />
 
+        <Route path="/:lerest" element={<ClientSitePage />} />
+        <Route path="/" element={<ClientSitePage />} />
 
-        <Route path="/:lerest" element={<HomePage />} />
-        <Route path="/" element={<HomePage />} />
 
         <Route path="/waiting" element={<WaiterPage />} />
         <Route path="/error" element={<ErrorPage />} />
@@ -165,16 +176,16 @@ function App() {
         <Route path="/viewerWord" element={<ViewerWord />} />
 
         <Route path="/clientsite" element={<ClientSitePage />} />
-        
-        <Route path="/contrat" element={<ContratPage />} />
-        <Route path="/appareils" element={<AppareilsPage />} />
-        <Route path="/interventions" element={<InterventionPage />} />
+
+        <Route path="/contrat" element={storedClientSite ? <ContratPage /> : <ClientSitePage />} />
+        <Route path="/appareils" element={storedClientSite ? <AppareilsPage /> : <ClientSitePage />} />
+        <Route path="/interventions" element={storedClientSite ? <InterventionPage /> : <ClientSitePage />} />
         <Route
           path="/nouvelleintervention"
-          element={<NouvelleInterventionPage />}
+          element={storedClientSite ? <NouvelleInterventionPage /> : <ClientSitePage />}
         />
-        <Route path="/devis" element={<DevisPage />} />
-        <Route path="/factures" element={<FacturesPage />} />
+        <Route path="/devis" element={storedClientSite ? <DevisPage /> : <ClientSitePage />} />
+        <Route path="/factures" element={storedClientSite ? <FacturesPage /> : <ClientSitePage />} />
       </Routes>
     );
   };
@@ -211,14 +222,13 @@ function App() {
   return (
     <TokenContext.Provider value={tokenCookie[tokenName]}>
       <ClientSiteContratContext.Provider
-        value={{ storedClientSite, setClientSite, storedListe }}
+        value={{ storedClientSite, setClientSite }}
       >
         <ParametresContext.Provider value={listeParamsCookie[listParamName]}>
           <Router>
             <BreakpointProvider>
-            <SmallDown />
-            <LargeUp />
-            
+              <SmallDown />
+              <LargeUp />
             </BreakpointProvider>
           </Router>
         </ParametresContext.Provider>

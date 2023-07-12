@@ -77,25 +77,17 @@ const LoginPage = (props) => {
 
     //2 -> Callback de Connexion :
     const getToken = async (response) => {
-      //?2.5 -> On va récupérer la liste des clientSites et les parametres de l'application
+      //?2.5 -> On va récupérer la liste des parametres de l'application
       if (isNaN(response)) {
-        //4 -> Callback de GetClientSiteContrat : on enregistre les infos retournées
-        const FetchSetListeClientSiteContrat = async (data) => {
-          ListeClientSiteContratCtx.setListe(data);
-          ListeClientSiteContratCtx.setClientSite(data[0]);
-          props.setToken(response);
+        props.setToken(response);
 
-          //6 -> CallBack de GetListeParamètres : on enregistre les infos retournées
-          const FetchSetListeParams = (data) => {
-            props.setParams(data);
-          };
-
-          //5 -> On récupère la liste des paramètres de l'application
-          await GetListeParametres(response, FetchSetListeParams);
+        //4 -> CallBack de GetListeParamètres : on enregistre les infos retournées
+        const FetchSetListeParams = (data) => {
+          props.setParams(data);
         };
 
-        //3 -> On récupère la liste des clientsSites
-        await GetClientSiteContrat(response, FetchSetListeClientSiteContrat);
+        //3 -> On récupère la liste des paramètres de l'application
+        await GetListeParametres(response, FetchSetListeParams);
 
         //?2.5 -> La connexion a retourné une erreur
       } else {
@@ -228,7 +220,9 @@ const LoginPage = (props) => {
 
   //#endregion
 
-  useEffect(() => {document.title="Connexion"}, [login]);
+  useEffect(() => {
+    document.title = "Connexion";
+  }, [login]);
 
   const FormSubmit = () => {
     return (
@@ -292,7 +286,7 @@ const LoginPage = (props) => {
   //#endregion
 
   return (
-    <Container fluid >
+    <Container fluid>
       <Row className="align-items-center viewport-height ">
         <Col md={{ span: 4, offset: 4 }} className="container-login-content">
           <div>

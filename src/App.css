@@ -58,8 +58,8 @@
 
 .sidebar-gmao{
   
-  width: auto !important;
-  min-width: none !important;
+  width: 200px !important;
+  min-width: 24px !important;
 }
 
 

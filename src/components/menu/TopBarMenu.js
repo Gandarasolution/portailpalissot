@@ -5,10 +5,12 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavLink from "react-bootstrap/NavLink";
-import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
+import NavItem from "react-bootstrap/NavItem";
+import Popover from "react-bootstrap/Popover";
+
 //#enregion
 
 //#region Fontawsome
@@ -18,6 +20,7 @@ import {
   faHome,
   faMobile,
   faRightFromBracket,
+  faUser,
   faWrench,
 } from "@fortawesome/free-solid-svg-icons";
 import { faCalendar, faFile } from "@fortawesome/free-regular-svg-icons";
@@ -30,83 +33,10 @@ import logo from "../../image/favicon.ico";
 //#endregion
 import { useContext, useState } from "react";
 
-import { NavItem } from "react-bootstrap";
 //#endregion
 
 const TopBarMenu = ({ handleDeconnexion }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
-
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  // const OffcanvasClientSite = () => {
-  //   return (
-  //     <span>
-  //       <Button variant="" onClick={handleShow}>
-  //         {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
-  //       </Button>
-
-  //       <Offcanvas show={show} onHide={handleClose} placement="end">
-  //         <Offcanvas.Header closeButton>
-  //           <Offcanvas.Title>
-  //             <p>
-  //               {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
-  //             </p>
-  //             <p>
-  //               {ClientSiteContratCtx.storedClientSite.IdContrat > 0 ? (
-  //                 <a href="/contrat">
-  //                   {`Contrat N°${
-  //                     ClientSiteContratCtx.storedClientSite.IdContrat
-  //                   } souscrit le ${new Date(
-  //                     ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
-  //                   ).toLocaleDateString()}`}
-  //                 </a>
-  //               ) : (
-  //                 "Aucun contrat"
-  //               )}
-  //             </p>
-  //           </Offcanvas.Title>
-  //         </Offcanvas.Header>
-  //         <Offcanvas.Body>
-  //           <h6>Liste des sites</h6>
-  //           <hr />
-  //           {ClientSiteContratCtx.storedListe.map((csc, index) => {
-  //             if (
-  //               csc.IdClientSite ===
-  //               ClientSiteContratCtx.storedClientSite.IdClientSite
-  //             )
-  //               return null;
-  //             return (
-  //               <span key={csc.IdClientSite}>
-  //                 <Button
-  //                   className="bt-clientsite"
-  //                   key={index}
-  //                   onClick={() => ClientSiteContratCtx.setClientSite(csc)}
-  //                 >
-  //                   {`S${csc.IdClientSite}-${csc.NomCompletClientSite}`}
-  //                   {csc.IdContrat > 0 && (
-  //                     <span className="ms-2">
-  //                       {`Contrat N°${csc.IdContrat} souscrit le ${new Date(
-  //                         csc.DateSouscriptionContrat
-  //                       ).toLocaleDateString()}`}
-  //                     </span>
-  //                   )}
-  //                 </Button>
-  //               </span>
-  //             );
-  //           })}
-  //         </Offcanvas.Body>
-  //       </Offcanvas>
-  //     </span>
-  //   );
-  // };
-
-
-
-  
-
 
   const [showMenu, setShowMenu] = useState(false);
   const handleCloseMenu = () => setShowMenu(false);
@@ -162,51 +92,43 @@ const TopBarMenu = ({ handleDeconnexion }) => {
   };
 
   return (
-    // <span>
-    // <Navbar bg="light" expand="lg" sticky="top">
     <Navbar bg="light" expand="lg">
-      <Navbar.Toggle
-        onClick={() => setShowMenu(true)}
-        aria-controls="basic-navbar-nav"
-        className="m-2"
-      />
+      <Container fluid>
+        <Navbar.Toggle
+          onClick={() => setShowMenu(true)}
+          aria-controls="basic-navbar-nav"
+          className="m-2"
+        />
+        <OffcanvasMenu />
 
-      <Container>
         <NavLink href="/clientSite">
-          {ClientSiteContratCtx.storedClientSite.NomCompletClientSite}{" "}
+          {ClientSiteContratCtx.storedClientSite &&
+            ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
           <Button variant="" className="border">
-            {" "}
             Changer de site
           </Button>
         </NavLink>
-      </Container>
-
-      <Navbar.Collapse id="basic-navbar-nav">
-        <OffcanvasMenu />
-      </Navbar.Collapse>
-
-      <Nav>
-        {/* <OffcanvasClientSite /> */}
-        <Button
-          variant=" "
-          onClick={() => {
-            handleDeconnexion();
-          }}
-        >
+        <Navbar.Collapse className="justify-content-end">
           <OverlayTrigger
-            placement="bottom"
+            trigger={"click"}
+            placement="left"
             overlay={
-              <Tooltip placement="bottom" className="in" id="tooltip-right">
-                Déconnexion
-              </Tooltip>
+              <Popover>
+                <Popover.Body>
+                  <Button variant="" onClick={handleDeconnexion}>
+                    <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
+                  </Button>
+                </Popover.Body>
+              </Popover>
             }
           >
-            <FontAwesomeIcon icon={faRightFromBracket} />
+            <Button variant="" className="border">
+              <FontAwesomeIcon icon={faUser} />
+            </Button>
           </OverlayTrigger>
-        </Button>
-      </Nav>
+        </Navbar.Collapse>
+      </Container>
     </Navbar>
-    // </span>
   );
 };
 
