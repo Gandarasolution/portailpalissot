@@ -17,6 +17,7 @@
   --color-danger: #FF4D4F;
   --color-success:  #01B81A;
   --color-warning: #FA8B0C;
+  --color-info: #85c7f9;
   --color-dark:  #282c34;
   --color-darker: #3e4148;
 }
@@ -53,6 +54,13 @@
 }
 
 
+
+
+.sidebar-gmao{
+  
+  width: auto !important;
+  min-width: none !important;
+}
 
 
 .align-left {
@@ -477,6 +485,13 @@ justify-content: center;
   background-color: var(--color-danger) !important;
   font-weight: 400 !important;
 }
+
+
+.badge-bg-info-nowrap {
+  background-color: var(--color-info) !important;
+  font-weight: 400 !important;
+}
+
 
 
 

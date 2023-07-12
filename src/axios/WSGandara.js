@@ -5,8 +5,8 @@ import { HTMLEncode } from "../functions";
 //#endregion
 
 //#region Données
- const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+//  const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
@@ -825,6 +825,26 @@ const GetListeMails = (token, IdClientSite, setData) => {
 }
 
 
+
+const GetNombrePortails =( token, IdClientSiteRelation,setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetNombrePortails",
+
+    data: {
+      token: token,
+      IdClientSiteRelation: IdClientSiteRelation,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+}
+
 //#endregion
 
 export {
@@ -855,4 +875,5 @@ export {
   ,GetdocumentDevis
   ,GetListeTels
   ,GetListeMails
+  ,GetNombrePortails
 };

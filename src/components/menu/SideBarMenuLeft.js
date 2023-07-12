@@ -56,7 +56,7 @@ const SideBarMenuLeft = () => {
 
 
 const Sidebar = ()=> {
-  return (<CDBSidebar backgroundColor={"#282c34"}  breakpoint={992} fluid >
+  return (<CDBSidebar className='sidebar-gmao ' backgroundColor={"#282c34"}  breakpoint={992} fluid >
 
 
   <CDBSidebarHeader >

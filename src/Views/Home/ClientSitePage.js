@@ -24,8 +24,14 @@ import Table from "react-bootstrap/Table";
 
 //#region Components
 import TitreOfPage from "../../components/commun/TitreOfPage";
-import { GetClientSiteContrat, GetListeMails, GetListeTels } from "../../axios/WSGandara";
+import {
+  GetClientSiteContrat,
+  GetListeMails,
+  GetListeTels,
+  GetNombrePortails,
+} from "../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../App";
+import { Form } from "react-bootstrap";
 
 //#endregion
 
@@ -49,9 +55,68 @@ const ClientSitePage = () => {
   const [listeMails, setListeMails] = useState([]);
   const [mailIsLoaded, setMailIsLoaded] = useState(false);
 
+  const [nbPortails, setNbPortails] = useState([]);
+  const [isLoadedNbPortails, setIsLoadedNbPortails] = useState(false); 
+
+  
+  const [search, setSearch] = useState("");
+  
+
   //#endregion
 
   //#region Fonctions
+
+  function GetDataTrimed() {
+    let _data = JSON.parse(JSON.stringify(listeClientSite));
+
+    // if (search.length > 0) {
+    //   const sortedData = []
+    //     .concat(
+    //       _data.map(
+    //         (e) =>
+    //           e.NomCompletClientSite.toUpperCase().includes(
+    //             search.toUpperCase()
+    //           ) && e
+    //       ),
+    //       _data.map(
+    //         (e) =>
+    //           !e.NomCompletClientSite.toUpperCase().includes(
+    //             search.toUpperCase()
+    //           ) && e
+    //       )
+    //     )
+    //     .filter((e) => e);
+
+    //   _data = sortedData;
+    // }
+
+    if(search.length > 0)
+    {
+      const filteredData = _data.filter((f) => f.NomCompletClientSite.toUpperCase().includes(search.toUpperCase()));
+      _data = filteredData;
+    }
+
+
+    return _data;
+  }
+
+  const reactStringReplace = require("react-string-replace");
+  function HighlightTextIfSearch(text) {
+    if (
+      String(search).length > 0 &&
+      String(text).toUpperCase().includes(String(search).toUpperCase())
+    ) {
+      return (
+        <span>
+          {reactStringReplace(String(text), String(search), (match, i) => (
+            <mark key={i}>{match}</mark>
+          ))}
+        </span>
+      );
+    } else {
+      return text;
+    }
+  }
 
   function GetClientSites() {
     setIsLoaded(false);
@@ -84,9 +149,7 @@ const ClientSitePage = () => {
     );
   }
 
-
   function GetMails() {
-
     const FetchSetListeMails = (data) => {
       if (!Array.isArray(data)) {
         data = Array(data);
@@ -106,10 +169,13 @@ const ClientSitePage = () => {
     );
   }
 
-
   //#endregion
 
   //#region Evenements
+
+  const HandleSearchOnChange = (e) => {
+    setSearch(e.target.value);
+  };
 
   //#endregion
 
@@ -123,7 +189,9 @@ const ClientSitePage = () => {
     return (
       <Card className="m-2">
         <Card.Header>
-          <Card.Title>{clientSite.NomCompletClientSite}</Card.Title>
+          <Card.Title>
+            {HighlightTextIfSearch(clientSite.NomCompletClientSite)}
+          </Card.Title>
           <Card.Subtitle>
             {clientSite.IdContrat > 0
               ? `Contrat N° ${clientSite.IdContrat} souscrit le ${new Date(
@@ -138,12 +206,15 @@ const ClientSitePage = () => {
             {clientSite.AdresseClientSite}
           </div>
 
-          <Row>
-            <Button onClick={HandleChoixDuSite} variant="success">
+        
+        </Card.Body>
+        <Card.Footer>
+        <Row>
+            <Button onClick={HandleChoixDuSite} variant="">
               Choisir ce site
             </Button>
           </Row>
-        </Card.Body>
+        </Card.Footer>
       </Card>
     );
   };
@@ -201,21 +272,68 @@ const ClientSitePage = () => {
       );
     };
     const INFOS = () => {
-      const BADGEINFO = ({ text }) => {
+      const BADGEINFO = ({ kv }) => {
+        let _text = "";
+        let _href = "";
+        switch (kv.k) {
+          case "NbPrestations":
+            _text = "prestations maintenances";
+            _href="/contrat";
+            break;
+          case "NbAppareils":
+            _text = "appareils enregistrés";
+            _href = "/appareils";
+            break;
+          case "NbInterventions":
+            _text = "interventions de dépannages";
+            _href= "/interventions";
+            break;
+          case "NbDevis":
+            _text = "devis";
+            _href = "/devis";
+            break;
+          case "NbFactures":
+            _text = "factures";
+            _href = "/factures";
+            break;
+          default:
+            break;
+        }
+        
         return (
-          <Col>
-            <div className="badge badge-bg-success-nowrap"> {text}</div>
-          </Col>
+          // <Col>
+            <a href={_href}>
+              <div className="badge badge-bg-info-nowrap"> {`${kv.v} ${_text}`}</div>
+              </a>
+          // </Col>
         );
       };
+
+
+
       return (
         <h4 className="m-2">
           <Row>
+            {isLoadedNbPortails ? 
+            nbPortails.map((kv,index) => {
+              return <Col key={index}>
+               <BADGEINFO kv={kv}   />
+              </Col>
+            })  
+            
+            :  <Col>
+          
+          <Placeholder as="p" animation="glow">
+                    <Placeholder xs={5} />
+                  </Placeholder>
+        </Col>
+          }
+{/* 
             <BADGEINFO text={`${125} prestations maintenances`} />
             <BADGEINFO text={`${52} appareils enregistrés`} />
             <BADGEINFO text={`${89} interventions de dépannages`} />
             <BADGEINFO text={`${12} devis`} />
-            <BADGEINFO text={`${189} factures`} />
+            <BADGEINFO text={`${189} factures`} /> */}
           </Row>
         </h4>
       );
@@ -332,24 +450,25 @@ const ClientSitePage = () => {
               </tr>
             </thead>
             <tbody>
-              {mailIsLoaded ? listeMails.map((kv, index) => {
-                return <TableRowMel key={index} kv={kv} />;
-              })
-            : <tr>
-            <td>
-              <Placeholder as="p" animation="glow">
-                <Placeholder xs={5} />
-              </Placeholder>
-            </td>
+              {mailIsLoaded ? (
+                listeMails.map((kv, index) => {
+                  return <TableRowMel key={index} kv={kv} />;
+                })
+              ) : (
+                <tr>
+                  <td>
+                    <Placeholder as="p" animation="glow">
+                      <Placeholder xs={5} />
+                    </Placeholder>
+                  </td>
 
-            <td>
-              <Placeholder as="p" animation="glow">
-                <Placeholder xs={5} />
-              </Placeholder>
-            </td>
-          </tr>
-            
-            }
+                  <td>
+                    <Placeholder as="p" animation="glow">
+                      <Placeholder xs={5} />
+                    </Placeholder>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </Table>
         </Modal.Body>
@@ -357,6 +476,16 @@ const ClientSitePage = () => {
     );
   };
 
+  const SearchBar = () => {
+    return (
+      <Form.Control
+        type="search"
+        placeholder="Recherchez..."
+        value={search}
+        onChange={HandleSearchOnChange}
+      />
+    );
+  };
   //#endregion
 
   useEffect(() => {
@@ -365,6 +494,17 @@ const ClientSitePage = () => {
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+    
+    const FetchSetNombrePortail = (data) => {
+      setNbPortails(data);
+      setIsLoadedNbPortails(true);
+    }
+    setIsLoadedNbPortails(false);
+    GetNombrePortails(tokenCt,ClientSiteCt.storedClientSite.IdClientSiteRelation, FetchSetNombrePortail)
+
+
+  },[ ClientSiteCt.storedClientSite])
   return (
     <Container fluid>
       <TitreOfPage
@@ -373,10 +513,10 @@ const ClientSitePage = () => {
         soustitre={`${listeClientSite.length} sites `}
       />
       <ActualClientSite />
-
+      <div className="m-2">{SearchBar()}</div>
       <Row>
         {isLoaded ? (
-          listeClientSite.map((clientSite) => {
+          GetDataTrimed().map((clientSite) => {
             if (
               clientSite.IdClientSite ===
               ClientSiteCt.storedClientSite.IdClientSite

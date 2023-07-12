@@ -24,7 +24,7 @@ import ErrorPage from "./Views/ErrorHandling/Error";
 //#endregion
 
 //#region Composants
-import NavbarMenu from "./components/menu/ToBarMenu";
+import TopBarMenu from "./components/menu/TopBarMenu";
 import SideBarMenuLeft from "./components/menu/SideBarMenuLeft";
 
 //#endregion
@@ -182,7 +182,7 @@ function App() {
   const SmallDown = () => {
     return (
       <Breakpoint small down>
-        <NavbarMenu handleDeconnexion={handleDeconnexion} />
+        <TopBarMenu handleDeconnexion={handleDeconnexion} />
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <AppRoutes />
       </Breakpoint>
@@ -198,7 +198,7 @@ function App() {
           </Col>
 
           <Col className="App font-link p-0">
-            <NavbarMenu handleDeconnexion={handleDeconnexion} />
+            <TopBarMenu handleDeconnexion={handleDeconnexion} />
             <AppRoutes />
           </Col>
         </Row>

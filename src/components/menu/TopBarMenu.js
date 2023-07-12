@@ -33,7 +33,7 @@ import { useContext, useState } from "react";
 import { NavItem } from "react-bootstrap";
 //#endregion
 
-const NavbarMenu = ({ handleDeconnexion }) => {
+const TopBarMenu = ({ handleDeconnexion }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   const [show, setShow] = useState(false);
@@ -41,67 +41,72 @@ const NavbarMenu = ({ handleDeconnexion }) => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const OffcanvasClientSite = () => {
-    return (
-      <span>
-        <Button variant="" onClick={handleShow}>
-          {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
-        </Button>
+  // const OffcanvasClientSite = () => {
+  //   return (
+  //     <span>
+  //       <Button variant="" onClick={handleShow}>
+  //         {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
+  //       </Button>
 
-        <Offcanvas show={show} onHide={handleClose} placement="end">
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>
-              <p>
-                {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
-              </p>
-              <p>
-                {ClientSiteContratCtx.storedClientSite.IdContrat > 0 ? (
-                  <a href="/contrat">
-                    {`Contrat N°${
-                      ClientSiteContratCtx.storedClientSite.IdContrat
-                    } souscrit le ${new Date(
-                      ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
-                    ).toLocaleDateString()}`}
-                  </a>
-                ) : (
-                  "Aucun contrat"
-                )}
-              </p>
-            </Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <h6>Liste des sites</h6>
-            <hr />
-            {ClientSiteContratCtx.storedListe.map((csc, index) => {
-              if (
-                csc.IdClientSite ===
-                ClientSiteContratCtx.storedClientSite.IdClientSite
-              )
-                return null;
-              return (
-                <span key={csc.IdClientSite}>
-                  <Button
-                    className="bt-clientsite"
-                    key={index}
-                    onClick={() => ClientSiteContratCtx.setClientSite(csc)}
-                  >
-                    {`S${csc.IdClientSite}-${csc.NomCompletClientSite}`}
-                    {csc.IdContrat > 0 && (
-                      <span className="ms-2">
-                        {`Contrat N°${csc.IdContrat} souscrit le ${new Date(
-                          csc.DateSouscriptionContrat
-                        ).toLocaleDateString()}`}
-                      </span>
-                    )}
-                  </Button>
-                </span>
-              );
-            })}
-          </Offcanvas.Body>
-        </Offcanvas>
-      </span>
-    );
-  };
+  //       <Offcanvas show={show} onHide={handleClose} placement="end">
+  //         <Offcanvas.Header closeButton>
+  //           <Offcanvas.Title>
+  //             <p>
+  //               {`S${ClientSiteContratCtx.storedClientSite.IdClientSite}-${ClientSiteContratCtx.storedClientSite.NomCompletClientSite}`}
+  //             </p>
+  //             <p>
+  //               {ClientSiteContratCtx.storedClientSite.IdContrat > 0 ? (
+  //                 <a href="/contrat">
+  //                   {`Contrat N°${
+  //                     ClientSiteContratCtx.storedClientSite.IdContrat
+  //                   } souscrit le ${new Date(
+  //                     ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
+  //                   ).toLocaleDateString()}`}
+  //                 </a>
+  //               ) : (
+  //                 "Aucun contrat"
+  //               )}
+  //             </p>
+  //           </Offcanvas.Title>
+  //         </Offcanvas.Header>
+  //         <Offcanvas.Body>
+  //           <h6>Liste des sites</h6>
+  //           <hr />
+  //           {ClientSiteContratCtx.storedListe.map((csc, index) => {
+  //             if (
+  //               csc.IdClientSite ===
+  //               ClientSiteContratCtx.storedClientSite.IdClientSite
+  //             )
+  //               return null;
+  //             return (
+  //               <span key={csc.IdClientSite}>
+  //                 <Button
+  //                   className="bt-clientsite"
+  //                   key={index}
+  //                   onClick={() => ClientSiteContratCtx.setClientSite(csc)}
+  //                 >
+  //                   {`S${csc.IdClientSite}-${csc.NomCompletClientSite}`}
+  //                   {csc.IdContrat > 0 && (
+  //                     <span className="ms-2">
+  //                       {`Contrat N°${csc.IdContrat} souscrit le ${new Date(
+  //                         csc.DateSouscriptionContrat
+  //                       ).toLocaleDateString()}`}
+  //                     </span>
+  //                   )}
+  //                 </Button>
+  //               </span>
+  //             );
+  //           })}
+  //         </Offcanvas.Body>
+  //       </Offcanvas>
+  //     </span>
+  //   );
+  // };
+
+
+
+  
+
 
   const [showMenu, setShowMenu] = useState(false);
   const handleCloseMenu = () => setShowMenu(false);
@@ -181,7 +186,7 @@ const NavbarMenu = ({ handleDeconnexion }) => {
       </Navbar.Collapse>
 
       <Nav>
-        <OffcanvasClientSite />
+        {/* <OffcanvasClientSite /> */}
         <Button
           variant=" "
           onClick={() => {
@@ -205,4 +210,4 @@ const NavbarMenu = ({ handleDeconnexion }) => {
   );
 };
 
-export default NavbarMenu;
+export default TopBarMenu;
