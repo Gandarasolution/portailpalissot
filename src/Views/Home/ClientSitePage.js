@@ -643,6 +643,7 @@ const ClientSitePage = () => {
 
     useEffect(() => {
       GetNbPortails();
+      // eslint-disable-next-line
     }, []);
 
     return (

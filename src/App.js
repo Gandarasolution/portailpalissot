@@ -49,7 +49,6 @@ import { Breakpoint, BreakpointProvider } from "react-socks";
 import PageTest from "./Views/Home/Test";
 import ViewerWord from "./Views/Viewer/ViewerWord";
 import DevisPage from "./Views/Devis/DevisPage";
-import { Container } from "react-bootstrap";
 
 //#endregion
 
@@ -80,11 +79,7 @@ function App() {
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
   };
 
-
   //#region ClientSiteContrat
-
-
-
 
   const clientSiteName = cyrb53("clientSiteHashed").toString();
   const [clientSiteCookie, setClientSiteCookie, removeClientSiteCookie] =

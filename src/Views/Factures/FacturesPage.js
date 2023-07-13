@@ -52,13 +52,12 @@ const FacturesPage = () => {
 
   function GetListeFactureTrimed() {
     let _arrayFacture = JSON.parse(JSON.stringify(listeFactures));
-    if(! Array.isArray(_arrayFacture))
-    {
+    if (!Array.isArray(_arrayFacture)) {
       let _arrTmp = [];
       _arrTmp.push(_arrayFacture);
       _arrayFacture = _arrTmp;
     }
-    
+
     _arrayFacture = _arrayFacture.filter((fa) => fa.Type !== "Chantier");
 
     return _arrayFacture;
@@ -327,7 +326,7 @@ const FacturesPage = () => {
   }, [clientSiteCt.storedClientSite.IdClientSite]);
 
   return (
-    <Container fluid >
+    <Container fluid>
       <TitreOfPage
         titre={"Factures"}
         soustitre={` ${GetListeFactureTrimed().length} factures`}

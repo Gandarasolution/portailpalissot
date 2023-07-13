@@ -101,10 +101,14 @@ const TopBarMenu = ({ handleDeconnexion }) => {
         />
         <OffcanvasMenu />
 
-        <Navbar.Text >
+        <Navbar.Text>
           {ClientSiteContratCtx.storedClientSite &&
             ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
-          <Button variant="" className="border" onClick={() => ClientSiteContratCtx.removeclientSite()}>
+          <Button
+            variant=""
+            className="border"
+            onClick={() => ClientSiteContratCtx.removeclientSite()}
+          >
             Changer de site
           </Button>
         </Navbar.Text>

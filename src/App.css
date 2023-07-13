@@ -15,10 +15,10 @@
 
 :root {
   --color-danger: #FF4D4F;
-  --color-success:  #01B81A;
+  --color-success: #01B81A;
   --color-warning: #FA8B0C;
   --color-info: #85c7f9;
-  --color-dark:  #282c34;
+  --color-dark: #282c34;
   --color-darker: #3e4148;
 }
 
@@ -55,16 +55,15 @@
 
 
 
-.container-sidebar
-{
-  display: flex ;
-  height: 100% ;
-  overflow: scroll initial ;
+.container-sidebar {
+  display: flex;
+  height: 100%;
+  overflow: scroll initial;
 
 }
 
 
-.sidebar-gmao{
+.sidebar-gmao {
   width: 200px !important;
   min-width: 24px !important;
 }
@@ -84,35 +83,34 @@
 
 
 .active li {
-  background-color: var(--color-darker)!important;
+  background-color: var(--color-darker) !important;
 }
 
 
 
-nav ul li:hover
-{
+nav ul li:hover {
   /* color: lightgray  !important; */
-  background-color: var(--color-darker)!important;
+  background-color: var(--color-darker) !important;
 
 }
 
 
-.bg-infoB{
+.bg-infoB {
   background-color: var(--color-info) !important;
 }
 
-.navLeftMenu a{
+.navLeftMenu a {
   font-family: 'Roboto', sans-serif;
   color: black !important;
   text-decoration: none;
   margin: 3px;
 }
 
-.navLeftMenu div{
+.navLeftMenu div {
 
-display: flex;
-align-items: center;
-justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
 }
 
@@ -372,10 +370,10 @@ justify-content: center;
 }
 
 
-.row-height{
+.row-height {
   height: 3rem !important;
   overflow: hidden;
-  white-space: nowrap;  
+  white-space: nowrap;
 }
 
 .table-presta-row-selected {
@@ -546,4 +544,3 @@ justify-content: center;
 .popover-filters div {
   margin: 10px !important;
 }
-

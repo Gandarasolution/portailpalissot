@@ -1,5 +1,5 @@
 //#region Imports
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,19 +18,13 @@ import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region Components
-import {
-  Connexion,
-  GetClientSiteContrat,
-  GetListeParametres,
-} from "../../axios/WSGandara";
-import { ListeClientSiteContratContext } from "../../App";
+import { Connexion, GetListeParametres } from "../../axios/WSGandara";
 
 //#endregion
 
 //#endregion
 
 const LoginPage = (props) => {
-
   //#region States
 
   const [revealed, setRevealed] = useState(false);
@@ -78,19 +72,14 @@ const LoginPage = (props) => {
     const getToken = async (response) => {
       //?2.5 -> On va récupérer la liste des parametres de l'application
       if (isNaN(response)) {
-
         //4 -> CallBack de GetListeParamètres : on enregistre les infos retournées
         const FetchSetListeParams = async (data) => {
           props.setParams(data);
           props.setToken(response);
-
         };
 
         //3 -> On récupère la liste des paramètres de l'application
         await GetListeParametres(response, FetchSetListeParams);
-
-
-
 
         //?2.5 -> La connexion a retourné une erreur
       } else {

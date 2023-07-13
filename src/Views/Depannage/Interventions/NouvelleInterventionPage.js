@@ -62,15 +62,12 @@ const NouvelleInterventionPage = () => {
   //#region Fonctions
 
   const GetData = () => {
-
-
     const FetchSetSecteurs = (data) => {
       setListeSecteurs(data);
       setIsLoadedSecteurs(true);
     };
 
     const FetchSetTel = (data) => {
-      
       setListeTel(ParseKVAsArray(data));
       setIsLoadedTel(true);
     };
@@ -80,10 +77,12 @@ const NouvelleInterventionPage = () => {
       ClientSiteCt.storedClientSite.IdClientSiteRelation,
       FetchSetSecteurs
     );
-    
-    GetListeTels(TokenCt,ClientSiteCt.storedClientSite.IdClientSite, FetchSetTel)
 
-
+    GetListeTels(
+      TokenCt,
+      ClientSiteCt.storedClientSite.IdClientSite,
+      FetchSetTel
+    );
   };
 
   //#endregion
@@ -218,8 +217,7 @@ const NouvelleInterventionPage = () => {
               <span className=" m-4">
                 <h3 style={{ color: "red" }}>
                   <FontAwesomeIcon icon={faBell} className="me-2" />
-                  En cas d'urgence contactez le
-                  {" "}
+                  En cas d'urgence contactez le{" "}
                   <a
                     className="text-decoration-none"
                     href={`tel:${

@@ -100,7 +100,6 @@ const ContratPage = () => {
     }
   }
 
-
   function GetDatePeriodeInitial() {
     let _day = 1;
     // let _monthI = _dateContrat.getMonth();
