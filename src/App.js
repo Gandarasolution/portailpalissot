@@ -1,9 +1,12 @@
 //#region Imports
 import "./App.css";
+
 //#region Bootstrap
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Navbar from "react-bootstrap/Navbar";
 
 //#endregion
 
@@ -12,7 +15,7 @@ import Col from "react-bootstrap/Col";
 //#region Pages
 
 import LoginPage from "./Views/Login/LoginPage";
-import HomePage from "./Views/Home/HomePage";
+import ClientSitePage from "./Views/Home/ClientSitePage";
 import ContratPage from "./Views/Maintenance/Contrat/ContratPage";
 import AppareilsPage from "./Views/Maintenance/Appareils/AppareilsPage";
 import InterventionPage from "./Views/Depannage/Interventions/InterventionsPage";
@@ -24,7 +27,8 @@ import ErrorPage from "./Views/ErrorHandling/Error";
 //#endregion
 
 //#region Composants
-import NavbarMenu from "./components/menu/ToBarMenu";
+
+import TopBarMenu from "./components/menu/TopBarMenu";
 import SideBarMenuLeft from "./components/menu/SideBarMenuLeft";
 
 //#endregion
@@ -32,24 +36,21 @@ import SideBarMenuLeft from "./components/menu/SideBarMenuLeft";
 //#endregion
 
 //#region React
-import { React, useState, createContext } from "react";
+
+import { React, createContext } from "react";
 
 import { useCookies } from "react-cookie";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#endregion
 
 import PageTest from "./Views/Home/Test";
 import ViewerWord from "./Views/Viewer/ViewerWord";
 import DevisPage from "./Views/Devis/DevisPage";
-import { Breakpoint, BreakpointProvider } from "react-socks";
-import { Navbar } from "react-bootstrap";
-import ClientSitePage from "./Views/Home/ClientSitePage";
 
 //#endregion
-
-// library.add(faFileAlt, faSearch, faClock, faCalendarPlus, faYinYang, faFolder);
 
 //#region Context
 export const TokenContext = createContext(null);
@@ -80,25 +81,18 @@ function App() {
 
   //#region ClientSiteContrat
 
-  const storedListe = JSON.parse(
-    localStorage.getItem("listeClientSiteContrat")
-  );
-  // eslint-disable-next-line
-  const [listeClientSiteContrat, setListeClientSiteContrat] = useState([]);
-  const setListe = (liste) => {
-    localStorage.setItem("listeClientSiteContrat", JSON.stringify(liste));
-    setListeClientSiteContrat(liste);
-  };
+  const clientSiteName = cyrb53("clientSiteHashed").toString();
+  const [clientSiteCookie, setClientSiteCookie, removeClientSiteCookie] =
+    useCookies([clientSiteName]);
 
-  const storedClientSite = JSON.parse(
-    localStorage.getItem("clientSiteContrat")
-  );
-  // eslint-disable-next-line
-  const [clientSiteContrat, setClientSiteContrat] = useState(null);
-  const setClientSite = (clientSite) => {
-    localStorage.setItem("clientSiteContrat", JSON.stringify(clientSite));
-    setClientSiteContrat(clientSite);
-  };
+  function setClientSite(clientSite) {
+    setClientSiteCookie(clientSiteName, clientSite);
+  }
+  const storedClientSite = clientSiteCookie[clientSiteName];
+
+  function removeclientSite() {
+    removeClientSiteCookie(clientSiteName);
+  }
 
   //#endregion
 
@@ -130,20 +124,17 @@ function App() {
   const handleDeconnexion = () => {
     removeTokenCookie(tokenName);
     removeListeParamsCookie(listParamName);
+    removeClientSiteCookie(clientSiteName);
   };
 
   if (!tokenCookie[tokenName]) {
     return (
-      <ListeClientSiteContratContext.Provider
-        value={{ storedListe, setListe, storedClientSite, setClientSite }}
-      >
-        <div className="App font-link background">
-          <LoginPage
-            setToken={setTokenViaCookies}
-            setParams={setListeParamsViaCookies}
-          />
-        </div>
-      </ListeClientSiteContratContext.Provider>
+      <div className="App font-link background">
+        <LoginPage
+          setToken={setTokenViaCookies}
+          setParams={setListeParamsViaCookies}
+        />
+      </div>
     );
   }
 
@@ -155,26 +146,40 @@ function App() {
       <Routes>
         <Route path="/test" element={<PageTest />} />
 
-
-        <Route path="/:lerest" element={<HomePage />} />
-        <Route path="/" element={<HomePage />} />
+        <Route path="/:lerest" element={<ClientSitePage />} />
+        <Route path="/" element={<ClientSitePage />} />
 
         <Route path="/waiting" element={<WaiterPage />} />
         <Route path="/error" element={<ErrorPage />} />
 
         <Route path="/viewerWord" element={<ViewerWord />} />
 
-        <Route path="/clientsite" element={<ClientSitePage />} />
-        
-        <Route path="/contrat" element={<ContratPage />} />
-        <Route path="/appareils" element={<AppareilsPage />} />
-        <Route path="/interventions" element={<InterventionPage />} />
+        <Route
+          path="/contrat"
+          element={storedClientSite ? <ContratPage /> : <ClientSitePage />}
+        />
+        <Route
+          path="/appareils"
+          element={storedClientSite ? <AppareilsPage /> : <ClientSitePage />}
+        />
+        <Route
+          path="/interventions"
+          element={storedClientSite ? <InterventionPage /> : <ClientSitePage />}
+        />
         <Route
           path="/nouvelleintervention"
-          element={<NouvelleInterventionPage />}
+          element={
+            storedClientSite ? <NouvelleInterventionPage /> : <ClientSitePage />
+          }
         />
-        <Route path="/devis" element={<DevisPage />} />
-        <Route path="/factures" element={<FacturesPage />} />
+        <Route
+          path="/devis"
+          element={storedClientSite ? <DevisPage /> : <ClientSitePage />}
+        />
+        <Route
+          path="/factures"
+          element={storedClientSite ? <FacturesPage /> : <ClientSitePage />}
+        />
       </Routes>
     );
   };
@@ -182,7 +187,7 @@ function App() {
   const SmallDown = () => {
     return (
       <Breakpoint small down>
-        <NavbarMenu handleDeconnexion={handleDeconnexion} />
+        <TopBarMenu handleDeconnexion={handleDeconnexion} />
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <AppRoutes />
       </Breakpoint>
@@ -192,13 +197,13 @@ function App() {
   const LargeUp = () => {
     return (
       <Breakpoint medium up className="p-0 m-0">
-        <Row className="background m-0">
+        <Row className="background  m-0">
           <Col md={"auto"} className="p-0">
             <SideBarMenuLeft />
           </Col>
 
-          <Col className="App font-link p-0">
-            <NavbarMenu handleDeconnexion={handleDeconnexion} />
+          <Col className="App font-link p-0 ">
+            <TopBarMenu handleDeconnexion={handleDeconnexion} />
             <AppRoutes />
           </Col>
         </Row>
@@ -211,14 +216,13 @@ function App() {
   return (
     <TokenContext.Provider value={tokenCookie[tokenName]}>
       <ClientSiteContratContext.Provider
-        value={{ storedClientSite, setClientSite, storedListe }}
+        value={{ storedClientSite, setClientSite, removeclientSite }}
       >
         <ParametresContext.Provider value={listeParamsCookie[listParamName]}>
           <Router>
             <BreakpointProvider>
-            <SmallDown />
-            <LargeUp />
-            
+              <SmallDown />
+              <LargeUp />
             </BreakpointProvider>
           </Router>
         </ParametresContext.Provider>

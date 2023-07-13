@@ -1,4 +1,5 @@
-import { Col, Placeholder } from "react-bootstrap";
+import Col from "react-bootstrap/Col";
+import Placeholder from "react-bootstrap/Placeholder";
 
 const TitreOfPage = ({ titre, soustitre, isLoaded }) => {
   const PlaceholderST = () => {

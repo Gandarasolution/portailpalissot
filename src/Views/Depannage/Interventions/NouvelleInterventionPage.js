@@ -25,8 +25,9 @@ import {
   TokenContext,
 } from "../../../App";
 import { useEffect } from "react";
-import { GetListeSecteur } from "../../../axios/WSGandara";
+import { GetListeSecteur, GetListeTels } from "../../../axios/WSGandara";
 import { Placeholder } from "react-bootstrap";
+import { ParseKVAsArray } from "../../../functions";
 
 //#endregion
 
@@ -47,10 +48,10 @@ const NouvelleInterventionPage = () => {
   const [objetDemande, setObjetDemande] = useState("");
 
   const [listeTels, setListeTel] = useState([
-    { k: "Portable", v: "06 05 04 03 02" },
-    { k: "Domicile", v: "03 04 05 06 07" },
+    // { k: "Portable", v: "06 05 04 03 02" },
+    // { k: "Domicile", v: "03 04 05 06 07" },
   ]);
-  const [telChoix, setTelChoix] = useState(listeTels[0].v);
+  const [telChoix, setTelChoix] = useState();
   const [customTel, setCustomTel] = useState("");
 
   const [isLoadedSecteurs, setIsLoadedSecteurs] = useState(false);
@@ -66,9 +67,8 @@ const NouvelleInterventionPage = () => {
       setIsLoadedSecteurs(true);
     };
 
-    // eslint-disable-next-line
     const FetchSetTel = (data) => {
-      setListeTel(JSON.parse(data));
+      setListeTel(ParseKVAsArray(data));
       setIsLoadedTel(true);
     };
 
@@ -76,6 +76,12 @@ const NouvelleInterventionPage = () => {
       TokenCt,
       ClientSiteCt.storedClientSite.IdClientSiteRelation,
       FetchSetSecteurs
+    );
+
+    GetListeTels(
+      TokenCt,
+      ClientSiteCt.storedClientSite.IdClientSite,
+      FetchSetTel
     );
   };
 
@@ -211,8 +217,7 @@ const NouvelleInterventionPage = () => {
               <span className=" m-4">
                 <h3 style={{ color: "red" }}>
                   <FontAwesomeIcon icon={faBell} className="me-2" />
-                  En cas d'urgence contactez le
-                  {" "}
+                  En cas d'urgence contactez le{" "}
                   <a
                     className="text-decoration-none"
                     href={`tel:${

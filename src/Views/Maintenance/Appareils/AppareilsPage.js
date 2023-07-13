@@ -5,8 +5,10 @@ import { useState, useEffect, useContext } from "react";
 //#endregion
 
 //#region Bootstrap
+
 import Container from "react-bootstrap/Container";
 import Image from "react-bootstrap/Image";
+import Badge from "react-bootstrap/Badge";
 
 //#endregion
 
@@ -24,7 +26,6 @@ import TableData, {
 //#region DEV
 import { GetListeAppareils } from "../../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
-import { Badge } from "react-bootstrap";
 import TitreOfPage from "../../../components/commun/TitreOfPage";
 
 //#endregion

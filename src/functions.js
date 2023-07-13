@@ -1,5 +1,3 @@
-
-
 var groupBy = function (xs, key) {
   return xs.reduce(function (rv, x) {
     (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -37,9 +35,7 @@ function FiltrerUnSearch(fieldname, _lData, arrayFilters) {
   return _lData;
 }
 
-
-function FiltrerParSeuilDate(_lData, arrayFilters)
-{
+function FiltrerParSeuilDate(_lData, arrayFilters) {
   let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
 
   for (let index = 0; index < _arFilters.length; index++) {
@@ -50,9 +46,7 @@ function FiltrerParSeuilDate(_lData, arrayFilters)
   return _lData;
 }
 
-
-function FiltrerUnSeuilDate(fieldname, _lData, arrayFilters)
-{
+function FiltrerUnSeuilDate(fieldname, _lData, arrayFilters) {
   let _arColonne = arrayFilters.filter(
     (filter) => filter.fieldname === fieldname
   );
@@ -61,8 +55,10 @@ function FiltrerUnSeuilDate(fieldname, _lData, arrayFilters)
       return (
         _arColonne.filter((filter) => {
           return (
-            ParseDateFormat(data[fieldname]).getTime() <= new Date(filter.max).getTime() &&
-            ParseDateFormat(data[fieldname]).getTime() >= new Date(filter.min).getTime()
+            ParseDateFormat(data[fieldname]).getTime() <=
+              new Date(filter.max).getTime() &&
+            ParseDateFormat(data[fieldname]).getTime() >=
+              new Date(filter.min).getTime()
           );
         }).length > 0
       );
@@ -71,23 +67,20 @@ function FiltrerUnSeuilDate(fieldname, _lData, arrayFilters)
   return _lData;
 }
 
-
 const ParseDateFormat = (text) => {
-      
   try {
-    
     var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
     let _match = text.match(dateRegex)[0];
 
-    return new Date(_match.substring(6),_match.substring(3, 5) -1 ,_match.substring(0, 2))
-    
-    
+    return new Date(
+      _match.substring(6),
+      _match.substring(3, 5) - 1,
+      _match.substring(0, 2)
+    );
   } catch {
     return text;
   }
-  
-}
-
+};
 
 function FiltrerParSeuil(_lData, arrayFilters) {
   let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
@@ -288,37 +281,46 @@ function DateSOAP(date) {
 }
 
 function HTMLEncode(text) {
-  return text
-    // .replace(/&/g, "&amp;")
-    // .replace(/>/g, "&gt;")
-    // .replace(/</g, "&lt;")
-    // .replace(/"/g, "&quot;")
-    .replace(/\//g, "");
+  return (
+    text
+      // .replace(/&/g, "&amp;")
+      // .replace(/>/g, "&gt;")
+      // .replace(/</g, "&lt;")
+      // .replace(/"/g, "&quot;")
+      .replace(/\//g, "")
+  );
 }
 
-function URLReplace(text){
-  return text.replace(/&/g, ";amp;")
-  .replace(/\?/g, ";qmk;")
+function URLReplace(text) {
+  return text.replace(/&/g, ";amp;").replace(/\?/g, ";qmk;");
 }
 
-function ULRDeplace(text){
-  return text.replace(/;qmk;/g,"?")
-  .replace(/;amp;/g,"&")
+function ULRDeplace(text) {
+  return text.replace(/;qmk;/g, "?").replace(/;amp;/g, "&");
 }
 
-
-function RegexTestAndReturnMatch(data,regex){
-  let _test  = regex.test(data);
-  if(_test)
-  {
+function RegexTestAndReturnMatch(data, regex) {
+  let _test = regex.test(data);
+  if (_test) {
     let _match = data.match(regex)[0];
     return _match;
   }
   return data;
-
 }
 
+function ParseKVAsArray(kv) {
+  let _array = [];
 
+  if (Array.isArray(kv)) {
+    _array = kv;
+  } else {
+    if (kv) {
+      _array.push(kv);
+    }
+  }
+
+  return _array;
+}
 
 export {
   FiltrerParSeuilDate,
@@ -336,4 +338,5 @@ export {
   URLReplace,
   ULRDeplace,
   RegexTestAndReturnMatch,
+  ParseKVAsArray,
 };

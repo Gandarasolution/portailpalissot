@@ -1,7 +1,6 @@
 //#region Imports
 
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState,useEffect,useContext } from "react";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
@@ -22,7 +21,6 @@ import TableData, {
   EditorMontant,
 } from "../../components/commun/TableData";
 import { GetListeDevis } from "../../axios/WSGandara";
-import { useContext } from "react";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 
 //#endregion

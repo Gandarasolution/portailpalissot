@@ -6,7 +6,6 @@ import Container from "react-bootstrap/Container";
 //#endregion
 
 //#region Components
-import WhiteShadowCard from "../../components/commun/WhiteShadowCard";
 
 //#endregion
 
@@ -14,14 +13,8 @@ import React from "react";
 //#endregion
 
 const ErrorPage = () => {
-  document.title="Une erreur est survenue";
-  return (
-    <Container fluid>
-      <WhiteShadowCard icon="yin-yang" title="Portail GMAO">
-        Une erreur s'est produite :(
-      </WhiteShadowCard>
-    </Container>
-  );
+  document.title = "Une erreur est survenue";
+  return <Container fluid>Une erreur s'est produite :(</Container>;
 };
 
 export default ErrorPage;

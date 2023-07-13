@@ -589,14 +589,12 @@ const TableData = ({ ...props }) => {
       }
       setArraySearch(_arrSearch);
       ResetAffichage(1);
-
     };
 
     //#endregion
-    
+
     const SupprimerFiltreColonne = () => {
-  
-      function removeValue(array,setArray){
+      function removeValue(array, setArray) {
         let _array = JSON.parse(JSON.stringify(array));
         _array = _array.filter((f) => f.fieldname !== fieldname);
         setArray(_array);
@@ -605,19 +603,18 @@ const TableData = ({ ...props }) => {
       removeValue(arrayFilterRangeDate, setArrayFilterRangeDate);
       removeValue(arrayFilterSeuis, setArrayFilterSeuils);
       removeValue(arraySearch, setArraySearch);
-    }
-    
+    };
+
     return (
-      
       <Popover className="popover-filters">
-        <Tabs fill
+        <Tabs
+          fill
           defaultActiveKey={
             Object.entries(_headerToApply.filter).find(
               (value) => value[0] !== "isFilter" && value[1]
             )[0]
           }
         >
-          
           {/* Checkbox */}
           {_headerToApply.filter.isCheckbox && (
             <Tab title="Valeur" eventKey={"isCheckbox"}>
@@ -749,13 +746,22 @@ const TableData = ({ ...props }) => {
             </Tab>
           )}
 
-          <Tab  title={<span> <OverlayTrigger overlay={<Popover>Supprimer les filtres</Popover>}>
-              <FontAwesomeIcon onClick={SupprimerFiltreColonne} icon={faFilterCircleXmark} />
-            
-            </OverlayTrigger>
-               </span>} />
+          <Tab
+            title={
+              <span>
+                {" "}
+                <OverlayTrigger
+                  overlay={<Popover>Supprimer les filtres</Popover>}
+                >
+                  <FontAwesomeIcon
+                    onClick={SupprimerFiltreColonne}
+                    icon={faFilterCircleXmark}
+                  />
+                </OverlayTrigger>
+              </span>
+            }
+          />
         </Tabs>
-
       </Popover>
     );
   };

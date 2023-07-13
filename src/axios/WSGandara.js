@@ -5,11 +5,10 @@ import { HTMLEncode } from "../functions";
 //#endregion
 
 //#region Données
- const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
 // const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
-
 
 //#region Fonction publics
 
@@ -44,17 +43,19 @@ const GetListeParametres = async (token, setData) => {
       }
     },
   });
-
-  // setData([{k:"TelUrgenceIntervention", v:"01 02 03 04 05"}]);
 };
 
-const GetClientSiteContrat = async (token, setClientSiteContrat) => {
-  $.ajax({
+const GetClientSiteContrat = async (token, setData) => {
+  await $.ajax({
     type: "POST",
     url: urlAction + "GetClientSiteContrat",
     data: { token: token },
     success(data) {
-      setClientSiteContrat(JSON.parse(data));
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
     },
   });
 };
@@ -63,8 +64,6 @@ const GetClientSiteContrat = async (token, setClientSiteContrat) => {
 
 //#region Contrat
 
-
-
 // const GetPrestationContratOriginal = async (
 //   token,
 //   dateDebut,
@@ -72,7 +71,7 @@ const GetClientSiteContrat = async (token, setClientSiteContrat) => {
 //   IdSite,
 //   setData
 // ) => {
-  
+
 //   $.ajax({
 //     type: "POST",
 //     url: urlAction + "GetPrestationContrat",
@@ -98,16 +97,7 @@ const GetClientSiteContrat = async (token, setClientSiteContrat) => {
 //   });
 // };
 
-
-
-const GetPrestationContrat =  (
-  token,
-  dateDebut,
-  dateFin,
-  IdSite,
-  setData
-) => {
-  
+const GetPrestationContrat = (token, dateDebut, dateFin, IdSite, setData) => {
   var xhr = $.ajax({
     type: "POST",
     url: urlAction + "GetPrestationContrat",
@@ -132,17 +122,8 @@ const GetPrestationContrat =  (
     },
   });
 
-
   return xhr;
-  
-
 };
-
-
-
-
-
-
 
 const GetPrestationReleveTache = async (
   token,
@@ -183,22 +164,25 @@ const GetDocumentPrestation = async (
     url: urlAction + "GetDocumentsPrestation",
     data: { token: token, IdDossierIntervention: IdDossierIntervention },
     success(data) {
-      setDocuments(data,presta);
+      setDocuments(data, presta);
     },
   });
 };
 
-const GetDocumentPrestationRapport = async (token, IdMobiliteIntervention,telecharger, returnData) => {
-
-  if(returnData)
-  {
+const GetDocumentPrestationRapport = async (
+  token,
+  IdMobiliteIntervention,
+  telecharger,
+  returnData
+) => {
+  if (returnData) {
     let _return = undefined;
     await $.ajax({
       type: "POST",
       url: urlAction + "GetDocumentPrestationRapport",
       data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
       success(data) {
-        _return = JSON.parse(data)
+        _return = JSON.parse(data);
       },
     });
 
@@ -226,20 +210,22 @@ const GetDocumentPrestationRapport = async (token, IdMobiliteIntervention,telech
       targetWindow.location.href = `/error?error=${error.status}`;
     },
   });
+};
 
-}
-
-const GetDocumentPrestationCERFA = async (token, IdMobiliteIntervention,telecharger, returnData) => {
-
-  if(returnData)
-  {
+const GetDocumentPrestationCERFA = async (
+  token,
+  IdMobiliteIntervention,
+  telecharger,
+  returnData
+) => {
+  if (returnData) {
     let _return = undefined;
     await $.ajax({
       type: "POST",
       url: urlAction + "GetDocumentPrestationCERFA",
       data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
       success(data) {
-        _return = JSON.parse(data)
+        _return = JSON.parse(data);
       },
     });
 
@@ -267,19 +253,22 @@ const GetDocumentPrestationCERFA = async (token, IdMobiliteIntervention,telechar
       targetWindow.location.href = `/error?error=${error.status}`;
     },
   });
+};
 
-}
-
-const GetDocumentPrestationExtranet = async (token, fullPath,telecharger,returnData) => {
-  if(returnData)
-  {
+const GetDocumentPrestationExtranet = async (
+  token,
+  fullPath,
+  telecharger,
+  returnData
+) => {
+  if (returnData) {
     let _return = undefined;
     await $.ajax({
       type: "POST",
       url: urlAction + "GetDocumentPrestationExtranet",
       data: { token: token, fullPath: fullPath },
       success(data) {
-        _return = JSON.parse(data)
+        _return = JSON.parse(data);
       },
     });
 
@@ -307,12 +296,15 @@ const GetDocumentPrestationExtranet = async (token, fullPath,telecharger,returnD
       targetWindow.location.href = `/error?error=${error.status}`;
     },
   });
-}
+};
 
-const GetDocumentPrestationTicket = async (token, IdPJ,telecharger, returnData) => {
-
-  if(returnData)
-  {
+const GetDocumentPrestationTicket = async (
+  token,
+  IdPJ,
+  telecharger,
+  returnData
+) => {
+  if (returnData) {
     let _return = undefined;
     await $.ajax({
       type: "POST",
@@ -321,16 +313,17 @@ const GetDocumentPrestationTicket = async (token, IdPJ,telecharger, returnData) 
       success(data) {
         let _data = JSON.parse(data);
 
-        if( _data.k.substring(0 , _data.k.length - 4).split(".").pop() === "jpg" )
-        {
-          _data.k = _data.k.substring(0,_data.k.length - 4);
+        if (
+          _data.k
+            .substring(0, _data.k.length - 4)
+            .split(".")
+            .pop() === "jpg"
+        ) {
+          _data.k = _data.k.substring(0, _data.k.length - 4);
           _return = _data;
+        } else {
+          _return = JSON.parse(data);
         }
-        else {
-          _return = JSON.parse(data)
-
-        }
-        
       },
     });
 
@@ -348,19 +341,20 @@ const GetDocumentPrestationTicket = async (token, IdPJ,telecharger, returnData) 
         targetWindow.location.href = `/error?error=500`;
       }
       const _kv = JSON.parse(data);
-      
 
-      if( _kv.k.substring(0 , _kv.k.length - 4).split(".").pop() === "jpg" )
-      {
-        _kv.k = _kv.k.substring(0,_kv.k.length - 4);
+      if (
+        _kv.k
+          .substring(0, _kv.k.length - 4)
+          .split(".")
+          .pop() === "jpg"
+      ) {
+        _kv.k = _kv.k.substring(0, _kv.k.length - 4);
       }
 
       if (telecharger) {
-
         // TelechargerDocument(_kv.v, _kv.k, targetWindow);
         TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
       } else {
-
         VoirDocument(_kv.v, _kv.k, targetWindow);
       }
     },
@@ -368,9 +362,7 @@ const GetDocumentPrestationTicket = async (token, IdPJ,telecharger, returnData) 
       targetWindow.location.href = `/error?error=${error.status}`;
     },
   });
-
-}
-
+};
 
 //#endregion
 
@@ -406,8 +398,7 @@ const VoirDocumentOffice = async (b64, filename) => {
     },
   });
   return _urlRetour;
-}
-
+};
 
 const TelechargerDocument = (b64, filename, targetWindow) => {
   $.ajax({
@@ -428,19 +419,15 @@ const TelechargerDocument = (b64, filename, targetWindow) => {
 };
 
 const TelechargerZIP = (files, filename) => {
- 
-    $.ajax({
-      type: "POST",
-      url: `${urlAction}ZIPDocs`,
-      data: { arrayDocs: files, filename: filename },
-      success(data) {
-        const urlToOpen = `${urlAction}DownloadDocument&filename=${data}`;
-          window.open(urlToOpen, "_blank");
-
-      },
-     
-    });
- 
+  $.ajax({
+    type: "POST",
+    url: `${urlAction}ZIPDocs`,
+    data: { arrayDocs: files, filename: filename },
+    success(data) {
+      const urlToOpen = `${urlAction}DownloadDocument&filename=${data}`;
+      window.open(urlToOpen, "_blank");
+    },
+  });
 };
 
 //#endregion
@@ -494,49 +481,51 @@ const GetListeFactures = async (
   });
 };
 
-const VoirFactureDocument = async (token, IdFacture, TypeFacture, Avoir, returnData) => {
-if (returnData)
-{
-  let _return = undefined;
-  await $.ajax({
-    type: "POST",
-    url: urlAction + "GetFactureDocument",
-    data: {
-      token: token,
-      IdFacture: IdFacture,
-      TypeFacture: TypeFacture,
-      Avoir: Number(Avoir),
-    },
-    success(data) {
-      const _kv = JSON.parse(data);
-      _return = _kv;
-    },
-  });
+const VoirFactureDocument = async (
+  token,
+  IdFacture,
+  TypeFacture,
+  Avoir,
+  returnData
+) => {
+  if (returnData) {
+    let _return = undefined;
+    await $.ajax({
+      type: "POST",
+      url: urlAction + "GetFactureDocument",
+      data: {
+        token: token,
+        IdFacture: IdFacture,
+        TypeFacture: TypeFacture,
+        Avoir: Number(Avoir),
+      },
+      success(data) {
+        const _kv = JSON.parse(data);
+        _return = _kv;
+      },
+    });
 
-  return _return;
-}else {
-
-  let targetWindow = window.open("/waiting");
-  $.ajax({
-    type: "POST",
-    url: urlAction + "GetFactureDocument",
-    data: {
-      token: token,
-      IdFacture: IdFacture,
-      TypeFacture: TypeFacture,
-      Avoir: Number(Avoir),
-    },
-    success(data) {
-      const _kv = JSON.parse(data);
-      VoirDocument(_kv.v, _kv.k, targetWindow);
-    },
-    error(error) {
-      targetWindow.location.href = `/error?error=${error.status}`;
-    },
-  });
-
-}
-
+    return _return;
+  } else {
+    let targetWindow = window.open("/waiting");
+    $.ajax({
+      type: "POST",
+      url: urlAction + "GetFactureDocument",
+      data: {
+        token: token,
+        IdFacture: IdFacture,
+        TypeFacture: TypeFacture,
+        Avoir: Number(Avoir),
+      },
+      success(data) {
+        const _kv = JSON.parse(data);
+        VoirDocument(_kv.v, _kv.k, targetWindow);
+      },
+      error(error) {
+        targetWindow.location.href = `/error?error=${error.status}`;
+      },
+    });
+  }
 };
 
 const TelechargerFactureDocument = async (
@@ -656,7 +645,6 @@ const GetDocumentFISAV = async (
       },
       success(data) {
         if (data !== "500") {
-          
           _return = JSON.parse(data);
         }
       },
@@ -716,9 +704,7 @@ const GetListeSecteur = async (token, IdClientSiteRelation, setData) => {
 
 //#endregion
 
-
 //#region Devis
-
 
 const GetListeDevis = (token, IdClientSiteRelation, setData) => {
   $.ajax({
@@ -737,18 +723,17 @@ const GetListeDevis = (token, IdClientSiteRelation, setData) => {
       }
     },
   });
-}
+};
 
 const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
-  if(returnData)
-  {
+  if (returnData) {
     let _return = undefined;
     await $.ajax({
       type: "POST",
       url: urlAction + "GetdocumentDevis",
       data: { token: token, IdDevis: IdDevis },
       success(data) {
-          _return = JSON.parse(data)
+        _return = JSON.parse(data);
       },
     });
 
@@ -776,13 +761,9 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
       targetWindow.location.href = `/error?error=${error.status}`;
     },
   });
-
-}
-
+};
 
 //#endregion
-
-
 
 const GetListeTels = (token, IdClientSite, setData) => {
   $.ajax({
@@ -801,9 +782,7 @@ const GetListeTels = (token, IdClientSite, setData) => {
       }
     },
   });
-}
-
-
+};
 
 const GetListeMails = (token, IdClientSite, setData) => {
   $.ajax({
@@ -822,37 +801,56 @@ const GetListeMails = (token, IdClientSite, setData) => {
       }
     },
   });
-}
+};
 
+const GetNombrePortails = (token, IdClientSiteRelation, setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "GetNombrePortails",
+
+    data: {
+      token: token,
+      IdClientSiteRelation: IdClientSiteRelation,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+};
 
 //#endregion
 
 export {
-  Connexion
-  ,GetListeParametres
-  ,GetClientSiteContrat
-  ,VoirDocument
-  ,TelechargerDocument
-  ,TelechargerZIP
- , GetPrestationContrat
-  ,GetPrestationReleveTache
-  ,GetDocumentPrestation
-  ,GetDocumentPrestationRapport
-  ,GetDocumentPrestationCERFA
- , GetDocumentPrestationTicket
- , GetDocumentPrestationExtranet
- , GetListeAppareils
-  ,GetListeFactures
- , VoirFactureDocument
-  ,TelechargerFactureDocument
-  ,GetListeInterventions
-  ,GetListeFIIntervention
-  ,GeTListeFactureIntervention
-  ,GetDocumentFISAV
-  ,GetListeSecteur
-  ,VoirDocumentOffice
-  ,GetListeDevis
-  ,GetdocumentDevis
-  ,GetListeTels
-  ,GetListeMails
+  Connexion,
+  GetListeParametres,
+  GetClientSiteContrat,
+  VoirDocument,
+  TelechargerDocument,
+  TelechargerZIP,
+  GetPrestationContrat,
+  GetPrestationReleveTache,
+  GetDocumentPrestation,
+  GetDocumentPrestationRapport,
+  GetDocumentPrestationCERFA,
+  GetDocumentPrestationTicket,
+  GetDocumentPrestationExtranet,
+  GetListeAppareils,
+  GetListeFactures,
+  VoirFactureDocument,
+  TelechargerFactureDocument,
+  GetListeInterventions,
+  GetListeFIIntervention,
+  GeTListeFactureIntervention,
+  GetDocumentFISAV,
+  GetListeSecteur,
+  VoirDocumentOffice,
+  GetListeDevis,
+  GetdocumentDevis,
+  GetListeTels,
+  GetListeMails,
+  GetNombrePortails,
 };

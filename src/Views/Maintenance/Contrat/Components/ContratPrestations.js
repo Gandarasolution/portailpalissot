@@ -1,5 +1,5 @@
 //#region Imports
-import { createContext,  useState } from "react";
+import { createContext, useState } from "react";
 
 //#region Bootstrap
 import Button from "react-bootstrap/Button";
@@ -48,7 +48,6 @@ const ContratPrestation = ({
   ParentComponentPeriodeSelect,
   IsLoaded,
 }) => {
-
   const [showModalDoc, setShowModalDoc] = useState(false);
   const [showModalTaches, setShowModalTache] = useState(false);
   const [prestaSelected, setPrestaSelected] = useState(null);
@@ -87,8 +86,6 @@ const ContratPrestation = ({
     }
   }
 
-
-
   const GetPrestationTrimmed = () => {
     let _lPrestation = Prestations;
     for (let index = 0; index < _lPrestation.length; index++) {
@@ -115,7 +112,6 @@ const ContratPrestation = ({
     return _lPrestation;
   };
 
-
   const _methodeDate = (e) => {
     return `${GetNomMois(new Date(e).getMonth() + 1)}  ${new Date(
       e
@@ -125,14 +121,43 @@ const ContratPrestation = ({
   function CreateHeaderForTable() {
     let _headers = [];
     _headers.push(
-      CreateNewHeader("DateInterventionPrestationTrimed", CreateFilter(true,true,false,false), "Date")
+      CreateNewHeader(
+        "DateInterventionPrestationTrimed",
+        CreateFilter(true, true, false, false),
+        "Date"
+      )
     );
-    _headers.push(CreateNewHeader("Secteur", CreateFilter(true,true,false,true), "Secteur"));
-    _headers.push(CreateNewHeader("IdPrestationContrat", CreateFilter(true,true,true,true), "N°"));
     _headers.push(
-      CreateNewHeader("DescriptionPrestationContrat", CreateFilter(true,true,false,true), "Libellé")
+      CreateNewHeader(
+        "Secteur",
+        CreateFilter(true, true, false, true),
+        "Secteur"
+      )
     );
-    _headers.push(CreateNewHeader("IdEtat", CreateFilter(true,true,false,false), "Etat",(e)=>{return GetLibEtat(e)}));
+    _headers.push(
+      CreateNewHeader(
+        "IdPrestationContrat",
+        CreateFilter(true, true, true, true),
+        "N°"
+      )
+    );
+    _headers.push(
+      CreateNewHeader(
+        "DescriptionPrestationContrat",
+        CreateFilter(true, true, false, true),
+        "Libellé"
+      )
+    );
+    _headers.push(
+      CreateNewHeader(
+        "IdEtat",
+        CreateFilter(true, true, false, false),
+        "Etat",
+        (e) => {
+          return GetLibEtat(e);
+        }
+      )
+    );
     _headers.push(CreateNewUnboundHeader(CreateFilter(false), "Actions"));
 
     return _headers;
@@ -172,22 +197,34 @@ const ContratPrestation = ({
     return _cells;
   }
 
-
-  function CreateButtonFiltersForTable()
-  {
+  function CreateButtonFiltersForTable() {
     let _arrBt = [];
-  
-    _arrBt.push(CreateNewButtonFilter("IdEtat",1,(e)=> {return GetLibEtat(e)}));
-    _arrBt.push(CreateNewButtonFilter("IdEtat",95,(e)=> {return GetLibEtat(e)}));
-    _arrBt.push(CreateNewButtonFilter("IdEtat",3,(e)=> {return GetLibEtat(e)}));
-    _arrBt.push(CreateNewButtonFilter("IdEtat",96,(e)=> {return GetLibEtat(e)}));
+
+    _arrBt.push(
+      CreateNewButtonFilter("IdEtat", 1, (e) => {
+        return GetLibEtat(e);
+      })
+    );
+    _arrBt.push(
+      CreateNewButtonFilter("IdEtat", 95, (e) => {
+        return GetLibEtat(e);
+      })
+    );
+    _arrBt.push(
+      CreateNewButtonFilter("IdEtat", 3, (e) => {
+        return GetLibEtat(e);
+      })
+    );
+    _arrBt.push(
+      CreateNewButtonFilter("IdEtat", 96, (e) => {
+        return GetLibEtat(e);
+      })
+    );
 
     return _arrBt;
   }
 
-
   //#endregion
-
 
   //#region TableData
 
@@ -201,23 +238,32 @@ const ContratPrestation = ({
     );
   };
 
-
   const EditorCardBody = (presta) => {
-
     return (
       <>
         <h6>{`Secteur : ${presta.Secteur}`}</h6>
-        <Button className={`m-2 p-2 noBorder ${presta.IdEtat === 96 ? "bg-success" : "bg-secondary"} `}
-        onClick={() => { if(presta.IdEtat === 96 ) {setShowModalDoc(true);setPrestaSelected(presta);}}}>
-          <FontAwesomeIcon icon={faFile}  /> Liste des documents
+        <Button
+          className={`m-2 p-2 noBorder ${
+            presta.IdEtat === 96 ? "bg-success" : "bg-secondary"
+          } `}
+          onClick={() => {
+            if (presta.IdEtat === 96) {
+              setShowModalDoc(true);
+              setPrestaSelected(presta);
+            }
+          }}
+        >
+          <FontAwesomeIcon icon={faFile} /> Liste des documents
         </Button>
         <Button
           className="m-2 p-2 noBorder bg-success"
-          onClick={() => {setShowModalTache(true);setPrestaSelected(presta);} }
+          onClick={() => {
+            setShowModalTache(true);
+            setPrestaSelected(presta);
+          }}
         >
           <FontAwesomeIcon icon={faList} /> Relevés de tâches
         </Button>
-       
       </>
     );
   };
@@ -243,7 +289,6 @@ const ContratPrestation = ({
     );
   };
 
-
   const EditorActionDocuments = (presta) => {
     return (
       <Button className="ms-2">
@@ -251,19 +296,17 @@ const ContratPrestation = ({
           placement="bottom"
           overlay={<Tooltip>Liste des documents</Tooltip>}
         >
-          {
-            presta.IdEtat === 96 ?
+          {presta.IdEtat === 96 ? (
             <FontAwesomeIcon
-            icon={faFileAlt}
-            // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
-          />
-          :
-          <FontAwesomeIcon
-          icon={faBan}
-          // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
-        />
-          }
-       
+              icon={faFileAlt}
+              // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
+            />
+          ) : (
+            <FontAwesomeIcon
+              icon={faBan}
+              // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
+            />
+          )}
         </OverlayTrigger>
       </Button>
     );
@@ -277,7 +320,7 @@ const ContratPrestation = ({
           overlay={<Tooltip>Relevés de tâches</Tooltip>}
         >
           <span>
-            <FontAwesomeIcon icon={faListCheck}  />
+            <FontAwesomeIcon icon={faListCheck} />
           </span>
         </OverlayTrigger>
       </Button>
@@ -291,8 +334,6 @@ const ContratPrestation = ({
     const _Cells = CreateCellsForTable();
     const _ButtonFilters = CreateButtonFiltersForTable();
 
-
-
     const _CardModel = CreateNewCardModel(
       EditorCardBody,
       EditorCardTitle,
@@ -301,36 +342,42 @@ const ContratPrestation = ({
     );
 
     return (
-      <PrestaContext.Provider value={{showModalDoc, showModalTaches, setShowModalDoc, setShowModalTache, prestaSelected}} >
-
-      <TableData
-        Data={GetPrestationTrimmed()}
-        Headers={_Headers}
-        Cells={_Cells}
-        IsLoaded={IsLoaded}
-        Pagination
-        
-        TopPannelRightToSearch={
-          <Col md={"auto"} className="m-1">
-            {ParentComponentPeriodeSelect}
-          </Col>
-        }
-
-        CardModel={_CardModel}
-        ButtonFilters={_ButtonFilters}
-        
+      <PrestaContext.Provider
+        value={{
+          showModalDoc,
+          showModalTaches,
+          setShowModalDoc,
+          setShowModalTache,
+          prestaSelected,
+        }}
+      >
+        <TableData
+          Data={GetPrestationTrimmed()}
+          Headers={_Headers}
+          Cells={_Cells}
+          IsLoaded={IsLoaded}
+          Pagination
+          TopPannelRightToSearch={
+            <Col md={"auto"} className="m-1">
+              {ParentComponentPeriodeSelect}
+            </Col>
+          }
+          CardModel={_CardModel}
+          ButtonFilters={_ButtonFilters}
         />
-        </PrestaContext.Provider>
+      </PrestaContext.Provider>
     );
   };
 
   //#endregion
 
-
-
   return (
     <Container fluid>
-      <TitreOfPage titre={"Plannification"} soustitre={`${Prestations.length} prestations`} isLoaded={IsLoaded} />
+      <TitreOfPage
+        titre={"Plannification"}
+        soustitre={`${Prestations.length} prestations`}
+        isLoaded={IsLoaded}
+      />
       <TablePrestation />
     </Container>
   );
