@@ -49,6 +49,7 @@ import { Breakpoint, BreakpointProvider } from "react-socks";
 import PageTest from "./Views/Home/Test";
 import ViewerWord from "./Views/Viewer/ViewerWord";
 import DevisPage from "./Views/Devis/DevisPage";
+import { Container } from "react-bootstrap";
 
 //#endregion
 
@@ -79,7 +80,11 @@ function App() {
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
   };
 
+
   //#region ClientSiteContrat
+
+
+
 
   const clientSiteName = cyrb53("clientSiteHashed").toString();
   const [clientSiteCookie, setClientSiteCookie, removeClientSiteCookie] =
@@ -197,12 +202,12 @@ function App() {
   const LargeUp = () => {
     return (
       <Breakpoint medium up className="p-0 m-0">
-        <Row className="background m-0">
+        <Row className="background  m-0">
           <Col md={"auto"} className="p-0">
             <SideBarMenuLeft />
           </Col>
 
-          <Col className="App font-link p-0">
+          <Col className="App font-link p-0 ">
             <TopBarMenu handleDeconnexion={handleDeconnexion} />
             <AppRoutes />
           </Col>

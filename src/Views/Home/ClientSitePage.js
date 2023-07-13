@@ -27,6 +27,9 @@ import Form from "react-bootstrap/Form";
 import TitreOfPage from "../../components/commun/TitreOfPage";
 import {
   GetClientSiteContrat,
+  GetListeMails,
+  GetListeTels,
+  GetNombrePortails,
 } from "../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 
@@ -138,7 +141,26 @@ const ClientSitePage = () => {
 
       const CONTACT = () => {
         const [showTels, setShowTels] = useState(false);
-        const [showMails, setShowMails] = useState(false);
+        const [listeTels, setListeTels] = useState([]);
+        const [telIsLoaded, setTelIsLoaded] = useState(false);
+
+        const HandleShowTel = async () => {
+          const FetchSetTel = (data) => {
+            let _arrayTels = [];
+            if (!Array.isArray(data)) {
+              if (data) {
+                _arrayTels.push(data);
+              }
+            } else {
+              _arrayTels = data;
+            }
+
+            setListeTels(_arrayTels);
+            setTelIsLoaded(true);
+          };
+          setShowTels(true);
+          await GetListeTels(tokenCt, clientSite.IdClientSite, FetchSetTel);
+        };
 
         const ModalTels = () => {
           const TableRowTel = ({ kv }) => {
@@ -150,12 +172,6 @@ const ClientSitePage = () => {
             );
           };
 
-          let _lTels = [];
-          Array.isArray(clientSite.ListeTels.KV)
-            ? (_lTels = clientSite.ListeTels.KV)
-            : clientSite.ListeTels.KV
-            ? _lTels.push(clientSite.ListeTels.KV)
-            : _lTels.push({ k: "Aucune données.", v: "" });
           return (
             <Modal show={showTels} onHide={() => setShowTels(false)}>
               <Modal.Header closeButton>
@@ -173,14 +189,52 @@ const ClientSitePage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {_lTels.map((kv, index) => {
-                      return <TableRowTel key={index} kv={kv} />;
-                    })}
+                    {telIsLoaded ? (
+                      listeTels.map((kv, index) => {
+                        return <TableRowTel key={index} kv={kv} />;
+                      })
+                    ) : (
+                      <tr>
+                        <td>
+                          <Placeholder as="p" animation="glow">
+                            <Placeholder xs={12} />
+                          </Placeholder>
+                        </td>
+                        <td>
+                          <Placeholder as="p" animation="glow">
+                            <Placeholder xs={12} />
+                          </Placeholder>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </Table>
               </Modal.Body>
             </Modal>
           );
+        };
+
+        const [showMails, setShowMails] = useState(false);
+        const [listeMails, setListeMails] = useState([]);
+        const [mailsIsLoaded, setMailsIsLoaded] = useState(false);
+
+        const HandleShowMail = async () => {
+          const FetchSetMail = (data) => {
+            let _arrayMails = [];
+            if (!Array.isArray(data)) {
+              if (data) {
+                _arrayMails.push(data);
+              }
+            } else {
+              _arrayMails = data;
+            }
+
+            setListeMails(_arrayMails);
+            setMailsIsLoaded(true);
+          };
+
+          setShowMails(true);
+          await GetListeMails(tokenCt, clientSite.IdClientSite, FetchSetMail);
         };
 
         const ModalMail = () => {
@@ -192,13 +246,6 @@ const ClientSitePage = () => {
               </tr>
             );
           };
-
-          let _lMails = [];
-          Array.isArray(clientSite.ListeMails.KV)
-            ? (_lMails = clientSite.ListeMails.KV)
-            : clientSite.ListeMails.KV
-            ? _lMails.push(clientSite.ListeMails.KV)
-            : _lMails.push({ k: "Aucune données.", v: "" });
 
           return (
             <Modal show={showMails} onHide={() => setShowMails(false)}>
@@ -217,9 +264,24 @@ const ClientSitePage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {_lMails.map((kv, index) => {
-                      return <TableRowMel key={index} kv={kv} />;
-                    })}
+                    {mailsIsLoaded ? (
+                      listeMails.map((kv, index) => {
+                        return <TableRowMel key={index} kv={kv} />;
+                      })
+                    ) : (
+                      <tr>
+                        <td>
+                          <Placeholder as="p" animation="glow">
+                            <Placeholder xs={12} />
+                          </Placeholder>
+                        </td>
+                        <td>
+                          <Placeholder as="p" animation="glow">
+                            <Placeholder xs={12} />
+                          </Placeholder>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </Table>
               </Modal.Body>
@@ -230,28 +292,36 @@ const ClientSitePage = () => {
         return (
           <Row>
             <Col md={6}>
-              <Button
-                variant=" "
-                className="border"
-                onClick={() => setShowTels(true)}
-              >
+              <Button variant=" " className="border" onClick={HandleShowTel}>
                 <FontAwesomeIcon icon={faPhone} />
                 Liste des téléphones
               </Button>
               <ModalTels />
             </Col>
             <Col md={6}>
-              <Button
-                variant=" "
-                className="border"
-                onClick={() => setShowMails(true)}
-              >
+              <Button variant=" " className="border" onClick={HandleShowMail}>
                 <FontAwesomeIcon icon={faEnvelope} />
                 Liste des mails
               </Button>
               <ModalMail />
             </Col>
           </Row>
+        );
+      };
+
+      const [nbPortail, setNbPortail] = useState([]);
+      const [isLoadedNbPortail, setIsLoadedPortail] = useState(false);
+
+      const GetNbPortails = async () => {
+        const FetchSetNbPortail = (data) => {
+          setNbPortail(data);
+          setIsLoadedPortail(true);
+        };
+
+        GetNombrePortails(
+          tokenCt,
+          clientSite.IdClientSiteRelation,
+          FetchSetNbPortail
         );
       };
 
@@ -266,12 +336,22 @@ const ClientSitePage = () => {
 
         return (
           <Row>
-            {clientSite.NbPortail.KV.map((kv, index) => {
-              return <BADGEINFO kv={kv} key={index} />;
-            })}
+            {isLoadedNbPortail ? (
+              nbPortail.map((kv, index) => {
+                return <BADGEINFO kv={kv} key={index} />;
+              })
+            ) : (
+              <Placeholder as="p" animation="glow">
+                <Placeholder xs={12} bg="infoB" />
+              </Placeholder>
+            )}
           </Row>
         );
       };
+
+      useEffect(() => {
+        GetNbPortails();
+      }, []);
 
       return (
         <Card.Body>
@@ -330,7 +410,27 @@ const ClientSitePage = () => {
     };
     const CONTACT = () => {
       const [showTels, setShowTels] = useState(false);
-      const [showMails, setShowMails] = useState(false);
+      const [listeTels, setListeTels] = useState([]);
+      const [telIsLoaded, setTelIsLoaded] = useState(false);
+
+      const HandleShowTel = async () => {
+        const FetchSetTel = (data) => {
+          let _arrayTels = [];
+          if (!Array.isArray(data)) {
+            if (data) {
+              _arrayTels.push(data);
+            }
+          } else {
+            _arrayTels = data;
+          }
+
+          setListeTels(_arrayTels);
+          setTelIsLoaded(true);
+        };
+        setShowTels(true);
+        await GetListeTels(tokenCt, _cs.IdClientSite, FetchSetTel);
+      };
+
       const ModalTels = () => {
         const TableRowTel = ({ kv }) => {
           return (
@@ -341,12 +441,6 @@ const ClientSitePage = () => {
           );
         };
 
-        let _lTels = [];
-        Array.isArray(_cs.ListeTels.KV)
-          ? (_lTels = _cs.ListeTels.KV)
-          : _cs.ListeTels.KV
-          ? _lTels.push(_cs.ListeTels.KV)
-          : _lTels.push({ k: "Aucune données.", v: "" });
         return (
           <Modal show={showTels} onHide={() => setShowTels(false)}>
             <Modal.Header closeButton>
@@ -364,14 +458,52 @@ const ClientSitePage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {_lTels.map((kv, index) => {
-                    return <TableRowTel key={index} kv={kv} />;
-                  })}
+                  {telIsLoaded ? (
+                    listeTels.map((kv, index) => {
+                      return <TableRowTel key={index} kv={kv} />;
+                    })
+                  ) : (
+                    <tr>
+                      <td>
+                        <Placeholder as="p" animation="glow">
+                          <Placeholder xs={12} />
+                        </Placeholder>
+                      </td>
+                      <td>
+                        <Placeholder as="p" animation="glow">
+                          <Placeholder xs={12} />
+                        </Placeholder>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </Table>
             </Modal.Body>
           </Modal>
         );
+      };
+
+      const [showMails, setShowMails] = useState(false);
+      const [listeMails, setListeMails] = useState([]);
+      const [mailsIsLoaded, setMailsIsLoaded] = useState(false);
+
+      const HandleShowMail = async () => {
+        const FetchSetMail = (data) => {
+          let _arrayMails = [];
+          if (!Array.isArray(data)) {
+            if (data) {
+              _arrayMails.push(data);
+            }
+          } else {
+            _arrayMails = data;
+          }
+
+          setListeMails(_arrayMails);
+          setMailsIsLoaded(true);
+        };
+
+        setShowMails(true);
+        await GetListeMails(tokenCt, _cs.IdClientSite, FetchSetMail);
       };
 
       const ModalMail = () => {
@@ -383,13 +515,6 @@ const ClientSitePage = () => {
             </tr>
           );
         };
-
-        let _lMails = [];
-        Array.isArray(_cs.ListeMails.KV)
-          ? (_lMails = _cs.ListeMails.KV)
-          : _cs.ListeMails.KV
-          ? _lMails.push(_cs.ListeMails.KV)
-          : _lMails.push({ k: "Aucune données.", v: "" });
 
         return (
           <Modal show={showMails} onHide={() => setShowMails(false)}>
@@ -408,9 +533,24 @@ const ClientSitePage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {_lMails.map((kv, index) => {
-                    return <TableRowMel key={index} kv={kv} />;
-                  })}
+                  {mailsIsLoaded ? (
+                    listeMails.map((kv, index) => {
+                      return <TableRowMel key={index} kv={kv} />;
+                    })
+                  ) : (
+                    <tr>
+                      <td>
+                        <Placeholder as="p" animation="glow">
+                          <Placeholder xs={12} />
+                        </Placeholder>
+                      </td>
+                      <td>
+                        <Placeholder as="p" animation="glow">
+                          <Placeholder xs={12} />
+                        </Placeholder>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </Table>
             </Modal.Body>
@@ -420,30 +560,35 @@ const ClientSitePage = () => {
 
       return (
         <Row>
-          <Col>
-            <Button
-              className="border"
-              onClick={() => setShowTels(true)}
-              variant=""
-            >
-              <FontAwesomeIcon icon={faPhone} /> Liste des téléphones
+          <Col md={6}>
+            <Button variant=" " className="border" onClick={HandleShowTel}>
+              <FontAwesomeIcon icon={faPhone} />
+              Liste des téléphones
             </Button>
             <ModalTels />
           </Col>
-
-          <Col>
-            <Button
-              className="border"
-              onClick={() => setShowMails(true)}
-              variant=""
-            >
-              <FontAwesomeIcon icon={faEnvelope} /> Liste des mails
+          <Col md={6}>
+            <Button variant=" " className="border" onClick={HandleShowMail}>
+              <FontAwesomeIcon icon={faEnvelope} />
+              Liste des mails
             </Button>
             <ModalMail />
           </Col>
         </Row>
       );
     };
+    const [nbPortail, setNbPortail] = useState([]);
+    const [isLoadedNbPortail, setIsLoadedPortail] = useState(false);
+
+    const GetNbPortails = async () => {
+      const FetchSetNbPortail = (data) => {
+        setNbPortail(data);
+        setIsLoadedPortail(true);
+      };
+
+      GetNombrePortails(tokenCt, _cs.IdClientSiteRelation, FetchSetNbPortail);
+    };
+
     const INFOS = () => {
       const BADGEINFO = ({ kv }) => {
         let _href = "";
@@ -468,31 +613,37 @@ const ClientSitePage = () => {
         }
 
         return (
-          // <Col>
-          <a href={_href}>
-            <div className="badge badge-bg-info-nowrap">
-              {" "}
-              {`${kv.v} ${kv.k}`}
-            </div>
-          </a>
-          // </Col>
+          <Col>
+            <a href={_href}>
+              <div className="badge badge-bg-info-nowrap">
+                {" "}
+                {`${kv.v} ${kv.k}`}
+              </div>
+            </a>
+          </Col>
         );
       };
 
       return (
         <h4 className="m-2">
           <Row>
-            {_cs.NbPortail.KV.map((kv, index) => {
-              return (
-                <Col key={index}>
-                  <BADGEINFO kv={kv} />
-                </Col>
-              );
-            })}
+            {isLoadedNbPortail ? (
+              nbPortail.map((kv, index) => {
+                return <BADGEINFO kv={kv} key={index} />;
+              })
+            ) : (
+              <Placeholder as="p" animation="glow">
+                <Placeholder xs={12} bg="infoB" />
+              </Placeholder>
+            )}
           </Row>
         </h4>
       );
     };
+
+    useEffect(() => {
+      GetNbPortails();
+    }, []);
 
     return (
       <Card>
@@ -505,13 +656,6 @@ const ClientSitePage = () => {
           <INFOS />
         </Card.Body>
       </Card>
-
-      // <Container fluid className="border rounded">
-      //   <TITRE />
-      //   <ADRESSE />
-      //   <CONTACT />
-      //   <INFOS />
-      // </Container>
     );
   };
 

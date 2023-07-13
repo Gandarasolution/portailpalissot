@@ -55,9 +55,16 @@
 
 
 
+.container-sidebar
+{
+  display: flex ;
+  height: 100% ;
+  overflow: scroll initial ;
+
+}
+
 
 .sidebar-gmao{
-  
   width: 200px !important;
   min-width: 24px !important;
 }
@@ -89,11 +96,10 @@ nav ul li:hover
 
 }
 
-/* 
-.nav-link.active {
-  background-color: whitesmoke !important;
+
+.bg-infoB{
+  background-color: var(--color-info) !important;
 }
- */
 
 .navLeftMenu a{
   font-family: 'Roboto', sans-serif;
