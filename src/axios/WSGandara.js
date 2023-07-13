@@ -45,16 +45,19 @@ const GetListeParametres = async (token, setData) => {
     },
   });
 
-  // setData([{k:"TelUrgenceIntervention", v:"01 02 03 04 05"}]);
 };
 
-const GetClientSiteContrat = async (token, setClientSiteContrat) => {
-  $.ajax({
+const GetClientSiteContrat = async (token, setData) => {
+ await $.ajax({
     type: "POST",
     url: urlAction + "GetClientSiteContrat",
     data: { token: token },
     success(data) {
-      setClientSiteContrat(JSON.parse(data));
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
     },
   });
 };

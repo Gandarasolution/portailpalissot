@@ -101,13 +101,13 @@ const TopBarMenu = ({ handleDeconnexion }) => {
         />
         <OffcanvasMenu />
 
-        <NavLink href="/clientSite">
+        <Navbar.Text >
           {ClientSiteContratCtx.storedClientSite &&
             ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
-          <Button variant="" className="border">
+          <Button variant="" className="border" onClick={() => ClientSiteContratCtx.removeclientSite()}>
             Changer de site
           </Button>
-        </NavLink>
+        </Navbar.Text>
         <Navbar.Collapse className="justify-content-end">
           <OverlayTrigger
             trigger={"click"}

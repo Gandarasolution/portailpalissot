@@ -30,7 +30,6 @@ import { ListeClientSiteContratContext } from "../../App";
 //#endregion
 
 const LoginPage = (props) => {
-  const ListeClientSiteContratCtx = useContext(ListeClientSiteContratContext);
 
   //#region States
 
@@ -79,15 +78,19 @@ const LoginPage = (props) => {
     const getToken = async (response) => {
       //?2.5 -> On va récupérer la liste des parametres de l'application
       if (isNaN(response)) {
-        props.setToken(response);
 
         //4 -> CallBack de GetListeParamètres : on enregistre les infos retournées
-        const FetchSetListeParams = (data) => {
+        const FetchSetListeParams = async (data) => {
           props.setParams(data);
+          props.setToken(response);
+
         };
 
         //3 -> On récupère la liste des paramètres de l'application
         await GetListeParametres(response, FetchSetListeParams);
+
+
+
 
         //?2.5 -> La connexion a retourné une erreur
       } else {

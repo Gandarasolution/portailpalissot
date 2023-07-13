@@ -320,6 +320,33 @@ function RegexTestAndReturnMatch(data,regex){
 
 
 
+
+
+function ParseKVAsArray(kv){
+
+  let _array = [];
+
+  if(Array.isArray(kv))
+  {
+    _array = kv;
+  }else {
+    if(kv)
+    {
+      _array.push(kv);
+    }
+  }
+
+  
+
+
+
+
+  return _array;
+
+}
+
+
+
 export {
   FiltrerParSeuilDate,
   FiltrerParSearch,
@@ -336,4 +363,5 @@ export {
   URLReplace,
   ULRDeplace,
   RegexTestAndReturnMatch,
+  ParseKVAsArray,
 };
