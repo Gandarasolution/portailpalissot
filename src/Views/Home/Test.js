@@ -15,8 +15,6 @@ const PageTest = () => {
   return (
     <div>
       <Button onClick={handleClick}>Click</Button>
-
- 
     </div>
   );
 };
