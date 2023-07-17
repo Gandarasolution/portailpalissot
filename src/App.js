@@ -52,6 +52,11 @@ import DevisPage from "./Views/Devis/DevisPage";
 
 //#endregion
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faBook, faCalendar, faFile, faHome, faMobile, faWrench } from "@fortawesome/free-solid-svg-icons";
+
+library.add(faWrench,faCalendar, faHome,faMobile,faBook,faFile );
+
 //#region Context
 export const TokenContext = createContext(null);
 
@@ -59,6 +64,9 @@ export const ListeClientSiteContratContext = createContext(null);
 export const ClientSiteContratContext = createContext(null);
 
 export const ParametresContext = createContext([]);
+
+
+
 
 //#endregion
 function App() {
@@ -202,7 +210,7 @@ function App() {
             <SideBarMenuLeft />
           </Col>
 
-          <Col className="App font-link p-0 ">
+          <Col className="App font-link p-0">
             <TopBarMenu handleDeconnexion={handleDeconnexion} />
             <AppRoutes />
           </Col>
