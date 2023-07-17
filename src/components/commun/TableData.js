@@ -409,35 +409,82 @@ const TableData = ({ ...props }) => {
     //#region RangeDate
 
     let _arrayDate = _arrayVal.map((date) => {
+      if (!date) return date;
       try {
-        if (!date) return date;
-        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
-        let _match = date.match(dateRegex)[0];
+
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/;
+
+        
+        let _match = RegexTestAndReturnMatch(date, dateRegex)
+
+        if(_match === date)
+        {
+           dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/;
+           let _match2 = RegexTestAndReturnMatch(date, dateRegex)
+
+
+           let _retu = new Date(
+            _match2.substring(0,4),
+            _match2.substring(5, 7) - 1,
+            _match2.substring(8, 10)
+          );
+
+          return _retu;
+
+        }
 
         let _retu = new Date(
           _match.substring(6),
           _match.substring(3, 5) - 1,
           _match.substring(0, 2)
         );
+
         return _retu;
       } catch (error) {
         return date;
       }
+
+
+
+
     });
 
     const minDate = new Date(Math.min.apply(null, _arrayDate));
     const maxDate = new Date(Math.max.apply(null, _arrayDate));
 
     const ParseDateFormat = (text) => {
-      try {
-        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+
+      function parseAvecSlash() {
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/;
         let _match = text.match(dateRegex)[0];
 
         return `${_match.substring(6)}-${_match.substring(
           3,
           5
         )}-${_match.substring(0, 2)}`;
+      }
+
+
+      function parseAvecTiret() {
+        var dateRegex = /^[0-9]{1,2}-[0-9]{1,2}-[0-9]{4}/;
+        let _match = text.match(dateRegex)[0];
+
+        return `${_match.substring(6)}-${_match.substring(
+          3,
+          5
+        )}-${_match.substring(0, 2)}`;
+      }
+
+      try {
+      let _match =  parseAvecSlash();
+      if(_match === text){
+        _match = parseAvecTiret();
+      }
+
+      return _match;
+
       } catch {
+
         return text;
       }
     };
@@ -934,14 +981,6 @@ const TableData = ({ ...props }) => {
       />
     );
 
-    /*< 1 ... x-2 x-1 x x+1 x+2 ... l >
-
-      < 1 x+1 x+2 ... l >
-      if (_limiter / nbParPages + 1) > 10
-      {
-        
-      }
-*/
 
     for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
       if (_isEllipsisNedded) {
@@ -2103,11 +2142,12 @@ export const EditorDateFromDateTime = (data) => {
   if (_match !== data) {
     return _match;
   }
-  dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2} /;
+  dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/;
   _match = RegexTestAndReturnMatch(data, dateRegex);
   if (_match !== data) {
     return _match;
   }
+
 
   return data;
 };
