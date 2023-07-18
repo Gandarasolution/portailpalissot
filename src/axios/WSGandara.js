@@ -5,10 +5,45 @@ import { HTMLEncode } from "../functions";
 //#endregion
 
 //#region Données
-const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+// const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
+
+
+
+
+const callEndpoint = async (endpoint, data, setData, returnData) => {
+  let _data = undefined;
+  const currentURL = window.location.href;
+
+ 
+
+  function ErrorHandling(error) {
+    
+  }
+
+  $.ajax({
+    type: "POST",
+    url: urlAction + endpoint,
+    data: data,
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        ErrorHandling(500);
+      } else {
+        _data = JSON.parse(data);
+        if (returnData) {
+          return _data;
+        }
+
+        setData(_data);
+      }
+    },
+    error(error) {
+      ErrorHandling(error);
+    },
+  });
+};
 
 //#region Fonction publics
 
@@ -62,6 +97,35 @@ const GetClientSiteContrat = async (token, setData) => {
 
 //#endregion
 
+//#region ClientSite
+const GetListeTels = (token, IdClientSite, setData) => {
+  return callEndpoint(
+    "ListeTelsSelect",
+    { token: token, IdClientSite: IdClientSite },
+    setData
+  );
+};
+
+const GetListeMails = (token, IdClientSite, setData) => {
+  return callEndpoint(
+    "ListeMailsSelect",
+    { token: token, IdClientSite: IdClientSite },
+    setData
+  );
+
+};
+
+const GetNombrePortails = (token, IdClientSiteRelation, setData) => {
+  return callEndpoint(
+    "GetNombrePortails",
+    { token: token, IdClientSiteRelation: IdClientSiteRelation },
+    setData
+  );
+
+};
+
+//#endregion
+
 //#region Contrat
 
 // const GetPrestationContratOriginal = async (
@@ -98,31 +162,38 @@ const GetClientSiteContrat = async (token, setData) => {
 // };
 
 const GetPrestationContrat = (token, dateDebut, dateFin, IdSite, setData) => {
-  var xhr = $.ajax({
-    type: "POST",
-    url: urlAction + "GetPrestationContrat",
+return callEndpoint("GetPrestationContrat",{
+  token: token,
+  dateDebut: dateDebut,
+  dateFin: dateFin,
+  IdSite: IdSite,
+},setData);
 
-    data: {
-      token: token,
-      dateDebut: dateDebut,
-      dateFin: dateFin,
-      IdSite: IdSite,
-    },
-    success(data) {
-      if (data === "Erreur de connexion") {
-        setData(500);
-        return;
-      }
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        window.location.href = `/error?error=${data}`;
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
+  // var xhr = $.ajax({
+  //   type: "POST",
+  //   url: urlAction + "GetPrestationContrat",
 
-  return xhr;
+  //   data: {
+  //     token: token,
+  //     dateDebut: dateDebut,
+  //     dateFin: dateFin,
+  //     IdSite: IdSite,
+  //   },
+  //   success(data) {
+  //     if (data === "Erreur de connexion") {
+  //       setData(500);
+  //       return;
+  //     }
+  //     if (JSON.parse(JSON.stringify(data)) === "500") {
+  //       window.location.href = `/error?error=${data}`;
+  //       setData([]);
+  //     } else {
+  //       setData(JSON.parse(data));
+  //     }
+  //   },
+  // });
+
+  // return xhr;
 };
 
 const GetPrestationReleveTache = async (
@@ -554,31 +625,23 @@ const TelechargerFactureDocument = async (
   });
 };
 
+
+
+
 //#endregion
 
 //#region Interventions
 const GetListeInterventions = async (
   token,
   IdClientSite,
-
   setData
 ) => {
-  $.ajax({
-    type: "POST",
-    url: urlAction + "GetListeInterventions",
 
-    data: {
-      token: token,
-      IdClientSite: IdClientSite,
-    },
-    success(data) {
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
+  return callEndpoint("GetListeInterventions",{
+    token: token,
+    IdClientSite: IdClientSite,
+  },setData);
+
 };
 
 const GetListeFIIntervention = async (
@@ -586,22 +649,10 @@ const GetListeFIIntervention = async (
   IdDossierInterventionSAV,
   setData
 ) => {
-  await $.ajax({
-    type: "POST",
-    url: urlAction + "GetListeFIIntervention",
-
-    data: {
-      token: token,
-      IdDossierInterventionSAV: IdDossierInterventionSAV,
-    },
-    success(data) {
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
+  return callEndpoint("GetListeFIIntervention",{
+    token: token,
+    IdDossierInterventionSAV: IdDossierInterventionSAV,
+  },setData);
 };
 
 const GeTListeFactureIntervention = async (
@@ -609,22 +660,12 @@ const GeTListeFactureIntervention = async (
   IdDossierInterventionSAV,
   setData
 ) => {
-  $.ajax({
-    type: "POST",
-    url: urlAction + "GeTListeFactureIntervention",
 
-    data: {
-      token: token,
-      IdDossierInterventionSAV: IdDossierInterventionSAV,
-    },
-    success(data) {
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
+return callEndpoint("GeTListeFactureIntervention",{
+  token: token,
+  IdDossierInterventionSAV: IdDossierInterventionSAV,
+},setData);
+
 };
 
 const GetDocumentFISAV = async (
@@ -633,73 +674,57 @@ const GetDocumentFISAV = async (
   telecharger,
   returnData
 ) => {
-  if (returnData) {
-    let _return = undefined;
-    await $.ajax({
-      type: "POST",
-      url: urlAction + "GetDocumentFISAV",
 
-      data: {
-        token: token,
-        IdFicheInterventionSAV: IdFicheInterventionSAV,
-      },
-      success(data) {
-        if (data !== "500") {
-          _return = JSON.parse(data);
-        }
-      },
-    });
-    return _return;
-  }
 
-  let targetWindow = window.open("/waiting");
+  let targetWindow = undefined; 
+  if(!returnData)
+   {
+    targetWindow = window.open("/waiting");
+   }
+  
 
-  $.ajax({
-    type: "POST",
-    url: urlAction + "GetDocumentFISAV",
-
-    data: {
-      token: token,
-      IdFicheInterventionSAV: IdFicheInterventionSAV,
-    },
-    success(data) {
-      if (data === "500") {
-        targetWindow.location.href = `/error?error=500`;
-      }
-      const _kv = JSON.parse(data);
+  const SetData = (data) => {
+    const _kv = JSON.parse(data);
       if (telecharger) {
-        TelechargerDocument(_kv.v, _kv.k, targetWindow);
+        TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
       } else {
         VoirDocument(_kv.v, _kv.k, targetWindow);
       }
-    },
-    error(error) {
-      targetWindow.location.href = `/error?error=${error.status}`;
-    },
-  });
+  }
+
+  return callEndpoint("GetDocumentFISAV",{
+    token: token,
+    IdFicheInterventionSAV: IdFicheInterventionSAV,
+  },SetData, returnData);
+
+
 };
 
 const GetListeSecteur = async (token, IdClientSiteRelation, setData) => {
-  return $.ajax({
-    type: "POST",
-    url: urlAction + "GetListeSecteur",
+  return callEndpoint("GetListeSecteur",{
+    token: token,
+    IdClientSiteRelation: IdClientSiteRelation,
+  },setData)
+  // return $.ajax({
+  //   type: "POST",
+  //   url: urlAction + "GetListeSecteur",
 
-    data: {
-      token: token,
-      IdClientSiteRelation: IdClientSiteRelation,
-    },
-    success(data) {
-      if (data === "Erreur de connexion") {
-        setData(500);
-        return;
-      }
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
+  //   data: {
+  //     token: token,
+  //     IdClientSiteRelation: IdClientSiteRelation,
+  //   },
+  //   success(data) {
+  //     if (data === "Erreur de connexion") {
+  //       setData(500);
+  //       return;
+  //     }
+  //     if (JSON.parse(JSON.stringify(data)) === "500") {
+  //       setData([]);
+  //     } else {
+  //       setData(JSON.parse(data));
+  //     }
+  //   },
+  // });
 };
 
 //#endregion
@@ -707,120 +732,36 @@ const GetListeSecteur = async (token, IdClientSiteRelation, setData) => {
 //#region Devis
 
 const GetListeDevis = (token, IdClientSiteRelation, setData) => {
-  $.ajax({
-    type: "POST",
-    url: urlAction + "GetListeDevis",
+  return callEndpoint("GetListeDevis", {
+    token: token,
+    IdClientSiteRelation: IdClientSiteRelation,
+  },setData);
 
-    data: {
-      token: token,
-      IdClientSiteRelation: IdClientSiteRelation,
-    },
-    success(data) {
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
 };
 
 const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
-  if (returnData) {
-    let _return = undefined;
-    await $.ajax({
-      type: "POST",
-      url: urlAction + "GetdocumentDevis",
-      data: { token: token, IdDevis: IdDevis },
-      success(data) {
-        _return = JSON.parse(data);
-      },
-    });
+  let targetWindow = undefined; 
+  if(!returnData)
+   {
+    targetWindow = window.open("/waiting");
+   }
+  
 
-    return _return;
-  }
-
-  let targetWindow = window.open("/waiting");
-
-  $.ajax({
-    type: "POST",
-    url: urlAction + "GetdocumentDevis",
-    data: { token: token, IdDevis: IdDevis },
-    success(data) {
-      if (data === "500") {
-        targetWindow.location.href = `/error?error=500`;
-      }
-      const _kv = JSON.parse(data);
+  const SetData = (data) => {
+    const _kv = JSON.parse(data);
       if (telecharger) {
         TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
       } else {
         VoirDocument(_kv.v, _kv.k, targetWindow);
       }
-    },
-    error(error) {
-      targetWindow.location.href = `/error?error=${error.status}`;
-    },
-  });
+  }
+
+  return callEndpoint("GetdocumentDevis",{ token: token, IdDevis: IdDevis },SetData, returnData);
+
 };
 
 //#endregion
 
-const GetListeTels = (token, IdClientSite, setData) => {
-  $.ajax({
-    type: "POST",
-    url: urlAction + "ListeTelsSelect",
-
-    data: {
-      token: token,
-      IdClientSite: IdClientSite,
-    },
-    success(data) {
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
-};
-
-const GetListeMails = (token, IdClientSite, setData) => {
-  $.ajax({
-    type: "POST",
-    url: urlAction + "ListeMailsSelect",
-
-    data: {
-      token: token,
-      IdClientSite: IdClientSite,
-    },
-    success(data) {
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
-};
-
-const GetNombrePortails = (token, IdClientSiteRelation, setData) => {
-  $.ajax({
-    type: "POST",
-    url: urlAction + "GetNombrePortails",
-
-    data: {
-      token: token,
-      IdClientSiteRelation: IdClientSiteRelation,
-    },
-    success(data) {
-      if (JSON.parse(JSON.stringify(data)) === "500") {
-        setData([]);
-      } else {
-        setData(JSON.parse(data));
-      }
-    },
-  });
-};
 
 //#endregion
 

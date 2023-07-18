@@ -19,7 +19,9 @@ import TableData, {
   CreateNewButtonFilter,
   CreateNewCardModel,
   CreateNewCell,
+  CreateNewCellSelector,
   CreateNewHeader,
+  CreateNewHeaderSelector,
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
   EditorActionTelecharger,
@@ -66,6 +68,7 @@ const FacturesPage = () => {
   function CreateHeaderForTable() {
     // Date	Code	Libellé	Total HT	Total TTC	Origine	Type
     let _headers = [];
+    _headers.push(CreateNewHeaderSelector("factures"));
     _headers.push(
       CreateNewHeader(
         "DateFacture",
@@ -125,13 +128,14 @@ const FacturesPage = () => {
         EditorType
       )
     );
-    _headers.push(CreateNewUnboundHeader(CreateFilter(), "Actions"));
+    _headers.push(CreateNewUnboundHeader(CreateFilter(), "Actions",["tagFactureVoir","tagFactureTelecharger"]));
 
     return _headers;
   }
 
   function CreateCellsForTable() {
     let _cells = [];
+    _cells.push(CreateNewCellSelector("factures"));
     _cells.push(
       CreateNewCell("DateFacture", false, true, false, EditorDateFromDateTime)
     );

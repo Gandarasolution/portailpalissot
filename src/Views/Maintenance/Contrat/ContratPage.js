@@ -109,9 +109,8 @@ const ContratPage = () => {
     return _DateRetour;
   }
 
-  const [ajaxRequest, setAjaxRequest] = useState(undefined);
 
-  const FetchDataPrestation = async () => {
+  const FetchDataPrestation =  () => {
     if (ClientSiteContratCtx.storedClientSite.IdContrat === 0) {
       setIsLoadedPresta(true);
       return;
@@ -119,24 +118,19 @@ const ContratPage = () => {
     SetPrestations([]);
     setLastPeriode(DateSOAP(dateDebutPeriode));
 
-    if (ajaxRequest) {
-      ajaxRequest.abort();
-    }
 
-    var _ajx = GetPrestationContrat(
+     GetPrestationContrat(
       tokenCt,
       DateSOAP(dateDebutPeriode),
       DateSOAP(dateFinPeriode()),
       ClientSiteContratCtx.storedClientSite.IdClientSite,
       PrestationLoad
     );
-    setAjaxRequest(_ajx);
   };
 
   const PrestationLoad = (data) => {
     SetPrestations(data);
     if (lastPeriode === DateSOAP(dateDebutPeriode)) {
-      setAjaxRequest(undefined);
       setIsLoadedPresta(true);
     }
   };
@@ -152,7 +146,7 @@ const ContratPage = () => {
     setDateDebutPeriode(_dateDebutPeriode);
 
     setIsLoadedPresta(false);
-    await FetchDataPrestation();
+    FetchDataPrestation();
   };
 
   const SoustraireUnAnPeriode = async () => {
@@ -162,7 +156,7 @@ const ContratPage = () => {
     setDateDebutPeriode(_dateDebutPeriode);
     setIsLoadedPresta(false);
 
-    await FetchDataPrestation();
+     FetchDataPrestation();
   };
 
   const HandleDropdownPeriodeSelect = async (dateStart) => {
@@ -171,7 +165,7 @@ const ContratPage = () => {
     setDateDebutPeriode(_dateTemp);
     setIsLoadedPresta(false);
 
-    await FetchDataPrestation();
+     FetchDataPrestation();
   };
 
   //#endregion
