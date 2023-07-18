@@ -100,6 +100,15 @@ nav ul li:hover {
   background-color: var(--color-info) !important;
 }
 
+
+
+.card-footer-button :hover{
+  background-color: var(--color-info) !important;
+}
+
+
+
+
 .navLeftMenu a {
   font-family: 'Roboto', sans-serif;
   color: black !important;

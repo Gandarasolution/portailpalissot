@@ -74,13 +74,13 @@ const NouvelleInterventionPage = () => {
 
     GetListeSecteur(
       TokenCt,
-      ClientSiteCt.storedClientSite.IdClientSiteRelation,
+      ClientSiteCt.storedClientSite.GUID,
       FetchSetSecteurs
     );
 
     GetListeTels(
       TokenCt,
-      ClientSiteCt.storedClientSite.IdClientSite,
+      ClientSiteCt.storedClientSite.GUID,
       FetchSetTel
     );
   };
@@ -129,7 +129,7 @@ const NouvelleInterventionPage = () => {
     document.title = "Demande de dépannage";
     GetData();
     // eslint-disable-next-line
-  }, [ClientSiteCt.storedClientSite.IdClientSiteRelation]);
+  }, [ClientSiteCt.storedClientSite.GUID]);
 
   return (
     <Container fluid>

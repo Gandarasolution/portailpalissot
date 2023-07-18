@@ -316,7 +316,7 @@ const FacturesPage = () => {
     };
     await GetListeFactures(
       tokenCt,
-      clientSiteCt.storedClientSite.IdClientSite,
+      clientSiteCt.storedClientSite.GUID,
       DateSOAP(new Date()),
       DateSOAP(new Date()),
       FetchSetData
@@ -327,7 +327,7 @@ const FacturesPage = () => {
     document.title = "Factures";
     GetFactures();
     //eslint-disable-next-line
-  }, [clientSiteCt.storedClientSite.IdClientSite]);
+  }, [clientSiteCt.storedClientSite.GUID]);
 
   return (
     <Container fluid>

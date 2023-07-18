@@ -48,7 +48,7 @@ const DevisPage = () => {
 
     GetListeDevis(
       tokenCt,
-      clientSiteCt.storedClientSite.IdClientSiteRelation,
+      clientSiteCt.storedClientSite.GUID,
       FetchSetDevis
     );
   };

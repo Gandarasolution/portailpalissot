@@ -5,8 +5,8 @@ import { HTMLEncode } from "../functions";
 //#endregion
 
 //#region Données
-// const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
-const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+// const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
@@ -20,7 +20,7 @@ const callEndpoint = async (endpoint, data, setData, returnData) => {
  
 
   function ErrorHandling(error) {
-    
+    setData([]);
   }
 
   $.ajax({
@@ -98,27 +98,27 @@ const GetClientSiteContrat = async (token, setData) => {
 //#endregion
 
 //#region ClientSite
-const GetListeTels = (token, IdClientSite, setData) => {
+const GetListeTels = (token, guid, setData) => {
   return callEndpoint(
     "ListeTelsSelect",
-    { token: token, IdClientSite: IdClientSite },
+    { token: token, guid: guid },
     setData
   );
 };
 
-const GetListeMails = (token, IdClientSite, setData) => {
+const GetListeMails = (token, guid, setData) => {
   return callEndpoint(
     "ListeMailsSelect",
-    { token: token, IdClientSite: IdClientSite },
+    { token: token, guid: guid },
     setData
   );
 
 };
 
-const GetNombrePortails = (token, IdClientSiteRelation, setData) => {
+const GetNombrePortails = (token, guid, setData) => {
   return callEndpoint(
     "GetNombrePortails",
-    { token: token, IdClientSiteRelation: IdClientSiteRelation },
+    { token: token, guid: guid },
     setData
   );
 
@@ -161,12 +161,12 @@ const GetNombrePortails = (token, IdClientSiteRelation, setData) => {
 //   });
 // };
 
-const GetPrestationContrat = (token, dateDebut, dateFin, IdSite, setData) => {
+const GetPrestationContrat = (token, dateDebut, dateFin, guid, setData) => {
 return callEndpoint("GetPrestationContrat",{
   token: token,
   dateDebut: dateDebut,
   dateFin: dateFin,
-  IdSite: IdSite,
+  guid: guid,
 },setData);
 
   // var xhr = $.ajax({
@@ -504,14 +504,14 @@ const TelechargerZIP = (files, filename) => {
 //#endregion
 
 //#region Appareils
-const GetListeAppareils = async (token, IdClientSite, setData) => {
+const GetListeAppareils = async (token, guid, setData) => {
   $.ajax({
     type: "POST",
     url: urlAction + "GetAppareils",
 
     data: {
       token: token,
-      IdClientSite: IdClientSite,
+      guid: guid,
     },
     success(data) {
       if (JSON.parse(JSON.stringify(data)) === "500") {
@@ -527,7 +527,7 @@ const GetListeAppareils = async (token, IdClientSite, setData) => {
 //#region Factures
 const GetListeFactures = async (
   token,
-  IdClientSite,
+  guid,
   dateDebut,
   dateFin,
   setData
@@ -538,7 +538,7 @@ const GetListeFactures = async (
 
     data: {
       token: token,
-      IdClientSite: IdClientSite,
+      guid: guid,
       dateDebut: dateDebut,
       dateFin: dateFin,
     },
@@ -633,13 +633,13 @@ const TelechargerFactureDocument = async (
 //#region Interventions
 const GetListeInterventions = async (
   token,
-  IdClientSite,
+  guid,
   setData
 ) => {
 
   return callEndpoint("GetListeInterventions",{
     token: token,
-    IdClientSite: IdClientSite,
+    guid: guid,
   },setData);
 
 };
@@ -700,10 +700,10 @@ const GetDocumentFISAV = async (
 
 };
 
-const GetListeSecteur = async (token, IdClientSiteRelation, setData) => {
+const GetListeSecteur = async (token, guid, setData) => {
   return callEndpoint("GetListeSecteur",{
     token: token,
-    IdClientSiteRelation: IdClientSiteRelation,
+    guid: guid,
   },setData)
   // return $.ajax({
   //   type: "POST",
@@ -711,7 +711,7 @@ const GetListeSecteur = async (token, IdClientSiteRelation, setData) => {
 
   //   data: {
   //     token: token,
-  //     IdClientSiteRelation: IdClientSiteRelation,
+  //     guid: guid,
   //   },
   //   success(data) {
   //     if (data === "Erreur de connexion") {
@@ -731,10 +731,10 @@ const GetListeSecteur = async (token, IdClientSiteRelation, setData) => {
 
 //#region Devis
 
-const GetListeDevis = (token, IdClientSiteRelation, setData) => {
+const GetListeDevis = (token, guid, setData) => {
   return callEndpoint("GetListeDevis", {
     token: token,
-    IdClientSiteRelation: IdClientSiteRelation,
+    guid: guid,
   },setData);
 
 };

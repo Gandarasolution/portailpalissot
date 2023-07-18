@@ -59,7 +59,7 @@ const AppareilsPage = () => {
     setIsLoaded(false);
     await GetListeAppareils(
       tokenCx,
-      ClientSiteContratCtx.storedClientSite.IdClientSite,
+      ClientSiteContratCtx.storedClientSite.GUID,
       FetchSetListeAppareils
     );
   };
@@ -252,7 +252,7 @@ const AppareilsPage = () => {
 
     GetAppareils();
     // eslint-disable-next-line
-  }, [ClientSiteContratCtx.storedClientSite.IdClientSite]);
+  }, [ClientSiteContratCtx.storedClientSite.GUID]);
 
   return (
     <Container fluid>

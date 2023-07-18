@@ -50,7 +50,6 @@ const ClientSitePage = () => {
   const ClientSiteCt = useContext(ClientSiteContratContext);
 
   //#region States
-  // await GetListeParametres(response, FetchSetListeParams);
 
   const [listeClientSite, setListeClientSite] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -198,7 +197,10 @@ const ClientSitePage = () => {
             };
 
             setShowModal(true);
-            await functionGet(tokenCt, clientSite.IdClientSite, FetchSetData);
+            if(listeModal.length <= 0)
+            {
+              await functionGet(tokenCt, clientSite.GUID, FetchSetData);
+            }
           };
 
           const MODALCONTACT = () => {
@@ -341,7 +343,7 @@ const ClientSitePage = () => {
 
           GetNombrePortails(
             tokenCt,
-            clientSite.IdClientSiteRelation,
+            clientSite.GUID,
             FetchSetNbPortail
           );
         };
@@ -441,9 +443,9 @@ const ClientSitePage = () => {
       };
 
       return (
-        <Card.Footer>
+        <Card.Footer className="card-footer-button">
           <Row>
-            <Button onClick={HandleChoixDuSite} variant="">
+            <Button onClick={HandleChoixDuSite} variant="" >
               Choisir ce site
             </Button>
           </Row>
@@ -452,7 +454,8 @@ const ClientSitePage = () => {
     };
 
     return (
-      <Card className="m-2">
+
+      <Card className={`m-2 h-100 ${!actual && "card-clientsite"}`} >
         <CARDHEADER />
         <CARDBODY />
         {!actual && <CARDFOOTER />}
@@ -528,12 +531,14 @@ const ClientSitePage = () => {
           GetDataTrimed().map((clientSite) => {
             if (
               ClientSiteCt.storedClientSite &&
-              clientSite.IdClientSite ===
-                ClientSiteCt.storedClientSite.IdClientSite
+              clientSite.GUID ===
+                ClientSiteCt.storedClientSite.GUID
             )
+            {
               return null;
+            }
             return (
-              <Col md={4} key={clientSite.IdClientSite}>
+              <Col className="p-1" md={4} key={clientSite.GUID}>
                 <CardClientSite clientSite={clientSite} />
               </Col>
             );
