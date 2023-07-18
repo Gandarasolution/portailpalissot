@@ -123,7 +123,7 @@ const ContratPage = () => {
       tokenCt,
       DateSOAP(dateDebutPeriode),
       DateSOAP(dateFinPeriode()),
-      ClientSiteContratCtx.storedClientSite.IdClientSite,
+      ClientSiteContratCtx.storedClientSite.GUID,
       PrestationLoad
     );
   };
@@ -223,7 +223,7 @@ const ContratPage = () => {
     FetchDataPrestation();
 
     // eslint-disable-next-line
-  }, [ClientSiteContratCtx.storedClientSite.IdClientSite, lastPeriode]);
+  }, [ClientSiteContratCtx.storedClientSite.GUID.GUID, lastPeriode]);
 
   return (
     <Container fluid>

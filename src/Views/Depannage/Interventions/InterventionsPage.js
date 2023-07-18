@@ -51,7 +51,7 @@ const InterventionPage = () => {
 
     await GetListeInterventions(
       TokenCt,
-      ClientSiteCt.storedClientSite.IdClientSite,
+      ClientSiteCt.storedClientSite.GUID,
       FetchSetData
     );
   };
@@ -230,7 +230,7 @@ const InterventionPage = () => {
 
     GetData();
     // eslint-disable-next-line
-  }, [ClientSiteCt.storedClientSite.IdClientSite]);
+  }, [ClientSiteCt.storedClientSite.GUID]);
 
   //#region Editors
 

@@ -203,10 +203,10 @@
 		
 	}
 	
-	function GetPrestationContrat($token, $dateDebut, $dateFin, $idSite, $ws)
+	function GetPrestationContrat($token, $dateDebut, $dateFin, $guid, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
-		$request = array("token"=>$token, "dateDebut" => $dateDebut, "dateFin"=> $dateFin, "IdSite"=> $idSite);
+		$request = array("token"=>$token, "dateDebut" => $dateDebut, "dateFin"=> $dateFin, "guid"=> $guid);
 		
 		if($g_useSoapClientV2)
 		{
@@ -506,10 +506,10 @@
 	
 	
 	
-	function GetAppareils($token,$IdClientSite,$ws)
+	function GetAppareils($token,$guid,$ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
-		$request = array("token"=>$token,"IdClientSite" => $IdClientSite);
+		$request = array("token"=>$token,"guid" => $guid);
 		
 		if($g_useSoapClientV2)
 		{
@@ -590,10 +590,10 @@
 	
 	
 	
-	function GetFactures($token, $dateDebut, $dateFin, $IdClientSite, $ws)
+	function GetFactures($token, $dateDebut, $dateFin, $guid, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
-		$request = array("token"=>$token, "dateDebut" => $dateDebut, "dateFin"=> $dateFin, "IdClientSite"=> $IdClientSite);
+		$request = array("token"=>$token, "dateDebut" => $dateDebut, "dateFin"=> $dateFin, "guid"=> $guid);
 		
 		if($g_useSoapClientV2)
 		{
@@ -672,10 +672,10 @@
 	
 	
 	
-	function GetListeSecteur($token, $IdClientSiteRelation, $ws)
+	function GetListeSecteur($token, $guid, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
-		$request = array("token"=>$token, "IdClientSiteRelation" => $IdClientSiteRelation);
+		$request = array("token"=>$token, "guid" => $guid);
 		
 		if($g_useSoapClientV2)
 		{
@@ -756,10 +756,10 @@
 		}
 	}
 	
-	function GetListeInterventions($token, $IdClientSite, $ws)
+	function GetListeInterventions($token, $guid, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
-		$request = array("token"=>$token, "IdClientSite" => $IdClientSite);
+		$request = array("token"=>$token, "guid" => $guid);
 		
 		if($g_useSoapClientV2)
 		{
@@ -1064,10 +1064,10 @@
 	
 	
 	
-	function GetListeDevis($token, $IdClientSiteRelation,$ws)
+	function GetListeDevis($token, $guid,$ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
-		$request = array("token"=>$token, "IdClientSiteRelation" => $IdClientSiteRelation);
+		$request = array("token"=>$token, "guid" => $guid);
 		
 		if($g_useSoapClientV2)
 		{
@@ -1155,10 +1155,10 @@
 	
 
 	
-	function ListeTelsSelect($token, $IdClientSite, $ws)
+	function ListeTelsSelect($token, $guid, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
-		$request = array("token"=>$token, "IdClientSite" => $IdClientSite);
+		$request = array("token"=>$token, "guid" => $guid);
 		
 		if($g_useSoapClientV2)
 		{
@@ -1203,10 +1203,10 @@
 	
 
 	
-	function ListeMailsSelect($token, $IdClientSite, $ws)
+	function ListeMailsSelect($token, $guid, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
-		$request = array("token"=>$token, "IdClientSite" => $IdClientSite);
+		$request = array("token"=>$token, "guid" => $guid);
 		
 		if($g_useSoapClientV2)
 		{
@@ -1252,10 +1252,10 @@
 
 
 	
-	function GetNombrePortails($token, $IdClientSiteRelation, $ws)
+	function GetNombrePortails($token, $guid, $ws)
 	{
 		global $URL_API_CCS, $g_useSoapClientV2;
-		$request = array("token"=>$token, "IdClientSiteRelation" => $IdClientSiteRelation);
+		$request = array("token"=>$token, "guid" => $guid);
 		
 		if($g_useSoapClientV2)
 		{
@@ -1309,7 +1309,7 @@
 			
 			break;
 			case "GMAOGetPrestationContrat":
-			echo(GetPrestationContrat($_POST['token'], $_POST['dateDebut'],$_POST['dateFin'],$_POST['IdSite'],$url));
+			echo(GetPrestationContrat($_POST['token'], $_POST['dateDebut'],$_POST['dateFin'],$_POST['guid'],$url));
 			
 			break;
 			case "GMAOGetDocumentsPrestation":
@@ -1341,16 +1341,16 @@
 			
 			break;
 			case "GMAOGetAppareils":
-			echo(GetAppareils($_POST['token'],$_POST['IdClientSite'],$url));
+			echo(GetAppareils($_POST['token'],$_POST['guid'],$url));
 			
 			break;
 			case "GMAOGetListeParametres":
 			echo(GetListeParametres($_POST['token'], $url));
 			
 			break;
-			echo(GetFactures($_POST['token'], $_POST['dateDebut'],$_POST['dateFin'],$_POST['IdClientSite'],$url));
+			echo(GetFactures($_POST['token'], $_POST['dateDebut'],$_POST['dateFin'],$_POST['guid'],$url));
 			case "GMAOGetFactures":
-			echo(GetFactures($_POST['token'], $_POST['dateDebut'],$_POST['dateFin'],$_POST['IdClientSite'],$url));
+			echo(GetFactures($_POST['token'], $_POST['dateDebut'],$_POST['dateFin'],$_POST['guid'],$url));
 			
 			break;
 			case "GMAOGetFactureDocument":
@@ -1359,13 +1359,13 @@
 			break;
 			
 			case "GMAOGetListeSecteur":
-			echo(GetListeSecteur($_POST["token"],$_POST["IdClientSiteRelation"],$url));
+			echo(GetListeSecteur($_POST["token"],$_POST["guid"],$url));
 			
 			break;
 			
 			
 			case "GMAOGetListeInterventions":
-			echo(GetListeInterventions($_POST["token"], $_POST["IdClientSite"],$url));
+			echo(GetListeInterventions($_POST["token"], $_POST["guid"],$url));
 			break;
 			
 			
@@ -1407,7 +1407,7 @@
 			
 			
 			case "GMAOGetListeDevis":
-			echo(GetListeDevis($_POST['token'],$_POST['IdClientSiteRelation'],$url));
+			echo(GetListeDevis($_POST['token'],$_POST['guid'],$url));
 			break;
 			
 			
@@ -1417,16 +1417,16 @@
 			
 
 			case "GMAOListeTelsSelect":
-			echo(ListeTelsSelect($_POST['token'],$_POST['IdClientSite'],$url));
+			echo(ListeTelsSelect($_POST['token'],$_POST['guid'],$url));
 			break;
 
 			
 			case "GMAOListeMailsSelect":
-				echo(ListeMailsSelect($_POST['token'],$_POST['IdClientSite'],$url));
+				echo(ListeMailsSelect($_POST['token'],$_POST['guid'],$url));
 			break;
 
 			case "GMAOGetNombrePortails":
-				echo(GetNombrePortails($_POST['token'],$_POST['IdClientSiteRelation'],$url));
+				echo(GetNombrePortails($_POST['token'],$_POST['guid'],$url));
 			break;
 			
 
