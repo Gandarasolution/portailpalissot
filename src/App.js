@@ -53,9 +53,10 @@ import DevisPage from "./Views/Devis/DevisPage";
 //#endregion
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faCalendar, faFile, faHome, faMobile, faWrench } from "@fortawesome/free-solid-svg-icons";
+import { faBook, faCalendar, faFile, faHome, faMobile, faSquareCheck, faWrench } from "@fortawesome/free-solid-svg-icons";
+import { fas } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faWrench,faCalendar, faHome,faMobile,faBook,faFile );
+library.add(fas, faWrench,faCalendar, faHome,faMobile,faBook,faFile, faSquareCheck );
 
 //#region Context
 export const TokenContext = createContext(null);

@@ -54,6 +54,7 @@ function FiltrerUnSeuilDate(fieldname, _lData, arrayFilters) {
     _lData = _lData.filter((data) => {
       return (
         _arColonne.filter((filter) => {
+          
           return (
             ParseDateFormat(data[fieldname]).getTime() <=
               new Date(filter.max).getTime() &&
@@ -69,7 +70,7 @@ function FiltrerUnSeuilDate(fieldname, _lData, arrayFilters) {
 
 const ParseDateFormat = (text) => {
   try {
-    var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+    var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/;
     let _match = text.match(dateRegex)[0];
 
     return new Date(
@@ -78,7 +79,18 @@ const ParseDateFormat = (text) => {
       _match.substring(0, 2)
     );
   } catch {
-    return text;
+    try {
+       dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/;
+      let _match = text.match(dateRegex)[0];
+
+      return new Date(
+        _match.substring(0, 4),
+        _match.substring(5, 7) - 1,
+        _match.substring(10, 12)
+      );
+    } catch {
+      return text;
+    }
   }
 };
 

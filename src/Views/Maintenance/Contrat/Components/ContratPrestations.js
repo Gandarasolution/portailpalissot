@@ -33,6 +33,7 @@ import TableData, {
   CreateNewHeader,
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
+  EditorDateFromDateTime,
 } from "../../../../components/commun/TableData";
 import { GetNomMois } from "../../../../functions";
 import TitreOfPage from "../../../../components/commun/TitreOfPage";
@@ -88,16 +89,7 @@ const ContratPrestation = ({
 
   const GetPrestationTrimmed = () => {
     let _lPrestation = Prestations;
-    for (let index = 0; index < _lPrestation.length; index++) {
-      const element = _lPrestation[index];
-      element.DateInterventionPrestation = new Date(
-        element.DateInterventionPrestation
-      );
-
-      element.DateInterventionPrestationTrimed = _methodeDate(
-        element.DateInterventionPrestation
-      );
-    }
+    
 
     if (_lPrestation.length) {
       _lPrestation = _lPrestation.sort(
@@ -112,18 +104,14 @@ const ContratPrestation = ({
     return _lPrestation;
   };
 
-  const _methodeDate = (e) => {
-    return `${GetNomMois(new Date(e).getMonth() + 1)}  ${new Date(
-      e
-    ).getFullYear()}`;
-  };
+ 
 
   function CreateHeaderForTable() {
     let _headers = [];
     _headers.push(
       CreateNewHeader(
-        "DateInterventionPrestationTrimed",
-        CreateFilter(true, true, false, false),
+        "DateInterventionPrestation",
+        CreateFilter(true, false, false, false,true),
         "Date"
       )
     );
@@ -163,10 +151,24 @@ const ContratPrestation = ({
     return _headers;
   }
 
+
+  const EditorDateStringMonth = (data) => {
+   
+
+    let _parseDate = EditorDateFromDateTime(data);
+
+    const _month = Number(_parseDate.substring(5,7));
+    const _year = Number(_parseDate.substring(0,4));
+
+    return `${GetNomMois(_month)} ${_year.toString()}`
+    
+  }
+
+
   function CreateCellsForTable() {
     let _cells = [];
     _cells.push(
-      CreateNewCell("DateInterventionPrestationTrimed", true, true, false)
+      CreateNewCell("DateInterventionPrestation", true, true, false,EditorDateStringMonth)
     );
     _cells.push(CreateNewCell("Secteur", true, true, false));
     _cells.push(CreateNewCell("IdPrestationContrat", false, true, false));

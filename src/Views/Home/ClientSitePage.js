@@ -346,62 +346,65 @@ const ClientSitePage = () => {
           );
         };
 
-        const BADGEINFO = ({ kv }) => {
-          let _href = "";
-          let _icon = undefined;
-          switch (kv.k) {
-            case "prestations maintenances":
-              _href = "/contrat";
-              _icon = <IconeContrat />;
-              break;
-            case "appareils enregistrés":
-              _href = "/appareils";
-              _icon = <IconeAppareil />;
-              break;
-            case "interventions de dépannages":
-              _href = "/interventions";
-              _icon = <IconeDepannage />;
-              break;
-            case "devis":
-              _href = "/devis";
-              _icon = <IconeDevis />;
-              break;
-            case "factures":
-              _href = "/factures";
-              _icon = <IconeFacture />;
-              break;
-            default:
-              break;
-          }
 
-          const BADGE = () => {
-            return (
-              <div className="badge badge-bg-info-nowrap">
-                {_icon} {`${kv.v} ${kv.k}`}
-              </div>
-            );
-          };
-
-          return (
-            <Col>
-              {actual ? (
-                <a href={_href}>
-                  <BADGE />
-                </a>
-              ) : (
-                <BADGE />
-              )}
-            </Col>
-          );
-        };
 
         useEffect(() => {
           GetNbPortails();
         }, []);
 
         const ROWINFO = () => {
+
+          const BADGEINFO = ({ kv }) => {
+            let _href = "";
+            let _icon = undefined;
+            switch (kv.k) {
+              case "prestations maintenances":
+                _href = "/contrat";
+                _icon = <IconeContrat />;
+                break;
+              case "appareils enregistrés":
+                _href = "/appareils";
+                _icon = <IconeAppareil />;
+                break;
+              case "interventions de dépannages":
+                _href = "/interventions";
+                _icon = <IconeDepannage />;
+                break;
+              case "devis":
+                _href = "/devis";
+                _icon = <IconeDevis />;
+                break;
+              case "factures":
+                _href = "/factures";
+                _icon = <IconeFacture />;
+                break;
+              default:
+                break;
+            }
+  
+            const BADGE = () => {
+              return (
+                <div className="badge badge-bg-info-nowrap">
+                  {_icon} {`${kv.v} ${kv.k}`}
+                </div>
+              );
+            };
+  
+            return (
+              <Col>
+                {actual ? (
+                  <a href={_href}>
+                    <BADGE />
+                  </a>
+                ) : (
+                  <BADGE />
+                )}
+              </Col>
+            );
+          };
+
           return (
-            <Row>
+            <Row className="m-2">
               {isLoadedNbPortail ? (
                 nbPortail.map((kv, index) => {
                   return <BADGEINFO kv={kv} key={index} />;

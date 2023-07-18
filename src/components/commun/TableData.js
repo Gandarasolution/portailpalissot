@@ -26,6 +26,7 @@ import Card from "react-bootstrap/Card";
 
 //#region fontAwsome
 import {
+  faClose,
   faDownload,
   faEye,
   faFilter,
@@ -79,6 +80,7 @@ import { Link } from "react-router-dom";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import { Tooltip } from "react-bootstrap";
 
+const TAGSELECTION = "_xSelection";
 //#endregion
 
 /**
@@ -96,11 +98,12 @@ const TableData = ({ ...props }) => {
       _lData = JSON.parse(JSON.stringify(props.Data));
     }
 
-    //Récursion pour colonne unbound
+    //Récursion pour colonne unbound et _xSelection
     for (let index = 0; index < _lData.length; index++) {
       const element = _lData[index];
       let _unboundColonne = JSON.parse(JSON.stringify(element));
       element.unboundColonne = _unboundColonne;
+      element[TAGSELECTION] = arraySelector.includes(index);
     }
 
     //filtre par la barre de recherche
@@ -164,6 +167,8 @@ const TableData = ({ ...props }) => {
   const [pageActuelle, setPageActuelle] = useState(1);
 
   const [rowIndexSelected, setRowIndexSelected] = useState(null);
+
+  const [arraySelector, setArraySelector] = useState([]);
 
   //#endregion
 
@@ -352,6 +357,8 @@ const TableData = ({ ...props }) => {
   const TableHeader = ({ header }) => {
     return header.filter.isFilter ? (
       <TableHeaderCellFilter header={header} />
+    ) : header.fieldname === TAGSELECTION ? (
+      <TableHeaderCellSelection header={header} />
     ) : (
       <TableHeaderCell header={header} />
     );
@@ -370,6 +377,26 @@ const TableData = ({ ...props }) => {
       <th key={header.fieldname} colSpan={GetHeaderColSpan(header.fieldname)}>
         <div className="row-height">
           {header.caption ? header.caption : header.fieldname}
+        </div>
+      </th>
+    );
+  };
+
+  const TableHeaderCellSelection = ({ header }) => {
+    const HandleClick = () => {
+      setArraySelector([]);
+    };
+
+    return (
+      <th key={header.fieldname} colSpan={GetHeaderColSpan(header.fieldname)}>
+        <div className="row-height">
+          {header.caption ? header.caption : header.fieldname}
+          <FontAwesomeIcon
+            onClick={HandleClick}
+            // onDoubleClick={HandleDoubleClick}
+            icon={faClose}
+            className={"icon-bt"}
+          />
         </div>
       </th>
     );
@@ -409,16 +436,31 @@ const TableData = ({ ...props }) => {
     //#region RangeDate
 
     let _arrayDate = _arrayVal.map((date) => {
+      if (!date) return date;
       try {
-        if (!date) return date;
-        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
-        let _match = date.match(dateRegex)[0];
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/;
+
+        let _match = RegexTestAndReturnMatch(date, dateRegex);
+
+        if (_match === date) {
+          dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/;
+          let _match2 = RegexTestAndReturnMatch(date, dateRegex);
+
+          let _retu = new Date(
+            _match2.substring(0, 4),
+            _match2.substring(5, 7) - 1,
+            _match2.substring(8, 10)
+          );
+
+          return _retu;
+        }
 
         let _retu = new Date(
           _match.substring(6),
           _match.substring(3, 5) - 1,
           _match.substring(0, 2)
         );
+
         return _retu;
       } catch (error) {
         return date;
@@ -429,14 +471,33 @@ const TableData = ({ ...props }) => {
     const maxDate = new Date(Math.max.apply(null, _arrayDate));
 
     const ParseDateFormat = (text) => {
-      try {
-        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
+      function parseAvecSlash() {
+        var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/;
         let _match = text.match(dateRegex)[0];
 
         return `${_match.substring(6)}-${_match.substring(
           3,
           5
         )}-${_match.substring(0, 2)}`;
+      }
+
+      function parseAvecTiret() {
+        var dateRegex = /^[0-9]{1,2}-[0-9]{1,2}-[0-9]{4}/;
+        let _match = text.match(dateRegex)[0];
+
+        return `${_match.substring(6)}-${_match.substring(
+          3,
+          5
+        )}-${_match.substring(0, 2)}`;
+      }
+
+      try {
+        let _match = parseAvecSlash();
+        if (_match === text) {
+          _match = parseAvecTiret();
+        }
+
+        return _match;
       } catch {
         return text;
       }
@@ -605,9 +666,7 @@ const TableData = ({ ...props }) => {
       removeValue(arraySearch, setArraySearch);
     };
 
-
-    if(_headerToApply.filter.isCheckbox && _arFilters.length > 10 )
-    {
+    if (_headerToApply.filter.isCheckbox && _arFilters.length > 10) {
       _headerToApply.filter.isCheckbox = false;
     }
     return (
@@ -817,7 +876,9 @@ const TableData = ({ ...props }) => {
     return (
       <tr
         className={
-          index === rowIndexSelected ? "table-presta-row-selected" : ""
+          index === rowIndexSelected || arraySelector.includes(index)
+            ? "table-presta-row-selected"
+            : ""
         }
       >
         {props.Headers.map((header, i) => {
@@ -853,6 +914,9 @@ const TableData = ({ ...props }) => {
       return c.fieldname === fieldname;
     });
 
+    if (_cellToApplys.length <= 0) {
+      return <td></td>;
+    }
     return _cellToApplys.map((_cellToApply, i) => {
       return (
         <TableBodyCellBody
@@ -933,15 +997,6 @@ const TableData = ({ ...props }) => {
         className="m-1"
       />
     );
-
-    /*< 1 ... x-2 x-1 x x+1 x+2 ... l >
-
-      < 1 x+1 x+2 ... l >
-      if (_limiter / nbParPages + 1) > 10
-      {
-        
-      }
-*/
 
     for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
       if (_isEllipsisNedded) {
@@ -1210,6 +1265,47 @@ const TableData = ({ ...props }) => {
 
   //#endregion
 
+  //#region Selection
+
+  const SelectionInfo = () => {
+    const SwitchTagSelection = async (tagMethod) => {
+      switch (tagMethod) {
+        case "selection_factures":
+          await HandleSelectorFacture();
+
+          break;
+
+        default:
+          break;
+      }
+    };
+
+    const HandleTelechargerSelection = async () => {
+      let _tagMethod = props.Cells.find(
+        (c) => c.fieldname === TAGSELECTION
+      ).tagMethod;
+      await SwitchTagSelection(_tagMethod);
+    };
+
+    if (arraySelector.length > 0) {
+      return (
+        <Container>
+          <Button
+            onClick={HandleTelechargerSelection}
+            variant=" "
+            className="border"
+          >
+            Télecharger {arraySelector.length} document
+            {arraySelector.length > 1 && "s"}
+          </Button>
+        </Container>
+      );
+    }
+    return "";
+  };
+
+  //#endregion
+
   //#region TopPannel
 
   const TopPannel = () => {
@@ -1417,6 +1513,19 @@ const TableData = ({ ...props }) => {
         HandleDocumentDevis(item, true);
         break;
       default:
+        if (tagMethod.includes("selection_")) {
+          let _arrSelector = JSON.parse(JSON.stringify(arraySelector));
+
+          if (_arrSelector.includes(index)) {
+            _arrSelector = _arrSelector.filter((s) => s !== index);
+          } else {
+            _arrSelector.push(index);
+          }
+          if (!_arrSelector) {
+            _arrSelector = [];
+          }
+          setArraySelector(_arrSelector);
+        }
         break;
     }
   };
@@ -1868,6 +1977,48 @@ const TableData = ({ ...props }) => {
     // eslint-disable-next-line
   }, [FactureCtx && FactureCtx.TelechargerFacture]);
 
+  const HandleSelectorFacture = async () => {
+    let _arrayOfFactures = [];
+
+    for (let index = 0; index < arraySelector.length; index++) {
+      const element = arraySelector[index];
+      _arrayOfFactures.push(Data()[element]);
+    }
+
+    //Création du fichier ZIP
+    let _targetWindow = window.open("/waiting");
+
+    const CreateArrayZIP = async () => {
+      let _arrDocs = [];
+
+      for (let index = 0; index < _arrayOfFactures.length; index++) {
+        const facture = _arrayOfFactures[index];
+        let _kv = await VoirFactureDocument(
+          tokenCt,
+          facture.IdFacture,
+          facture.Type,
+          facture.Avoir,
+          true
+        );
+        if (_kv) {
+          _arrDocs.push([_kv.v, _kv.k]);
+        }
+      }
+
+      return _arrDocs;
+    };
+
+    let _arrDocs = await CreateArrayZIP();
+    const _date = new Date();
+    await TelechargerZIP(
+      _arrDocs,
+      `${_date.toLocaleDateString("fr-FR").replace(/\//g, "-")}_${
+        _arrDocs.length
+      }_factures`
+    );
+    _targetWindow.close();
+  };
+
   //#endregion
 
   //#region Intervention
@@ -2075,8 +2226,12 @@ const TableData = ({ ...props }) => {
         <Breakpoint medium down>
           <GridCards />
         </Breakpoint>
-
-        {props.Pagination && TablePagination()}
+        <Row>
+          {props.Pagination && <Col>{TablePagination()}</Col>}
+          <Col>
+            <SelectionInfo />
+          </Col>
+        </Row>
       </Container>
     </BreakpointProvider>
   );
@@ -2103,7 +2258,7 @@ export const EditorDateFromDateTime = (data) => {
   if (_match !== data) {
     return _match;
   }
-  dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2} /;
+  dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/;
   _match = RegexTestAndReturnMatch(data, dateRegex);
   if (_match !== data) {
     return _match;
@@ -2133,6 +2288,10 @@ export const EditorActionTelecharger = (e) => {
       </OverlayTrigger>
     </Button>
   );
+};
+
+const EditorSelection = (e) => {
+  return <Form.Check defaultChecked={e} />;
 };
 
 //#endregion
@@ -2184,11 +2343,12 @@ export const CreateNewCell = (
   return _cell;
 };
 
-export const CreateNewUnboundHeader = (filter, caption) => {
+export const CreateNewUnboundHeader = (filter, caption, tagMethod) => {
   let _header = {
     fieldname: "unboundColonne",
     filter: filter,
     caption: caption,
+    tagMethod: tagMethod,
   };
   return _header;
 };
@@ -2209,6 +2369,21 @@ export const CreateNewUnboundCell = (
     tagMethod: tagMethod,
   };
   return _cell;
+};
+
+export const CreateNewHeaderSelector = (tagMethod) => {
+  return CreateNewHeader(TAGSELECTION, false, "Selection", EditorSelection);
+};
+
+export const CreateNewCellSelector = (tagMethod) => {
+  return CreateNewCell(
+    TAGSELECTION,
+    false,
+    false,
+    true,
+    EditorSelection,
+    `selection_${tagMethod}`
+  );
 };
 
 export const CreateNewButtonFilter = (fieldname, value, editor) => {
