@@ -100,7 +100,10 @@ nav ul li:hover {
   background-color: var(--color-info) !important;
 }
 
+.btn-infoB {
+  background-color: var(--color-info) !important;
 
+}
 
 .card-footer-button :hover{
   background-color: var(--color-info) !important;
@@ -248,6 +251,10 @@ nav ul li:hover {
 
 
 
+.card-clientsite{
+  border-width: 3px !important;
+  border-color: #01B81A !important;
+}
 
 .bt-clientsite {
 

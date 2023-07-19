@@ -55,6 +55,7 @@ import DevisPage from "./Views/Devis/DevisPage";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faBook, faCalendar, faFile, faHome, faMobile, faSquareCheck, faWrench } from "@fortawesome/free-solid-svg-icons";
 import { fas } from '@fortawesome/free-solid-svg-icons'
+import AccountPage from "./Views/Home/AccountPage";
 
 library.add(fas, faWrench,faCalendar, faHome,faMobile,faBook,faFile, faSquareCheck );
 
@@ -119,6 +120,15 @@ function App() {
 
   //#region Token
 
+  const accountName = cyrb53("accountNamedHashed").toString();
+  const [accountCookie, setAccountCookie, removeAccountCookie]=useCookies([accountName]);
+  function setAccountName(name){
+    setAccountCookie(accountName,name);
+  }
+
+  const account = accountCookie[accountName];
+
+
   //Hashage du nom du token pour éviter une récupération mannuelle rapide
   const tokenName = cyrb53("tokenNameHashed").toString();
 
@@ -134,6 +144,7 @@ function App() {
     removeTokenCookie(tokenName);
     removeListeParamsCookie(listParamName);
     removeClientSiteCookie(clientSiteName);
+    removeAccountCookie(accountName);
   };
 
   if (!tokenCookie[tokenName]) {
@@ -142,6 +153,7 @@ function App() {
         <LoginPage
           setToken={setTokenViaCookies}
           setParams={setListeParamsViaCookies}
+          setAccountName={setAccountName}
         />
       </div>
     );
@@ -151,44 +163,51 @@ function App() {
 
   //#region Composants
   const AppRoutes = () => {
+
     return (
       <Routes>
-        <Route path="/test" element={<PageTest />} />
+        <Route path="test" element={<PageTest />} />
+                  
 
-        <Route path="/:lerest" element={<ClientSitePage />} />
-        <Route path="/" element={<ClientSitePage />} />
+        <Route path="*" element={<ClientSitePage />} />
 
-        <Route path="/waiting" element={<WaiterPage />} />
-        <Route path="/error" element={<ErrorPage />} />
 
-        <Route path="/viewerWord" element={<ViewerWord />} />
+        <Route path="waiting" element={<WaiterPage />} />
+        <Route path="error" element={<ErrorPage />} />
 
+        <Route path="viewerWord" element={<ViewerWord />} />
+        
+        <Route path="account" element={<AccountPage accountName={account}/>}/>
+        
+        
         <Route
-          path="/contrat"
+          path="maintenance"
           element={storedClientSite ? <ContratPage /> : <ClientSitePage />}
-        />
+        /> 
         <Route
-          path="/appareils"
+          path="appareils"
           element={storedClientSite ? <AppareilsPage /> : <ClientSitePage />}
         />
         <Route
-          path="/interventions"
+          path="interventions"
+          exact
           element={storedClientSite ? <InterventionPage /> : <ClientSitePage />}
         />
         <Route
-          path="/nouvelleintervention"
+          path="nouvelleintervention"
           element={
             storedClientSite ? <NouvelleInterventionPage /> : <ClientSitePage />
           }
         />
         <Route
-          path="/devis"
+          path="devis"
           element={storedClientSite ? <DevisPage /> : <ClientSitePage />}
         />
         <Route
-          path="/factures"
+          path="factures"
           element={storedClientSite ? <FacturesPage /> : <ClientSitePage />}
         />
+
       </Routes>
     );
   };
@@ -196,7 +215,7 @@ function App() {
   const SmallDown = () => {
     return (
       <Breakpoint small down>
-        <TopBarMenu handleDeconnexion={handleDeconnexion} />
+        <TopBarMenu accountName={account}  handleDeconnexion={handleDeconnexion} />
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <AppRoutes />
       </Breakpoint>
@@ -212,7 +231,7 @@ function App() {
           </Col>
 
           <Col className="App font-link p-0">
-            <TopBarMenu handleDeconnexion={handleDeconnexion} />
+            <TopBarMenu accountName={account} handleDeconnexion={handleDeconnexion} />
             <AppRoutes />
           </Col>
         </Row>

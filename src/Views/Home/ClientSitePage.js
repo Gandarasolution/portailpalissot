@@ -64,12 +64,27 @@ const ClientSitePage = () => {
     let _data = JSON.parse(JSON.stringify(listeClientSite));
 
     if (search.length > 0) {
-      const filteredData = _data.filter((f) =>
-        f.NomCompletClientSite.toUpperCase().includes(search.toUpperCase())
+      const filteredData = _data.filter(
+        (f) =>
+          f.NomCompletClientSite.toUpperCase().includes(search.toUpperCase()) ||
+          (ClientSiteCt.storedClientSite &&
+            f.GUID === ClientSiteCt.storedClientSite.GUID)
       );
+
       _data = filteredData;
     }
 
+    if (ClientSiteCt.storedClientSite) {
+      let _tempArray = JSON.parse(JSON.stringify(_data)).filter(
+        (cs) => cs.GUID === ClientSiteCt.storedClientSite.GUID
+      );
+
+      let _tempWithout = JSON.parse(JSON.stringify(_data)).filter(
+        (cs) => cs.GUID !== ClientSiteCt.storedClientSite.GUID
+      );
+
+      _data = _tempArray.concat(_tempWithout);
+    }
     return _data;
   }
 
@@ -119,11 +134,7 @@ const ClientSitePage = () => {
       const TITRE = () => {
         return (
           <Card.Title>
-            {actual ? (
-              <h1>{clientSite.NomCompletClientSite}</h1>
-            ) : (
-              HighlightTextIfSearch(clientSite.NomCompletClientSite)
-            )}
+            {HighlightTextIfSearch(clientSite.NomCompletClientSite)}
           </Card.Title>
         );
       };
@@ -131,21 +142,11 @@ const ClientSitePage = () => {
       const SOUSTITRE = () => {
         return (
           <Card.Subtitle>
-            {actual ? (
-              <h2>
-                {clientSite.IdContrat > 0
-                  ? `Contrat N° ${clientSite.IdContrat} souscrit le ${new Date(
-                      clientSite.DateSouscriptionContrat
-                    ).toLocaleDateString()}`
-                  : "Aucun contrat actif"}
-              </h2>
-            ) : clientSite.IdContrat > 0 ? (
-              `Contrat N° ${clientSite.IdContrat} souscrit le ${new Date(
-                clientSite.DateSouscriptionContrat
-              ).toLocaleDateString()}`
-            ) : (
-              `Aucun contrat actif`
-            )}
+            {clientSite.IdContrat > 0
+              ? `Contrat N° ${clientSite.IdContrat} souscrit le ${new Date(
+                  clientSite.DateSouscriptionContrat
+                ).toLocaleDateString()}`
+              : `Aucun contrat actif`}
           </Card.Subtitle>
         );
       };
@@ -160,7 +161,7 @@ const ClientSitePage = () => {
 
     const CARDBODY = () => {
       const ADRESSE = () => {
-        return actual ? (
+        return (
           <h4 className="m-2">
             <FontAwesomeIcon icon={faLocationDot} />{" "}
             <a
@@ -170,11 +171,6 @@ const ClientSitePage = () => {
               {clientSite.AdresseClientSite}
             </a>
           </h4>
-        ) : (
-          <div>
-            <FontAwesomeIcon icon={faLocationDot} />{" "}
-            {` ${clientSite.AdresseClientSite}`}
-          </div>
         );
       };
 
@@ -197,8 +193,7 @@ const ClientSitePage = () => {
             };
 
             setShowModal(true);
-            if(listeModal.length <= 0)
-            {
+            if (listeModal.length <= 0) {
               await functionGet(tokenCt, clientSite.GUID, FetchSetData);
             }
           };
@@ -341,27 +336,20 @@ const ClientSitePage = () => {
             setIsLoadedPortail(true);
           };
 
-          GetNombrePortails(
-            tokenCt,
-            clientSite.GUID,
-            FetchSetNbPortail
-          );
+          GetNombrePortails(tokenCt, clientSite.GUID, FetchSetNbPortail);
         };
-
-
 
         useEffect(() => {
           GetNbPortails();
         }, []);
 
         const ROWINFO = () => {
-
           const BADGEINFO = ({ kv }) => {
             let _href = "";
             let _icon = undefined;
             switch (kv.k) {
               case "prestations maintenances":
-                _href = "/contrat";
+                _href = "/maintenance";
                 _icon = <IconeContrat />;
                 break;
               case "appareils enregistrés":
@@ -383,7 +371,7 @@ const ClientSitePage = () => {
               default:
                 break;
             }
-  
+
             const BADGE = () => {
               return (
                 <div className="badge badge-bg-info-nowrap">
@@ -391,7 +379,7 @@ const ClientSitePage = () => {
                 </div>
               );
             };
-  
+
             return (
               <Col>
                 {actual ? (
@@ -445,7 +433,7 @@ const ClientSitePage = () => {
       return (
         <Card.Footer className="card-footer-button">
           <Row>
-            <Button onClick={HandleChoixDuSite} variant="" >
+            <Button onClick={HandleChoixDuSite} variant="">
               Choisir ce site
             </Button>
           </Row>
@@ -454,8 +442,7 @@ const ClientSitePage = () => {
     };
 
     return (
-
-      <Card className={`m-2 h-100 ${!actual && "card-clientsite"}`} >
+      <Card className={`m-2 h-100 ${actual ? "card-clientsite" : ""}`}>
         <CARDHEADER />
         <CARDBODY />
         {!actual && <CARDFOOTER />}
@@ -519,27 +506,23 @@ const ClientSitePage = () => {
         isLoaded={isLoaded}
         soustitre={`${listeClientSite.length} sites `}
       />
-      {ClientSiteCt.storedClientSite && (
-        <CardClientSite
-          clientSite={ClientSiteCt.storedClientSite}
-          actual={true}
-        />
-      )}
+
       <div className="m-2">{SearchBar()}</div>
+      <Container fluid className="container-table p-4 ">
+
       <Row>
+        {!ClientSiteCt.storedClientSite && <h3>Merci de choisir un site</h3>}
         {isLoaded ? (
           GetDataTrimed().map((clientSite) => {
-            if (
-              ClientSiteCt.storedClientSite &&
-              clientSite.GUID ===
-                ClientSiteCt.storedClientSite.GUID
-            )
-            {
-              return null;
-            }
             return (
               <Col className="p-1" md={4} key={clientSite.GUID}>
-                <CardClientSite clientSite={clientSite} />
+                <CardClientSite
+                  clientSite={clientSite}
+                  actual={
+                    ClientSiteCt.storedClientSite &&
+                    clientSite.GUID === ClientSiteCt.storedClientSite.GUID
+                  }
+                />
               </Col>
             );
           })
@@ -547,6 +530,7 @@ const ClientSitePage = () => {
           <PlaceholderCards number={9} />
         )}
       </Row>
+      </Container>
     </Container>
   );
 };

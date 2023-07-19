@@ -15,7 +15,7 @@ const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
 
 const callEndpoint = async (endpoint, data, setData, returnData) => {
   let _data = undefined;
-  const currentURL = window.location.href;
+  // const currentURL = window.location.href;
 
  
 
