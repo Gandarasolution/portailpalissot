@@ -1292,7 +1292,7 @@ const TableData = ({ ...props }) => {
         <Container>
           <Button
             onClick={HandleTelechargerSelection}
-            variant=" "
+            variant="warning"
             className="border"
           >
             Télecharger {arraySelector.length} document
@@ -1340,6 +1340,12 @@ const TableData = ({ ...props }) => {
           />
         </Col>
         {props.TopPannelRightToSearch && props.TopPannelRightToSearch}
+        {props.Headers.findIndex((h)=> h.fieldname.includes(TAGSELECTION)) > -1 &&(
+         
+        <Col>
+            <SelectionInfo />
+          </Col>
+        )}
       </Row>
     );
   };
@@ -1626,8 +1632,9 @@ const TableData = ({ ...props }) => {
         keyboard={false}
         animation={false}
       >
-        <Modal.Header closeButton>
+        <Modal.Header  >
           <Modal.Title> Liste des relevés de tâches </Modal.Title>
+          <Button variant="danger" onClick={() => setShowModalListeTaches(false)}> X </Button>
         </Modal.Header>
         <Modal.Body>
           <CardListeTachesBodyL />
@@ -1669,6 +1676,9 @@ const TableData = ({ ...props }) => {
     return (
       <Card className="mb-2">
         <Card.Header className="card-document">
+          <Row>
+
+          <Col md={"auto"}>
           Documents{" "}
           {isDocumentLoaded ? (
             `(${
@@ -1679,12 +1689,20 @@ const TableData = ({ ...props }) => {
               <Placeholder xs={1} />
             </Placeholder>
           )}
+
+</Col>
+
+          <Col style={{ textAlign: "end" }}>
+
           <CloseButton
             onClick={() => {
               setGridColMDValue(12);
             }}
             className="ms-4"
           />
+          </Col>
+          </Row>
+
         </Card.Header>
         {isDocumentLoaded ? (
           <Card.Body>
@@ -2118,7 +2136,7 @@ const TableData = ({ ...props }) => {
           _arrFI.push(_obj);
         }
       } else if (data.k) {
-        const _obj = CreatePropsDocumentInterventionFI(JSON.PARSE(data));
+        const _obj = CreatePropsDocumentInterventionFI(data);
 
         _arrFI.push(_obj);
       }
@@ -2228,9 +2246,7 @@ const TableData = ({ ...props }) => {
         </Breakpoint>
         <Row>
           {props.Pagination && <Col>{TablePagination()}</Col>}
-          <Col>
-            <SelectionInfo />
-          </Col>
+          
         </Row>
       </Container>
     </BreakpointProvider>
