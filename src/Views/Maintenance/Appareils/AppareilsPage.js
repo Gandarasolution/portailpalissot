@@ -105,8 +105,8 @@ const AppareilsPage = () => {
   function CreateButtonFilters() {
     let _bt = [];
     _bt.push(CreateNewButtonFilter("IdEtat", 56, EditorFilter));
-    _bt.push(CreateNewButtonFilter("IdEtat", 57, EditorFilter));
     _bt.push(CreateNewButtonFilter("IdEtat", 206, EditorFilter));
+    _bt.push(CreateNewButtonFilter("IdEtat", 57, EditorFilter));
     return _bt;
   }
 

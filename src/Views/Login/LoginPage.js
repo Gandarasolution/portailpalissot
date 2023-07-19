@@ -76,6 +76,7 @@ const LoginPage = (props) => {
         const FetchSetListeParams = async (data) => {
           props.setParams(data);
           props.setToken(response);
+          props.setAccountName(login);
         };
 
         //3 -> On récupère la liste des paramètres de l'application

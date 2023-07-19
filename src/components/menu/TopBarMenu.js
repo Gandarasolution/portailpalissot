@@ -17,6 +17,8 @@ import Popover from "react-bootstrap/Popover";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBook,
+  faCircleUser,
+  faCookieBite,
   faHome,
   faMobile,
   faRightFromBracket,
@@ -32,11 +34,14 @@ import logo from "../../image/favicon.ico";
 
 //#endregion
 import { useContext, useState } from "react";
+import { Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 //#endregion
 
-const TopBarMenu = ({ handleDeconnexion }) => {
+const TopBarMenu = ({ accountName,handleDeconnexion }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
+  const navigate = useNavigate();
 
   const [showMenu, setShowMenu] = useState(false);
   const handleCloseMenu = () => setShowMenu(false);
@@ -91,6 +96,37 @@ const TopBarMenu = ({ handleDeconnexion }) => {
     );
   };
 
+  const handleAccount = () => {
+    navigate("/account");
+  }
+  const handleCookies = () => {
+    console.log("Modal Cookies");
+  }
+  const PopoverAccount = (
+    
+    <Popover>
+      <Popover.Header>{accountName}</Popover.Header>
+      <Popover.Body>
+        <Row>
+          <Button variant="" className="border mb-2" onClick={handleAccount} >
+            <FontAwesomeIcon icon={faUser} /> Mon compte
+          </Button>
+        </Row>
+        <Row>
+          <Button variant="" className="border mb-2" onClick={handleDeconnexion} >
+            <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
+          </Button>
+        </Row>
+        <Row>
+          <Button variant="" className="border mb-2" onClick={handleCookies} >
+            <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
+          </Button>
+        </Row>
+      </Popover.Body>
+    </Popover>
+  );
+  
+
   return (
     <Navbar bg="light" expand="lg">
       <Container fluid>
@@ -112,26 +148,24 @@ const TopBarMenu = ({ handleDeconnexion }) => {
             Changer de site
           </Button>
         </Navbar.Text>
+
+
         <Navbar.Collapse className="justify-content-end">
           <OverlayTrigger
             trigger={"click"}
-            placement="left"
-            overlay={
-              <Popover>
-                <Popover.Body>
-                  <Button variant="" onClick={handleDeconnexion}>
-                    <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
-                  </Button>
-                </Popover.Body>
-              </Popover>
-            }
+            placement="bottom"
+            overlay={PopoverAccount}
           >
             <Button variant="" className="border">
-              <FontAwesomeIcon icon={faUser} />
+              <FontAwesomeIcon icon={faCircleUser} /> {accountName}
             </Button>
           </OverlayTrigger>
         </Navbar.Collapse>
+
+
+
       </Container>
+
     </Navbar>
   );
 };

@@ -163,10 +163,9 @@ const InterventionPage = () => {
 
   function CreateButtonFilters() {
     let _bt = [];
-    _bt.push(CreateNewButtonFilter("VerrouEtat", 3, EditorFiltres));
-    _bt.push(CreateNewButtonFilter("VerrouEtat", 2, EditorFiltres));
     _bt.push(CreateNewButtonFilter("VerrouEtat", 1, EditorFiltres));
-    _bt.push(CreateNewButtonFilter("VerrouEtat", 0, EditorFiltres));
+    _bt.push(CreateNewButtonFilter("VerrouEtat", 2, EditorFiltres));
+    _bt.push(CreateNewButtonFilter("VerrouEtat", 3, EditorFiltres));
     _bt.push(CreateNewButtonFilter("VerrouEtat", 4, EditorFiltres));
 
     return _bt;
