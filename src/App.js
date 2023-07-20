@@ -64,6 +64,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import AccountPage from "./Views/Home/AccountPage";
+import HomePage from "./Views/Home/HomePage";
 
 library.add(
   fas,
@@ -182,7 +183,11 @@ function App() {
       <Routes>
         <Route path="test" element={<PageTest />} />
 
-        <Route path="*" element={<ClientSitePage />} />
+        <Route path="*" element={storedClientSite ? <HomePage /> : < ClientSitePage />} />
+
+        <Route path="/" element={storedClientSite ? <HomePage /> : < ClientSitePage />} />
+        <Route path="/sites" element={< ClientSitePage />} />
+
 
         <Route path="waiting" element={<WaiterPage />} />
         <Route path="error" element={<ErrorPage />} />
@@ -239,9 +244,14 @@ function App() {
     return (
       <Breakpoint medium up className="p-0 m-0">
         <Row className="background  m-0">
+{
+  storedClientSite && (
+
           <Col md={"auto"} className="p-0">
             <SideBarMenuLeft />
           </Col>
+  )
+}
 
           <Col className="App font-link p-0">
             <TopBarMenu

@@ -133,7 +133,10 @@ const ClientSitePage = () => {
       const TITRE = () => {
         return (
           <Card.Title>
+            <h3>
+
             {HighlightTextIfSearch(clientSite.NomCompletClientSite)}
+            </h3>
           </Card.Title>
         );
       };
@@ -141,17 +144,26 @@ const ClientSitePage = () => {
       const SOUSTITRE = () => {
         return (
           <Card.Subtitle>
+            <h4>
+
             {clientSite.IdContrat > 0
               ? `Contrat N° ${clientSite.IdContrat} souscrit le ${new Date(
-                  clientSite.DateSouscriptionContrat
+                clientSite.DateSouscriptionContrat
                 ).toLocaleDateString()}`
-              : `Aucun contrat actif`}
+                : `Aucun contrat actif`}
+                </h4>
           </Card.Subtitle>
         );
       };
 
+      const HandleChoixDuSite = () => {
+        if(!actual) {
+          ClientSiteCt.setClientSite(clientSite);
+        }
+      };
+
       return (
-        <Card.Header>
+        <Card.Header onClick={HandleChoixDuSite} className={actual ? "" : "header-card-site"} >
           <TITRE />
           <SOUSTITRE />
         </Card.Header>
@@ -161,7 +173,7 @@ const ClientSitePage = () => {
     const CARDBODY = () => {
       const ADRESSE = () => {
         return (
-          <h4 className="m-2">
+          <h5 className="m-2">
             <FontAwesomeIcon icon={faLocationDot} />{" "}
             <a
               href={`https://www.google.fr/maps/place/${clientSite.CoordonneesGPSClientSite}`}
@@ -169,7 +181,7 @@ const ClientSitePage = () => {
             >
               {clientSite.AdresseClientSite}
             </a>
-          </h4>
+          </h5>
         );
       };
 
@@ -391,8 +403,6 @@ const ClientSitePage = () => {
               </Col>
             );
           };
-
-          console.log(clientSite.NbPortail.KV);
           return (
             <Row className="justify-content-md-center">
               {clientSite.NbPortail.KV.map((kv, index) => {
@@ -401,13 +411,10 @@ const ClientSitePage = () => {
             </Row>
           );
         };
-        return actual ? (
-          <h4 className="m-2">
+        return        (  <h4 className="m-2">
             <ROWINFO />
-          </h4>
-        ) : (
-          <ROWINFO />
-        );
+          </h4>)
+       
       };
 
       return (
@@ -419,27 +426,27 @@ const ClientSitePage = () => {
       );
     };
 
-    const CARDFOOTER = () => {
-      const HandleChoixDuSite = () => {
-        ClientSiteCt.setClientSite(clientSite);
-      };
+    // const CARDFOOTER = () => {
+    //   const HandleChoixDuSite = () => {
+    //     ClientSiteCt.setClientSite(clientSite);
+    //   };
 
-      return (
-        <Card.Footer className="card-footer-button">
-          <Row>
-            <Button onClick={HandleChoixDuSite} variant="">
-              Choisir ce site
-            </Button>
-          </Row>
-        </Card.Footer>
-      );
-    };
+    //   return (
+    //     <Card.Footer className="card-footer-button">
+    //       <Row>
+    //         <Button onClick={HandleChoixDuSite} variant="">
+    //           Choisir ce site
+    //         </Button>
+    //       </Row>
+    //     </Card.Footer>
+    //   );
+    // };
 
     return (
       <Card className={`m-2 h-100 ${actual ? "card-clientsite" : ""}`}>
         <CARDHEADER />
         <CARDBODY />
-        {!actual && <CARDFOOTER />}
+        {/* {!actual && <CARDFOOTER />} */}
       </Card>
     );
   };
@@ -504,7 +511,7 @@ const ClientSitePage = () => {
       <div className="m-2">{SearchBar()}</div>
       <Container fluid className="container-table p-4 ">
         <Row>
-          {!ClientSiteCt.storedClientSite && <h3>Merci de choisir un site</h3>}
+          {!ClientSiteCt.storedClientSite && <h1>Merci de choisir un site</h1>}
           {isLoaded ? (
             GetDataTrimed().map((clientSite) => {
               return (
