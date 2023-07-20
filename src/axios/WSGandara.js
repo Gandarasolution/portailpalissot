@@ -740,7 +740,7 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
   }
 
   const SetData = (data) => {
-    const _kv = JSON.parse(data);
+    const _kv = data;
     if (telecharger) {
       TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
     } else {

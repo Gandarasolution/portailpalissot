@@ -227,6 +227,13 @@ function GetNomMois(num, short = false) {
   }
 }
 
+
+
+
+
+
+
+
 function addOneYear(date) {
   date.setFullYear(date.getFullYear() + 1);
   return date;

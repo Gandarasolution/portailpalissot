@@ -100,7 +100,6 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
     navigate("/account");
   };
   const handleCookies = () => {
-    console.log("Modal Cookies");
   };
   const PopoverAccount = (
     <Popover>
@@ -129,6 +128,10 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
     </Popover>
   );
 
+const handleChangerClientsite = () => {
+  navigate("/sites");
+}
+
   return (
     <Navbar bg="light" expand="lg">
       <Container fluid>
@@ -145,7 +148,8 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
           <Button
             variant=""
             className="border"
-            onClick={() => ClientSiteContratCtx.removeclientSite()}
+            // onClick={() => ClientSiteContratCtx.removeclientSite()}
+            onClick={handleChangerClientsite}
           >
             Changer de site
           </Button>
