@@ -1,19 +1,25 @@
 import Image from "react-bootstrap/Image";
 
 const ImageExtension = ({ extension }) => {
-  const ImgJPG = require("../../image/jpg.png");
-  const ImgPDF = require("../../image/pdf.png");
-  const ImgPNG = require("../../image/png.png");
-  const ImgDOC = require("../../image/doc.png");
-  const ImgZIP = require("../../image/zip.png");
+  const ImgJPG = require("../../image/imageDocuments/jpg.png");
+  const ImgPDF = require("../../image/imageDocuments/pdf.png");
+  const ImgPNG = require("../../image/imageDocuments/png.png");
+  const ImgDOC = require("../../image/imageDocuments/doc.png");
+  const ImgZIP = require("../../image/imageDocuments/zip.png");
+  const ImgXML = require("../../image/imageDocuments/xml.png");
+  const ImgXLS = require("../../image/imageDocuments/xls.png");
+  const ImgTXT = require("../../image/imageDocuments/txt.png");
+  const ImgGIF = require("../../image/imageDocuments/gif.png");
+  const ImgMP3 = require("../../image/imageDocuments/mp3.png");
+  const ImgSVG = require("../../image/imageDocuments/svg.png");
+  const ImgBMP = require("../../image/imageDocuments/bmp.png");
 
-  const ImgXML = require("../../image/xml.png");
-  const ImgXLS = require("../../image/xls.png");
-  const ImgTXT = require("../../image/txt.png");
-  const ImgGIF = require("../../image/gif.png");
-  const ImgMP3 = require("../../image/mp3.png");
-  const ImgSVG = require("../../image/svg.png");
-  const ImgBMP = require("../../image/bmp.png");
+  const ImgDOCX = require("../../image/imageDocuments/docx.png");
+  const ImgDWG = require("../../image/imageDocuments/dwg.png");
+  const ImgNEUTRE = require("../../image/imageDocuments/neutre.png");
+  const ImgPPTX = require("../../image/imageDocuments/pptx.png");
+  const ImgRAR = require("../../image/imageDocuments/rar.png");
+  const ImgXLSX = require("../../image/imageDocuments/xlsx.png");
 
   const GetImageExtension = (extension) => {
     switch (extension.toString().toUpperCase()) {
@@ -28,8 +34,9 @@ const ImageExtension = ({ extension }) => {
       case "XML":
         return ImgXML;
       case "XLS":
-      case "XLSX":
         return ImgXLS;
+      case "XLSX":
+        return ImgXLSX;
       case "TXT":
         return ImgTXT;
       case "GIF":
@@ -40,8 +47,18 @@ const ImageExtension = ({ extension }) => {
         return ImgSVG;
       case "BMP":
         return ImgBMP;
-      default:
+      case "DOC":
         return ImgDOC;
+      case "DOCX":
+        return ImgDOCX;
+      case "DWG":
+        return ImgDWG;
+      case "PPTX":
+        return ImgPPTX;
+      case "RAR":
+        return ImgRAR;
+      default:
+        return ImgNEUTRE;
     }
   };
 
