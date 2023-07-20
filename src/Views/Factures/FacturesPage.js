@@ -128,7 +128,12 @@ const FacturesPage = () => {
         EditorType
       )
     );
-    _headers.push(CreateNewUnboundHeader(CreateFilter(), "Actions",["tagFactureVoir","tagFactureTelecharger"]));
+    _headers.push(
+      CreateNewUnboundHeader(CreateFilter(), "Actions", [
+        "tagFactureVoir",
+        "tagFactureTelecharger",
+      ])
+    );
 
     return _headers;
   }

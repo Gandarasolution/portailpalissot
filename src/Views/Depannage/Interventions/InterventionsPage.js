@@ -175,53 +175,6 @@ const InterventionPage = () => {
 
   //#region Component
 
-  // const DropDownYears = (small) => {
-  //   let _dateDebut = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-  //   let _dateEnd = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-  //   let _arrayPeriodes = [
-  //     {
-  //       dateStart: new Date(_dateDebut),
-  //       dateEnd: new Date(_dateEnd.setMonth(_dateDebut.getMonth() + 11)),
-  //     },
-  //   ];
-
-  //   for (let index = 0; index < 10; index++) {
-  //     let _dateStart = addOneYear(new Date(_arrayPeriodes[index].dateStart));
-  //     let _dateEnd = addOneYear(new Date(_arrayPeriodes[index].dateEnd));
-
-  //     _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
-  //   }
-
-  //   return (
-  //     <DropdownButton
-  //       variant=""
-  //       className="button-periode"
-  //       drop="down-centered"
-  //       style={{ borderRadius: "10px" }}
-  //       id="dropdown-datePeriode"
-  //       title={`Période : ${GetNomMois(dateDebutPeriode.getMonth() + 1, small)}
-  //             ${dateDebutPeriode.getFullYear()} à
-  //             ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
-  //             ${dateFinPeriode().getFullYear()}`}
-  //       onSelect={(e) => {
-  //         HandleDropdownPeriodeSelect(e);
-  //       }}
-  //     >
-  //       {_arrayPeriodes.map((periode, index) => {
-  //         return (
-  //           <Dropdown.Item key={index} eventKey={periode.dateStart}>
-  //             {` ${GetNomMois(
-  //               periode.dateStart.getMonth() + 1
-  //             )} ${periode.dateStart.getFullYear()} à ${GetNomMois(
-  //               periode.dateEnd.getMonth() + 1
-  //             )} ${periode.dateEnd.getFullYear()}`}
-  //           </Dropdown.Item>
-  //         );
-  //       })}
-  //     </DropdownButton>
-  //   );
-  // };
-
   //#endregion
 
   useEffect(() => {
@@ -253,16 +206,7 @@ const InterventionPage = () => {
         break;
     }
 
-    return (
-      <span>
-        {/* <div
-      className={` text-wrap badge badge-bg-${GetBGColorByVerrouEtat(
-        VerrouEtat
-        )}`}
-        >{" "}</div> */}
-        {_text}
-      </span>
-    );
+    return <span>{_text}</span>;
   };
 
   const EditorActionDocuments = (inter) => {
@@ -277,13 +221,6 @@ const InterventionPage = () => {
       </Button>
     );
   };
-
-  // const EditorDateFromDateTime = (data) => {
-  //   if (!data) return data;
-  //   var dateRegex = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/g;
-  //   let _match = data.match(dateRegex)[0];
-  //   return _match;
-  // };
 
   const EditorEtat = (Etat) => {
     return (

@@ -29,7 +29,6 @@ import {
   GetClientSiteContrat,
   GetListeMails,
   GetListeTels,
-  GetNombrePortails,
 } from "../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 import {
@@ -327,42 +326,33 @@ const ClientSitePage = () => {
       };
 
       const INFOS = () => {
-        const [nbPortail, setNbPortail] = useState([]);
-        const [isLoadedNbPortail, setIsLoadedPortail] = useState(false);
-
-        const GetNbPortails = async () => {
-          const FetchSetNbPortail = (data) => {
-            setNbPortail(data);
-            setIsLoadedPortail(true);
-          };
-
-          GetNombrePortails(tokenCt, clientSite.GUID, FetchSetNbPortail);
-        };
-
-        useEffect(() => {
-          GetNbPortails();
-        }, []);
-
         const ROWINFO = () => {
           const BADGEINFO = ({ kv }) => {
             let _href = "";
             let _icon = undefined;
+            let _text = "";
+            let _wBadge = false;
             switch (kv.k) {
-              case "prestations maintenances":
+              case "maintenance":
                 _href = "/maintenance";
                 _icon = <IconeContrat />;
                 break;
-              case "appareils enregistrés":
+              case "appareils":
                 _href = "/appareils";
                 _icon = <IconeAppareil />;
+                _text = "appareils enregistrés";
                 break;
-              case "interventions de dépannages":
+              case "interventions":
                 _href = "/interventions";
                 _icon = <IconeDepannage />;
+                _text = `interventio${kv.v > 1 ? "ns" : "n"} en cours`;
+                _wBadge = kv.v > 0;
                 break;
               case "devis":
                 _href = "/devis";
                 _icon = <IconeDevis />;
+                _text = "devis en attente de décision";
+                _wBadge = kv.v > 0;
                 break;
               case "factures":
                 _href = "/factures";
@@ -374,14 +364,23 @@ const ClientSitePage = () => {
 
             const BADGE = () => {
               return (
-                <div className="badge badge-bg-info-nowrap">
-                  {_icon} {`${kv.v} ${kv.k}`}
-                </div>
+                <>
+                  <div className="position-relative d-inline-block">
+                    <div className="badge badge-bg-info-nowrap">
+                      {_icon} {` ${kv.v} ${_text} `}
+                    </div>
+                    {_wBadge && (
+                      <div className="position-absolute top-0 start-100 translate-middle p-2 circle-danger">
+                        {" "}
+                      </div>
+                    )}
+                  </div>
+                </>
               );
             };
 
             return (
-              <Col>
+              <Col md={"auto"} className="m-2">
                 {actual ? (
                   <a href={_href}>
                     <BADGE />
@@ -393,17 +392,12 @@ const ClientSitePage = () => {
             );
           };
 
+          console.log(clientSite.NbPortail.KV);
           return (
-            <Row className="m-2">
-              {isLoadedNbPortail ? (
-                nbPortail.map((kv, index) => {
-                  return <BADGEINFO kv={kv} key={index} />;
-                })
-              ) : (
-                <Placeholder as="p" animation="glow">
-                  <Placeholder xs={12} bg="infoB" />
-                </Placeholder>
-              )}
+            <Row className="justify-content-md-center">
+              {clientSite.NbPortail.KV.map((kv, index) => {
+                return <BADGEINFO kv={kv} key={index} />;
+              })}
             </Row>
           );
         };
@@ -509,27 +503,26 @@ const ClientSitePage = () => {
 
       <div className="m-2">{SearchBar()}</div>
       <Container fluid className="container-table p-4 ">
-
-      <Row>
-        {!ClientSiteCt.storedClientSite && <h3>Merci de choisir un site</h3>}
-        {isLoaded ? (
-          GetDataTrimed().map((clientSite) => {
-            return (
-              <Col className="p-1" md={4} key={clientSite.GUID}>
-                <CardClientSite
-                  clientSite={clientSite}
-                  actual={
-                    ClientSiteCt.storedClientSite &&
-                    clientSite.GUID === ClientSiteCt.storedClientSite.GUID
-                  }
-                />
-              </Col>
-            );
-          })
-        ) : (
-          <PlaceholderCards number={9} />
-        )}
-      </Row>
+        <Row>
+          {!ClientSiteCt.storedClientSite && <h3>Merci de choisir un site</h3>}
+          {isLoaded ? (
+            GetDataTrimed().map((clientSite) => {
+              return (
+                <Col className="p-1" md={4} key={clientSite.GUID}>
+                  <CardClientSite
+                    clientSite={clientSite}
+                    actual={
+                      ClientSiteCt.storedClientSite &&
+                      clientSite.GUID === ClientSiteCt.storedClientSite.GUID
+                    }
+                  />
+                </Col>
+              );
+            })
+          ) : (
+            <PlaceholderCards number={9} />
+          )}
+        </Row>
       </Container>
     </Container>
   );

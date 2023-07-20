@@ -10,14 +10,9 @@ const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
 
 //#endregion
 
-
-
-
 const callEndpoint = async (endpoint, data, setData, returnData) => {
   let _data = undefined;
   // const currentURL = window.location.href;
-
- 
 
   function ErrorHandling(error) {
     setData([]);
@@ -99,11 +94,7 @@ const GetClientSiteContrat = async (token, setData) => {
 
 //#region ClientSite
 const GetListeTels = (token, guid, setData) => {
-  return callEndpoint(
-    "ListeTelsSelect",
-    { token: token, guid: guid },
-    setData
-  );
+  return callEndpoint("ListeTelsSelect", { token: token, guid: guid }, setData);
 };
 
 const GetListeMails = (token, guid, setData) => {
@@ -112,7 +103,6 @@ const GetListeMails = (token, guid, setData) => {
     { token: token, guid: guid },
     setData
   );
-
 };
 
 const GetNombrePortails = (token, guid, setData) => {
@@ -121,7 +111,6 @@ const GetNombrePortails = (token, guid, setData) => {
     { token: token, guid: guid },
     setData
   );
-
 };
 
 //#endregion
@@ -162,12 +151,16 @@ const GetNombrePortails = (token, guid, setData) => {
 // };
 
 const GetPrestationContrat = (token, dateDebut, dateFin, guid, setData) => {
-return callEndpoint("GetPrestationContrat",{
-  token: token,
-  dateDebut: dateDebut,
-  dateFin: dateFin,
-  guid: guid,
-},setData);
+  return callEndpoint(
+    "GetPrestationContrat",
+    {
+      token: token,
+      dateDebut: dateDebut,
+      dateFin: dateFin,
+      guid: guid,
+    },
+    setData
+  );
 
   // var xhr = $.ajax({
   //   type: "POST",
@@ -525,13 +518,7 @@ const GetListeAppareils = async (token, guid, setData) => {
 //#endregion
 
 //#region Factures
-const GetListeFactures = async (
-  token,
-  guid,
-  dateDebut,
-  dateFin,
-  setData
-) => {
+const GetListeFactures = async (token, guid, dateDebut, dateFin, setData) => {
   $.ajax({
     type: "POST",
     url: urlAction + "GetFactures",
@@ -625,23 +612,18 @@ const TelechargerFactureDocument = async (
   });
 };
 
-
-
-
 //#endregion
 
 //#region Interventions
-const GetListeInterventions = async (
-  token,
-  guid,
-  setData
-) => {
-
-  return callEndpoint("GetListeInterventions",{
-    token: token,
-    guid: guid,
-  },setData);
-
+const GetListeInterventions = async (token, guid, setData) => {
+  return callEndpoint(
+    "GetListeInterventions",
+    {
+      token: token,
+      guid: guid,
+    },
+    setData
+  );
 };
 
 const GetListeFIIntervention = async (
@@ -649,10 +631,14 @@ const GetListeFIIntervention = async (
   IdDossierInterventionSAV,
   setData
 ) => {
-  return callEndpoint("GetListeFIIntervention",{
-    token: token,
-    IdDossierInterventionSAV: IdDossierInterventionSAV,
-  },setData);
+  return callEndpoint(
+    "GetListeFIIntervention",
+    {
+      token: token,
+      IdDossierInterventionSAV: IdDossierInterventionSAV,
+    },
+    setData
+  );
 };
 
 const GeTListeFactureIntervention = async (
@@ -660,12 +646,14 @@ const GeTListeFactureIntervention = async (
   IdDossierInterventionSAV,
   setData
 ) => {
-
-return callEndpoint("GeTListeFactureIntervention",{
-  token: token,
-  IdDossierInterventionSAV: IdDossierInterventionSAV,
-},setData);
-
+  return callEndpoint(
+    "GeTListeFactureIntervention",
+    {
+      token: token,
+      IdDossierInterventionSAV: IdDossierInterventionSAV,
+    },
+    setData
+  );
 };
 
 const GetDocumentFISAV = async (
@@ -674,37 +662,40 @@ const GetDocumentFISAV = async (
   telecharger,
   returnData
 ) => {
-
-
-  let targetWindow = undefined; 
-  if(!returnData)
-   {
+  let targetWindow = undefined;
+  if (!returnData) {
     targetWindow = window.open("/waiting");
-   }
-  
+  }
 
   const SetData = (data) => {
     const _kv = JSON.parse(data);
-      if (telecharger) {
-        TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
-      } else {
-        VoirDocument(_kv.v, _kv.k, targetWindow);
-      }
-  }
+    if (telecharger) {
+      TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
+    } else {
+      VoirDocument(_kv.v, _kv.k, targetWindow);
+    }
+  };
 
-  return callEndpoint("GetDocumentFISAV",{
-    token: token,
-    IdFicheInterventionSAV: IdFicheInterventionSAV,
-  },SetData, returnData);
-
-
+  return callEndpoint(
+    "GetDocumentFISAV",
+    {
+      token: token,
+      IdFicheInterventionSAV: IdFicheInterventionSAV,
+    },
+    SetData,
+    returnData
+  );
 };
 
 const GetListeSecteur = async (token, guid, setData) => {
-  return callEndpoint("GetListeSecteur",{
-    token: token,
-    guid: guid,
-  },setData)
+  return callEndpoint(
+    "GetListeSecteur",
+    {
+      token: token,
+      guid: guid,
+    },
+    setData
+  );
   // return $.ajax({
   //   type: "POST",
   //   url: urlAction + "GetListeSecteur",
@@ -732,36 +723,40 @@ const GetListeSecteur = async (token, guid, setData) => {
 //#region Devis
 
 const GetListeDevis = (token, guid, setData) => {
-  return callEndpoint("GetListeDevis", {
-    token: token,
-    guid: guid,
-  },setData);
-
+  return callEndpoint(
+    "GetListeDevis",
+    {
+      token: token,
+      guid: guid,
+    },
+    setData
+  );
 };
 
 const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
-  let targetWindow = undefined; 
-  if(!returnData)
-   {
+  let targetWindow = undefined;
+  if (!returnData) {
     targetWindow = window.open("/waiting");
-   }
-  
+  }
 
   const SetData = (data) => {
     const _kv = JSON.parse(data);
-      if (telecharger) {
-        TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
-      } else {
-        VoirDocument(_kv.v, _kv.k, targetWindow);
-      }
-  }
+    if (telecharger) {
+      TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
+    } else {
+      VoirDocument(_kv.v, _kv.k, targetWindow);
+    }
+  };
 
-  return callEndpoint("GetdocumentDevis",{ token: token, IdDevis: IdDevis },SetData, returnData);
-
+  return callEndpoint(
+    "GetdocumentDevis",
+    { token: token, IdDevis: IdDevis },
+    SetData,
+    returnData
+  );
 };
 
 //#endregion
-
 
 //#endregion
 

@@ -21,6 +21,7 @@ import Modal from "react-bootstrap/Modal";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Card from "react-bootstrap/Card";
+import Tooltip from "react-bootstrap/Tooltip";
 
 //#endregion
 
@@ -78,7 +79,6 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Breakpoint, BreakpointProvider } from "react-socks";
-import { Tooltip } from "react-bootstrap";
 
 const TAGSELECTION = "_xSelection";
 //#endregion
@@ -998,7 +998,9 @@ const TableData = ({ ...props }) => {
       />
     );
 
-    for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
+    const maxLoop = Math.ceil(_limiter / nbParPages);
+    // for (let number = 1; number <= _limiter / nbParPages + 1; number++) {
+    for (let number = 1; number <= maxLoop; number++) {
       if (_isEllipsisNedded) {
         if (number === 1) {
           // 1
@@ -1340,9 +1342,9 @@ const TableData = ({ ...props }) => {
           />
         </Col>
         {props.TopPannelRightToSearch && props.TopPannelRightToSearch}
-        {props.Headers.findIndex((h)=> h.fieldname.includes(TAGSELECTION)) > -1 &&(
-         
-        <Col>
+        {props.Headers.findIndex((h) => h.fieldname.includes(TAGSELECTION)) >
+          -1 && (
+          <Col>
             <SelectionInfo />
           </Col>
         )}
@@ -1632,9 +1634,15 @@ const TableData = ({ ...props }) => {
         keyboard={false}
         animation={false}
       >
-        <Modal.Header  >
+        <Modal.Header>
           <Modal.Title> Liste des relevés de tâches </Modal.Title>
-          <Button variant="danger" onClick={() => setShowModalListeTaches(false)}> X </Button>
+          <Button
+            variant="danger"
+            onClick={() => setShowModalListeTaches(false)}
+          >
+            {" "}
+            X{" "}
+          </Button>
         </Modal.Header>
         <Modal.Body>
           <CardListeTachesBodyL />
@@ -1677,32 +1685,30 @@ const TableData = ({ ...props }) => {
       <Card className="mb-2">
         <Card.Header className="card-document">
           <Row>
+            <Col md={"auto"}>
+              Documents{" "}
+              {isDocumentLoaded ? (
+                `(${
+                  _arrayDocs.length > 1
+                    ? _arrayDocs.length - 1
+                    : _arrayDocs.length
+                })`
+              ) : (
+                <Placeholder animation="glow">
+                  <Placeholder xs={1} />
+                </Placeholder>
+              )}
+            </Col>
 
-          <Col md={"auto"}>
-          Documents{" "}
-          {isDocumentLoaded ? (
-            `(${
-              _arrayDocs.length > 1 ? _arrayDocs.length - 1 : _arrayDocs.length
-            })`
-          ) : (
-            <Placeholder animation="glow">
-              <Placeholder xs={1} />
-            </Placeholder>
-          )}
-
-</Col>
-
-          <Col style={{ textAlign: "end" }}>
-
-          <CloseButton
-            onClick={() => {
-              setGridColMDValue(12);
-            }}
-            className="ms-4"
-          />
-          </Col>
+            <Col style={{ textAlign: "end" }}>
+              <CloseButton
+                onClick={() => {
+                  setGridColMDValue(12);
+                }}
+                className="ms-4"
+              />
+            </Col>
           </Row>
-
         </Card.Header>
         {isDocumentLoaded ? (
           <Card.Body>
@@ -2244,10 +2250,7 @@ const TableData = ({ ...props }) => {
         <Breakpoint medium down>
           <GridCards />
         </Breakpoint>
-        <Row>
-          {props.Pagination && <Col>{TablePagination()}</Col>}
-          
-        </Row>
+        <Row>{props.Pagination && <Col>{TablePagination()}</Col>}</Row>
       </Container>
     </BreakpointProvider>
   );

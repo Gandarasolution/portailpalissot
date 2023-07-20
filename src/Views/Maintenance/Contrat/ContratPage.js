@@ -109,8 +109,7 @@ const ContratPage = () => {
     return _DateRetour;
   }
 
-
-  const FetchDataPrestation =  () => {
+  const FetchDataPrestation = () => {
     if (ClientSiteContratCtx.storedClientSite.IdContrat === 0) {
       setIsLoadedPresta(true);
       return;
@@ -118,8 +117,7 @@ const ContratPage = () => {
     SetPrestations([]);
     setLastPeriode(DateSOAP(dateDebutPeriode));
 
-
-     GetPrestationContrat(
+    GetPrestationContrat(
       tokenCt,
       DateSOAP(dateDebutPeriode),
       DateSOAP(dateFinPeriode()),
@@ -156,7 +154,7 @@ const ContratPage = () => {
     setDateDebutPeriode(_dateDebutPeriode);
     setIsLoadedPresta(false);
 
-     FetchDataPrestation();
+    FetchDataPrestation();
   };
 
   const HandleDropdownPeriodeSelect = async (dateStart) => {
@@ -165,7 +163,7 @@ const ContratPage = () => {
     setDateDebutPeriode(_dateTemp);
     setIsLoadedPresta(false);
 
-     FetchDataPrestation();
+    FetchDataPrestation();
   };
 
   //#endregion
