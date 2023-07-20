@@ -1,6 +1,6 @@
 //#region Imports
 
-import { useState,useEffect,useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
@@ -46,11 +46,7 @@ const DevisPage = () => {
       setIsLoaded(true);
     };
 
-    GetListeDevis(
-      tokenCt,
-      clientSiteCt.storedClientSite.GUID,
-      FetchSetDevis
-    );
+    GetListeDevis(tokenCt, clientSiteCt.storedClientSite.GUID, FetchSetDevis);
   };
 
   const GetDevisTrimmed = () => {

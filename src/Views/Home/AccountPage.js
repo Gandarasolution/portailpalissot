@@ -1,15 +1,21 @@
 //#region Imports
 
-import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
-import TitreOfPage from "../../components/commun/TitreOfPage";
+//#region FontAwsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPen } from "@fortawesome/free-solid-svg-icons";
+//#endregion
 
 //#region Bootstrap
-
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import InputGroup from "react-bootstrap/InputGroup";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
 //#endregion
 
 //#region Components
+import TitreOfPage from "../../components/commun/TitreOfPage";
 
 //#endregion
 
@@ -58,14 +64,10 @@ const AccountPage = ({ accountName }) => {
           <Col>
             <Button variant="danger">Réinitialiser mon mot de passe</Button>
           </Col>
-
-         
         </Row>
       </span>
     );
   };
-
-
 
   //#endregion
 
@@ -79,7 +81,6 @@ const AccountPage = ({ accountName }) => {
 
       <Container fluid className="container-table p-4 ">
         <INFOS />
-
       </Container>
     </Container>
   );

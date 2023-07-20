@@ -85,17 +85,20 @@ const SideBarMenuLeft = () => {
         <CDBSidebarContent className="sidebar-content">
           <CDBSidebarMenu>
             <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
+          </CDBSidebarMenu>
+          <CDBSidebarMenu>
+            <MenuNavLink
+              href={"/maintenance"}
+              icon={"calendar"}
+              text={"Maintenance"}
+            />
 
-            </CDBSidebarMenu>
-            <CDBSidebarMenu>
-            <MenuNavLink href={"/maintenance"} icon={"calendar"} text={"Maintenance"} />
-           
             <MenuNavLink
               href={"/interventions"}
               icon={"wrench"}
               text={"Dépannage"}
             />
-             <MenuNavLink
+            <MenuNavLink
               href={"/appareils"}
               icon={"mobile"}
               text={"Appareils"}

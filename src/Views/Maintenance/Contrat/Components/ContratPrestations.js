@@ -89,7 +89,6 @@ const ContratPrestation = ({
 
   const GetPrestationTrimmed = () => {
     let _lPrestation = Prestations;
-    
 
     if (_lPrestation.length) {
       _lPrestation = _lPrestation.sort(
@@ -104,14 +103,12 @@ const ContratPrestation = ({
     return _lPrestation;
   };
 
- 
-
   function CreateHeaderForTable() {
     let _headers = [];
     _headers.push(
       CreateNewHeader(
         "DateInterventionPrestation",
-        CreateFilter(true, false, false, false,true),
+        CreateFilter(true, false, false, false, true),
         "Date"
       )
     );
@@ -151,24 +148,25 @@ const ContratPrestation = ({
     return _headers;
   }
 
-
   const EditorDateStringMonth = (data) => {
-   
-
     let _parseDate = EditorDateFromDateTime(data);
 
-    const _month = Number(_parseDate.substring(5,7));
-    const _year = Number(_parseDate.substring(0,4));
+    const _month = Number(_parseDate.substring(5, 7));
+    const _year = Number(_parseDate.substring(0, 4));
 
-    return `${GetNomMois(_month)} ${_year.toString()}`
-    
-  }
-
+    return `${GetNomMois(_month)} ${_year.toString()}`;
+  };
 
   function CreateCellsForTable() {
     let _cells = [];
     _cells.push(
-      CreateNewCell("DateInterventionPrestation", true, true, false,EditorDateStringMonth)
+      CreateNewCell(
+        "DateInterventionPrestation",
+        true,
+        true,
+        false,
+        EditorDateStringMonth
+      )
     );
     _cells.push(CreateNewCell("Secteur", true, true, false));
     _cells.push(CreateNewCell("IdPrestationContrat", false, true, false));

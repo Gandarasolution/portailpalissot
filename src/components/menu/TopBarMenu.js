@@ -10,6 +10,7 @@ import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import NavItem from "react-bootstrap/NavItem";
 import Popover from "react-bootstrap/Popover";
+import Row from "react-bootstrap/Row";
 
 //#enregion
 
@@ -34,12 +35,11 @@ import logo from "../../image/favicon.ico";
 
 //#endregion
 import { useContext, useState } from "react";
-import { Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 //#endregion
 
-const TopBarMenu = ({ accountName,handleDeconnexion }) => {
+const TopBarMenu = ({ accountName, handleDeconnexion }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
   const navigate = useNavigate();
 
@@ -98,34 +98,36 @@ const TopBarMenu = ({ accountName,handleDeconnexion }) => {
 
   const handleAccount = () => {
     navigate("/account");
-  }
+  };
   const handleCookies = () => {
     console.log("Modal Cookies");
-  }
+  };
   const PopoverAccount = (
-    
     <Popover>
       <Popover.Header>{accountName}</Popover.Header>
       <Popover.Body>
         <Row>
-          <Button variant="" className="border mb-2" onClick={handleAccount} >
+          <Button variant="" className="border mb-2" onClick={handleAccount}>
             <FontAwesomeIcon icon={faUser} /> Mon compte
           </Button>
         </Row>
         <Row>
-          <Button variant="" className="border mb-2" onClick={handleDeconnexion} >
+          <Button
+            variant=""
+            className="border mb-2"
+            onClick={handleDeconnexion}
+          >
             <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
           </Button>
         </Row>
         <Row>
-          <Button variant="" className="border mb-2" onClick={handleCookies} >
+          <Button variant="" className="border mb-2" onClick={handleCookies}>
             <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
           </Button>
         </Row>
       </Popover.Body>
     </Popover>
   );
-  
 
   return (
     <Navbar bg="light" expand="lg">
@@ -149,7 +151,6 @@ const TopBarMenu = ({ accountName,handleDeconnexion }) => {
           </Button>
         </Navbar.Text>
 
-
         <Navbar.Collapse className="justify-content-end">
           <OverlayTrigger
             trigger={"click"}
@@ -161,11 +162,7 @@ const TopBarMenu = ({ accountName,handleDeconnexion }) => {
             </Button>
           </OverlayTrigger>
         </Navbar.Collapse>
-
-
-
       </Container>
-
     </Navbar>
   );
 };

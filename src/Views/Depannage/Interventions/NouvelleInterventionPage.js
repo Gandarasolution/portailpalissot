@@ -14,6 +14,7 @@ import Container from "react-bootstrap/Container";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
+import Placeholder from "react-bootstrap/Placeholder";
 
 //#endregion
 
@@ -26,7 +27,6 @@ import {
 } from "../../../App";
 import { useEffect } from "react";
 import { GetListeSecteur, GetListeTels } from "../../../axios/WSGandara";
-import { Placeholder } from "react-bootstrap";
 import { ParseKVAsArray } from "../../../functions";
 
 //#endregion
@@ -78,11 +78,7 @@ const NouvelleInterventionPage = () => {
       FetchSetSecteurs
     );
 
-    GetListeTels(
-      TokenCt,
-      ClientSiteCt.storedClientSite.GUID,
-      FetchSetTel
-    );
+    GetListeTels(TokenCt, ClientSiteCt.storedClientSite.GUID, FetchSetTel);
   };
 
   //#endregion

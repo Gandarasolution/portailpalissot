@@ -52,12 +52,29 @@ import DevisPage from "./Views/Devis/DevisPage";
 
 //#endregion
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faCalendar, faFile, faHome, faMobile, faSquareCheck, faWrench } from "@fortawesome/free-solid-svg-icons";
-import { fas } from '@fortawesome/free-solid-svg-icons'
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faBook,
+  faCalendar,
+  faFile,
+  faHome,
+  faMobile,
+  faSquareCheck,
+  faWrench,
+} from "@fortawesome/free-solid-svg-icons";
+import { fas } from "@fortawesome/free-solid-svg-icons";
 import AccountPage from "./Views/Home/AccountPage";
 
-library.add(fas, faWrench,faCalendar, faHome,faMobile,faBook,faFile, faSquareCheck );
+library.add(
+  fas,
+  faWrench,
+  faCalendar,
+  faHome,
+  faMobile,
+  faBook,
+  faFile,
+  faSquareCheck
+);
 
 //#region Context
 export const TokenContext = createContext(null);
@@ -66,9 +83,6 @@ export const ListeClientSiteContratContext = createContext(null);
 export const ClientSiteContratContext = createContext(null);
 
 export const ParametresContext = createContext([]);
-
-
-
 
 //#endregion
 function App() {
@@ -121,13 +135,14 @@ function App() {
   //#region Token
 
   const accountName = cyrb53("accountNamedHashed").toString();
-  const [accountCookie, setAccountCookie, removeAccountCookie]=useCookies([accountName]);
-  function setAccountName(name){
-    setAccountCookie(accountName,name);
+  const [accountCookie, setAccountCookie, removeAccountCookie] = useCookies([
+    accountName,
+  ]);
+  function setAccountName(name) {
+    setAccountCookie(accountName, name);
   }
 
   const account = accountCookie[accountName];
-
 
   //Hashage du nom du token pour éviter une récupération mannuelle rapide
   const tokenName = cyrb53("tokenNameHashed").toString();
@@ -163,27 +178,23 @@ function App() {
 
   //#region Composants
   const AppRoutes = () => {
-
     return (
       <Routes>
         <Route path="test" element={<PageTest />} />
-                  
 
         <Route path="*" element={<ClientSitePage />} />
-
 
         <Route path="waiting" element={<WaiterPage />} />
         <Route path="error" element={<ErrorPage />} />
 
         <Route path="viewerWord" element={<ViewerWord />} />
-        
-        <Route path="account" element={<AccountPage accountName={account}/>}/>
-        
-        
+
+        <Route path="account" element={<AccountPage accountName={account} />} />
+
         <Route
           path="maintenance"
           element={storedClientSite ? <ContratPage /> : <ClientSitePage />}
-        /> 
+        />
         <Route
           path="appareils"
           element={storedClientSite ? <AppareilsPage /> : <ClientSitePage />}
@@ -207,7 +218,6 @@ function App() {
           path="factures"
           element={storedClientSite ? <FacturesPage /> : <ClientSitePage />}
         />
-
       </Routes>
     );
   };
@@ -215,7 +225,10 @@ function App() {
   const SmallDown = () => {
     return (
       <Breakpoint small down>
-        <TopBarMenu accountName={account}  handleDeconnexion={handleDeconnexion} />
+        <TopBarMenu
+          accountName={account}
+          handleDeconnexion={handleDeconnexion}
+        />
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <AppRoutes />
       </Breakpoint>
@@ -231,7 +244,10 @@ function App() {
           </Col>
 
           <Col className="App font-link p-0">
-            <TopBarMenu accountName={account} handleDeconnexion={handleDeconnexion} />
+            <TopBarMenu
+              accountName={account}
+              handleDeconnexion={handleDeconnexion}
+            />
             <AppRoutes />
           </Col>
         </Row>

@@ -105,8 +105,12 @@ nav ul li:hover {
 
 }
 
-.card-footer-button :hover{
+.card-footer-button :hover {
   background-color: var(--color-info) !important;
+  border-radius: var(--bs-card-inner-border-radius);
+  /* padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x); */
+  color: var(--bs-card-cap-color);
+  border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);
 }
 
 
@@ -209,6 +213,14 @@ nav ul li:hover {
 }
 
 
+sup {
+  top: -.5em;
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
 .circle-success {
   background: var(--color-success);
   width: 10px;
@@ -251,7 +263,7 @@ nav ul li:hover {
 
 
 
-.card-clientsite{
+.card-clientsite {
   border-width: 3px !important;
   border-color: #01B81A !important;
 }
