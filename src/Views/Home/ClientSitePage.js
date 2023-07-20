@@ -129,6 +129,7 @@ const ClientSitePage = () => {
   //#region Composants
 
   const CardClientSite = ({ clientSite, actual }) => {
+    let _isContact = false;
     const CARDHEADER = () => {
       const TITRE = () => {
         return (
@@ -420,7 +421,7 @@ const ClientSitePage = () => {
       return (
         <Card.Body>
           <ADRESSE />
-          <CONTACTS />
+          {_isContact && (<CONTACTS />)}
           <INFOS />
         </Card.Body>
       );
