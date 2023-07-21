@@ -1294,6 +1294,53 @@
 	}
 
 	
+
+
+
+	
+	function GetContratPrestationPeriodes($token, $guid, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token"=>$token, "guid" => $guid);
+		
+		if($g_useSoapClientV2)
+		{
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOGetContratPrestationPeriodes",  array("parameters" => $request));
+			
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		}
+		else
+		{
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOGetContratPrestationPeriodes", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+		
+		$error = $client->getError();
+		
+		
+		if ($error) {
+			error_log($error);
+			return $error;
+			} else {
+			
+			if(isset($result["GMAOGetContratPrestationPeriodesResult"]["KV"]))
+			{
+				return json_encode($result["GMAOGetContratPrestationPeriodesResult"]["KV"]);
+				}elseif(isset($result["GMAOGetContratPrestationPeriodesResult"])){
+				return json_encode($result["GMAOGetContratPrestationPeriodesResult"]);
+				}else{
+				return "500";
+			}
+		}
+	}
+
+
+
 	function CallENDPOINT($url="",$endpoint="", )
 	{
 		
@@ -1429,6 +1476,9 @@
 				echo(GetNombrePortails($_POST['token'],$_POST['guid'],$url));
 			break;
 			
+			case "GMAOGetContratPrestationPeriodes":
+				echo(GetContratPrestationPeriodes($_POST['token'], $_POST['guid'], $url));
+			break;
 
 			default:
 			header("HTTP/1.1 500 Internal Server Error");

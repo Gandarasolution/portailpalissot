@@ -16,6 +16,9 @@ const callEndpoint = async (endpoint, data, setData, returnData) => {
 
   function ErrorHandling(error) {
     setData([]);
+    console.log(error);
+    console.log("Erreur lors du endpoint ", endpoint);
+    console.log("avec les donnes ", data);
   }
 
   $.ajax({
@@ -117,39 +120,6 @@ const GetNombrePortails = (token, guid, setData) => {
 
 //#region Contrat
 
-// const GetPrestationContratOriginal = async (
-//   token,
-//   dateDebut,
-//   dateFin,
-//   IdSite,
-//   setData
-// ) => {
-
-//   $.ajax({
-//     type: "POST",
-//     url: urlAction + "GetPrestationContrat",
-
-//     data: {
-//       token: token,
-//       dateDebut: dateDebut,
-//       dateFin: dateFin,
-//       IdSite: IdSite,
-//     },
-//     success(data) {
-//       if (data === "Erreur de connexion") {
-//         setData(500);
-//         return;
-//       }
-//       if (JSON.parse(JSON.stringify(data)) === "500") {
-//         window.location.href = `/error?error=${data}`;
-//         setData([]);
-//       } else {
-//         setData(JSON.parse(data));
-//       }
-//     },
-//   });
-// };
-
 const GetPrestationContrat = (token, dateDebut, dateFin, guid, setData) => {
   return callEndpoint(
     "GetPrestationContrat",
@@ -161,32 +131,17 @@ const GetPrestationContrat = (token, dateDebut, dateFin, guid, setData) => {
     },
     setData
   );
+};
 
-  // var xhr = $.ajax({
-  //   type: "POST",
-  //   url: urlAction + "GetPrestationContrat",
-
-  //   data: {
-  //     token: token,
-  //     dateDebut: dateDebut,
-  //     dateFin: dateFin,
-  //     IdSite: IdSite,
-  //   },
-  //   success(data) {
-  //     if (data === "Erreur de connexion") {
-  //       setData(500);
-  //       return;
-  //     }
-  //     if (JSON.parse(JSON.stringify(data)) === "500") {
-  //       window.location.href = `/error?error=${data}`;
-  //       setData([]);
-  //     } else {
-  //       setData(JSON.parse(data));
-  //     }
-  //   },
-  // });
-
-  // return xhr;
+const GetContratPrestationPeriodes = (token, guid, setData) => {
+  return callEndpoint(
+    "GetContratPrestationPeriodes",
+    {
+      token: token,
+      guid: guid,
+    },
+    setData
+  );
 };
 
 const GetPrestationReleveTache = async (
@@ -789,4 +744,5 @@ export {
   GetListeTels,
   GetListeMails,
   GetNombrePortails,
+  GetContratPrestationPeriodes,
 };

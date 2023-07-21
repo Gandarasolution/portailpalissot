@@ -1340,7 +1340,7 @@ const TableData = ({ ...props }) => {
         {props.TopPannelRightToSearch && props.TopPannelRightToSearch}
         {props.Headers.findIndex((h) => h.fieldname.includes(TAGSELECTION)) >
           -1 && (
-          <Col>
+          <Col md={"auto"} className="m-1">
             <SelectionInfo />
           </Col>
         )}
