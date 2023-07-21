@@ -47,6 +47,7 @@ import {
   RegexTestAndReturnMatch,
   groupBy,
 } from "../../functions";
+import RowDocument from "./RowDocument";
 
 import {
   GeTListeFactureIntervention,
@@ -58,25 +59,20 @@ import {
   GetDocumentPrestationTicket,
   GetListeFIIntervention,
   GetPrestationReleveTache,
-  GetdocumentDevis,
   TelechargerFactureDocument,
   TelechargerZIP,
   VoirFactureDocument,
 } from "../../axios/WSGandara";
 
-import ImageExtension from "./ImageExtension";
-
 //#region Contexts
 import { TokenContext } from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
-import { FactureContext } from "../../Views/Factures/FacturesPage";
 
 //#endregion
 
 //#endregion
 
 import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
@@ -1508,18 +1504,6 @@ const TableData = ({ ...props }) => {
       case "tagInterventionDocuments":
         HandleAfficherFacture(Data()[index]);
         break;
-      case "tagFactureVoir":
-        HandleVoirFacture(item);
-        break;
-      case "tagFactureTelecharger":
-        HandleTelechargerFacture(item);
-        break;
-      case "tagDevisVoirDevis":
-        HandleDocumentDevis(item);
-        break;
-      case "tagDevisTelechargerDevis":
-        HandleDocumentDevis(item, true);
-        break;
       default:
         if (tagMethod.includes("selection_")) {
           let _arrSelector = JSON.parse(JSON.stringify(arraySelector));
@@ -1705,7 +1689,7 @@ const TableData = ({ ...props }) => {
                 onClick={() => {
                   setGridColMDValue(12);
                 }}
-                className="ms-4"
+                // className="ms-4"
               />
             </Col>
           </Row>
@@ -1715,7 +1699,9 @@ const TableData = ({ ...props }) => {
             <div id="collapse-listeDocuments">
               {_arrayDocs.length > 0
                 ? _arrayDocs.map((doc, index) => {
-                    return RowDocument(doc, index);
+                    return (
+                      <RowDocument key={index} props={doc} index={index} />
+                    );
                   })
                 : "Aucun document."}
             </div>
@@ -1734,33 +1720,6 @@ const TableData = ({ ...props }) => {
           </Card.Body>
         )}
       </Card>
-    );
-  };
-
-  const RowDocument = (props, index) => {
-    return (
-      <Row className="mb-1" key={index}>
-        <Col md={3}>
-          <ImageExtension extension={props.extension} />
-        </Col>
-        <Col md={9}>
-          <Row>
-            <p className="mb-0 document-title">{`${props.title}`}</p>
-            {props.size && (
-              <span className="document-size">{`${props.size}`}</span>
-            )}
-            <span className="document-links">
-              {props.extension.toUpperCase() !== "ZIP" && (
-                <Link onClick={() => props.VoirDocumentSup()}>Voir</Link>
-              )}
-
-              <Link onClick={() => props.TelechargerDocumentSup()}>
-                Télécharger
-              </Link>
-            </span>
-          </Row>
-        </Col>
-      </Row>
     );
   };
 
@@ -1931,10 +1890,14 @@ const TableData = ({ ...props }) => {
         {isDocumentLoaded ? (
           <Modal.Body>
             <div id="collapse-listeDocuments">
-              {_arrayDocs.length > 0 ? RowDocument(_DocZIP) : "Aucun document"}
+              {_arrayDocs.length > 0 ? (
+                <RowDocument props={_DocZIP} />
+              ) : (
+                "Aucun document"
+              )}
 
               {_arrayDocs.map((doc, index) => {
-                return RowDocument(doc, index);
+                return <RowDocument key={index} props={doc} index={index} />;
               })}
             </div>
           </Modal.Body>
@@ -1960,47 +1923,6 @@ const TableData = ({ ...props }) => {
   //#endregion
 
   //#region Factures
-
-  const FactureCtx = useContext(FactureContext);
-
-  const HandleVoirFacture = (facture) => {
-    VoirFactureDocument(
-      tokenCt,
-      facture.IdFacture,
-      facture.Type,
-      facture.Avoir
-    );
-    FactureCtx.setVoirFacture(false);
-  };
-
-  const HandleTelechargerFacture = (facture) => {
-    TelechargerFactureDocument(
-      tokenCt,
-      facture.IdFacture,
-      facture.Type,
-      facture.Avoir
-    );
-    FactureCtx.setTelechargerFacture(false);
-  };
-
-  useEffect(() => {
-    if (FactureCtx) {
-      if (FactureCtx.voirFacture) {
-        HandleVoirFacture(FactureCtx.factureSelected);
-      }
-    }
-    // eslint-disable-next-line
-  }, [FactureCtx && FactureCtx.voirFacture]);
-
-  useEffect(() => {
-    if (FactureCtx) {
-      if (FactureCtx.TelechargerFacture) {
-        HandleTelechargerFacture(FactureCtx.factureSelected);
-      }
-    }
-    // eslint-disable-next-line
-  }, [FactureCtx && FactureCtx.TelechargerFacture]);
-
   const HandleSelectorFacture = async () => {
     let _arrayOfFactures = [];
 
@@ -2209,14 +2131,6 @@ const TableData = ({ ...props }) => {
 
   //#endregion
 
-  //#region Devis
-
-  const HandleDocumentDevis = (devis, telecharger) => {
-    GetdocumentDevis(tokenCt, devis.IdDevis, telecharger);
-  };
-
-  //#endregion
-
   //#endregion
 
   return (
@@ -2226,7 +2140,7 @@ const TableData = ({ ...props }) => {
         <ModalList />
         <Breakpoint large up>
           <Row>
-            <Col md={gridColMDValue}>
+            <Col>
               <Table className="table-presta">
                 <TableHeaders />
                 {props.IsLoaded ? (
@@ -2241,9 +2155,7 @@ const TableData = ({ ...props }) => {
               </Table>
             </Col>
 
-            {gridColMDValue !== 12 && (
-              <Col md={12 - gridColMDValue}>{CardDocs()}</Col>
-            )}
+            {gridColMDValue !== 12 && <Col md={"auto"}>{CardDocs()}</Col>}
           </Row>
         </Breakpoint>
 
@@ -2307,6 +2219,25 @@ export const EditorActionTelecharger = (e) => {
       </OverlayTrigger>
     </Button>
   );
+};
+
+const CreateEditorDocument = (
+  methodTitle,
+  extension,
+  methodTelecharger,
+  methodVoir
+) => {
+  const EditorDocument = (e) => {
+    const _obj = {};
+    _obj.title = methodTitle(e);
+    _obj.extension = extension;
+    methodVoir && (_obj.VoirDocumentSup = () => methodVoir(e));
+    methodTelecharger &&
+      (_obj.TelechargerDocumentSup = () => methodTelecharger(e));
+
+    return <RowDocument props={_obj} />;
+  };
+  return EditorDocument;
 };
 
 const EditorSelection = (e) => {
@@ -2387,6 +2318,22 @@ export const CreateNewUnboundCell = (
     editor: editor,
     tagMethod: tagMethod,
   };
+  return _cell;
+};
+
+export const CreateNewDocumentCell = (
+  methodTitle,
+  extension,
+  methodTelecharger,
+  methodVoir
+) => {
+  let _cell = CreateNewUnboundCell(
+    false,
+    false,
+    false,
+    CreateEditorDocument(methodTitle, extension, methodTelecharger, methodVoir)
+  );
+
   return _cell;
 };
 
