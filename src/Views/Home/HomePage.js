@@ -1,6 +1,8 @@
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
-// import Button from "react-bootstrap/Button";
+import Image from "react-bootstrap/Image";
+import Nav from "react-bootstrap/Nav";
+import NavLink from "react-bootstrap/NavLink";
 
 //#endregion
 
@@ -10,7 +12,6 @@ import TitreOfPage from "../../components/commun/TitreOfPage";
 //#endregion
 
 import React from "react";
-import { Button, Image, Nav, NavLink } from "react-bootstrap";
 import { useContext } from "react";
 import { ClientSiteContratContext } from "../../App";
 //#endregion

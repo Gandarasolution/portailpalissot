@@ -254,6 +254,17 @@ function DateSOAP(date) {
   return year + "-" + month + "-" + day;
 }
 
+
+function GetDateFromStringDDMMYYY(dateStr){
+  const Day = dateStr.substring(0,2);
+      const Month = dateStr.substring(3,5);
+      const Year = dateStr.substring(6,10);
+  return new Date(Year, Number(Month) - 1, Day);
+ 
+}
+
+
+
 function HTMLEncode(text) {
   return (
     text
@@ -312,4 +323,5 @@ export {
   ULRDeplace,
   RegexTestAndReturnMatch,
   ParseKVAsArray,
+  GetDateFromStringDDMMYYY,
 };

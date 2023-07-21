@@ -12,15 +12,13 @@ import TableData, {
   CreateFilter,
   CreateNewButtonFilter,
   CreateNewCell,
+  CreateNewDocumentCell,
   CreateNewHeader,
-  CreateNewUnboundCell,
   CreateNewUnboundHeader,
-  EditorActionTelecharger,
-  EditorActionVoir,
   EditorDateFromDateTime,
   EditorMontant,
 } from "../../components/commun/TableData";
-import { GetListeDevis } from "../../axios/WSGandara";
+import { GetListeDevis, GetdocumentDevis } from "../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 
 //#endregion
@@ -119,25 +117,25 @@ const DevisPage = () => {
     _cells.push(CreateNewCell("TotalTTC", false, true, false, EditorMontant));
     _cells.push(CreateNewCell("LibEtat", false, false, false, EditorEtat));
 
-    _cells.push(
-      CreateNewUnboundCell(
-        false,
-        false,
-        true,
-        EditorActionVoir,
-        "tagDevisVoirDevis"
-      )
-    );
-    _cells.push(
-      CreateNewUnboundCell(
-        false,
-        false,
-        true,
-        EditorActionTelecharger,
-        "tagDevisTelechargerDevis"
-      )
-    );
+    const methodTitleDoc = (e) => {
+      const dateFR = new Date().toLocaleDateString("fr-FR");
+      return `${dateFR} Devis N°${e.IdDevis}.pdf`;
+    };
+    const methodTelecharger = (e) => {
+      GetdocumentDevis(tokenCt, e.IdDevis, true);
+    };
+    const methodVoir = (e) => {
+      GetdocumentDevis(tokenCt, e.IdDevis);
+    };
 
+    _cells.push(
+      CreateNewDocumentCell(
+        methodTitleDoc,
+        "PDF",
+        methodTelecharger,
+        methodVoir
+      )
+    );
     return _cells;
   }
 

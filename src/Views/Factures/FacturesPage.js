@@ -11,7 +11,11 @@ import Row from "react-bootstrap/Row";
 //#endregion
 
 //#region Components
-import { GetListeFactures } from "../../axios/WSGandara";
+import {
+  GetListeFactures,
+  TelechargerFactureDocument,
+  VoirFactureDocument,
+} from "../../axios/WSGandara";
 import { DateSOAP } from "../../functions";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 import TableData, {
@@ -20,12 +24,10 @@ import TableData, {
   CreateNewCardModel,
   CreateNewCell,
   CreateNewCellSelector,
+  CreateNewDocumentCell,
   CreateNewHeader,
   CreateNewHeaderSelector,
-  CreateNewUnboundCell,
   CreateNewUnboundHeader,
-  EditorActionTelecharger,
-  EditorActionVoir,
   EditorDateFromDateTime,
   EditorMontant,
 } from "../../components/commun/TableData";
@@ -154,31 +156,41 @@ const FacturesPage = () => {
     _cells.push(CreateNewCell("Dossier", false, true, false));
     _cells.push(CreateNewCell("Type", false, true, false, EditorType));
 
+    const methodTitle = (e) => {
+      const dateFR = new Date().toLocaleDateString("fr-FR");
+      return `${dateFR} Facture N°${e.IdFacture}.pdf`;
+    };
+
+    const methodTelecharger = (facture) => {
+      TelechargerFactureDocument(
+        tokenCt,
+        facture.IdFacture,
+        facture.Type,
+        facture.Avoir
+      );
+      setTelechargerFacture(false);
+    };
+    const methodVoir = (facture) => {
+      VoirFactureDocument(
+        tokenCt,
+        facture.IdFacture,
+        facture.Type,
+        facture.Avoir
+      );
+
+      setVoirFacture(false);
+    };
+
     _cells.push(
-      CreateNewUnboundCell(
-        false,
-        false,
-        true,
-        EditorActionVoir,
-        "tagFactureVoir"
-      )
+      CreateNewDocumentCell(methodTitle, "PDF", methodTelecharger, methodVoir)
     );
-    _cells.push(
-      CreateNewUnboundCell(
-        false,
-        false,
-        true,
-        EditorActionTelecharger,
-        "tagFactureTelecharger"
-      )
-    );
+
     return _cells;
   }
 
   function CreateButtonFiltersForTable() {
     let _arrBt = [];
 
-    // _arrBt.push(CreateNewButtonFilter("Type", "Chantier"));
     _arrBt.push(
       CreateNewButtonFilter("Type", "Facture Contrat", () => "Contrat")
     );
@@ -189,7 +201,6 @@ const FacturesPage = () => {
         () => "Dépannage"
       )
     );
-    // _arrBt.push(CreateNewButtonFilter("Type", "Facture SAV Selon Devis"));
 
     return _arrBt;
   }

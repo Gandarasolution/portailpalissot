@@ -17,9 +17,16 @@ import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
 //#region Components
 import ContratPrestation from "./Components/ContratPrestations";
-import { GetPrestationContrat } from "../../../axios/WSGandara";
+import {
+  GetContratPrestationPeriodes,
+  GetPrestationContrat,
+} from "../../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
-import { DateSOAP } from "../../../functions";
+import {
+  DateSOAP,
+  GetDateFromStringDDMMYYY,
+  addOneYear,
+} from "../../../functions";
 
 //#endregion
 
@@ -31,40 +38,22 @@ const ContratPage = () => {
 
   //#region Données
 
-  const dateFinPeriode = () => {
-    let _dateEndTmp = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-
-    _dateEndTmp = addOneYear(_dateEndTmp);
-
-    var day = _dateEndTmp.getDate() - 1;
-    _dateEndTmp.setDate(day);
-
-    return new Date(_dateEndTmp);
-  };
-
   //#endregion
 
   //#region States
   const [isLoadedPresta, setIsLoadedPresta] = useState(false);
   const [Prestations, SetPrestations] = useState([]);
-  const [dateDebutPeriode, setDateDebutPeriode] = useState(
-    GetDatePeriodeInitial()
-  );
-  const [lastPeriode, setLastPeriode] = useState(null);
+
+  const [periodeEnCours, setPeriodeEnCours] = useState({
+    k: DateSOAP(GetDatePeriodeInitial()),
+    v: DateSOAP(addOneYear(GetDatePeriodeInitial())),
+  });
+
+  const [listePeriodes, setListePeriodes] = useState([]);
 
   //#endregion
 
   //#region Fonctions
-
-  function addOneYear(date) {
-    date.setFullYear(date.getFullYear() + 1);
-    return date;
-  }
-
-  function subOneYear(date) {
-    date.setFullYear(date.getFullYear() - 1);
-    return date;
-  }
 
   function GetNomMois(num, short = false) {
     if (num > 12) {
@@ -109,18 +98,45 @@ const ContratPage = () => {
     return _DateRetour;
   }
 
+  const GetPeriodes = async () => {
+    const FetchSetDataPeriode = (data) => {
+      for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+
+        element.k = `01-01-${element.k}`;
+        element.v = `31-12-${element.v}`;
+      }
+
+      setListePeriodes(data);
+      const PeriodeInitial = GetDatePeriodeInitial();
+      const _indexPeriode = data.findIndex((p) => {
+        return (
+          GetDateFromStringDDMMYYY(p.k).getTime() <= PeriodeInitial.getTime() &&
+          GetDateFromStringDDMMYYY(p.v).getTime() >= PeriodeInitial.getTime()
+        );
+      });
+      setPeriodeEnCours(data[_indexPeriode]);
+    };
+
+    await GetContratPrestationPeriodes(
+      tokenCt,
+      ClientSiteContratCtx.storedClientSite.GUID,
+      FetchSetDataPeriode
+    );
+  };
+
   const FetchDataPrestation = () => {
     if (ClientSiteContratCtx.storedClientSite.IdContrat === 0) {
       setIsLoadedPresta(true);
       return;
     }
+
     SetPrestations([]);
-    setLastPeriode(DateSOAP(dateDebutPeriode));
 
     GetPrestationContrat(
       tokenCt,
-      DateSOAP(dateDebutPeriode),
-      DateSOAP(dateFinPeriode()),
+      DateSOAP(GetDateFromStringDDMMYYY(periodeEnCours.k)),
+      DateSOAP(GetDateFromStringDDMMYYY(periodeEnCours.v)),
       ClientSiteContratCtx.storedClientSite.GUID,
       PrestationLoad
     );
@@ -128,9 +144,7 @@ const ContratPage = () => {
 
   const PrestationLoad = (data) => {
     SetPrestations(data);
-    if (lastPeriode === DateSOAP(dateDebutPeriode)) {
-      setIsLoadedPresta(true);
-    }
+    setIsLoadedPresta(true);
   };
 
   //#endregion
@@ -138,49 +152,49 @@ const ContratPage = () => {
   //#region Evenement
 
   const AjouterUnAnPeriode = async () => {
-    let _dateTMP = dateDebutPeriode;
-    _dateTMP = addOneYear(_dateTMP);
-    let _dateDebutPeriode = new Date(_dateTMP);
-    setDateDebutPeriode(_dateDebutPeriode);
+    const _periodeEnCours = JSON.parse(JSON.stringify(periodeEnCours));
+    const _indexPeriode = listePeriodes.findIndex(
+      (f) =>
+        GetDateFromStringDDMMYYY(f.k).getTime() ===
+          GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
+        GetDateFromStringDDMMYYY(f.v).getTime() ===
+          GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
+    );
 
-    setIsLoadedPresta(false);
-    FetchDataPrestation();
+    if (_indexPeriode < listePeriodes.length - 1) {
+      setPeriodeEnCours(listePeriodes[_indexPeriode + 1]);
+    }
   };
 
   const SoustraireUnAnPeriode = async () => {
-    let _dateTMP = dateDebutPeriode;
-    _dateTMP = subOneYear(_dateTMP);
-    let _dateDebutPeriode = new Date(_dateTMP);
-    setDateDebutPeriode(_dateDebutPeriode);
-    setIsLoadedPresta(false);
+    const _periodeEnCours = JSON.parse(JSON.stringify(periodeEnCours));
+    const _indexPeriode = listePeriodes.findIndex(
+      (f) =>
+        GetDateFromStringDDMMYYY(f.k).getTime() ===
+          GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
+        GetDateFromStringDDMMYYY(f.v).getTime() ===
+          GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
+    );
 
-    FetchDataPrestation();
+    if (_indexPeriode > 0) {
+      setPeriodeEnCours(listePeriodes[_indexPeriode - 1]);
+    }
   };
 
-  const HandleDropdownPeriodeSelect = async (dateStart) => {
-    let _dateTemp = new Date(dateStart);
-
-    setDateDebutPeriode(_dateTemp);
-    setIsLoadedPresta(false);
-
-    FetchDataPrestation();
+  const HandleDropdownPeriodeSelect = async (index) => {
+    const _periode = listePeriodes[index];
+    setPeriodeEnCours(_periode);
   };
 
   //#endregion
 
   const DropDownYears = (small) => {
-    let _dateDebut = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-    let _dateEnd = new Date(JSON.parse(JSON.stringify(dateDebutPeriode)));
-    let _arrayPeriodes = [
-      {
-        dateStart: new Date(_dateDebut),
-        dateEnd: new Date(_dateEnd.setMonth(_dateDebut.getMonth() + 11)),
-      },
-    ];
+    let _arrayPeriodes = [];
 
-    for (let index = 0; index < 10; index++) {
-      let _dateStart = addOneYear(new Date(_arrayPeriodes[index].dateStart));
-      let _dateEnd = addOneYear(new Date(_arrayPeriodes[index].dateEnd));
+    for (let index = 0; index < listePeriodes.length; index++) {
+      const element = listePeriodes[index];
+      let _dateStart = GetDateFromStringDDMMYYY(element.k);
+      let _dateEnd = GetDateFromStringDDMMYYY(element.v);
 
       _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
     }
@@ -192,17 +206,24 @@ const ContratPage = () => {
         drop="down-centered"
         style={{ borderRadius: "10px" }}
         id="dropdown-datePeriode"
-        title={`Période : ${GetNomMois(dateDebutPeriode.getMonth() + 1, small)}
-              ${dateDebutPeriode.getFullYear()} à
-              ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
-              ${dateFinPeriode().getFullYear()}`}
+        // title={`Période : ${GetNomMois(dateDebutPeriode.getMonth() + 1, small)}
+        //       ${dateDebutPeriode.getFullYear()} à
+        //       ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
+        //       ${dateFinPeriode().getFullYear()}`}
+
+        title={`Période : ${GetNomMois(1, small)} ${GetDateFromStringDDMMYYY(
+          periodeEnCours.k
+        ).getFullYear()} à ${GetNomMois(12, small)} ${GetDateFromStringDDMMYYY(
+          periodeEnCours.v
+        ).getFullYear()}`}
         onSelect={(e) => {
           HandleDropdownPeriodeSelect(e);
         }}
       >
         {_arrayPeriodes.map((periode, index) => {
           return (
-            <Dropdown.Item key={index} eventKey={periode.dateStart}>
+            // <Dropdown.Item key={index} eventKey={periode.dateStart}>
+            <Dropdown.Item key={index} eventKey={index}>
               {` ${GetNomMois(
                 periode.dateStart.getMonth() + 1
               )} ${periode.dateStart.getFullYear()} à ${GetNomMois(
@@ -216,23 +237,23 @@ const ContratPage = () => {
   };
 
   useEffect(() => {
-    document.title = "Contrat";
+    document.title = "Maintenance";
+
     setIsLoadedPresta(false);
-    FetchDataPrestation();
+    if (listePeriodes && listePeriodes.length === 0) {
+      GetPeriodes();
+    } else {
+      FetchDataPrestation();
+    }
 
     // eslint-disable-next-line
-  }, [ClientSiteContratCtx.storedClientSite.GUID.GUID, lastPeriode]);
+  }, [ClientSiteContratCtx.storedClientSite.GUID.GUID, periodeEnCours]);
 
   return (
     <Container fluid>
       <ContratPrestation
         IsLoaded={isLoadedPresta}
         Prestations={Prestations}
-        datePrestation={
-          new Date(
-            ClientSiteContratCtx.storedClientSite.DateSouscriptionContrat
-          )
-        }
         ParentComponentPeriodeSelect={
           <BreakpointProvider>
             <Breakpoint large up>

@@ -21,6 +21,11 @@ const ImageExtension = ({ extension }) => {
   const ImgRAR = require("../../image/imageDocuments/rar.png");
   const ImgXLSX = require("../../image/imageDocuments/xlsx.png");
 
+  const ImgAVI = require("../../image/imageDocuments/avi.png");
+  const ImgMPG = require("../../image/imageDocuments/mpg.png");
+  const ImgPPT = require("../../image/imageDocuments/ppt.png");
+  const ImgMOV = require("../../image/imageDocuments/mov.png");
+
   const GetImageExtension = (extension) => {
     switch (extension.toString().toUpperCase()) {
       case "JPG":
@@ -57,6 +62,14 @@ const ImageExtension = ({ extension }) => {
         return ImgPPTX;
       case "RAR":
         return ImgRAR;
+      case "MOV":
+        return ImgMOV;
+      case "PPT":
+        return ImgPPT;
+      case "MPG":
+        return ImgMPG;
+      case "AVI":
+        return ImgAVI;
       default:
         return ImgNEUTRE;
     }
@@ -72,3 +85,16 @@ const ImageExtension = ({ extension }) => {
 };
 
 export default ImageExtension;
+
+export const IsExtensionVisible = (extension) => {
+  switch (extension.toString().toUpperCase()) {
+    case "JPG":
+    case "PDF":
+    case "PNG":
+    case "TXT":
+    case "MP3":
+      return true;
+    default:
+      return false;
+  }
+};
