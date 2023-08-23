@@ -46,11 +46,11 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
   const [showMenu, setShowMenu] = useState(false);
   const handleCloseMenu = () => setShowMenu(false);
 
-  const MenuNavLink = ({ href, text, icon }) => {
+  const MenuNavLink = ({ href, text, icon, onClick }) => {
     return (
-      <NavItem>
+      <NavItem className="m-4" onClick={onClick}>
         <NavLink href={href}>
-          <FontAwesomeIcon icon={icon} />
+          <FontAwesomeIcon icon={icon} className="m-1" />
           {text}
         </NavLink>
       </NavItem>
@@ -59,8 +59,8 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
 
   const OffcanvasMenu = () => {
     return (
-      <Offcanvas show={showMenu} onHide={handleCloseMenu} placement="start">
-        <Offcanvas.Header closeButton>
+      <Offcanvas show={showMenu} onHide={handleCloseMenu} placement="start" className="sidebar-small">
+        <Offcanvas.Header closeButton className="sidebar-small-header">
           <a
             href="/"
             className="text-decoration-none"
@@ -82,15 +82,48 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
           <Nav></Nav>
 
           <MenuNavLink href={"/"} icon={faHome} text={"Accueil"} />
-          <MenuNavLink href={"/contrat"} icon={faCalendar} text={"Contrat"} />
-          <MenuNavLink href={"/appareils"} icon={faMobile} text={"Appareils"} />
+          <MenuNavLink href={"/maintenance"} icon={faCalendar} text={"Maintenance"} />
           <MenuNavLink
             href={"/interventions"}
             icon={faWrench}
-            text={"Interventions"}
+            text={"Dépannage"}
           />
+          <MenuNavLink href={"/appareils"} icon={faMobile} text={"Appareils"} />
           <MenuNavLink href={"/devis"} icon={faBook} text={"Devis"} />
           <MenuNavLink href={"/factures"} icon={faFile} text={"Factures"} />
+<br/>
+<hr/>
+
+          <MenuNavLink href={"/account"} icon={faUser} text={"Mon compte"} />
+          <MenuNavLink icon={faRightFromBracket} text={"Se déconnecter"} onClick={handleDeconnexion} />
+          <MenuNavLink href={"/"} icon={faCookieBite} text={"Cookies"} />
+
+{/* 
+          <Row>
+          <Button variant="" className="border mb-2" onClick={handleAccount}>
+            <FontAwesomeIcon icon={faUser} /> Mon compte
+          </Button>
+        </Row>
+        <Row>
+          <Button
+            variant=""
+            className="border mb-2"
+            onClick={handleDeconnexion}
+          >
+            <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
+          </Button>
+        </Row>
+        <Row>
+          <Button variant="" className="border mb-2" onClick={handleCookies}>
+            <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
+          </Button>
+        </Row> */}
+
+
+
+
+
+
         </Offcanvas.Body>
       </Offcanvas>
     );

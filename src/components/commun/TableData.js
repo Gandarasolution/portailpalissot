@@ -1453,7 +1453,7 @@ const TableData = ({ ...props }) => {
 
   const GridCard = ({ item }) => {
     return (
-      <Card className="m-2">
+      <Card className="m-2 p-1">
         <GridCardHeader item={item} />
         <GridCardBody item={item} />
       </Card>

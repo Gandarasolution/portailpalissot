@@ -11,6 +11,7 @@ import TitreOfPage from "../../components/commun/TitreOfPage";
 import TableData, {
   CreateFilter,
   CreateNewButtonFilter,
+  CreateNewCardModel,
   CreateNewCell,
   CreateNewDocumentCell,
   CreateNewHeader,
@@ -20,6 +21,7 @@ import TableData, {
 } from "../../components/commun/TableData";
 import { GetListeDevis, GetdocumentDevis } from "../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../App";
+import { Button, Col, Row } from "react-bootstrap";
 
 //#endregion
 
@@ -165,7 +167,7 @@ const DevisPage = () => {
         break;
     }
 
-    return <span className={`badge badge-bg-${_bgColor}`}>{e}</span>;
+    return <span className={`badge text-wrap badge-bg-${_bgColor}`}>{e}</span>;
 
     // return ` ${_id} ${e}`
   };
@@ -178,12 +180,76 @@ const DevisPage = () => {
   };
 
   //#endregion
+  const EditorCardBody = (devis) => {
+    console.log(devis)
+    return (
+      <>
+      <h6>{`Secteur : ${devis.DescriptionSecteur}`}</h6>
+      <Row>
+          <Col>
+            <h3>Montant Hors taxe : {EditorMontant(devis.TotalHT)}</h3>
+          </Col>
+          <Col>
+            <h3>Montant TTC : {EditorMontant(devis.TotalTTC)}</h3>{" "}
+          </Col>
+        </Row>
+      <Row>
+          <Col className="p-4">
+            <Button
+              className="m-2"
+              onClick={() => {
+              
+              }}
+            >
+              Voir le devis
+            </Button>
+            <Button
+              className="m-2"
+              onClick={() => {
+               
+              }}
+            >
+              Télécharger le devis
+            </Button>
+          </Col>
+        </Row>
+      </>
+    )
+  }
+
+
+  const EditorCardTitle = (devis) => {
+    return (
+      <>
+        <Row>
+          <Col>
+           {EditorDateFromDateTime(devis.DateDemandeDossierInterventionSAV)}
+          </Col>
+
+          <Col>
+          {EditorEtat(devis.LibEtat)}
+          </Col>
+        </Row>
+      </>
+    );
+  }
+
+  const EditorCardSubtitle = (devis) => {
+    return `${devis.IdDevis} - ${devis.DescriptionDevis}`;
+  };
+
+
 
   const TableDevis = () => {
     const _Data = GetDevisTrimmed();
     const _Headers = CreateHeaderForTable();
     const _Cells = CreateCellsForTable();
     const _ButtonFilters = CreateButtonFilters();
+    const _CardModel = CreateNewCardModel(
+      EditorCardBody,
+      EditorCardTitle,
+      EditorCardSubtitle
+    );
 
     return (
       <TableData
@@ -197,6 +263,7 @@ const DevisPage = () => {
           CreateNewButtonFilter("IdEtat", 9, EditorFilter)
         }
         Pagination
+        CardModel={_CardModel}
       />
     );
   };
