@@ -69,6 +69,20 @@
   min-width: 24px !important;
 }
 
+.sidebar-small{
+  background-color: var(--color-dark) !important;
+  color: white !important;
+  font-weight: 500;
+  font-size: larger;
+}
+
+
+.sidebar-small-header{
+  background-color: whitesmoke;
+  color: var(--color-dark) !important;
+  font-weight: 600;
+  font-size: larger;
+}
 
 
 .header-card-site :hover{
