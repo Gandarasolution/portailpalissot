@@ -289,16 +289,16 @@ const InterventionPage = () => {
         IsLoaded={isLoaded}
         Pagination
         ButtonFilters={_ButtonFilter}
-        TopPannelRightToSearch={
-          <Col md={"auto"} className="m-1">
-            <Button
-              variant="danger"
-              onClick={() => (window.location.href = "/nouvelleintervention")}
-            >
-              Demander une nouvelle intervention
-            </Button>
-          </Col>
-        }
+        // TopPannelRightToSearch={
+        //   <Col md={"auto"} className="m-1">
+        //     <Button
+        //       variant="danger"
+        //       onClick={() => (window.location.href = "/nouvelleintervention")}
+        //     >
+        //       Demander une nouvelle intervention
+        //     </Button>
+        //   </Col>
+        // }
 
         CardModel={_CardModel}
       />

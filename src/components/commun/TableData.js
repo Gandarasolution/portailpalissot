@@ -22,7 +22,8 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Card from "react-bootstrap/Card";
 import Tooltip from "react-bootstrap/Tooltip";
-
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 //#endregion
 
 //#region fontAwsome
@@ -59,6 +60,7 @@ import {
   GetDocumentPrestationTicket,
   GetListeFIIntervention,
   GetPrestationReleveTache,
+  TelechargerDocument,
   TelechargerFactureDocument,
   TelechargerZIP,
   VoirFactureDocument,
@@ -1545,21 +1547,32 @@ const TableData = ({ ...props }) => {
   };
 
   const FetchSetListeTache = (data) => {
-    const groups = data.reduce((groups, item) => {
-      const k = groups[item.k] || [];
-      k.push(item);
-      groups[item.k] = k;
-      return groups;
-    }, {});
+    console.log(data);
+    if (data.length) {
+      const groups = data.reduce((groups, item) => {
+        const k = groups[item.k] || [];
+        k.push(item);
+        groups[item.k] = k;
+        return groups;
+      }, {});
 
-    const arr = [];
-    Object.keys(groups).forEach((key) =>
-      arr.push({ name: key, value: groups[key] })
-    );
+      const arr = [];
+      Object.keys(groups).forEach((key) =>
+        arr.push({ name: key, value: groups[key] })
+      );
 
-    setListeTaches(arr);
-    setShowModalListeTaches(true);
-    setIsLoadingTaches(false);
+      setListeTaches(arr);
+      setShowModalListeTaches(true);
+      setIsLoadingTaches(false);
+    } else {
+      const arr = [];
+
+      arr.push({ name: data.k, value: data.v });
+
+      setListeTaches(arr);
+      setShowModalListeTaches(true);
+      setIsLoadingTaches(false);
+    }
   };
 
   const ModalListeTaches = () => {
@@ -1582,21 +1595,48 @@ const TableData = ({ ...props }) => {
                     <FontAwesomeIcon icon={faList} /> {Relevetache.name}
                   </Col>
                 </Row>
+                {
+                  true && Array.isArray(Relevetache.value) ? (
+                    Relevetache.value.map((tache, indexT) => {
+                      return (
+                        <Row key={indexT}>
+                          <Col md={{ offset: 1 }}>
+                            <Form.Check
+                              readOnly
+                              checked={false}
+                              label={tache.v}
+                            />
+                          </Col>
+                        </Row>
+                      );
+                    })
+                  ) : 
+                  (
+                    <Row>
+                      <Col md={{ offset: 1 }}>
+                        <Form.Check
+                          readOnly
+                          checked={false}
+                          label={Relevetache.value}
+                        />
+                      </Col>
+                    </Row>
+                  )
 
-                {true &&
-                  Relevetache.value.map((tache, indexT) => {
-                    return (
-                      <Row key={indexT}>
-                        <Col md={{ offset: 1 }}>
-                          <Form.Check
-                            readOnly
-                            checked={false}
-                            label={tache.v}
-                          />
-                        </Col>
-                      </Row>
-                    );
-                  })}
+                  // Relevetache.value.map((tache, indexT) => {
+                  //   return (
+                  //     <Row key={indexT}>
+                  //       <Col md={{ offset: 1 }}>
+                  //         <Form.Check
+                  //           readOnly
+                  //           checked={false}
+                  //           label={tache.v}
+                  //         />
+                  //       </Col>
+                  //     </Row>
+                  //   );
+                  // })}
+                }
               </span>
             );
           })}
@@ -1657,6 +1697,10 @@ const TableData = ({ ...props }) => {
 
   //#region Documents
 
+  const [showToast, setShowToast] = useState(false);
+const [arrayFileToast, setArrayFileToast] = useState([])
+
+
   const [documents, setDocuments] = useState([]);
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   const [gridColMDValue, setGridColMDValue] = useState(12);
@@ -1705,6 +1749,12 @@ const TableData = ({ ...props }) => {
                   })
                 : "Aucun document."}
             </div>
+
+
+        
+
+
+            
           </Card.Body>
         ) : (
           <Card.Body>
@@ -1723,7 +1773,16 @@ const TableData = ({ ...props }) => {
     );
   };
 
+  const CreatePropError = () => {
+    const _obj = {
+      title:"Une erreur s'est produite",
+      extension : "ERROR"
+    }
+    return _obj;
+  }
+
   const CreatePropsDocPresta = (element) => {
+   
     const _obj = {};
 
     _obj.title = element.k;
@@ -1731,8 +1790,21 @@ const TableData = ({ ...props }) => {
 
     _obj.VoirDocumentSup = () => GetMethodFetchDataDocumentPresta(element.v);
 
-    _obj.TelechargerDocumentSup = () =>
-      GetMethodFetchDataDocumentPresta(element.v, true);
+    _obj.TelechargerDocumentSup = () =>{
+
+      GetMethodFetchDataDocumentPresta(element.v, true, true);    
+
+      // let _arrayToast = [];
+      // _arrayToast = JSON.parse(JSON.stringify(arrayFileToast));
+      // console.log("bfr push : ",_arrayToast);
+      
+      // _arrayToast.push(element.k);
+      // console.log("aftr push : ",_arrayToast);
+      // setArrayFileToast(_arrayToast);
+      // console.log(_arrayToast);
+      // setShowToast(true);
+
+  }
 
     _obj.data = element;
 
@@ -1746,37 +1818,58 @@ const TableData = ({ ...props }) => {
   ) => {
     const splitPop = v.split("|").pop();
     const splitShift = v.split("|").shift();
+    var _kv;
     switch (splitPop) {
       case "CERFA":
-        return await GetDocumentPrestationCERFA(
+        _kv = await GetDocumentPrestationCERFA(
           tokenCt,
           splitShift,
           telecharger,
           returnData
         );
+        break;
+
       case "RAPPORT":
-        return await GetDocumentPrestationRapport(
+        // return await GetDocumentPrestationRapport(
+        //   tokenCt,
+        //   splitShift,
+        //   telecharger,
+        //   returnData
+        // );
+
+        _kv = await GetDocumentPrestationRapport(
           tokenCt,
           splitShift,
           telecharger,
           returnData
         );
+        break;
+
       case "TICKET":
-        return await GetDocumentPrestationTicket(
+        _kv = await GetDocumentPrestationTicket(
           tokenCt,
           splitShift,
           telecharger,
           returnData
         );
+        break;
+
       case "EXTRANET":
-        return await GetDocumentPrestationExtranet(
+        _kv = await GetDocumentPrestationExtranet(
           tokenCt,
           splitShift,
           telecharger,
           returnData
         );
+        break;
+
       default:
         break;
+    }
+    if (telecharger) {
+      return TelechargerDocument(_kv.v, _kv.k);
+    } else {
+      return _kv;
     }
   };
 
@@ -1818,6 +1911,16 @@ const TableData = ({ ...props }) => {
     let _arrDocs = [];
 
     const arrData = JSON.parse(data);
+    if (arrData === 500)
+    {
+      const _arrError = [CreatePropError()]
+      //Erreur
+      setDocuments(_arrError);
+      setIsDocumentLoaded(true);
+      setGridColMDValue(10);
+
+      return;
+    }
 
     if (arrData.length) {
       for (let index = 0; index < arrData.length; index++) {
@@ -2155,7 +2258,25 @@ const TableData = ({ ...props }) => {
               </Table>
             </Col>
 
-            {gridColMDValue !== 12 && <Col md={"auto"}>{CardDocs()}</Col>}
+            {gridColMDValue !== 12 && <Col md={"auto"}>{CardDocs()} 
+            {/* <ToastContainer
+            className="p-3"
+            position={"bottom-end"}
+            // style={{ zIndex: 1 }}
+          >
+            <Toast show={showToast}>
+              <Toast.Header closeButton={false}>Téléchargement en cours</Toast.Header>
+              <Toast.Body>
+                {
+                  arrayFileToast.map((fileName)=>{
+                    return <div>{fileName}</div>
+                  })
+                }
+
+              </Toast.Body>
+            </Toast>
+          </ToastContainer> */}
+            </Col>}
           </Row>
         </Breakpoint>
 

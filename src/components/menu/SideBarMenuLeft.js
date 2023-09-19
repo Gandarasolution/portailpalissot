@@ -1,5 +1,5 @@
 //#region Imports
-import React from "react";
+import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 
 //#region Contrast
@@ -21,6 +21,7 @@ import Container from "react-bootstrap/Container";
 //#region Interne
 
 import logo from "../../image/favicon.ico";
+import { ClientSiteContratContext } from "../../App";
 
 //#endregion
 
@@ -30,7 +31,7 @@ import logo from "../../image/favicon.ico";
 
 const SideBarMenuLeft = () => {
   //#region States
-
+  const ClientSiteCt = useContext(ClientSiteContratContext);
   //#endregion
 
   //#region Fonctions
@@ -43,11 +44,26 @@ const SideBarMenuLeft = () => {
 
   //#region Components
 
+
+
   const MenuNavLink = ({ href, text, icon }) => {
+
+
+    if(href === "/maintenance")
+    {
+      if(ClientSiteCt.storedClientSite.IdContrat <= 0 )
+      {
+        return;
+      }
+
+    }
+
+    
     return (
       <NavLink to={href}>
         <CDBSidebarMenuItem icon={icon} iconSize="xl">
           {text}
+          
         </CDBSidebarMenuItem>
       </NavLink>
     );
@@ -85,12 +101,9 @@ const SideBarMenuLeft = () => {
         <CDBSidebarContent className="sidebar-content sidebar-gmao">
           <CDBSidebarMenu>
             <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
-            <MenuNavLink
-              href={"/maintenance"}
-              icon={"calendar"}
-              text={"Maintenance"}
-            />
-
+           <MenuNavLink href={"/maintenance"} icon={"calendar"} text={"Maintenance"} />
+           
+           
             <MenuNavLink
               href={"/interventions"}
               icon={"wrench"}

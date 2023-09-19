@@ -39,12 +39,15 @@ import {
   IconeFacture,
 } from "../../components/commun/Icones";
 import { ParseKVAsArray } from "../../functions";
+import {  useNavigate } from "react-router-dom";
 
 //#endregion
 
 //#endregion
 
 const ClientSitePage = () => {
+  const navigate = useNavigate();
+
   const tokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
 
@@ -61,6 +64,13 @@ const ClientSitePage = () => {
 
   function GetDataTrimed() {
     let _data = JSON.parse(JSON.stringify(listeClientSite));
+
+    if (!Array.isArray(_data))
+    {
+      let _data2 = new Array();
+      _data2.push(_data);
+      _data = _data2;
+    }
 
     if (search.length > 0) {
       const filteredData = _data.filter(
@@ -110,6 +120,11 @@ const ClientSitePage = () => {
 
     const FetchSetClientSite = (data) => {
       setListeClientSite(data);
+      if(!Array.isArray(data))
+      {
+        ClientSiteCt.setClientSite(data);
+        navigate("/");
+      }
       setIsLoaded(true);
     };
 
@@ -506,7 +521,7 @@ const ClientSitePage = () => {
       <TitreOfPage
         titre={"Choix du site"}
         isLoaded={isLoaded}
-        soustitre={`${listeClientSite.length} sites `}
+        soustitre={`${listeClientSite.length > 1 ? listeClientSite.length : 1} sites `}
       />
 
       <div className="m-2">{SearchBar()}</div>

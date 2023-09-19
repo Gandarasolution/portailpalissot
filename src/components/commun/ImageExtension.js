@@ -1,6 +1,9 @@
 import Image from "react-bootstrap/Image";
 
 const ImageExtension = ({ extension }) => {
+
+  const ImgError = require("../../image/error.png");
+  const ImgNEUTRE = require("../../image/imageDocuments/neutre.png");
   const ImgJPG = require("../../image/imageDocuments/jpg.png");
   const ImgPDF = require("../../image/imageDocuments/pdf.png");
   const ImgPNG = require("../../image/imageDocuments/png.png");
@@ -16,7 +19,6 @@ const ImageExtension = ({ extension }) => {
 
   const ImgDOCX = require("../../image/imageDocuments/docx.png");
   const ImgDWG = require("../../image/imageDocuments/dwg.png");
-  const ImgNEUTRE = require("../../image/imageDocuments/neutre.png");
   const ImgPPTX = require("../../image/imageDocuments/pptx.png");
   const ImgRAR = require("../../image/imageDocuments/rar.png");
   const ImgXLSX = require("../../image/imageDocuments/xlsx.png");
@@ -28,6 +30,8 @@ const ImageExtension = ({ extension }) => {
 
   const GetImageExtension = (extension) => {
     switch (extension.toString().toUpperCase()) {
+      case"ERROR":
+      return ImgError;
       case "JPG":
         return ImgJPG;
       case "PDF":
