@@ -65,6 +65,8 @@ import {
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import AccountPage from "./Views/Home/AccountPage";
 import HomePage from "./Views/Home/HomePage";
+import { Toast, ToastContainer } from "react-bootstrap";
+import { useState } from "react";
 
 library.add(
   fas,
@@ -84,6 +86,8 @@ export const ListeClientSiteContratContext = createContext(null);
 export const ClientSiteContratContext = createContext(null);
 
 export const ParametresContext = createContext([]);
+
+export const ToastContext = createContext(null);
 
 //#endregion
 function App() {
@@ -177,17 +181,26 @@ function App() {
 
   //#endregion
 
+  //#region Toast
+
+  //#endregion
+
   //#region Composants
   const AppRoutes = () => {
     return (
       <Routes>
         <Route path="test" element={<PageTest />} />
 
-        <Route path="*" element={storedClientSite ? <HomePage /> : < ClientSitePage />} />
+        <Route
+          path="*"
+          element={storedClientSite ? <HomePage /> : <ClientSitePage />}
+        />
 
-        <Route path="/" element={storedClientSite ? <HomePage /> : < ClientSitePage />} />
-        <Route path="/sites" element={< ClientSitePage />} />
-
+        <Route
+          path="/"
+          element={storedClientSite ? <HomePage /> : <ClientSitePage />}
+        />
+        <Route path="/sites" element={<ClientSitePage />} />
 
         <Route path="waiting" element={<WaiterPage />} />
         <Route path="error" element={<ErrorPage />} />
@@ -241,26 +254,25 @@ function App() {
   };
 
   const LargeUp = () => {
+
     return (
       <Breakpoint medium up className="p-0 m-0">
-        <Row className="background  m-0">
-{
-  storedClientSite && (
+          <Row className="background  m-0">
+            {storedClientSite && (
+              <Col md={"auto"} className="p-0">
+                <SideBarMenuLeft />
+              </Col>
+            )}
 
-          <Col md={"auto"} className="p-0">
-            <SideBarMenuLeft />
-          </Col>
-  )
-}
+            <Col className="App font-link p-0">
+              <TopBarMenu
+                accountName={account}
+                handleDeconnexion={handleDeconnexion}
+              />
+              <AppRoutes />
+            </Col>
+          </Row>
 
-          <Col className="App font-link p-0">
-            <TopBarMenu
-              accountName={account}
-              handleDeconnexion={handleDeconnexion}
-            />
-            <AppRoutes />
-          </Col>
-        </Row>
       </Breakpoint>
     );
   };
