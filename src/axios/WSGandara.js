@@ -7,6 +7,7 @@ import { HTMLEncode } from "../functions";
 //#region Données
 const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
 // const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
+// const urlAction = `https://dev.extranet.gandarasolution.fr/extranet/inc_librairie/WSGandara.php?endpoint=GMAO`;
 
 //#endregion
 
@@ -56,6 +57,7 @@ const Connexion = async (login, pass, setToken) => {
       setToken(data);
     },
     error(error) {
+      console.log(error);
       setToken(500);
     },
   });
@@ -185,6 +187,7 @@ const GetDocumentPrestation = async (
     success(data) {
       setDocuments(data, presta);
     },
+   
   });
 };
 
@@ -623,7 +626,7 @@ const GetDocumentFISAV = async (
   }
 
   const SetData = (data) => {
-    const _kv = JSON.parse(data);
+    const _kv = data;
     if (telecharger) {
       TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
     } else {
