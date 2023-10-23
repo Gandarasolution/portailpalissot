@@ -1,3 +1,5 @@
+import { Buffer } from "buffer";
+
 var groupBy = function (xs, key) {
   return xs.reduce(function (rv, x) {
     (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -307,6 +309,38 @@ function ParseKVAsArray(kv) {
   return _array;
 }
 
+
+
+
+const base64toBlob = (data) => {
+  // Cut the prefix `data:application/pdf;base64` from the raw base 64
+  // const base64WithoutPrefix = data.substr('data:application/pdf;base64,'.length);
+
+
+  const bytes = Buffer.from(data, "base64");
+  return new Blob([bytes], { type: "application/pdf" });
+};
+
+
+const GetURLLocationViewerFromExtension = (extension) => {
+
+  switch (extension.toUpperCase()) {
+    case "PDF":
+      return "/viewerPDF";
+      case "DOCX":
+        case "DOC":
+          return "/viewerDOC";
+          case "PNG":
+            case "JPG":
+              return"/viewerIMG";
+    default:
+      return "/";
+    
+    }
+  
+  }
+  
+
 export {
   FiltrerParSeuilDate,
   FiltrerParSearch,
@@ -324,4 +358,6 @@ export {
   RegexTestAndReturnMatch,
   ParseKVAsArray,
   GetDateFromStringDDMMYYY,
+  base64toBlob,
+  GetURLLocationViewerFromExtension,
 };
