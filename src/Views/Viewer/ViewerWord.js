@@ -1,14 +1,26 @@
-import Container from "react-bootstrap/Container";
-import { ULRDeplace } from "../../functions";
+import { useContext, } from "react";
+import { ViewerContext } from "../../App";
 
-const ViewerWord = () => {
-  document.title = "Document WORD";
-  const queryParameters = new URLSearchParams(window.location.search);
-  let _urlToOpen = ULRDeplace(queryParameters.get("urlToOpen"));
+const ViewerWordPage = () => {
+const viewerCt = useContext(ViewerContext);
 
-  _urlToOpen = _urlToOpen.replace(/"/g, "");
 
-  return <Container fluid>Viewer !{_urlToOpen}</Container>;
+const url =  viewerCt.viewerURL;
+// console.log(url);
+// viewerCt.removeViewer();
+return (
+    <div>
+      
+      <iframe
+      src={url}
+      title="Viewer"
+      >
+
+      </iframe>
+
+    </div>
+  );
 };
 
-export default ViewerWord;
+
+export default ViewerWordPage;

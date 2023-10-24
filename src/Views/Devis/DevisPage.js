@@ -20,8 +20,10 @@ import TableData, {
   EditorMontant,
 } from "../../components/commun/TableData";
 import { GetListeDevis, GetdocumentDevis } from "../../axios/WSGandara";
-import { ClientSiteContratContext, TokenContext } from "../../App";
+import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
 import { Button, Col, Row } from "react-bootstrap";
+import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";
+import { saveAs } from "file-saver";
 
 //#endregion
 
@@ -30,6 +32,8 @@ import { Button, Col, Row } from "react-bootstrap";
 const DevisPage = () => {
   const tokenCt = useContext(TokenContext);
   const clientSiteCt = useContext(ClientSiteContratContext);
+  const viewerCt = useContext(ViewerContext);
+
   //#region States
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeDevis, setListeDevis] = useState([]);
@@ -123,23 +127,80 @@ const DevisPage = () => {
       const dateFR = new Date().toLocaleDateString("fr-FR");
       return `${dateFR} Devis N°${e.IdDevis}.pdf`;
     };
-    const methodTelecharger = (e) => {
-      GetdocumentDevis(tokenCt, e.IdDevis, true);
-    };
-    const methodVoir = (e) => {
-      GetdocumentDevis(tokenCt, e.IdDevis);
-    };
+
 
     _cells.push(
       CreateNewDocumentCell(
         methodTitleDoc,
         "PDF",
-        methodTelecharger,
-        methodVoir
+        Telechargement,
+        Voir
       )
     );
     return _cells;
   }
+
+
+  const methodTelecharger = async (e) => {
+
+
+    return await GetdocumentDevis(tokenCt, e.IdDevis, true,true);
+
+
+  };
+  const methodVoir = async (e) => {
+   return await GetdocumentDevis(tokenCt, e.IdDevis,false,true);
+  };
+  
+  const Telechargement = async (e) => {
+    //Affichage d'un toast
+    // setShowToast(true);
+    const _kv = await methodTelecharger(e);
+
+    try {
+    //Transformation en blob
+    const base64data = _kv.v;
+    const _bblob = base64toBlob(base64data);
+    //Téléchargement
+    // saveAs(_bblob, props.title);
+    saveAs(_bblob, _kv.k);
+
+      
+    } finally {
+      
+          //Cacher le toast
+          // setShowToast(false);
+      
+    }
+  };
+
+
+const Voir = async (e) => {
+  //On ouvre une nouvelle fenêtre d'attente
+  let targetWindow = window.open("/waiting");
+
+  //On récupère le fichier en b64
+  // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+  const b64data = await methodVoir(e);
+
+
+  //On transforme le fichier en blob
+  const blobData = base64toBlob(b64data.v);
+
+  //On créer l'URL utilisé par les viewers
+  const url = URL.createObjectURL(blobData);
+
+  //On l'enregistre dans le viewerContext
+  viewerCt.setViewer(url);
+
+  //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //Le bon viewer est déterminé par l'extension
+  targetWindow.location.href = GetURLLocationViewerFromExtension(
+    b64data.k.split(".").pop()
+  );
+}
+
+
 
   function CreateButtonFilters() {
     let _bt = [];
@@ -181,7 +242,7 @@ const DevisPage = () => {
 
   //#endregion
   const EditorCardBody = (devis) => {
-    console.log(devis)
+    // console.log(devis)
     return (
       <>
       <h6>{`Secteur : ${devis.DescriptionSecteur}`}</h6>

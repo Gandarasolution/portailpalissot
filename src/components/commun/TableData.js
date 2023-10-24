@@ -22,8 +22,6 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Card from "react-bootstrap/Card";
 import Tooltip from "react-bootstrap/Tooltip";
-import Toast from "react-bootstrap/Toast";
-import ToastContainer from "react-bootstrap/ToastContainer";
 //#endregion
 
 //#region fontAwsome
@@ -45,7 +43,9 @@ import {
   FiltrerParSearch,
   FiltrerParSeuil,
   FiltrerParSeuilDate,
+  GetURLLocationViewerFromExtension,
   RegexTestAndReturnMatch,
+  base64toBlob,
   groupBy,
 } from "../../functions";
 import RowDocument from "./RowDocument";
@@ -60,14 +60,13 @@ import {
   GetDocumentPrestationTicket,
   GetListeFIIntervention,
   GetPrestationReleveTache,
-  TelechargerDocument,
   TelechargerFactureDocument,
   TelechargerZIP,
   VoirFactureDocument,
 } from "../../axios/WSGandara";
 
 //#region Contexts
-import { TokenContext } from "../../App";
+import { TokenContext, ViewerContext } from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
 
 //#endregion
@@ -77,6 +76,8 @@ import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/Contra
 import { useContext, useEffect, useState } from "react";
 
 import { Breakpoint, BreakpointProvider } from "react-socks";
+import { saveAs } from "file-saver";
+import JSZip from "jszip";
 
 const TAGSELECTION = "_xSelection";
 //#endregion
@@ -87,6 +88,8 @@ const TAGSELECTION = "_xSelection";
  */
 const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
+
+  const viewerCt = useContext(ViewerContext);
 
   const Data = () => {
     let _lData = [];
@@ -1547,7 +1550,7 @@ const TableData = ({ ...props }) => {
   };
 
   const FetchSetListeTache = (data) => {
-    console.log(data);
+    // console.log(data);
     if (data.length) {
       const groups = data.reduce((groups, item) => {
         const k = groups[item.k] || [];
@@ -1595,48 +1598,31 @@ const TableData = ({ ...props }) => {
                     <FontAwesomeIcon icon={faList} /> {Relevetache.name}
                   </Col>
                 </Row>
-                {
-                  true && Array.isArray(Relevetache.value) ? (
-                    Relevetache.value.map((tache, indexT) => {
-                      return (
-                        <Row key={indexT}>
-                          <Col md={{ offset: 1 }}>
-                            <Form.Check
-                              readOnly
-                              checked={false}
-                              label={tache.v}
-                            />
-                          </Col>
-                        </Row>
-                      );
-                    })
-                  ) : 
-                  (
-                    <Row>
-                      <Col md={{ offset: 1 }}>
-                        <Form.Check
-                          readOnly
-                          checked={false}
-                          label={Relevetache.value}
-                        />
-                      </Col>
-                    </Row>
-                  )
-
-                  // Relevetache.value.map((tache, indexT) => {
-                  //   return (
-                  //     <Row key={indexT}>
-                  //       <Col md={{ offset: 1 }}>
-                  //         <Form.Check
-                  //           readOnly
-                  //           checked={false}
-                  //           label={tache.v}
-                  //         />
-                  //       </Col>
-                  //     </Row>
-                  //   );
-                  // })}
-                }
+                {true && Array.isArray(Relevetache.value) ? (
+                  Relevetache.value.map((tache, indexT) => {
+                    return (
+                      <Row key={indexT}>
+                        <Col md={{ offset: 1 }}>
+                          <Form.Check
+                            readOnly
+                            checked={false}
+                            label={tache.v}
+                          />
+                        </Col>
+                      </Row>
+                    );
+                  })
+                ) : (
+                  <Row>
+                    <Col md={{ offset: 1 }}>
+                      <Form.Check
+                        readOnly
+                        checked={false}
+                        label={Relevetache.value}
+                      />
+                    </Col>
+                  </Row>
+                )}
               </span>
             );
           })}
@@ -1697,10 +1683,6 @@ const TableData = ({ ...props }) => {
 
   //#region Documents
 
-  const [showToast, setShowToast] = useState(false);
-const [arrayFileToast, setArrayFileToast] = useState([])
-
-
   const [documents, setDocuments] = useState([]);
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   const [gridColMDValue, setGridColMDValue] = useState(12);
@@ -1749,12 +1731,6 @@ const [arrayFileToast, setArrayFileToast] = useState([])
                   })
                 : "Aucun document."}
             </div>
-
-
-        
-
-
-            
           </Card.Body>
         ) : (
           <Card.Body>
@@ -1775,47 +1751,136 @@ const [arrayFileToast, setArrayFileToast] = useState([])
 
   const CreatePropError = () => {
     const _obj = {
-      title:"Une erreur s'est produite",
-      extension : "ERROR"
-    }
+      title: "Une erreur s'est produite",
+      extension: "ERROR",
+    };
     return _obj;
-  }
+  };
 
-  const CreatePropsDocPresta = (element) => {
-   
+  //#region Props
+
+  /**
+   *
+   * @returns Un objet représentant le document
+   */
+  const CreatePropsDocumentMaintenance = (element) => {
     const _obj = {};
 
+    //le titre et l'extension
     _obj.title = element.k;
     _obj.extension = element.k.split(".").pop();
 
-    _obj.VoirDocumentSup = () => GetMethodFetchDataDocumentPresta(element.v);
+    //La fonction appelé lors de l'appuye du bouton 'Voir'
+    _obj.VoirDocumentSup = () => DocumentMaintenanceVoirDocumentSup(element);
 
-    _obj.TelechargerDocumentSup = () =>{
-
-      GetMethodFetchDataDocumentPresta(element.v, true, true);    
-
-      // let _arrayToast = [];
-      // _arrayToast = JSON.parse(JSON.stringify(arrayFileToast));
-      // console.log("bfr push : ",_arrayToast);
-      
-      // _arrayToast.push(element.k);
-      // console.log("aftr push : ",_arrayToast);
-      // setArrayFileToast(_arrayToast);
-      // console.log(_arrayToast);
-      // setShowToast(true);
-
-  }
+    //La fonction appelé lors de l'appuye du bouton télécharger
+    _obj.TelechargerDocumentSup = async () => {
+      return await DocumentMaintenanceGetFile(element.v, true, true);
+    };
 
     _obj.data = element;
 
     return _obj;
   };
 
-  const GetMethodFetchDataDocumentPresta = async (
-    v,
-    telecharger,
-    returnData
-  ) => {
+
+
+
+
+
+
+  /**
+   *
+   * @returns Un objet représentant le document
+   */
+  const CreatePropsDocumentInterventionFI = (element) => {
+    const _obj = {};
+
+    //le titre et l'extension
+    _obj.title = element.k;
+    _obj.extension = element.k.split(".").pop();
+
+    //La fonction appelé lors de l'appuye du bouton 'Voir'
+    _obj.VoirDocumentSup = () => DocumentDepannageVoirDocumentSup(element);
+
+    //La fonction appelé lors de l'appuye du bouton télécharger
+    _obj.TelechargerDocumentSup = async () => {
+      return await await GetDocumentFISAV(tokenCt, element.v,false,true);
+    };
+
+    _obj.data = element;
+
+    return _obj;
+  };
+
+/**
+   * La méthode appellé pour voir un document de maintenance
+   */
+const DocumentDepannageVoirDocumentSup = async (element) => {
+
+  //On ouvre une nouvelle fenêtre d'attente
+  let targetWindow = window.open("/waiting");
+
+  //On récupère le fichier en b64
+  // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+  const b64data = await GetDocumentFISAV(tokenCt, element.v,false,true);
+
+
+
+  //On transforme le fichier en blob
+  const blobData = base64toBlob(b64data.v);
+
+  //On créer l'URL utilisé par les viewers
+  const url = URL.createObjectURL(blobData);
+
+  //On l'enregistre dans le viewerContext
+  viewerCt.setViewer(url);
+
+  //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //Le bon viewer est déterminé par l'extension
+  targetWindow.location.href = GetURLLocationViewerFromExtension(
+    element.k.split(".").pop()
+  );
+};
+
+
+
+
+
+
+
+
+
+
+
+
+  /**
+   * La méthode appellé pour voir un document de maintenance
+   */
+  const DocumentMaintenanceVoirDocumentSup = async (element) => {
+    //On ouvre une nouvelle fenêtre d'attente
+    let targetWindow = window.open("/waiting");
+
+    //On récupère le fichier en b64
+    const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+
+    //On transforme le fichier en blob
+    const blobData = base64toBlob(b64data.v);
+
+    //On créer l'URL utilisé par les viewers
+    const url = URL.createObjectURL(blobData);
+
+    //On l'enregistre dans le viewerContext
+    viewerCt.setViewer(url);
+
+    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+    //Le bon viewer est déterminé par l'extension
+    targetWindow.location.href = GetURLLocationViewerFromExtension(
+      element.k.split(".").pop()
+    );
+  };
+
+  const DocumentMaintenanceGetFile = async (v, telecharger, returnData) => {
     const splitPop = v.split("|").pop();
     const splitShift = v.split("|").shift();
     var _kv;
@@ -1830,13 +1895,6 @@ const [arrayFileToast, setArrayFileToast] = useState([])
         break;
 
       case "RAPPORT":
-        // return await GetDocumentPrestationRapport(
-        //   tokenCt,
-        //   splitShift,
-        //   telecharger,
-        //   returnData
-        // );
-
         _kv = await GetDocumentPrestationRapport(
           tokenCt,
           splitShift,
@@ -1866,54 +1924,69 @@ const [arrayFileToast, setArrayFileToast] = useState([])
       default:
         break;
     }
-    if (telecharger) {
-      return TelechargerDocument(_kv.v, _kv.k);
-    } else {
-      return _kv;
-    }
+    return _kv;
   };
 
+  /**
+   * Créer le props pour le fichier ZIP
+   * @param {*} _arrDocT
+   * @param {*} presta
+   * @returns
+   */
   const CreatePropsDocPrestaZIP = async (_arrDocT, presta) => {
     const _obj = {};
     _obj.title = "Tous les documents";
     _obj.extension = "zip";
 
-    const TelechargerZIPSup = async (presta) => {
-      let _arrDocs = [];
-      let _targetWindow = window.open("/waiting");
 
+
+    const TelechargerZIPSup = async (presta) => {
+      const zip = JSZip();
+      let _arrDocs = [];
+      
       for (let index = 0; index < _arrDocT.length; index++) {
         const element = _arrDocT[index];
 
-        let _kv = await GetMethodFetchDataDocumentPresta(
-          element.data.v,
-          false,
-          true
-        );
+        let _kv = await DocumentMaintenanceGetFile(element.data.v, false, true);
         if (_kv) {
           _arrDocs.push([_kv.v, _kv.k]);
         }
       }
 
-      await TelechargerZIP(
-        _arrDocs,
-        `Documents PC${presta.IdPrestationContrat}_${presta.DateInterventionPrestationTrimed}`
-      );
-      _targetWindow.close();
-    };
+      _arrDocs.forEach((kv,i)=> {
+        try {
+          let _b64 = kv[0];
+          let _blob = base64toBlob(_b64);
+          zip.file(kv[1],_blob);
+          
+        } catch (error) {
+          console.log("Impossible de zipper")
+          console.log(kv[0]);
+          console.log(error);
+        }
+      });
 
+      const _v = zip.generateAsync({type: 'blob'})
+      const _k = `Documents PC${presta.IdPrestationContrat}_${presta.DateInterventionPrestation}`;
+      
+      return {k: _k, v: _v};
+      
+    }
+
+ 
     _obj.TelechargerDocumentSup = () => TelechargerZIPSup(presta);
 
     return _obj;
   };
 
+  //#endregion
+
   const FetchSetDocuments = async (data, presta) => {
     let _arrDocs = [];
 
     const arrData = JSON.parse(data);
-    if (arrData === 500)
-    {
-      const _arrError = [CreatePropError()]
+    if (arrData === 500) {
+      const _arrError = [CreatePropError()];
       //Erreur
       setDocuments(_arrError);
       setIsDocumentLoaded(true);
@@ -1925,10 +1998,10 @@ const [arrayFileToast, setArrayFileToast] = useState([])
     if (arrData.length) {
       for (let index = 0; index < arrData.length; index++) {
         const element = arrData[index];
-        _arrDocs.push(CreatePropsDocPresta(element));
+        _arrDocs.push(CreatePropsDocumentMaintenance(element));
       }
     } else {
-      _arrDocs.push(CreatePropsDocPresta(arrData));
+      _arrDocs.push(CreatePropsDocumentMaintenance(arrData));
     }
 
     if (_arrDocs.length > 1) {
@@ -2035,11 +2108,9 @@ const [arrayFileToast, setArrayFileToast] = useState([])
     }
 
     //Création du fichier ZIP
-    let _targetWindow = window.open("/waiting");
+    // let _targetWindow = window.open("/waiting");
 
     const CreateArrayZIP = async () => {
-      let _arrDocs = [];
-
       for (let index = 0; index < _arrayOfFactures.length; index++) {
         const facture = _arrayOfFactures[index];
         let _kv = await VoirFactureDocument(
@@ -2049,43 +2120,47 @@ const [arrayFileToast, setArrayFileToast] = useState([])
           facture.Avoir,
           true
         );
-        if (_kv) {
-          _arrDocs.push([_kv.v, _kv.k]);
-        }
+
+        //Transformation en blob
+        const base64data = _kv.v;
+        const _bblob = base64toBlob(base64data);
+        //Téléchargement
+        saveAs(_bblob, _kv.k);
       }
 
-      return _arrDocs;
+      // return _arrDocs;
     };
 
-    let _arrDocs = await CreateArrayZIP();
-    const _date = new Date();
-    await TelechargerZIP(
-      _arrDocs,
-      `${_date.toLocaleDateString("fr-FR").replace(/\//g, "-")}_${
-        _arrDocs.length
-      }_factures`
-    );
-    _targetWindow.close();
+    await CreateArrayZIP();
+    // const _date = new Date();
+
+    // await TelechargerZIP(
+    //   _arrDocs,
+    //   `${_date.toLocaleDateString("fr-FR").replace(/\//g, "-")}_${
+    //     _arrDocs.length
+    //   }_factures`
+    // );
+    // _targetWindow.close();
   };
 
   //#endregion
 
   //#region Intervention
 
-  const CreatePropsDocumentInterventionFI = (element) => {
-    const _obj = {};
-    _obj.title = `${element.k}`;
-    _obj.extension = "pdf";
+  // const CreatePropsDocumentInterventionFI2 = (element) => {
+  //   const _obj = {};
+  //   _obj.title = `${element.k}`;
+  //   _obj.extension = "pdf";
 
-    _obj.VoirDocumentSup = () => {
-      GetDocumentFISAV(tokenCt, element.v);
-    };
-    _obj.TelechargerDocumentSup = () => {
-      GetDocumentFISAV(tokenCt, element.v, true);
-    };
-    _obj.data = element;
-    return _obj;
-  };
+  //   _obj.VoirDocumentSup = () => {
+  //     GetDocumentFISAV(tokenCt, element.v);
+  //   };
+  //   _obj.TelechargerDocumentSup = () => {
+  //     GetDocumentFISAV(tokenCt, element.v, true);
+  //   };
+  //   _obj.data = element;
+  //   return _obj;
+  // };
 
   const CreatePropsDocumentInterventionFacture = (element) => {
     const _obj = {};
@@ -2258,25 +2333,7 @@ const [arrayFileToast, setArrayFileToast] = useState([])
               </Table>
             </Col>
 
-            {gridColMDValue !== 12 && <Col md={"auto"}>{CardDocs()} 
-            {/* <ToastContainer
-            className="p-3"
-            position={"bottom-end"}
-            // style={{ zIndex: 1 }}
-          >
-            <Toast show={showToast}>
-              <Toast.Header closeButton={false}>Téléchargement en cours</Toast.Header>
-              <Toast.Body>
-                {
-                  arrayFileToast.map((fileName)=>{
-                    return <div>{fileName}</div>
-                  })
-                }
-
-              </Toast.Body>
-            </Toast>
-          </ToastContainer> */}
-            </Col>}
+            {gridColMDValue !== 12 && <Col md={"auto"}>{CardDocs()}</Col>}
           </Row>
         </Breakpoint>
 

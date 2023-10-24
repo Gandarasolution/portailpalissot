@@ -4,72 +4,129 @@ import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import { Link } from "react-router-dom";
 import ImageExtension, { IsExtensionVisible } from "./ImageExtension";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";
+import { saveAs } from "file-saver";
+import { useContext } from "react";
+import { ViewerContext } from "../../App";
+
+
 
 const RowDocument = ({ props, index }) => {
+  const viewerCt = useContext(ViewerContext);
+  
+  //#region States
+  const [showToast, setShowToast] = useState(false);
+  //#endregion
 
-// const [showToast, setShowToast] = useEffect(false);
 
-// const Telechargement = ()=> {
 
-//   //Affichage d'un toast
 
-//   // setShowToast(true);
-// }
+  //#region Evenements
+  const Telechargement = async () => {
+    //Affichage d'un toast
+    setShowToast(true);
+    const _kv = await props.TelechargerDocumentSup();
 
+    try {
+    //Transformation en blob
+    const base64data = _kv.v;
+    const _bblob = base64toBlob(base64data);
+    //Téléchargement
+    // saveAs(_bblob, props.title);
+    saveAs(_bblob, _kv.k);
+
+      
+    } finally {
+      
+          //Cacher le toast
+          setShowToast(false);
+      
+    }
+  };
+
+const Visualisation = async () => {
+  let targetWindow = window.open("/waiting");
+
+  const _kv = await props.VoirDocumentSup();
+
+      //On récupère le fichier en b64
+  const b64data = _kv.v;
+  
+    //On transforme le fichier en blob
+    const blobData = base64toBlob(b64data.v);
+
+    //On créer l'URL utilisé par les viewers
+    const url = URL.createObjectURL(blobData);
+
+    //On l'enregistre dans le viewerContext
+    viewerCt.setViewer(url);
+
+    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+    //Le bon viewer est déterminé par l'extension
+    targetWindow.location.href = GetURLLocationViewerFromExtension(
+      _kv.k.split(".").pop()
+    );
+}
+
+
+  //#endregion
+
+  //#region Component
+
+  const ToastTelechargement = () => {
+    return (
+      <ToastContainer
+        className="p-3"
+        position={"bottom-end"}
+        // style={{ zIndex: 1 }}
+      >
+        <Toast show={showToast}>
+          <Toast.Header closeButton={false}></Toast.Header>
+          <Toast.Body>
+            <div>Téléchargement en cours</div>
+            <div>{props.title}</div>
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
+    );
+  };
+
+  //#endregion
 
   return (
     <>
-
-{/* 
-<ToastContainer
-            className="p-3"
-            position={"bottom-end"}
-            // style={{ zIndex: 1 }}
-          >
-            <Toast show={showToast}>
-              <Toast.Header closeButton={false}></Toast.Header>
-              <Toast.Body>Hello, world! This is a toast message.</Toast.Body>
-            </Toast>
-          </ToastContainer>
- */}
-
-    <Row key={index}>
-      <Col md={"auto"}>
-        <ImageExtension extension={props.extension} />
-      </Col>
-      <Col>
-        <div>
-          <div className="mb-0 document-title">{`${props.title}`}</div>
-          {props.size && (
-            <span className="document-size">{`${props.size}`}</span>
-          )}
-
-            {props.extension === "ERROR" && (<div>
-              Impossible de récupérer les documents.
-              </div>)}
-
-          <div className="document-links">
-            {IsExtensionVisible(props.extension.toUpperCase()) &&
-              props.VoirDocumentSup && (
-                <Link onClick={() => props.VoirDocumentSup()}>Voir</Link>
-              )}
-
-            {props.TelechargerDocumentSup && (
-              <Link onClick={() => props.TelechargerDocumentSup()}>
-                Télécharger
-              </Link>
-            //   <Link onClick={Telechargement}>
-            //   Télécharger
-            // </Link>
+      <ToastTelechargement />
+      <Row key={index}>
+        <Col md={"auto"}>
+          <ImageExtension extension={props.extension} />
+        </Col>
+        <Col>
+          <div>
+            <div className="mb-0 document-title">{`${props.title}`}</div>
+            {props.size && (
+              <span className="document-size">{`${props.size}`}</span>
             )}
-          </div>
-        </div>
-        {props.extension.toUpperCase() === "ZIP" && <hr />}
-      </Col>
-    </Row>
-    </>
 
+            {props.extension === "ERROR" && (
+              <div>Impossible de récupérer les documents.</div>
+            )}
+
+            <div className="document-links">
+              {IsExtensionVisible(props.extension.toUpperCase()) &&
+                props.VoirDocumentSup && (
+                  <Link onClick={() => props.VoirDocumentSup()}>Voir</Link>
+                )}
+
+              {props.TelechargerDocumentSup && (
+                <Link onClick={Telechargement}>Télécharger</Link>
+              )}
+            </div>
+          </div>
+          {props.extension.toUpperCase() === "ZIP" && <hr />}
+        </Col>
+      </Row>
+    </>
   );
 };
 

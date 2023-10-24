@@ -65,8 +65,9 @@ import {
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import AccountPage from "./Views/Home/AccountPage";
 import HomePage from "./Views/Home/HomePage";
-import { Toast, ToastContainer } from "react-bootstrap";
-import { useState } from "react";
+import ViewerPDFPage from "./Views/Viewer/ViewerPDF";
+import ViewerWordPage from "./Views/Viewer/ViewerWord";
+import ViewerImagePage from "./Views/Viewer/ViewerImage";
 
 library.add(
   fas,
@@ -88,6 +89,8 @@ export const ClientSiteContratContext = createContext(null);
 export const ParametresContext = createContext([]);
 
 export const ToastContext = createContext(null);
+
+export const ViewerContext = createContext(null);
 
 //#endregion
 function App() {
@@ -133,6 +136,26 @@ function App() {
 
   function setListeParamsViaCookies(listeParams) {
     setListeParamsCookie(listParamName, listeParams);
+  }
+
+  //#endregion
+
+  //#region Viewer
+
+  const viewerName = cyrb53("viewer").toString();
+  const [viewerCookie, setViewerCookie, removeViewerCookie] = useCookies([
+    viewerName,
+  ]);
+
+  const viewerURL = viewerCookie[viewerName];
+
+  function setViewer(viewer) {
+    console.log("viewer :", viewer);
+    setViewerCookie(viewerName, viewer);
+  }
+
+  function removeViewer() {
+    removeViewerCookie(viewerName);
   }
 
   //#endregion
@@ -190,25 +213,19 @@ function App() {
     return (
       <Routes>
         <Route path="test" element={<PageTest />} />
-
         <Route
           path="*"
           element={storedClientSite ? <HomePage /> : <ClientSitePage />}
         />
-
         <Route
           path="/"
           element={storedClientSite ? <HomePage /> : <ClientSitePage />}
         />
         <Route path="/sites" element={<ClientSitePage />} />
-
         <Route path="waiting" element={<WaiterPage />} />
         <Route path="error" element={<ErrorPage />} />
-
         <Route path="viewerWord" element={<ViewerWord />} />
-
         <Route path="account" element={<AccountPage accountName={account} />} />
-
         <Route
           path="maintenance"
           element={storedClientSite ? <ContratPage /> : <ClientSitePage />}
@@ -236,6 +253,18 @@ function App() {
           path="factures"
           element={storedClientSite ? <FacturesPage /> : <ClientSitePage />}
         />
+        <Route
+          path="viewerPDF"
+          element={storedClientSite ? <ViewerPDFPage /> : <ClientSitePage />}
+        />{" "}
+        <Route
+          path="viewerDOC"
+          element={storedClientSite ? <ViewerWordPage /> : <ClientSitePage />}
+        />
+        <Route
+          path="viewerIMG"
+          element={storedClientSite ? <ViewerImagePage /> : <ClientSitePage />}
+        />
       </Routes>
     );
   };
@@ -254,25 +283,23 @@ function App() {
   };
 
   const LargeUp = () => {
-
     return (
       <Breakpoint medium up className="p-0 m-0">
-          <Row className="background  m-0">
-            {storedClientSite && (
-              <Col md={"auto"} className="p-0">
-                <SideBarMenuLeft />
-              </Col>
-            )}
-
-            <Col className="App font-link p-0">
-              <TopBarMenu
-                accountName={account}
-                handleDeconnexion={handleDeconnexion}
-              />
-              <AppRoutes />
+        <Row className="background  m-0">
+          {storedClientSite && (
+            <Col md={"auto"} className="p-0">
+              <SideBarMenuLeft />
             </Col>
-          </Row>
+          )}
 
+          <Col className="App font-link p-0">
+            <TopBarMenu
+              accountName={account}
+              handleDeconnexion={handleDeconnexion}
+            />
+            <AppRoutes />
+          </Col>
+        </Row>
       </Breakpoint>
     );
   };
@@ -285,12 +312,16 @@ function App() {
         value={{ storedClientSite, setClientSite, removeclientSite }}
       >
         <ParametresContext.Provider value={listeParamsCookie[listParamName]}>
-          <Router>
-            <BreakpointProvider>
-              <SmallDown />
-              <LargeUp />
-            </BreakpointProvider>
-          </Router>
+          <ViewerContext.Provider
+            value={{ viewerURL, setViewer, removeViewer }}
+          >
+            <Router>
+              <BreakpointProvider>
+                <SmallDown />
+                <LargeUp />
+              </BreakpointProvider>
+            </Router>
+          </ViewerContext.Provider>
         </ParametresContext.Provider>
       </ClientSiteContratContext.Provider>
     </TokenContext.Provider>

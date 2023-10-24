@@ -13,11 +13,14 @@ import Row from "react-bootstrap/Row";
 //#region Components
 import {
   GetListeFactures,
-  TelechargerFactureDocument,
   VoirFactureDocument,
 } from "../../axios/WSGandara";
-import { DateSOAP } from "../../functions";
-import { ClientSiteContratContext, TokenContext } from "../../App";
+import { DateSOAP, base64toBlob } from "../../functions";
+import {
+  ClientSiteContratContext,
+  TokenContext,
+  ViewerContext,
+} from "../../App";
 import TableData, {
   CreateFilter,
   CreateNewButtonFilter,
@@ -41,6 +44,7 @@ export const FactureContext = createContext(null);
 const FacturesPage = () => {
   const tokenCt = useContext(TokenContext);
   const clientSiteCt = useContext(ClientSiteContratContext);
+  const viewerCt = useContext(ViewerContext);
 
   //#region States
   const [isFacturesLoaded, setIsFactureLoaded] = useState(false);
@@ -161,22 +165,49 @@ const FacturesPage = () => {
       return `${dateFR} Facture N°${e.IdFacture}.pdf`;
     };
 
-    const methodTelecharger = (facture) => {
-      TelechargerFactureDocument(
+    const methodTelecharger = async (facture) => {
+      // TelechargerFactureDocument(
+      //   tokenCt,
+      //   facture.IdFacture,
+      //   facture.Type,
+      //   facture.Avoir
+      // );
+      // setTelechargerFacture(false);
+
+      return await await VoirFactureDocument(
         tokenCt,
         facture.IdFacture,
         facture.Type,
-        facture.Avoir
+        facture.Avoir,
+        true
       );
-      setTelechargerFacture(false);
     };
-    const methodVoir = (facture) => {
-      VoirFactureDocument(
+
+    const methodVoir = async (facture) => {
+      //On ouvre une nouvelle fenêtre d'attente
+      let targetWindow = window.open("/waiting");
+
+      //On récupère le fichier en b64
+      const b64data = await VoirFactureDocument(
         tokenCt,
         facture.IdFacture,
         facture.Type,
-        facture.Avoir
+        facture.Avoir,
+        true
       );
+
+      //On transforme le fichier en blob
+      const blobData = base64toBlob(b64data.v);
+
+      //On créer l'URL utilisé par les viewers
+      const url = URL.createObjectURL(blobData);
+
+      //On l'enregistre dans le viewerContext
+      viewerCt.setViewer(url);
+
+      //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+      //Le bon viewer est déterminé par l'extension
+      targetWindow.location.href = "/viewerPDF";
 
       setVoirFacture(false);
     };

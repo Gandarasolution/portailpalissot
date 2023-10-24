@@ -5,11 +5,12 @@ import { HTMLEncode } from "../functions";
 //#endregion
 
 //#region Données
-const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
+// const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
 // const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
-// const urlAction = `https://dev.extranet.gandarasolution.fr/extranet/inc_librairie/WSGandara.php?endpoint=GMAO`;
+// const urlAction = `https://dev.extranet.gandarasolution.fr/extranet/inc_librairie/WSGandara.fct.php?endpoint=GMAO`;
+const urlAction = `https://extranet.palissot.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO`;
 
-//#endregion
+//#endregionhttps://dev.extranet.gandarasolution.fr/extranet/inc_librairie/WSGandara.fct.php
 
 const callEndpoint = async (endpoint, data, setData, returnData) => {
   let _data = undefined;
@@ -54,9 +55,16 @@ const Connexion = async (login, pass, setToken) => {
     url: urlAction + "Connexion",
     data: { login: login, pass_clear: pass },
     success(data) {
-      setToken(data);
+      // console.log(data)
+      if (data === 'Erreur de connexion')
+      {setToken(500)}
+      else {
+        setToken(data);
+
+      }
     },
     error(error) {
+
       console.log(error);
       setToken(500);
     },
@@ -204,6 +212,7 @@ const GetDocumentPrestationRapport = async (
       url: urlAction + "GetDocumentPrestationRapport",
       data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
       success(data) {
+        // console.log(data);
         _return = JSON.parse(data);
       },
     });
@@ -396,7 +405,7 @@ const VoirDocument = (b64, filename, targetWindow) => {
     url: `${urlAction}File64`,
     data: { b64: b64, filename: HTMLEncode(filename) },
     success(data) {
-      const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
+       const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
       if (targetWindow) {
         //Ouvre dans cette fenêtre
         targetWindow.location.href = urlToOpen;
@@ -621,6 +630,30 @@ const GetDocumentFISAV = async (
   returnData
 ) => {
   let targetWindow = undefined;
+
+  let _return = undefined;
+if (returnData) {
+  await $.ajax({
+    type: "POST",
+    url: urlAction + "GetDocumentFISAV",
+    data : {
+      token: token,
+      IdFicheInterventionSAV: IdFicheInterventionSAV,
+    },
+    success(data){
+      console.log(data)
+      _return = JSON.parse(data);
+    },
+    error(error)
+    {
+      console.log(error);
+    }
+
+  })
+
+  return _return;
+}
+
   if (!returnData) {
     targetWindow = window.open("/waiting");
   }
@@ -643,6 +676,11 @@ const GetDocumentFISAV = async (
     SetData,
     returnData
   );
+
+
+
+
+
 };
 
 const GetListeSecteur = async (token, guid, setData) => {
@@ -693,6 +731,37 @@ const GetListeDevis = (token, guid, setData) => {
 
 const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
   let targetWindow = undefined;
+
+
+  
+
+
+
+  let _return = undefined;
+  if (returnData) {
+    await $.ajax({
+      type: "POST",
+      url: urlAction + "GetdocumentDevis",
+      data : { token: token, IdDevis: IdDevis },
+      success(data){
+        _return = JSON.parse(data);
+      },
+      error(error)
+      {
+        console.log(error);
+      }
+  
+    })
+  
+    return _return;
+  }
+
+
+
+
+
+
+
   if (!returnData) {
     targetWindow = window.open("/waiting");
   }
