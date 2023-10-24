@@ -1323,10 +1323,51 @@ class MSSoapClient extends SoapClient
 
 		
 
+		
+		
+		function UpdateMdp($token, $newMdp, $ws)
+		{
+			global $URL_API_CCS, $g_useSoapClientV2;
+			$request = array("token"=>$token, "newMdp" => $newMdp);
+			
+			if($g_useSoapClientV2)
+			{
+				$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+				$result = $client->__soapCall("GMAO_UpdateMdp",  array("parameters" => $request));
+				
+				if (is_object($result)) {
+					$result = json_decode(json_encode($result), true);
+				}
+			}
+			else
+			{
+				$client = new nusoap_client($ws, true);
+				$client->soap_defencoding = 'UTF-8';
+				$client->decode_utf8 = false;
+				$result = $client->call("GMAO_UpdateMdp", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+			}
+			
+			$error = $client->getError();
+			
+			
+			if ($error) {
+				error_log($error);
+				return $error;
+				} else {
+				
+					return json_encode($result["GMAO_UpdateMdp"]);
+					
+			}
+		}
+
 		function CallENDPOINT($url,$endpoint)
 		{			
 			switch($endpoint)
 			{
+case "GMAO_UpdateMdp":
+	echo(UpdateMdp($_POST['token'],$_POST['newMdp'],$url));
+	break;
+
 				case "GMAOConnexion":
 				echo(ConnexionGMAO($_POST['login'],$_POST['pass_clear'],$url));
 				//echo(ConnexionGMAO('a@a.fr','Youforlife',$url));

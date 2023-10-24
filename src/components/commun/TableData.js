@@ -2162,22 +2162,80 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
   //   return _obj;
   // };
 
+  // const CreatePropsDocumentInterventionFacture = (element) => {
+  //   const _obj = {};
+
+  //   _obj.title = `${element.k}`;
+  //   _obj.extension = "pdf";
+
+  //   _obj.VoirDocumentSup = () => {
+  //     VoirFactureDocument(tokenCt, element.v, "Facture SAV", false);
+  //   };
+
+  //   _obj.TelechargerDocumentSup = () => {
+      // TelechargerFactureDocument(tokenCt, element.v, "Facture SAV", false);
+  //   };
+  //   _obj.data = element;
+  //   return _obj;
+  // };
+
+
+
+
+  /**
+   *
+   * @returns Un objet représentant le document
+   */
   const CreatePropsDocumentInterventionFacture = (element) => {
     const _obj = {};
 
-    _obj.title = `${element.k}`;
-    _obj.extension = "pdf";
+    //le titre et l'extension
+    _obj.title = element.k;
+    _obj.extension = element.k.split(".").pop();
 
-    _obj.VoirDocumentSup = () => {
-      VoirFactureDocument(tokenCt, element.v, "Facture SAV", false);
+    //La fonction appelé lors de l'appuye du bouton 'Voir'
+    _obj.VoirDocumentSup = () => FactureMaintenanceVoirDocumentSup(element);
+
+
+    //La fonction appelé lors de l'appuye du bouton télécharger
+    _obj.TelechargerDocumentSup = async () => {
+      return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false,true);
     };
 
-    _obj.TelechargerDocumentSup = () => {
-      TelechargerFactureDocument(tokenCt, element.v, "Facture SAV", false);
-    };
     _obj.data = element;
+
     return _obj;
   };
+
+
+
+ /**
+   * La méthode appellé pour voir un document de maintenance
+   */
+ const FactureMaintenanceVoirDocumentSup = async (element) => {
+  //On ouvre une nouvelle fenêtre d'attente
+  let targetWindow = window.open("/waiting");
+
+  //On récupère le fichier en b64
+  const b64data = await  VoirFactureDocument(tokenCt, element.v, "Facture SAV", false,true);
+
+  //On transforme le fichier en blob
+  const blobData = base64toBlob(b64data.v);
+
+  //On créer l'URL utilisé par les viewers
+  const url = URL.createObjectURL(blobData);
+
+  //On l'enregistre dans le viewerContext
+  viewerCt.setViewer(url);
+
+  //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //Le bon viewer est déterminé par l'extension
+  targetWindow.location.href = GetURLLocationViewerFromExtension(
+    element.k.split(".").pop()
+  );
+};
+
+
 
   const CreatePropsDocumentInterventionZIP = (_arrDocsFI, _arrDocsFA) => {
     const _obj = {};
@@ -2260,7 +2318,7 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
           _arrFA.push(_obj);
         }
       } else if (data.k) {
-        const _obj = CreatePropsDocumentInterventionFacture(JSON.parse(data));
+        const _obj = CreatePropsDocumentInterventionFacture(data);
 
         _arrFA.push(_obj);
       }

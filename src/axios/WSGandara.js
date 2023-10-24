@@ -71,6 +71,27 @@ const Connexion = async (login, pass, setToken) => {
   });
 };
 
+
+
+const UpdateMDP = async (token,newMdp, setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "_UpdateMdp",
+    data: {
+      token: token,
+      newMdp: newMdp,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+  });
+}
+
+
 const GetListeParametres = async (token, setData) => {
   $.ajax({
     type: "POST",
@@ -817,4 +838,5 @@ export {
   GetListeMails,
   GetNombrePortails,
   GetContratPrestationPeriodes,
+  UpdateMDP,
 };
