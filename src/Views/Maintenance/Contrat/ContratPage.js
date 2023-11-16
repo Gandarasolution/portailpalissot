@@ -100,13 +100,23 @@ const ContratPage = () => {
 
   const GetPeriodes = async () => {
     const FetchSetDataPeriode = (data) => {
-      for (let index = 0; index < data.length; index++) {
-        const element = data[index];
+      if(data.length > 1)
+      {
 
-        element.k = `01-01-${element.k}`;
-        element.v = `31-12-${element.v}`;
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+          element.k = `01-01-${element.k}`;
+          element.v = `31-12-${element.v}`;
+        }
+      }else{
+        let _lData = [];
+        data.k = `01-01-${data.k}`;
+        data.v = `31-12-${data.v}`;
+        _lData[0] = data;
+        data = _lData;
+
       }
-
+        
       setListePeriodes(data);
       const PeriodeInitial = GetDatePeriodeInitial();
       const _indexPeriode = data.findIndex((p) => {
