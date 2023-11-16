@@ -18,7 +18,7 @@ import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region Components
-import { Connexion, GetListeParametres } from "../../axios/WSGandara";
+import { Connexion, CreateTokenMDP, GetListeParametres } from "../../axios/WSGandara";
 
 //#endregion
 
@@ -37,6 +37,10 @@ const LoginPage = (props) => {
 
   const [idError, setIdError] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+const [recupAlertVisible, setRecupAlerteVisible] = useState(false);
+const [recupAlertText, setRecupAlertText] = useState("");
+const [recupAlertVariant, setRecupAlertVariant] = useState("danger");
 
   const inputRef = useRef(null);
 
@@ -102,10 +106,32 @@ const LoginPage = (props) => {
 
   const handleForgotPassword = () => {
     if (mailRecup.length > 0) {
+
+      const FetchSetRecup = (data) => {
+        setRecupAlertVariant("danger");
+        if (data === 1)
+        {
+          //Alerte ok
+          setRecupAlertText("Un mail de récupération vous a été envoyé. Merci de vérifier votre boite mail, et de suivre les instructions.")
+          setRecupAlertVariant("success");
+        }else if(data === 2)
+        {
+          //Alerte pas ok
+          setRecupAlertText("Ce mail est inconnu.")
+        }else {
+          //alerte erreur
+          setRecupAlertText("Une erreur est survenu. Merci de recommencer ultérieurement.")
+        }
+        setRecupAlerteVisible(true)
+      }
+
+      CreateTokenMDP(mailRecup, FetchSetRecup)
+
     }
   };
 
   const FormModalForgotPassword = () => {
+
     return (
       <div>
         <p>
@@ -126,14 +152,38 @@ const LoginPage = (props) => {
           </Form.FloatingLabel>
 
           <div className="d-flex justify-content-center">
-            <Button variant="primary" type="submit">
+            {/* <Button variant="primary" type="submit"> */}
+            <Button variant="primary" onClick={() => handleForgotPassword()}>
               Envoyer
             </Button>
           </div>
+           
         </Form>
       </div>
     );
   };
+
+
+const ModalAlerte = () => {
+return (
+  <Modal
+  show={recupAlertVisible}
+  onHide={() => setRecupAlerteVisible(false)}
+  backdrop="static"
+  keyboard={false}
+>
+  <Modal.Header closeButton>
+    <h1>Changement de mot de passe</h1>
+  </Modal.Header>
+
+  <Modal.Body>
+  <Alert variant={recupAlertVariant} show={recupAlertVisible} >
+  {recupAlertText}
+</Alert></Modal.Body>
+</Modal>
+
+)
+}
 
   const ModalForgotPassword = () => {
     return (
@@ -290,6 +340,7 @@ const LoginPage = (props) => {
         </Col>
       </Row>
       {ModalForgotPassword()}
+      {ModalAlerte()}
     </Container>
   );
 };
