@@ -41,7 +41,7 @@ import { React, createContext } from "react";
 
 import { useCookies } from "react-cookie";
 
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#endregion
@@ -68,6 +68,7 @@ import HomePage from "./Views/Home/HomePage";
 import ViewerPDFPage from "./Views/Viewer/ViewerPDF";
 import ViewerWordPage from "./Views/Viewer/ViewerWord";
 import ViewerImagePage from "./Views/Viewer/ViewerImage";
+import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
 
 library.add(
   fas,
@@ -94,6 +95,8 @@ export const ViewerContext = createContext(null);
 
 //#endregion
 function App() {
+
+
   //Fonction de hash : https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
   const cyrb53 = (str, seed = 0) => {
     let h1 = 0xdeadbeef ^ seed,
@@ -190,7 +193,7 @@ function App() {
     removeAccountCookie(accountName);
   };
 
-  if (!tokenCookie[tokenName]) {
+  if (!tokenCookie[tokenName] && ! window.location.href.toUpperCase().includes('changeMDP'.toUpperCase())) {
     return (
       <div className="App font-link background">
         <LoginPage
@@ -212,7 +215,9 @@ function App() {
   const AppRoutes = () => {
     return (
       <Routes>
+        
         <Route path="test" element={<PageTest />} />
+        <Route path="/changemdp/:token" element={<ChangeMDPPage />}/>
         <Route
           path="*"
           element={storedClientSite ? <HomePage /> : <ClientSitePage />}
@@ -316,6 +321,7 @@ function App() {
             value={{ viewerURL, setViewer, removeViewer }}
           >
             <Router>
+
               <BreakpointProvider>
                 <SmallDown />
                 <LargeUp />

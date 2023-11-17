@@ -72,6 +72,47 @@ const Connexion = async (login, pass, setToken) => {
 };
 
 
+const CreateTokenMDP = async (mail,setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "CreateTokenMDP",
+    data: {
+      mail: mail
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+    error(error) {
+      setData(500);
+    }
+  });
+}
+
+const ChangeMDP = async (token,newMdp,setData) => {
+  $.ajax({
+    type: "POST",
+    url: urlAction + "ChangeMDP",
+    data: {
+      token: token,
+      newMdp: newMdp,
+    },
+    success(data) {
+      if (JSON.parse(JSON.stringify(data)) === "500") {
+        setData([]);
+      } else {
+        setData(JSON.parse(data));
+      }
+    },
+    error(error) {
+      setData(500);
+    }
+  });
+}
+
 
 const UpdateMDP = async (token,newMdp, setData) => {
   $.ajax({
@@ -839,4 +880,6 @@ export {
   GetNombrePortails,
   GetContratPrestationPeriodes,
   UpdateMDP,
+  ChangeMDP,
+  CreateTokenMDP,
 };
