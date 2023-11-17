@@ -18,9 +18,9 @@ const callEndpoint = async (endpoint, data, setData, returnData) => {
 
   function ErrorHandling(error) {
     setData([]);
-    console.log(error);
-    console.log("Erreur lors du endpoint ", endpoint);
-    console.log("avec les donnes ", data);
+    // console.log(error);
+    // console.log("Erreur lors du endpoint ", endpoint);
+    // console.log("avec les donnes ", data);
   }
 
   $.ajax({
@@ -65,7 +65,6 @@ const Connexion = async (login, pass, setToken) => {
     },
     error(error) {
 
-      console.log(error);
       setToken(500);
     },
   });
@@ -98,11 +97,11 @@ const ChangeMDP = async (token,newMdp,setData) => {
     url: urlAction + "ChangeMDP",
     data: {
       token: token,
-      newMdp: newMdp,
+      newMDP: newMdp,
     },
     success(data) {
       if (JSON.parse(JSON.stringify(data)) === "500") {
-        setData([]);
+        setData(500);
       } else {
         setData(JSON.parse(data));
       }
@@ -703,12 +702,10 @@ if (returnData) {
       IdFicheInterventionSAV: IdFicheInterventionSAV,
     },
     success(data){
-      console.log(data)
       _return = JSON.parse(data);
     },
     error(error)
     {
-      console.log(error);
     }
 
   })
@@ -810,7 +807,6 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
       },
       error(error)
       {
-        console.log(error);
       }
   
     })
