@@ -192,7 +192,7 @@ function App() {
     removeAccountCookie(accountName);
   };
 
-  if (!tokenCookie[tokenName] && ! window.location.href.toUpperCase().includes('changeMDP'.toUpperCase())) {
+  if (!tokenCookie[tokenName] && ! window.location.href.toUpperCase().includes('changeMDP/'.toUpperCase())) {
     return (
       <div className="App font-link background">
         <LoginPage
@@ -214,11 +214,6 @@ function App() {
   const AppRoutes = () => {
     return (
       <Routes>
-        <Route path='/login' element={ <LoginPage
-          setToken={setTokenViaCookies}
-          setParams={setListeParamsViaCookies}
-          setAccountName={setAccountName}
-        />}/>
         <Route path="test" element={<PageTest />} />
         <Route path="/changemdp/:token" element={<ChangeMDPPage />}/>
         <Route
