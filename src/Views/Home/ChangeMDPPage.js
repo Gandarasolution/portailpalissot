@@ -13,7 +13,7 @@ const [newMdp, setNewMdp] = useState('')
 const [newMdp2, setNewMdp2] = useState('')
 const [alertVisible, setAlertVisible] = useState(false)
 const [textalert,setTextAlert] = useState("")
-
+const [alertVariant, setAlertVariant] = useState("")
 
 if(token.length <= 2)
 {
@@ -28,11 +28,14 @@ const SubmitNewMDP = () => {
   {
     const FetchSetData =(data) => {
 
+      setAlertVariant("danger")
 
       if(data === 1)
       {
         //Redirection connexion
-        navigate("/login")
+        setTextAlert("Mot de passe modifié");
+        setAlertVisible(true);
+        setAlertVariant("success");
       }else if(data === 0)
       {
         setTextAlert("La demande n'est plus valide. Veuillez recommencer votre demande");
@@ -76,7 +79,7 @@ const SubmitNewMDP = () => {
           Merci de renseigner votre nouveau mot de passe
         </Form.Text> */}
         </Form.Group>
-        <Alert  variant={'danger'} show={alertVisible} >
+        <Alert  variant={alertVariant} show={alertVisible} >
           {textalert}
         </Alert>
         <Button variant="primary" type="button" onClick={() => SubmitNewMDP()}>
