@@ -1352,7 +1352,7 @@
 				return $error;
 				} else {
 				
-				return json_encode($result["GMAO_UpdateMdp"]);
+				return json_encode($result["GMAO_UpdateMdpResult"]);
 				
 			}
 		}
@@ -1394,7 +1394,7 @@
 				return $error;
 				} else {
 				
-				return json_encode($result["GMAOCreateTokenMDP"]);
+				return json_encode($result["GMAOCreateTokenMDPResult"]);
 				
 			}
 		}
@@ -1430,7 +1430,7 @@
 				return $error;
 				} else {
 				
-				return json_encode($result["GMAOChangeMDP"]);
+				return json_encode($result["GMAOChangeMDPResult"]);
 				
 			}
 		}

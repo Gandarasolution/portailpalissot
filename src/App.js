@@ -153,7 +153,6 @@ function App() {
   const viewerURL = viewerCookie[viewerName];
 
   function setViewer(viewer) {
-    console.log("viewer :", viewer);
     setViewerCookie(viewerName, viewer);
   }
 
@@ -215,7 +214,11 @@ function App() {
   const AppRoutes = () => {
     return (
       <Routes>
-        
+        <Route path='/login' element={ <LoginPage
+          setToken={setTokenViaCookies}
+          setParams={setListeParamsViaCookies}
+          setAccountName={setAccountName}
+        />}/>
         <Route path="test" element={<PageTest />} />
         <Route path="/changemdp/:token" element={<ChangeMDPPage />}/>
         <Route

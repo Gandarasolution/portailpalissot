@@ -27,11 +27,12 @@ const SubmitNewMDP = () => {
   if(newMdp.length > 0 && newMdp === newMdp2) 
   {
     const FetchSetData =(data) => {
-       console.log(data)
+
+
       if(data === 1)
       {
         //Redirection connexion
-        navigate("/");
+        navigate("/login")
       }else if(data === 0)
       {
         setTextAlert("La demande n'est plus valide. Veuillez recommencer votre demande");
@@ -39,9 +40,11 @@ const SubmitNewMDP = () => {
       }else {
         setTextAlert("Une erreur s'est produite. Veuillez recommencer votre demande ultérieurement.");
         setAlertVisible(true);
+        
       }
     }
     ChangeMDP(token, newMdp,FetchSetData)
+
 
   }else {
     setAlertVisible(true)
@@ -57,7 +60,7 @@ const SubmitNewMDP = () => {
   return (
     <Container>
       
-      <Form onSubmit={() => SubmitNewMDP()} > 
+      <Form  > 
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Nouveau mot de passe</Form.Label>
           <Form.Control type="password"  value={newMdp} onChange={(e)=> setNewMdp(e.target.value)} required />
@@ -76,7 +79,7 @@ const SubmitNewMDP = () => {
         <Alert  variant={'danger'} show={alertVisible} >
           {textalert}
         </Alert>
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="button" onClick={() => SubmitNewMDP()}>
           Changer de mot de passe
         </Button>
       </Form>
