@@ -216,13 +216,13 @@ function App() {
       <Routes>
         <Route path="test" element={<PageTest />} />
         <Route path="/changemdp/:token" element={<ChangeMDPPage />}/>
-        <Route
+        {/* <Route
           path="*"
           element={storedClientSite ? <HomePage /> : <ClientSitePage />}
-        />
+        /> */}
         <Route
           path="/"
-          element={storedClientSite ? <HomePage /> : <ClientSitePage />}
+          element={ storedClientSite ? <HomePage /> : <ClientSitePage />}
         />
         <Route path="/sites" element={<ClientSitePage />} />
         <Route path="waiting" element={<WaiterPage />} />
