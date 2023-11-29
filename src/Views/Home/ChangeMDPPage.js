@@ -32,10 +32,14 @@ const SubmitNewMDP = () => {
 
       if(data === 1)
       {
+        
         //Redirection connexion
         setTextAlert("Mot de passe modifié");
         setAlertVisible(true);
         setAlertVariant("success");
+        // navigate("/");
+        window.location.href = "/";
+
       }else if(data === 0)
       {
         setTextAlert("La demande n'est plus valide. Veuillez recommencer votre demande");
