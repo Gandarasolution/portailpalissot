@@ -23,6 +23,9 @@ import { Connexion, CreateTokenMDP, GetListeParametres } from "../../axios/WSGan
 //#endregion
 
 //#endregion
+import backgroundLogin from "../../image/imageLogin/login.jpg";
+import logo from "../../image/favicon.ico";
+import logoNoir from "../../image/imageLogin/logo_noir.png";
 
 const LoginPage = (props) => {
   //#region States
@@ -38,9 +41,9 @@ const LoginPage = (props) => {
   const [idError, setIdError] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-const [recupAlertVisible, setRecupAlerteVisible] = useState(false);
-const [recupAlertText, setRecupAlertText] = useState("");
-const [recupAlertVariant, setRecupAlertVariant] = useState("danger");
+  const [recupAlertVisible, setRecupAlerteVisible] = useState(false);
+  const [recupAlertText, setRecupAlertText] = useState("");
+  const [recupAlertVariant, setRecupAlertVariant] = useState("danger");
 
   const inputRef = useRef(null);
 
@@ -109,16 +112,14 @@ const [recupAlertVariant, setRecupAlertVariant] = useState("danger");
 
       const FetchSetRecup = (data) => {
         setRecupAlertVariant("danger");
-        if (data === 1)
-        {
+        if (data === 1) {
           //Alerte ok
           setRecupAlertText("Un mail de récupération vous a été envoyé. Merci de vérifier votre boite mail, et de suivre les instructions.")
           setRecupAlertVariant("success");
-        }else if(data === 2)
-        {
+        } else if (data === 2) {
           //Alerte pas ok
           setRecupAlertText("Ce mail est inconnu.")
-        }else {
+        } else {
           //alerte erreur
           setRecupAlertText("Une erreur est survenu. Merci de recommencer ultérieurement.")
         }
@@ -157,33 +158,33 @@ const [recupAlertVariant, setRecupAlertVariant] = useState("danger");
               Envoyer
             </Button>
           </div>
-           
+
         </Form>
       </div>
     );
   };
 
 
-const ModalAlerte = () => {
-return (
-  <Modal
-  show={recupAlertVisible}
-  onHide={() => setRecupAlerteVisible(false)}
-  backdrop="static"
-  keyboard={false}
->
-  <Modal.Header closeButton>
-    <h1>Changement de mot de passe</h1>
-  </Modal.Header>
+  const ModalAlerte = () => {
+    return (
+      <Modal
+        show={recupAlertVisible}
+        onHide={() => setRecupAlerteVisible(false)}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <h1>Changement de mot de passe</h1>
+        </Modal.Header>
 
-  <Modal.Body>
-  <Alert variant={recupAlertVariant} show={recupAlertVisible} >
-  {recupAlertText}
-</Alert></Modal.Body>
-</Modal>
+        <Modal.Body>
+          <Alert variant={recupAlertVariant} show={recupAlertVisible} >
+            {recupAlertText}
+          </Alert></Modal.Body>
+      </Modal>
 
-)
-}
+    )
+  }
 
   const ModalForgotPassword = () => {
     return (
@@ -270,27 +271,27 @@ return (
   const FormSubmit = () => {
     return (
       <Form className="m-4 p-2">
-        <Form.Group className="mb-3" controlId="formLogin">
-          <Form.Label>Identifiant</Form.Label>
+        <Form.Group className="mb-4" controlId="formLogin">
+          <Form.Label>Email</Form.Label>
 
           <Form.Control
             type="email"
             required
-            placeholder="identifiant@exemple.com"
+            placeholder="@"
             value={login}
             onChange={(e) => setLogin(e.target.value)}
             onKeyUp={handleLoginKeyPress}
           />
         </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formPassword">
+        <Form.Group className="mb-4" controlId="formPassword">
           <Form.Label>Mot de passe</Form.Label>
           <InputGroup>
             <Form.Control
               ref={inputRef}
               type={revealed ? "text" : "password"}
               required
-              placeholder="Mot de passe"
+              placeholder="****"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyUp={handlePasswordKeyPress}
@@ -308,20 +309,23 @@ return (
             </Spinner>
           )}
           <AlertErrorConnexion />
-
-          <div className=" d-flex justify-content-end m-2">
-            <NavLink
-              onClick={() => setShowModal(true)}
-              className="link-password-forgot"
-            >
-              Mot de passe oublié ?
-            </NavLink>
-          </div>
         </Form.Group>
 
         <Button variant="primary" onClick={() => handleSubmit()}>
           Connexion
         </Button>
+
+        <div className=" d-flex justify-content-center m-4">
+          <NavLink
+            onClick={() => setShowModal(true)}
+            className="link-password-forgot"
+          >
+            Mot de passe oublié ?{" "}
+            <span className="text-reset">
+              Réinitialiser &gt;
+            </span>
+          </NavLink>
+        </div>
       </Form>
     );
   };
@@ -330,13 +334,41 @@ return (
 
   return (
     <Container fluid>
-      <Row className="align-items-center viewport-height ">
-        <Col md={{ span: 4, offset: 4 }} className="container-login-content">
-          <div>
-            <h1>Connexion</h1>
-            <hr />
+      <Row className="align-items-center" style={{ minHeight: "100vh" }}>
+        <Col md={9} className="p-0">
+          <div
+            style={{
+              backgroundImage: `url(${backgroundLogin})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              height: "100vh",
+            }}
+          />
+        </Col>
+        <Col md={3} className="d-flex align-items-center justify-content-around flex-column login-content-wrapper">
+          {/* Logo au-dessus du formulaire */}
+          <div className="container-login-content">
+            <div className="text-center mb-4">
+              <img
+                alt="Logo"
+                src={logo}
+                width="50"
+                height="50"
+                className="d-inline-block align-top"
+              />
+              <h2 className="mt-2">GMAO</h2>
+            </div>
+            {FormSubmit()}
           </div>
-          {FormSubmit()}
+          {/* Image logo_noir en dessous du formulaire */}
+          <div className="text-center mt-4">
+            <img
+              alt="Logo noir"
+              src={logoNoir}
+              width="60"
+              height="60"
+            />
+          </div>
         </Col>
       </Row>
       {ModalForgotPassword()}

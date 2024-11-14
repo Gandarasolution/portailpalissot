@@ -161,12 +161,45 @@ nav ul li:hover {
 
 
 
-.container-login-content {
+/*.container-login-content {
   background-color: white;
   padding: 30px;
   border-radius: 10px;
+}*/
+.login-content-wrapper{
+  height: 100vh;
 }
 
+.container-login-content{
+  width: 100%;
+}
+
+.container-login-content > form > div{
+  text-align: left;
+}
+
+.container-login-content > form > div > label{
+  padding-left: .75rem;
+}
+
+.container-login-content .form-control,
+.container-login-content > form > button{
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 12px;
+}
+
+.container-login-content > form > button{
+  width: 100%;
+  background-color: var(--color-darker);
+  border: 1px solid var(--color-darker);
+  font-size: 22px;
+}
+
+.container-login-content > form > button:hover{
+  background-color: var(--color-dark);
+  border: 1px solid var(--color-dark);
+}
 
 .viewport-height {
   height: 75vh;
@@ -184,7 +217,15 @@ nav ul li:hover {
 
 
 .link-password-forgot {
-  color: var(--bs-primary) !important;
+  color: var(--color-dark) !important;
+}
+
+.link-password-forgot{
+  font-weight: 700 !important;
+}
+
+.link-password-forgot span{
+  font-weight: 100 !important;
 }
 
 .centerStack {
