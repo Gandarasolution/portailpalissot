@@ -75,7 +75,7 @@ const SideBarMenuLeft = () => {
     return (
       <CDBSidebar
         className="sidebar-gmao "
-        backgroundColor={"#282c34"}
+        backgroundColor={"#fff"}
         breakpoint={992}
         fluid
       >
@@ -83,7 +83,7 @@ const SideBarMenuLeft = () => {
           <a
             href="/"
             className="text-decoration-none"
-            style={{ color: "inherit" }}
+            style={{ color: "#ba1d59" }}
           >
             <Container>
               <img
@@ -100,10 +100,8 @@ const SideBarMenuLeft = () => {
 
         <CDBSidebarContent className="sidebar-content sidebar-gmao">
           <CDBSidebarMenu>
-            <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
+          <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
            <MenuNavLink href={"/maintenance"} icon={"calendar"} text={"Maintenance"} />
-           
-           
             <MenuNavLink
               href={"/interventions"}
               icon={"wrench"}

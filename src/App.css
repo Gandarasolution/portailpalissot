@@ -21,6 +21,7 @@
   --color-info: #85c7f9;
   --color-dark: #282c34;
   --color-darker: #3e4148;
+  --color-red: #ba1d59;
 }
 
 .App-header {
@@ -84,6 +85,12 @@
   font-size: larger;
 }
 
+.sidebar-content nav ul a{
+  color: var(--color-red) !important;
+}
+.sidebar-content nav ul li:hover{
+  color: #fff !important;
+}
 
 .header-card-site :hover{
   cursor: pointer;
@@ -104,15 +111,15 @@
 
 
 .active li {
-  background-color: var(--color-darker) !important;
+  background-color: var(--color-red) !important;
+  color: #fff;
 }
 
 
 
 nav ul li:hover {
   /* color: lightgray  !important; */
-  background-color: var(--color-darker) !important;
-
+  background-color: var(--color-red) !important;
 }
 
 
