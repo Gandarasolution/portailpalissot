@@ -20,7 +20,7 @@ import Container from "react-bootstrap/Container";
 
 //#region Interne
 
-import logo from "../../image/favicon.ico";
+import logo from "../../image/imageHome/logo_blanc.png";
 import { ClientSiteContratContext } from "../../App";
 
 //#endregion
@@ -83,17 +83,16 @@ const SideBarMenuLeft = () => {
           <a
             href="/"
             className="text-decoration-none"
-            style={{ color: "#ba1d59" }}
+            style={{ backgroundColor: "#ba1d59" }}
           >
             <Container>
               <img
                 alt=""
                 src={logo}
-                width="30"
-                height="30"
-                className="d-inline-block align-top"
+                width="80"
+                height="80"
+                className="d-inline-block align-top img-logo"
               />
-              GMAO
             </Container>
           </a>
         </CDBSidebarHeader>
