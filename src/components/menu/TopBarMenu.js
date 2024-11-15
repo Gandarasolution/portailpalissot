@@ -43,6 +43,8 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
   const navigate = useNavigate();
 
+  const { titre, soustitre } = getTitleAndSubtitle();
+
   const [showMenu, setShowMenu] = useState(false);
   const handleCloseMenu = () => setShowMenu(false);
 
@@ -91,14 +93,14 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
           <MenuNavLink href={"/appareils"} icon={faMobile} text={"Appareils"} />
           <MenuNavLink href={"/devis"} icon={faBook} text={"Devis"} />
           <MenuNavLink href={"/factures"} icon={faFile} text={"Factures"} />
-<br/>
-<hr/>
+          <br />
+          <hr />
 
           <MenuNavLink href={"/account"} icon={faUser} text={"Mon compte"} />
           <MenuNavLink icon={faRightFromBracket} text={"Se déconnecter"} onClick={handleDeconnexion} />
           <MenuNavLink href={"/"} icon={faCookieBite} text={"Cookies"} />
 
-{/* 
+          {/* 
           <Row>
           <Button variant="" className="border mb-2" onClick={handleAccount}>
             <FontAwesomeIcon icon={faUser} /> Mon compte
@@ -161,12 +163,12 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
     </Popover>
   );
 
-const handleChangerClientsite = () => {
-  navigate("/sites");
-}
+  const handleChangerClientsite = () => {
+    navigate("/sites");
+  }
 
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar expand="lg" className="top-bar-menu">
       <Container fluid>
         <Navbar.Toggle
           onClick={() => setShowMenu(true)}
@@ -175,20 +177,24 @@ const handleChangerClientsite = () => {
         />
         <OffcanvasMenu />
 
-        <Navbar.Text>
-          {ClientSiteContratCtx.storedClientSite &&
-            ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
-          <Button
-            variant=""
-            className="border"
-            // onClick={() => ClientSiteContratCtx.removeclientSite()}
-            onClick={handleChangerClientsite}
-          >
-            Changer de site
-          </Button>
+        <Navbar.Text className="navbar-title-container">
+          <h1>{titre}</h1>
+          <div className="box-length"><span>{soustitre}</span></div>
         </Navbar.Text>
 
-        <Navbar.Collapse className="justify-content-end">
+        <Navbar.Text className="d-flex align-items-center">
+          <div className="me-3 title-site">
+            {ClientSiteContratCtx.storedClientSite &&
+              ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
+            <Button
+              variant=""
+              className="border ms-2"
+              onClick={handleChangerClientsite}
+            >
+              Changer de site
+            </Button>
+          </div>
+
           <OverlayTrigger
             trigger={"click"}
             placement="bottom"
@@ -198,10 +204,20 @@ const handleChangerClientsite = () => {
               <FontAwesomeIcon icon={faCircleUser} /> {accountName}
             </Button>
           </OverlayTrigger>
-        </Navbar.Collapse>
+        </Navbar.Text>
       </Container>
     </Navbar>
   );
 };
 
+
+function getTitleAndSubtitle(data) {
+  const pathname = window.location.pathname;
+
+  if(pathname === "/devis"){
+    return { titre: "Liste des devis", soustitre: `X` };
+  }
+
+  return { titre: "Titre page", soustitre: "X" };
+}
 export default TopBarMenu;
