@@ -416,9 +416,8 @@ const TableData = ({ ...props }) => {
           >
             <FontAwesomeIcon
               icon={faFilter}
-              className={`icon-bt ${
-                IsButtonShouldBeCheck(header.fieldname) && "filter-actif"
-              } `}
+              className={`icon-bt ${IsButtonShouldBeCheck(header.fieldname) && "filter-actif"
+                } `}
             />
           </OverlayTrigger>
         </div>
@@ -983,20 +982,36 @@ const TableData = ({ ...props }) => {
   //#endregion
 
   //#region Pagination
-
+  const LeftArrow = () => (
+    <svg width="30" height="10" viewBox="0 0 30 10" fill="none">
+      <line x1="30" y1="5" x2="5" y2="5" stroke="#01B075" strokeWidth="1" />
+      <line x1="5" y1="5" x2="10" y2="2" stroke="#01B075" strokeWidth="1" />
+      <line x1="5" y1="5" x2="10" y2="8" stroke="#01B075" strokeWidth="1" />
+    </svg>
+  );
+  const RightArrow = () => (
+    <svg width="30" height="10" viewBox="0 0 30 10" fill="none">
+      <line x1="0" y1="5" x2="25" y2="5" stroke="#01B075" strokeWidth="1" />
+      <line x1="25" y1="5" x2="20" y2="2" stroke="#01B075" strokeWidth="1" />
+      <line x1="25" y1="5" x2="20" y2="8" stroke="#01B075" strokeWidth="1" />
+    </svg>
+  );
+  
   const TablePagination = () => {
     let _items = [];
+
+    const totalData = Data().length;
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const pageName = pathSegments[pathSegments.length - 1] || "Accueil";
 
     let _lData = Data();
     let _limiter = _lData.length;
     let _isEllipsisNedded = _limiter / nbParPages + 1 > 10;
 
     _items.push(
-      <Pagination.Prev
-        key={0}
-        onClick={() => handlePagePrev()}
-        className="m-1"
-      />
+      <Pagination.Prev key="prev" onClick={() => handlePagePrev()} className="m-1">
+        <LeftArrow />
+      </Pagination.Prev>
     );
 
     const maxLoop = Math.ceil(_limiter / nbParPages);
@@ -1206,15 +1221,14 @@ const TableData = ({ ...props }) => {
     }
 
     _items.push(
-      <Pagination.Next
-        key={-1}
-        onClick={() => handlePageNext(_limiter / nbParPages)}
-        className="m-1"
-      />
+      <Pagination.Next key="next" onClick={() => handlePageNext(totalData / nbParPages)} className="m-1">
+        <RightArrow />
+      </Pagination.Next>
     );
 
     return (
-      <Stack direction="horizontal">
+      <Stack direction="horizontal" className="content-pagination">
+        <div className="total-data">{totalData} {pageName} au total</div>
         <Pagination className="m-2">{_items}</Pagination>
         <DrodpdownNbPages />
       </Stack>
@@ -1225,10 +1239,10 @@ const TableData = ({ ...props }) => {
     return (
       <DropdownButton
         variant=""
-        className="border button-periode"
+        className="button-periode"
         drop="down-centered"
         style={{ borderRadius: "10px" }}
-        title={`${nbParPages} / page`}
+        title={`Résultat par page : ${nbParPages}`}
       >
         <Dropdown.Item
           onClick={() => {
@@ -1313,11 +1327,22 @@ const TableData = ({ ...props }) => {
 
   const TopPannel = () => {
     return (
-      <Row className="mb-2">
+      <Row className="mb-2 content-search">
         {props.TopPannelLeftToSearch && props.TopPannelLeftToSearch}
-
+        <Col className="m-1 search-bar">
+          <Form.Control
+            type="search"
+            placeholder="Rechercher dans la liste..."
+            aria-label="Search"
+            onChange={(e) => {
+              handleSearch(e);
+            }}
+            className="noBorder"
+            value={search}
+          />
+        </Col>
         {props.ButtonFilters && (
-          <Col className="m-1" md={"auto"}>
+          <Col className="m-1 status-bar" md={"auto"}>
             <div className="project-sort-nav">
               <nav>
                 <ul>
@@ -1330,25 +1355,13 @@ const TableData = ({ ...props }) => {
             </div>
           </Col>
         )}
-        <Col className="m-1">
-          <Form.Control
-            type="search"
-            placeholder="Rechercher"
-            aria-label="Search"
-            onChange={(e) => {
-              handleSearch(e);
-            }}
-            className="noBorder"
-            value={search}
-          />
-        </Col>
         {props.TopPannelRightToSearch && props.TopPannelRightToSearch}
         {props.Headers.findIndex((h) => h.fieldname.includes(TAGSELECTION)) >
           -1 && (
-          <Col md={"auto"} className="m-1">
-            <SelectionInfo />
-          </Col>
-        )}
+            <Col md={"auto"} className="m-1">
+              <SelectionInfo />
+            </Col>
+          )}
       </Row>
     );
   };
@@ -1358,12 +1371,15 @@ const TableData = ({ ...props }) => {
   const ButtonFilter = ({ filter }) => {
     if (!filter) {
       return (
-        <li
-          className={btFilterActif ? "li-inactif" : "li-actif"}
-          onClick={() => handleTousFilter()}
-        >
-          Tous
-        </li>
+        <>
+          <span className="filter-status-label">Etat :</span>
+          <li
+            className={btFilterActif ? "li-inactif" : "li-actif"}
+            onClick={() => handleTousFilter()}
+          >
+            Tous
+          </li>
+        </>
       );
     }
 
@@ -1698,10 +1714,9 @@ const TableData = ({ ...props }) => {
             <Col md={"auto"}>
               Documents{" "}
               {isDocumentLoaded ? (
-                `(${
-                  _arrayDocs.length > 1
-                    ? _arrayDocs.length - 1
-                    : _arrayDocs.length
+                `(${_arrayDocs.length > 1
+                  ? _arrayDocs.length - 1
+                  : _arrayDocs.length
                 })`
               ) : (
                 <Placeholder animation="glow">
@@ -1715,7 +1730,7 @@ const TableData = ({ ...props }) => {
                 onClick={() => {
                   setGridColMDValue(12);
                 }}
-                // className="ms-4"
+              // className="ms-4"
               />
             </Col>
           </Row>
@@ -1725,10 +1740,10 @@ const TableData = ({ ...props }) => {
             <div id="collapse-listeDocuments">
               {_arrayDocs.length > 0
                 ? _arrayDocs.map((doc, index) => {
-                    return (
-                      <RowDocument key={index} props={doc} index={index} />
-                    );
-                  })
+                  return (
+                    <RowDocument key={index} props={doc} index={index} />
+                  );
+                })
                 : "Aucun document."}
             </div>
           </Card.Body>
@@ -1805,7 +1820,7 @@ const TableData = ({ ...props }) => {
 
     //La fonction appelé lors de l'appuye du bouton télécharger
     _obj.TelechargerDocumentSup = async () => {
-      return await await GetDocumentFISAV(tokenCt, element.v,false,true);
+      return await await GetDocumentFISAV(tokenCt, element.v, false, true);
     };
 
     _obj.data = element;
@@ -1813,35 +1828,35 @@ const TableData = ({ ...props }) => {
     return _obj;
   };
 
-/**
-   * La méthode appellé pour voir un document de maintenance
-   */
-const DocumentDepannageVoirDocumentSup = async (element) => {
+  /**
+     * La méthode appellé pour voir un document de maintenance
+     */
+  const DocumentDepannageVoirDocumentSup = async (element) => {
 
-  //On ouvre une nouvelle fenêtre d'attente
-  let targetWindow = window.open("/waiting");
+    //On ouvre une nouvelle fenêtre d'attente
+    let targetWindow = window.open("/waiting");
 
-  //On récupère le fichier en b64
-  // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
-  const b64data = await GetDocumentFISAV(tokenCt, element.v,false,true);
+    //On récupère le fichier en b64
+    // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+    const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
 
 
-  //On transforme le fichier en blob
-  const blobData = base64toBlob(b64data.v);
+    //On transforme le fichier en blob
+    const blobData = base64toBlob(b64data.v);
 
-  //On créer l'URL utilisé par les viewers
-  const url = URL.createObjectURL(blobData);
+    //On créer l'URL utilisé par les viewers
+    const url = URL.createObjectURL(blobData);
 
-  //On l'enregistre dans le viewerContext
-  viewerCt.setViewer(url);
+    //On l'enregistre dans le viewerContext
+    viewerCt.setViewer(url);
 
-  //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-  //Le bon viewer est déterminé par l'extension
-  targetWindow.location.href = GetURLLocationViewerFromExtension(
-    element.k.split(".").pop()
-  );
-};
+    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+    //Le bon viewer est déterminé par l'extension
+    targetWindow.location.href = GetURLLocationViewerFromExtension(
+      element.k.split(".").pop()
+    );
+  };
 
 
 
@@ -1943,7 +1958,7 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
     const TelechargerZIPSup = async (presta) => {
       const zip = JSZip();
       let _arrDocs = [];
-      
+
       for (let index = 0; index < _arrDocT.length; index++) {
         const element = _arrDocT[index];
 
@@ -1953,12 +1968,12 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
         }
       }
 
-      _arrDocs.forEach((kv,i)=> {
+      _arrDocs.forEach((kv, i) => {
         try {
           let _b64 = kv[0];
           let _blob = base64toBlob(_b64);
-          zip.file(kv[1],_blob);
-          
+          zip.file(kv[1], _blob);
+
         } catch (error) {
           console.log("Impossible de zipper")
           console.log(kv[0]);
@@ -1966,14 +1981,14 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
         }
       });
 
-      const _v = zip.generateAsync({type: 'blob'})
+      const _v = zip.generateAsync({ type: 'blob' })
       const _k = `Documents PC${presta.IdPrestationContrat}_${presta.DateInterventionPrestation}`;
-      
-      return {k: _k, v: _v};
-      
+
+      return { k: _k, v: _v };
+
     }
 
- 
+
     _obj.TelechargerDocumentSup = () => TelechargerZIPSup(presta);
 
     return _obj;
@@ -2173,7 +2188,7 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
   //   };
 
   //   _obj.TelechargerDocumentSup = () => {
-      // TelechargerFactureDocument(tokenCt, element.v, "Facture SAV", false);
+  // TelechargerFactureDocument(tokenCt, element.v, "Facture SAV", false);
   //   };
   //   _obj.data = element;
   //   return _obj;
@@ -2199,7 +2214,7 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
 
     //La fonction appelé lors de l'appuye du bouton télécharger
     _obj.TelechargerDocumentSup = async () => {
-      return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false,true);
+      return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
     };
 
     _obj.data = element;
@@ -2209,31 +2224,31 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
 
 
 
- /**
-   * La méthode appellé pour voir un document de maintenance
-   */
- const FactureMaintenanceVoirDocumentSup = async (element) => {
-  //On ouvre une nouvelle fenêtre d'attente
-  let targetWindow = window.open("/waiting");
+  /**
+    * La méthode appellé pour voir un document de maintenance
+    */
+  const FactureMaintenanceVoirDocumentSup = async (element) => {
+    //On ouvre une nouvelle fenêtre d'attente
+    let targetWindow = window.open("/waiting");
 
-  //On récupère le fichier en b64
-  const b64data = await  VoirFactureDocument(tokenCt, element.v, "Facture SAV", false,true);
+    //On récupère le fichier en b64
+    const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
 
-  //On transforme le fichier en blob
-  const blobData = base64toBlob(b64data.v);
+    //On transforme le fichier en blob
+    const blobData = base64toBlob(b64data.v);
 
-  //On créer l'URL utilisé par les viewers
-  const url = URL.createObjectURL(blobData);
+    //On créer l'URL utilisé par les viewers
+    const url = URL.createObjectURL(blobData);
 
-  //On l'enregistre dans le viewerContext
-  viewerCt.setViewer(url);
+    //On l'enregistre dans le viewerContext
+    viewerCt.setViewer(url);
 
-  //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-  //Le bon viewer est déterminé par l'extension
-  targetWindow.location.href = GetURLLocationViewerFromExtension(
-    element.k.split(".").pop()
-  );
-};
+    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+    //Le bon viewer est déterminé par l'extension
+    targetWindow.location.href = GetURLLocationViewerFromExtension(
+      element.k.split(".").pop()
+    );
+  };
 
 
 
@@ -2372,7 +2387,7 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
   return (
     <BreakpointProvider>
       {TopPannel()}
-      <Container fluid className="container-table p-4 ">
+      <Container fluid className="container-table">
         <ModalList />
         <Breakpoint large up>
           <Row>
