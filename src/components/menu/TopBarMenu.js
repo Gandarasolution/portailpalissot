@@ -188,10 +188,13 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
               ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
             <Button
               variant=""
-              className="border ms-2"
+              className="border ms-2 switch-site"
               onClick={handleChangerClientsite}
             >
-              Changer de site
+              <span className="me-2">
+                <i className="fas fa-building"></i>
+              </span>
+              <span className="chevron-down">&gt;</span>
             </Button>
           </div>
 
@@ -214,7 +217,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
 function getTitleAndSubtitle(data) {
   const pathname = window.location.pathname;
 
-  if(pathname === "/devis"){
+  if (pathname === "/devis") {
     return { titre: "Liste des devis", soustitre: `X` };
   }
 
