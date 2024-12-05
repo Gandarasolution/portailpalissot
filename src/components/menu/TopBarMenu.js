@@ -179,24 +179,28 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
 
         <Navbar.Text className="navbar-title-container">
           <h1>{titre}</h1>
-          <div className="box-length"><span>{soustitre}</span></div>
+          {soustitre && (
+            <div className="box-length">
+              <span>{soustitre}</span>
+            </div>
+          )}
         </Navbar.Text>
 
         <Navbar.Text className="d-flex align-items-center">
-            <div className="title-site">
+          <div className="title-site">
             {ClientSiteContratCtx.storedClientSite &&
               ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
-            </div>
-            <Button
-              variant=""
-              className="ms-2 me-3 switch-site"
-              onClick={handleChangerClientsite}
-            >
-              <span className="me-1">
-                <i className="fas fa-building"></i>
-              </span>
-              <span className="chevron-down">&gt;</span>
-            </Button>
+          </div>
+          <Button
+            variant=""
+            className="ms-2 me-3 switch-site"
+            onClick={handleChangerClientsite}
+          >
+            <span className="me-1">
+              <i className="fas fa-building"></i>
+            </span>
+            <span className="chevron-down">&gt;</span>
+          </Button>
 
           <OverlayTrigger
             trigger={"click"}
@@ -217,10 +221,27 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
 function getTitleAndSubtitle(data) {
   const pathname = window.location.pathname;
 
-  if (pathname === "/devis") {
-    return { titre: "Liste des devis", soustitre: `X` };
-  }
+  switch (pathname) {
+    case "/devis":
+      return { titre: "Liste des devis", soustitre: `X` };
 
-  return { titre: "Titre page", soustitre: "X" };
+    case "/factures":
+      return { titre: "Liste des factures", soustitre: `X` };
+
+    case "/appareils":
+      return { titre: "Liste des appareils", soustitre: `X` };
+
+    case "/interventions":
+      return { titre: "Liste des dépannages", soustitre: `X` };
+
+    case "/maintenance":
+      return { titre: "Liste des plannifications", soustitre: `X` };
+
+    case "/": // Page d'accueil
+      return { titre: "Tableau de bord" };
+
+    default: // Page par défaut
+      return { titre: "Titre page" };
+  }
 }
 export default TopBarMenu;
