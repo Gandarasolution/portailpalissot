@@ -12,6 +12,9 @@
   --color-pastel-red: #FFF0ED;
   --color-pastel-red-text: #FB6D4D;
   --color-grey: #83949E;
+  --color-white: #fff;
+  --color-blue-icone-site: #518097;
+  --color-grey-icone-site: #F4F5F7;
   --font-bold: 'BorisBlackBloxx', sans-serif;
   --font-text: 'Corbel', sans-serif;
   --font-arial: 'ArialMT', sans-serif;
@@ -253,13 +256,52 @@ nav ul li:hover {
   color: #fff;
 }
 
-.top-bar-menu .title-site{
+.top-bar-menu .title-site {
+  position: relative;
+  display: inline-block;
+  font-weight: bold;
   font-family: var(--font-arial);
   color: var(--color-grey);
-  text-decoration: underline;
-  font-weight: bold;
 }
 
+.top-bar-menu .title-site::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 1px;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-grey);
+}
+
+.top-bar-menu .switch-site{
+  background: var(--color-white);
+  border-radius: 16px;
+  border: 1px solid transparent;
+  padding: 10px 12px 6px 12px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.top-bar-menu .switch-site{
+  font-size: 20px;
+}
+
+.top-bar-menu .chevron-down{
+  display: inline-block;
+  transform: rotate(90deg);
+  color: var(--color-grey);
+  font-size: 15px;
+}
+
+.top-bar-menu .icone-site{
+  border: 1px solid var(--color-blue-icone-site);
+  background-color: var(--color-grey-icone-site);
+  border-radius: 99px;
+}
+
+.top-bar-menu .icone-site{
+  font-size: 20px;
+}
 /*.container-login-content {
   background-color: white;
   padding: 30px;
