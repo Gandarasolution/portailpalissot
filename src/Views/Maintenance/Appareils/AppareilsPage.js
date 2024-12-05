@@ -255,7 +255,7 @@ const AppareilsPage = () => {
   }, [ClientSiteContratCtx.storedClientSite.GUID]);
 
   return (
-    <Container fluid>
+    <Container fluid className="table-appareil">
       {/* <TitreOfPage
         titre={"Liste des appareils"}
         soustitre={` ${listeAppareils.length} appareils`}
