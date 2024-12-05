@@ -183,28 +183,28 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
         </Navbar.Text>
 
         <Navbar.Text className="d-flex align-items-center">
-          <div className="me-3 title-site">
+            <div className="title-site">
             {ClientSiteContratCtx.storedClientSite &&
               ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
+            </div>
             <Button
               variant=""
-              className="border ms-2 switch-site"
+              className="ms-2 me-3 switch-site"
               onClick={handleChangerClientsite}
             >
-              <span className="me-2">
+              <span className="me-1">
                 <i className="fas fa-building"></i>
               </span>
               <span className="chevron-down">&gt;</span>
             </Button>
-          </div>
 
           <OverlayTrigger
             trigger={"click"}
             placement="bottom"
             overlay={PopoverAccount}
           >
-            <Button variant="" className="border">
-              <FontAwesomeIcon icon={faCircleUser} /> {accountName}
+            <Button variant="" className="icone-site">
+              <FontAwesomeIcon icon={faCircleUser} />
             </Button>
           </OverlayTrigger>
         </Navbar.Text>
