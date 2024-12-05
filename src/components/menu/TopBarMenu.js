@@ -237,6 +237,9 @@ function getTitleAndSubtitle(data) {
     case "/maintenance":
       return { titre: "Liste des plannifications", soustitre: `X` };
 
+    case "/account":
+      return { titre: "Mon compte"};
+
     case "/": // Page d'accueil
       return { titre: "Tableau de bord" };
 
