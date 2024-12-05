@@ -256,11 +256,11 @@ const AppareilsPage = () => {
 
   return (
     <Container fluid>
-      <TitreOfPage
+      {/* <TitreOfPage
         titre={"Liste des appareils"}
         soustitre={` ${listeAppareils.length} appareils`}
         isLoaded={isLoaded}
-      />
+      /> */}
       <TableAppareils />
     </Container>
   );

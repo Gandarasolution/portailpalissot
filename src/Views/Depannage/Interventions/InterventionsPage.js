@@ -307,13 +307,13 @@ const InterventionPage = () => {
 
   return (
     <Container fluid>
-      <TitreOfPage
+      {/* <TitreOfPage
         titre={"Interventions dépannage"}
         soustitre={` ${listeInterventions.length} intervention${
           listeInterventions.length > 1 ? "s" : ""
         } `}
         isLoaded={isLoaded}
-      />
+      /> */}
       <Container fluid>
         <TableInterventions />
       </Container>

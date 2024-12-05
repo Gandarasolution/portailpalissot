@@ -130,11 +130,11 @@ const AccountPage = ({ accountName }) => {
 
   return (
     <Container fluid>
-      <TitreOfPage
+      {/* <TitreOfPage
         titre={"Mon compte"}
         soustitre={accountName}
         isLoaded={true}
-      />
+      /> */}
 
       <Container fluid className="container-table p-4 ">
         <INFOS />

@@ -69,11 +69,11 @@ const HomePage = () => {
 
   return (
     <Container fluid className="p-4 h-100">
-      <TitreOfPage
+      {/* <TitreOfPage
         titre={"Portail client"}
         soustitre={ClientSiteCt.storedClientSite.NomCompletClientSite}
         isLoaded
-      />
+      /> */}
       <Container fluid className="container-table ">
         <div>
 

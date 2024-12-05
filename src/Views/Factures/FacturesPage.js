@@ -378,11 +378,11 @@ const FacturesPage = () => {
 
   return (
     <Container fluid>
-      <TitreOfPage
+      {/* <TitreOfPage
         titre={"Factures"}
         soustitre={` ${GetListeFactureTrimed().length} factures`}
         isLoaded={isFacturesLoaded}
-      />
+      /> */}
       <TableFactures />
     </Container>
   );

@@ -373,11 +373,11 @@ const ContratPrestation = ({
 
   return (
     <Container fluid>
-      <TitreOfPage
+      {/* <TitreOfPage
         titre={"Plannification"}
         soustitre={`${Prestations.length} prestations`}
         isLoaded={IsLoaded}
-      />
+      /> */}
       <TablePrestation />
     </Container>
   );
