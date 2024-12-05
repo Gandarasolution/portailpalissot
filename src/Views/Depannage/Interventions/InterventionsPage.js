@@ -306,7 +306,7 @@ const InterventionPage = () => {
   };
 
   return (
-    <Container fluid>
+    <Container fluid className="table-depannage">
       {/* <TitreOfPage
         titre={"Interventions dépannage"}
         soustitre={` ${listeInterventions.length} intervention${

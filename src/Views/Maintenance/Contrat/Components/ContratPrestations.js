@@ -372,7 +372,7 @@ const ContratPrestation = ({
   //#endregion
 
   return (
-    <Container fluid>
+    <Container fluid className="table-maintenance">
       {/* <TitreOfPage
         titre={"Plannification"}
         soustitre={`${Prestations.length} prestations`}

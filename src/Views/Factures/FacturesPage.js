@@ -377,7 +377,7 @@ const FacturesPage = () => {
   }, [clientSiteCt.storedClientSite.GUID]);
 
   return (
-    <Container fluid>
+    <Container fluid className="table-facture">
       {/* <TitreOfPage
         titre={"Factures"}
         soustitre={` ${GetListeFactureTrimed().length} factures`}
