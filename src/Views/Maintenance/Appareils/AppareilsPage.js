@@ -188,7 +188,7 @@ const AppareilsPage = () => {
   const EditorFilter = (value) => {
     return (
       <span>
-        <GetImageAppareilEtat IdEtat={value} className={"img-bt-filter"} />
+        {/* <GetImageAppareilEtat IdEtat={value} className={"img-bt-filter"} /> */}
         {GetLibelleEtat(value)}
       </span>
     );
@@ -197,7 +197,7 @@ const AppareilsPage = () => {
   const EditorCardBody = (appareil) => {
     return (
       <span>
-        <GetImageAppareilEtat IdEtat={appareil.IdEtat} />
+        {/* <GetImageAppareilEtat IdEtat={appareil.IdEtat} /> */}
         <Badge pill bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
           {GetLibelleEtat(appareil.IdEtat)}
         </Badge>
