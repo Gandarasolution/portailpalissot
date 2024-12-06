@@ -6,6 +6,17 @@ import NavLink from "react-bootstrap/NavLink";
 
 //#endregion
 
+//#region fontAwsome
+import {
+  faCalendar,
+  faWrench,
+  faBook,
+  faFile,
+  faBell,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//#endregion
+
 //#region Components
 import TitreOfPage from "../../components/commun/TitreOfPage";
 
@@ -19,49 +30,49 @@ import { ClientSiteContratContext } from "../../App";
 const HomePage = () => {
   const ClientSiteCt = useContext(ClientSiteContratContext);
 
-  const ImgAppareil = require("../../image/imageHome/appareilImage.jpg");
-  const ImgPresta = require("../../image/imageHome/PrestaContraImage.jpg");
-  const ImgMaintenance = require("../../image/imageHome/MaintenanceImage.jpg");
-  const ImgUrgence = require("../../image/imageHome/UrgenceImage.jpg");
-  const ImgDevis = require("../../image/imageHome/DevisImage.jpg");
-  const ImgFacture = require("../../image/imageHome/FacturationImage.jpg");
-  const ImgAccount = require("../../image/imageHome/accountImage.jpg");
+  // const ImgAppareil = require("../../image/imageHome/appareilImage.jpg");
+  // const ImgPresta = require("../../image/imageHome/PrestaContraImage.jpg");
+  // const ImgMaintenance = require("../../image/imageHome/MaintenanceImage.jpg");
+  // const ImgUrgence = require("../../image/imageHome/UrgenceImage.jpg");
+  // const ImgDevis = require("../../image/imageHome/DevisImage.jpg");
+  // const ImgFacture = require("../../image/imageHome/FacturationImage.jpg");
+  // const ImgAccount = require("../../image/imageHome/accountImage.jpg");
 
   const SpanLink = ({ title, to, img, kv, disable }) => {
     let _text = "";
     let _wBadge = false;
 
-    if (kv) {
-      switch (kv.k) {
-        case "interventions":
-          _text = `interventio${kv.v > 1 ? "ns" : "n"} en cours`;
-          _wBadge = kv.v > 0;
-          break;
-        case "devis":
-          _text = "devis en attente de décision";
-          _wBadge = kv.v > 0;
-          break;
-        default:
-          break;
-      }
-    }
+    // if (kv) {
+    //   switch (kv.k) {
+    //     case "interventions":
+    //       _text = `interventio${kv.v > 1 ? "ns" : "n"} en cours`;
+    //       _wBadge = kv.v > 0;
+    //       break;
+    //     case "devis":
+    //       _text = "devis en attente de décision";
+    //       _wBadge = kv.v > 0;
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // }
 
     return (
       <Nav.Link href={to} disabled={disable ? true : false}>
         <div className="content  position-relative d-inline-block">
           <div>{title}</div>
-          <div>
+          {/* <div>
             <Image src={img} height={150} alt={`image-${to}`} />
-          </div>
-          {kv && kv.v > 0 && (
+          </div> */}
+          {/* {kv && kv.v > 0 && (
             <>
               <div className="position-absolute top-0 start-100 translate-middle p-2 circle-danger"></div>
               {_wBadge && (
                 <div className=" badge badge-bg-danger-nowrap ">{`${kv.v} ${_text}`}</div>
               )}
             </>
-          )}
-          {disable}
+          )} */}
+          {/* {disable} */}
         </div>
       </Nav.Link>
     );
@@ -77,70 +88,84 @@ const HomePage = () => {
       <Container fluid className="container-table ">
         <div>
 
-        <h2>Bienvenue sur votre espace client !</h2>
+          <h2>Raccourcis</h2>
         </div>
 
         <span className="m-2">
-          <Nav>
+          <Nav className="shortcut-link">
             <Nav.Item>
+              <FontAwesomeIcon
+                icon={faCalendar}
+              />
               <SpanLink
-                title={"Accéder à mes prestations contrats"}
+                title={"Maintenances"}
                 to={"/maintenance"}
-                img={ImgPresta}
-                disable={
-                  ClientSiteCt.storedClientSite.IdContrat <= 0 ? (
-                    <div className=" badge badge-bg-danger-nowrap ">
-                      Aucun contrat actif
-                    </div>
-                  ) : undefined
-                }
+              // img={ImgMaintenance}
+              // disable={
+              //   ClientSiteCt.storedClientSite.IdContrat <= 0 ? (
+              //     <div className=" badge badge-bg-danger-nowrap ">
+              //       Aucun contrat actif
+              //     </div>
+              //   ) : undefined
+              // }
               />
             </Nav.Item>
-            <Nav.Item>
+            {/* <Nav.Item>
               <SpanLink
                 title={"Voir la liste des appareils enregistrés"}
                 to={"/appareils"}
                 img={ImgAppareil}
               />
-            </Nav.Item>
+            </Nav.Item> */}
             <Nav.Item>
+              <FontAwesomeIcon
+                icon={faWrench}
+              />
               <SpanLink
-                title={"Consulter la liste des interventions réalisées"}
+                title={"Dépannages"}
                 to={"/interventions"}
-                img={ImgMaintenance}
-                kv={ClientSiteCt.storedClientSite.NbPortail.KV.find(
-                  (kv) => kv.k === "interventions"
-                )}
+              // img={ImgMaintenance}
+              // kv={ClientSiteCt.storedClientSite.NbPortail.KV.find(
+              //   (kv) => kv.k === "interventions"
+              // )}
               />
             </Nav.Item>
             <Nav.Item>
-              <SpanLink
-                title={"Demander une nouvelle intervention"}
-                to={"/nouvelleIntervention"}
-                img={ImgUrgence}
+              <FontAwesomeIcon
+                icon={faBook}
               />
-            </Nav.Item>
-            <Nav.Item>
               <SpanLink
-                title={"Voir mes devis"}
+                title={"Devis"}
                 to={"/devis"}
-                img={ImgDevis}
-                kv={ClientSiteCt.storedClientSite.NbPortail.KV.find(
-                  (kv) => kv.k === "devis"
-                )}
+              // img={ImgDevis}
+              // kv={ClientSiteCt.storedClientSite.NbPortail.KV.find(
+              //   (kv) => kv.k === "devis"
+              // )}
               />
             </Nav.Item>
             <Nav.Item>
+            <FontAwesomeIcon
+                icon={faFile}
+              />
               <SpanLink
-                title={"Espace facturation"}
+                title={"Factures"}
                 to={"/factures"}
-                img={ImgFacture}
+              // img={ImgFacture}
               />
 
               <NavLink></NavLink>
             </Nav.Item>
-
             <Nav.Item>
+              <FontAwesomeIcon
+                icon={faBell}
+              />
+              <SpanLink
+                title={"Demande d'intervention"}
+                to={"/nouvelleIntervention"}
+              // img={ImgUrgence}
+              />
+            </Nav.Item>
+            {/* <Nav.Item>
               <SpanLink
                 title={"Gérer mon compte"}
                 to={"/account"}
@@ -148,7 +173,7 @@ const HomePage = () => {
               />
 
               <NavLink></NavLink>
-            </Nav.Item>
+            </Nav.Item> */}
           </Nav>
         </span>
       </Container>
