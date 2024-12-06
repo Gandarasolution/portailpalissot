@@ -598,14 +598,15 @@ sup {
 .shortcut-link{
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 .shortcut-link .nav-item{
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 20px;
+  padding: 10px 20px;
   border-radius: 16px;
-  min-width: 18%;
+  width: 18%;
 }
 
 .shortcut-link .nav-item:not(:last-child){
@@ -628,6 +629,7 @@ sup {
   color: var(--color-white);
   font-family: var(--font-text);
   font-size: 1.25em;
+  text-align: left;
 }
 
 /* ---- CONTENT SEARCH ---- */
