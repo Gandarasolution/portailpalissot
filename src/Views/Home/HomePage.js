@@ -1,6 +1,6 @@
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
-import Image from "react-bootstrap/Image";
+// import Image from "react-bootstrap/Image";
 import Nav from "react-bootstrap/Nav";
 import NavLink from "react-bootstrap/NavLink";
 
@@ -18,17 +18,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
 //#region Components
-import TitreOfPage from "../../components/commun/TitreOfPage";
+// import TitreOfPage from "../../components/commun/TitreOfPage";
 
 //#endregion
 
 import React from "react";
-import { useContext } from "react";
-import { ClientSiteContratContext } from "../../App";
+// import { useContext } from "react";
+// import { ClientSiteContratContext } from "../../App";
 //#endregion
 
 const HomePage = () => {
-  const ClientSiteCt = useContext(ClientSiteContratContext);
+  // const ClientSiteCt = useContext(ClientSiteContratContext);
 
   // const ImgAppareil = require("../../image/imageHome/appareilImage.jpg");
   // const ImgPresta = require("../../image/imageHome/PrestaContraImage.jpg");
@@ -39,8 +39,8 @@ const HomePage = () => {
   // const ImgAccount = require("../../image/imageHome/accountImage.jpg");
 
   const SpanLink = ({ title, to, img, kv, disable }) => {
-    let _text = "";
-    let _wBadge = false;
+    // let _text = "";
+    // let _wBadge = false;
 
     // if (kv) {
     //   switch (kv.k) {
