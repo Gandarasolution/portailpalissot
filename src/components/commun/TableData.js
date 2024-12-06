@@ -31,8 +31,10 @@ import {
   faEye,
   faFilter,
   faFilterCircleXmark,
-  faList,
+  //faList,
   faSearch,
+  faTasks,
+  faXmark
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
@@ -60,7 +62,7 @@ import {
   GetDocumentPrestationTicket,
   GetListeFIIntervention,
   GetPrestationReleveTache,
-  TelechargerFactureDocument,
+  //TelechargerFactureDocument,
   TelechargerZIP,
   VoirFactureDocument,
 } from "../../axios/WSGandara";
@@ -996,7 +998,7 @@ const TableData = ({ ...props }) => {
       <line x1="25" y1="5" x2="20" y2="8" stroke="#01B075" strokeWidth="1" />
     </svg>
   );
-  
+
   const TablePagination = () => {
     let _items = [];
 
@@ -1610,32 +1612,34 @@ const TableData = ({ ...props }) => {
             return (
               <span key={index} className="mb-2">
                 <Row>
-                  <Col>
-                    <FontAwesomeIcon icon={faList} /> {Relevetache.name}
+                  <Col className="task-statement">
+                    {Relevetache.name}
                   </Col>
                 </Row>
                 {true && Array.isArray(Relevetache.value) ? (
                   Relevetache.value.map((tache, indexT) => {
                     return (
                       <Row key={indexT}>
-                        <Col md={{ offset: 1 }}>
-                          <Form.Check
+                        <Col className="task">
+                          {/* <Form.Check
                             readOnly
                             checked={false}
                             label={tache.v}
-                          />
+                          /> */}
+                          {tache.v}
                         </Col>
                       </Row>
                     );
                   })
                 ) : (
                   <Row>
-                    <Col md={{ offset: 1 }}>
-                      <Form.Check
+                    <Col className="task">
+                      {/* { <Form.Check
                         readOnly
                         checked={false}
                         label={Relevetache.value}
-                      />
+                      />} */}
+                      {Relevetache.value}
                     </Col>
                   </Row>
                 )}
@@ -1650,7 +1654,7 @@ const TableData = ({ ...props }) => {
 
     return (
       <Modal
-        dialogClassName="modal-90w"
+        dialogClassName="modal-listing"
         show={showModalListeTaches || PrestaCtx.showModalTaches}
         onHide={() => {
           setShowModalListeTaches(false);
@@ -1661,13 +1665,13 @@ const TableData = ({ ...props }) => {
         animation={false}
       >
         <Modal.Header>
-          <Modal.Title> Liste des relevés de tâches </Modal.Title>
+          <Modal.Title>
+            <FontAwesomeIcon icon={faTasks} />
+            Liste des relevés de tâches </Modal.Title>
           <Button
-            variant="danger"
+            className="close-modal"
             onClick={() => setShowModalListeTaches(false)}
-          >
-            {" "}
-            X{" "}
+          ><FontAwesomeIcon icon={faXmark} />
           </Button>
         </Modal.Header>
         <Modal.Body>
