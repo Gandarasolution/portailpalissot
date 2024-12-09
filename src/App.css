@@ -54,6 +54,11 @@ input.form-control:focus{
   padding: 0 !important;
 }
 
+.container-table:has(.container-fluid){
+  padding-left: 0.75rem;
+  padding-right: 0.2rem;
+}
+
 /* General */
 .search-bar input,
 .status-bar nav,
@@ -72,6 +77,12 @@ input.form-control:focus{
   font-family: var(--font-bold);
   font-size: 1em;
   color: var(--color-black);
+  padding-left: 1%;
+}
+
+.table-depannage.container-fluid,
+.table-maintenance.container-fluid{
+  padding: 0;
 }
 /* Fin General */
 
@@ -259,6 +270,7 @@ nav ul li:hover {
 .top-bar-menu{
   margin-top: 30px;
   margin-bottom: 10px;
+  padding-left: 1% !important;
 }
 
 /* Title page + length */
@@ -993,6 +1005,7 @@ thead th,
 
 .modal.show .modal-dialog.modal-listing{
   max-width: 80vw;
+  width: 60vw;
 }
 
 .modal.show .modal-dialog.modal-password{
