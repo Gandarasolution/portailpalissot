@@ -47,6 +47,7 @@
 /* Reset Boostrap */
 input.form-control:focus{
   box-shadow: none;
+  border-color: transparent;
 }
 
 .container-table div.breakpoint__large-up > div.row > div{
@@ -57,9 +58,11 @@ input.form-control:focus{
 .search-bar input,
 .status-bar nav,
 .search-bar input:focus,
-.modal.show .modal-dialog.modal-listing,
-.modal.show .modal-dialog.modal-listing .modal-content .modal-header,
-.modal.show .modal-dialog.modal-listing .close-modal,
+.modal.show .modal-dialog,
+.modal.show .modal-dialog .modal-content .modal-header,
+.modal.show .modal-dialog .close-modal,
+.modal.show .modal-dialog.modal-password button.btn.close-modal,
+.modal .modal-dialog.modal-password input.form-control,
 .shortcut-link .nav-item{
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06);
 }
@@ -76,7 +79,7 @@ input.form-control:focus{
   text-align: center;
   min-height: 100vh;
   background: var(--color-sky-blue);
-  font-family: var(--font-text);  
+  font-family: var(--font-text);
 }
 
 .App-logo {
@@ -271,6 +274,7 @@ nav ul li:hover {
   color: var(--color-black);
   padding-right: 3%;
   padding-left: 3%;
+  white-space: nowrap;
 }
 
 .top-bar-menu .navbar-title-container .box-length{
@@ -397,10 +401,8 @@ nav ul li:hover {
 
 .link-password-forgot {
   color: var(--color-dark) !important;
-}
-
-.link-password-forgot{
   font-weight: 700 !important;
+  white-space: nowrap;
 }
 
 .link-password-forgot span{
@@ -981,38 +983,55 @@ thead th,
 
 /* ---- MODAL ---- */
 
-.modal.show .modal-dialog.modal-listing{
+.modal.show .modal-dialog{
   position: absolute;
   top: 40%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) !important;
   left: 50%;
-  max-width: 80vw;
-  width: 60vw;
   max-height: 50%;
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content{
-  background: var(--color-sky-blue);
-  border-radius: 16px;
+.modal.show .modal-dialog.modal-listing{
+  max-width: 80vw;
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content .modal-header{
-  width: 95%;
+.modal.show .modal-dialog.modal-password{
+  max-width: 60vw;
+}
+
+.modal.show .modal-dialog .modal-content{
+  background: var(--color-sky-blue);
+  border-radius: 16px;
+  font-family: var(--font-text);
+}
+
+.modal.show .modal-dialog .modal-content .modal-header{
+  width: 93%;
   margin: 20px auto 10px;
   background: var(--color-white);
   border-radius: 16px;
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content .modal-header .modal-title.h4:not(svg){
+.modal.show .modal-dialog .modal-content .modal-header .modal-title:not(svg),
+.modal.show .modal-dialog .modal-content .modal-header h1{
+  font-family: var(--font-bold);
+}
+
+.modal.show .modal-dialog .modal-content .modal-header .modal-title:not(svg){
   position: relative;
   display: inline-block;
-  font-family: var(--font-bold);
   margin-left: 2.5%;
   width: auto;
   color: var(--color-blue-grey);
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content .modal-header .modal-title.h4::after{
+.modal.show .modal-dialog .modal-content .modal-header h1{
+  font-family: var(--font-bold);
+  margin: 0 auto;
+  font-size: 1.75rem;
+}
+
+.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4::after{
   content: "";
   position: absolute;
   bottom: -17px;
@@ -1022,20 +1041,20 @@ thead th,
   background-color: transparent;
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content .modal-header .modal-title.h4.actif::after{
+.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.actif::after{
   background-color: var(--color-red);
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content .modal-header .modal-title.h4.actif{
+.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.actif{
   color: var(--color-black);
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content .modal-header .modal-title.h4 svg{
+.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4 svg{
   margin-right: 30px;
   color: initial;
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content .modal-body{
+.modal.show .modal-dialog.modal-dialog.modal-listing .modal-content .modal-body{
   max-height: 55vh;
   overflow-y: auto;
   padding: 15px;
@@ -1045,8 +1064,74 @@ thead th,
   padding-left: 20px;
 }
 
+/* Password */
+.modal.show .modal-dialog.modal-password .modal-content .modal-header{
+  width: 93%;
+}
+
+.modal.fade .modal-dialog,
+.modal.fade{
+  transition: none !important;
+}
+
+.modal.show .modal-dialog.modal-password .modal-content .modal-body{
+  padding: 0;
+}
+
+.modal.show .modal-dialog.modal-password .modal-content .modal-body>div p{
+  text-align: center;
+  font-size: 1.25em;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.modal.show .modal-dialog.modal-password .modal-content .modal-body>div p:first-child{
+  margin-top: 50px;
+  margin-bottom: 10px;
+}
+
+.modal.show .modal-dialog.modal-password .modal-content .modal-body>div p:first-child,
+.modal.show .modal-dialog.modal-password .modal-content .modal-body>div p>span {
+  font-weight: bold;
+}
+
+.modal .modal-dialog.modal-password .modal-content .modal-body input.form-control,
+.modal .modal-dialog.modal-password .modal-content .modal-body .btn.btn-modal{
+  width: 100%;
+  border-radius: 14px;
+}
+
+.modal .modal-dialog.modal-password .modal-content .modal-body .btn.btn-modal{
+  font-size: 1.4em;
+  color: var(--color-white);
+}
+
+.modal .modal-dialog.modal-password .modal-content .modal-body input{
+  border: 1px solid transparent;
+  padding: 14px;
+  text-align: center;
+  margin: 20px 0 15px;
+  font-size: 1.4em;
+}
+
+.modal .modal-dialog.modal-password .modal-content .modal-body input::placeholder{
+  text-align: center;
+  color: var(--color-grey);
+  font-family: var(--font-text);
+}
+
+.modal .modal-dialog.modal-password .modal-content .modal-body .btn.btn-modal{
+  border: 1px solid var(--color-red);
+  background: var(--color-red);
+  margin-top: 20px;
+  margin-bottom: 30px;
+  padding: 12px;
+  font-family: var(--font-arial);
+  font-weight: bold;
+}
+
 /* Relevé des tâches */
-.modal.show .modal-dialog.modal-listing .modal-content .modal-body .task-statement{
+.modal.show .modal-dialog .modal-content .modal-body .task-statement{
     display: flex;
     align-items: center;
     color: var(--color-black);
@@ -1055,32 +1140,43 @@ thead th,
     margin-top: 20px;
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content .modal-body .task-statement::before{
+.modal.show .modal-dialog .modal-content .modal-body .task-statement::before{
     content: "•";
     margin-right: 6px;
     color: var(--color-black);
     font-size: 1.25em;
 }
 
-.modal.show .modal-dialog.modal-listing .modal-content .modal-body .task{
+.modal.show .modal-dialog .modal-content .modal-body .task{
   font-size: 1em;
   margin-left: 6%;
 }
 
-.modal.show .modal-dialog.modal-listing .btn.close-modal{
+.modal.show .modal-dialog .btn.close-modal{
   position: absolute;
-  right: -32px;
-  top: -32px;
   background: var(--color-grey-icone-site);
   border-radius: 99px;
-  font-size: 40px;
   color: var(--color-dark);
   border: 1px solid transparent;
-  height: 65px;
-  width: 65px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.modal .modal-dialog.modal-listing .btn.close-modal{
+  right: -32px;
+  top: -32px;
+  font-size: 40px;
+  height: 65px;
+  width: 65px;
+}
+
+.modal .modal-dialog.modal-password .btn.close-modal{
+  right: -20px;
+  top: -20px;
+  font-size: 35px;
+  height: 40px;
+  width: 40px;
 }
 
 .popover-filters div {
