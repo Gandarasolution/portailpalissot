@@ -1,7 +1,7 @@
 //#region Imports
 import { useEffect, useState, useRef } from "react";
 
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 //#region Bootstrap
@@ -136,25 +136,26 @@ const LoginPage = (props) => {
     return (
       <div>
         <p>
-          Merci d'indiquer votre adresse mail. Si celle-ci est connu de notre
-          service, vous recevrez un mail avec le lien de réinitialisation du mot
-          de passe.
+          Merci d'indiquer votre adresse mail.
+        </p>
+        <p>
+          Si celle-ci est connu de notre
+          service, vous recevrez un mail avec le <span>lien de réinitialisation du mot
+          de passe.</span>
         </p>
 
         <Form className="m-4" onSubmit={() => handleForgotPassword()}>
-          <Form.FloatingLabel label="Email" className="mb-3">
             <Form.Control
               type="email"
               required
-              placeholder="identifiant@exemple.com"
+              placeholder="Tapez votre adresse email"
               value={mailRecup}
               onChange={(e) => setMailRecup(e.target.value)}
             />
-          </Form.FloatingLabel>
 
-          <div className="d-flex justify-content-center">
+          <div>
             {/* <Button variant="primary" type="submit"> */}
-            <Button variant="primary" onClick={() => handleForgotPassword()}>
+            <Button className="btn-modal" variant="" onClick={() => handleForgotPassword()}>
               Envoyer
             </Button>
           </div>
@@ -193,9 +194,15 @@ const LoginPage = (props) => {
         onHide={() => setShowModal(false)}
         backdrop="static"
         keyboard={false}
+        dialogClassName="modal-password"
       >
-        <Modal.Header closeButton>
+        <Modal.Header>
           <h1>Mot de passe oublié ?</h1>
+          <Button
+            className="close-modal"
+            variant=""
+            ><FontAwesomeIcon icon={faXmark} onClick={() => setShowModal(false)} />
+          </Button>
         </Modal.Header>
 
         <Modal.Body>{FormModalForgotPassword()}</Modal.Body>
@@ -311,7 +318,7 @@ const LoginPage = (props) => {
           <AlertErrorConnexion />
         </Form.Group>
 
-        <Button variant="primary" onClick={() => handleSubmit()}>
+        <Button onClick={() => handleSubmit()}>
           Connexion
         </Button>
 
