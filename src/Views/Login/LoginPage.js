@@ -24,7 +24,7 @@ import { Connexion, CreateTokenMDP, GetListeParametres } from "../../axios/WSGan
 
 //#endregion
 import backgroundLogin from "../../image/imageLogin/login.jpg";
-import logo from "../../image/favicon.ico";
+// import logo from "../../image/favicon.ico";
 import logoNoir from "../../image/imageLogin/logo_noir.png";
 
 const LoginPage = (props) => {
@@ -356,26 +356,27 @@ const LoginPage = (props) => {
           {/* Logo au-dessus du formulaire */}
           <div className="container-login-content">
             <div className="text-center mb-4">
-              <img
-                alt="Logo"
-                src={logo}
-                width="50"
-                height="50"
-                className="d-inline-block align-top"
-              />
-              <h2 className="mt-2">GMAO</h2>
-            </div>
-            {FormSubmit()}
-          </div>
-          {/* Image logo_noir en dessous du formulaire */}
-          <div className="text-center mt-4">
             <img
               alt="Logo noir"
               src={logoNoir}
               width="60"
               height="60"
             />
+              {/* <img
+                alt="Logo"
+                src={logo}
+                width="50"
+                height="50"
+                className="d-inline-block align-top"
+              />
+              <h2 className="mt-2">GMAO</h2> */}
+            </div>
+            {FormSubmit()}
           </div>
+          {/* Image logo_noir en dessous du formulaire */}
+          {/* <div className="text-center mt-4">
+            
+          </div> */}
         </Col>
       </Row>
       {ModalForgotPassword()}
