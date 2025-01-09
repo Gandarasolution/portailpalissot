@@ -112,11 +112,11 @@ const SideBarMenuLeft = () => {
               icon={"wrench"}
               text={"Dépannage"}
             />
-            <MenuNavLink
+            {/* <MenuNavLink
               href={"/appareils"}
               icon={"mobile"}
               text={"Appareils"}
-            />
+            /> */}
             <MenuNavLink href={"/devis"} icon={"book"} text={"Devis"} />
             <MenuNavLink href={"/factures"} icon={"file"} text={"Factures"} />
           </CDBSidebarMenu>
