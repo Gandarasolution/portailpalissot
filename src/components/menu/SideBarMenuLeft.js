@@ -10,11 +10,15 @@ import {
   CDBSidebarMenu,
   CDBSidebarMenuItem,
 } from "cdbreact";
+
 //#endregion
 
 //#region Bootstrap
 
 import Container from "react-bootstrap/Container";
+import Button from "react-bootstrap/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCookieBite } from "@fortawesome/free-solid-svg-icons";
 
 //#endregion
 
@@ -35,7 +39,9 @@ const SideBarMenuLeft = () => {
   //#endregion
 
   //#region Fonctions
-
+  const handleCookies = () => {
+    alert("Gestion des cookies");
+  };
   //#endregion
 
   //#region Evenements
@@ -115,6 +121,17 @@ const SideBarMenuLeft = () => {
             <MenuNavLink href={"/factures"} icon={"file"} text={"Factures"} />
           </CDBSidebarMenu>
         </CDBSidebarContent>
+
+          {/* Bouton gestion des cookies */}
+          <div className="sidebar-footer">
+          <Button
+            variant=""
+            className="cookies-btn"
+            onClick={handleCookies}
+          >
+            <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
+          </Button>
+        </div>
       </CDBSidebar>
     );
   };
