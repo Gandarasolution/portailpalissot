@@ -10,7 +10,7 @@ import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import NavItem from "react-bootstrap/NavItem";
 import Popover from "react-bootstrap/Popover";
-import Row from "react-bootstrap/Row";
+// import Row from "react-bootstrap/Row";
 
 //#enregion
 
@@ -131,35 +131,36 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
     );
   };
 
-  const handleAccount = () => {
-    navigate("/account");
-  };
-  const handleCookies = () => {
-  };
+  // const handleAccount = () => {
+  //   navigate("/account");
+  // };
+  // const handleCookies = () => {
+  // };
   const PopoverAccount = (
-    <Popover>
-      <Popover.Header>{accountName}</Popover.Header>
-      <Popover.Body>
-        <Row>
+    <Popover aria-label="Menu déconnexion" className="popover-menu">
+      {/* <Popover.Header>{accountName}
+      </Popover.Header> */}
+      {/* <Popover.Body> */}
+        {/* <Row>
           <Button variant="" className="border mb-2" onClick={handleAccount}>
             <FontAwesomeIcon icon={faUser} /> Mon compte
           </Button>
-        </Row>
-        <Row>
+        </Row> */}
+        {/* <Row> */}
           <Button
             variant=""
-            className="border mb-2"
+            className="popover-btn"
             onClick={handleDeconnexion}
           >
             <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
           </Button>
-        </Row>
-        <Row>
+        {/* </Row> */}
+        {/* <Row>
           <Button variant="" className="border mb-2" onClick={handleCookies}>
             <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
           </Button>
-        </Row>
-      </Popover.Body>
+        </Row> */}
+      {/* </Popover.Body> */}
     </Popover>
   );
 
