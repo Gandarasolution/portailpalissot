@@ -1040,10 +1040,10 @@ thead th,
 
 .modal.show .modal-dialog{
   position: absolute;
-  top: 40%;
+  top: 45%;
   transform: translate(-50%, -50%) !important;
   left: 50%;
-  max-height: 50%;
+  max-height: 50vh;
 }
 
 .modal.show .modal-dialog.modal-listing{
@@ -1111,14 +1111,22 @@ thead th,
 }
 
 .modal.show .modal-dialog.modal-dialog.modal-listing .modal-content .modal-body{
-  max-height: 55vh;
-  overflow-y: auto;
+  max-height: 50vh;
+  overflow-y: scroll;
+  scrollbar-width: thin;  /* Pour les navigateurs compatibles (Firefox) */
   padding: 15px;
   box-sizing: border-box;
   width: 93%;
   margin: -10px auto 30px;
   padding-left: 20px;
 }
+
+/* Pour Chrome, Edge et autres navigateurs basés sur Webkit */
+.modal-content::-webkit-scrollbar {
+  width: 8px; /* Force la largeur de l'ascenseur */
+}
+
+
 
 /* Password */
 .modal.show .modal-dialog.modal-password .modal-content .modal-header{
