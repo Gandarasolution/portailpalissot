@@ -221,7 +221,7 @@ const ContratPage = () => {
         //       ${GetNomMois(dateFinPeriode().getMonth() + 1, small)}
         //       ${dateFinPeriode().getFullYear()}`}
 
-        title={`Période : ${GetNomMois(1, small)} ${GetDateFromStringDDMMYYY(
+        title={`Contrat de maintenance de : ${GetNomMois(1, small)} ${GetDateFromStringDDMMYYY(
           periodeEnCours.k
         ).getFullYear()} à ${GetNomMois(12, small)} ${GetDateFromStringDDMMYYY(
           periodeEnCours.v
