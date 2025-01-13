@@ -68,7 +68,8 @@ input.form-control:focus{
 .modal.show .modal-dialog .close-modal,
 .modal.show .modal-dialog.modal-password button.btn.close-modal,
 .modal .modal-dialog.modal-password input.form-control,
-.shortcut-link .nav-item{
+.shortcut-link .nav-item,
+.btn-upload-file{
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06);
 }
 
@@ -356,6 +357,21 @@ nav ul li:hover {
   background-color: inherit;
   border-color: inherit;
 }
+
+/* Menu deconnexion */
+.popover-body{
+  padding: 0;
+}
+
+.popover.popover-menu .popover-arrow{
+  display: none;
+}
+
+.popover-menu .popover-btn.btn{
+  color: var(--color-white);
+  background: var(--color-red);
+}
+
 /*.container-login-content {
   background-color: white;
   padding: 30px;
@@ -673,10 +689,10 @@ sup {
 
 .search-bar input{
   padding-left: 7%;
-  padding-bottom: 18px;
+  padding-bottom: 14px;
 }
 
-.search-bar input::placeholder {
+.search-bar input::placeholder{
   color: var(--color-grey);
   opacity: 1;
 }
@@ -685,6 +701,32 @@ sup {
 .status-bar nav{
   border-radius: 16px;
   padding-top: 18px;
+}
+
+.btn-primary.btn-upload-file{
+  padding-bottom: 15px;
+  padding-top: 14px;
+  border-radius: 16px;
+  font-size: 1rem;
+}
+
+.btn-primary.btn-upload-file,
+.btn-primary.btn-upload-file:hover{
+  background: var(--color-white);
+  color: var(--color-grey);
+  border: 1px solid transparent;
+}
+
+.btn-primary.btn-upload-file:active,
+.btn-primary.btn-upload-file:focus,
+.btn-primary.btn-upload-file:focus-visible{
+  background: var(--color-red) !important;
+  color: var(--color-white);
+  border: 1px solid transparent !important;
+}
+
+.btn-primary.btn-upload-file svg{
+  margin-right: 10px;
 }
 
 /* ---- TABLE DATA ---- */
@@ -814,6 +856,7 @@ thead th,
 }
 
 .table-presta tr:hover {
+  background-color: whitesmoke;
   cursor: default;
 }
 
