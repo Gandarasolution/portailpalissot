@@ -1311,10 +1311,10 @@ const TableData = ({ ...props }) => {
         <Container>
           <Button
             onClick={HandleTelechargerSelection}
-            variant="warning"
-            className="border"
+            className="btn-upload-file"
           >
-            Télecharger {arraySelector.length} document
+              <FontAwesomeIcon icon={faDownload} className="mr-2" />
+            Télécharger {arraySelector.length} document
             {arraySelector.length > 1 && "s"}
           </Button>
         </Container>
