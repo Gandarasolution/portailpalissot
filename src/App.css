@@ -807,8 +807,15 @@ tbody td:nth-child(1){
 .table-devis tbody td:nth-child(1),
 .table-devis tbody td:nth-child(5),
 .table-facture tbody td:nth-child(2),
-.table-facture tbody td:nth-child(6){
+.table-facture tbody td:nth-child(6),
+.table-sites tbody td{
   font-weight: bold;
+}
+
+
+.table-sites tbody td:hover{
+  cursor: pointer;
+
 }
 
 .table-devis tbody td:nth-child(5),
