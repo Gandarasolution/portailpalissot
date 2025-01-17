@@ -882,7 +882,7 @@ const TableData = ({ ...props }) => {
     return (
       <tr
         className={
-          index === rowIndexSelected || arraySelector.includes(index) || (item.GUID && item.GUID === ClientSiteCt.storedClientSite.GUID)
+          index === rowIndexSelected || arraySelector.includes(index) || (ClientSiteCt.storedClientSite && item.GUID && item.GUID === ClientSiteCt.storedClientSite.GUID)
             ? "table-presta-row-selected"
             : ""
         }
@@ -1558,7 +1558,7 @@ const TableData = ({ ...props }) => {
   const HandleChoixDuSite = (siteAChoisir) => {
     //Pas de changement si même site
     let _actualClientSite = ClientSiteCt.storedClientSite;
-    if (_actualClientSite.GUID !== siteAChoisir.GUID) {
+    if (!(_actualClientSite) || (_actualClientSite.GUID !== siteAChoisir.GUID)  ) {
       ClientSiteCt.setClientSite(siteAChoisir);
     }
   }
