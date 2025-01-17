@@ -26,7 +26,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile } from "@fortawesome/free-solid-svg-icons";
 import TitreOfPage from "../../../components/commun/TitreOfPage";
 import { GetListeInterventions } from "../../../axios/WSGandara";
-import { ClientSiteContratContext, TokenContext } from "../../../App";
+import { ClientSiteContratContext, TitreContext, TokenContext } from "../../../App";
 import { Row } from "react-bootstrap";
 //#endregion
 
@@ -35,6 +35,8 @@ import { Row } from "react-bootstrap";
 const InterventionPage = () => {
   const TokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
+  const PageCt = useContext(TitreContext);
+
   //#region States
 
   const [isLoaded, setIsLoaded] = useState(false);
@@ -48,6 +50,8 @@ const InterventionPage = () => {
     setIsLoaded(false);
     const FetchSetData = (data) => {
       setListeInterventions(data);
+      PageCt.setPageSubtitle(`${data.length} interventions`);
+
       setIsLoaded(true);
     };
 
@@ -181,6 +185,7 @@ const InterventionPage = () => {
 
   useEffect(() => {
     document.title = "Dépannage";
+    PageCt.setPageTitle(`Dépannage`);
 
     GetData();
     // eslint-disable-next-line

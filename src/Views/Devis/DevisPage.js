@@ -21,7 +21,7 @@ import TableData, {
   EditorMontant,
 } from "../../components/commun/TableData";
 import { GetListeDevis, GetdocumentDevis } from "../../axios/WSGandara";
-import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
+import { ClientSiteContratContext, TitreContext, TokenContext, ViewerContext } from "../../App";
 import { Button, Col, Row } from "react-bootstrap";
 import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";
 import { saveAs } from "file-saver";
@@ -34,6 +34,7 @@ const DevisPage = () => {
   const tokenCt = useContext(TokenContext);
   const clientSiteCt = useContext(ClientSiteContratContext);
   const viewerCt = useContext(ViewerContext);
+  const PageCt = useContext(TitreContext);
 
   //#region States
   const [isLoaded, setIsLoaded] = useState(false);
@@ -48,6 +49,8 @@ const DevisPage = () => {
 
     const FetchSetDevis = (data) => {
       setListeDevis(data);
+      PageCt.setPageSubtitle(`${data.length} devis`);
+      
       setIsLoaded(true);
     };
 
@@ -334,6 +337,7 @@ const DevisPage = () => {
 
   useEffect(() => {
     document.title = "Devis";
+    PageCt.setPageTitle("Devis");
     GetDevis();
     // eslint-disable-next-line
   }, [clientSiteCt.storedClientSite]);

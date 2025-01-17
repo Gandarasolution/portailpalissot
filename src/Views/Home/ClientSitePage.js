@@ -30,7 +30,7 @@ import {
   GetListeMails,
   GetListeTels,
 } from "../../axios/WSGandara";
-import { ClientSiteContratContext, TokenContext } from "../../App";
+import { ClientSiteContratContext, TitreContext, TokenContext } from "../../App";
 import {
   IconeAppareil,
   IconeContrat,
@@ -51,10 +51,12 @@ import TableData, {
 //#endregion
 
 const ClientSitePage = () => {
+  
   const navigate = useNavigate();
 
   const tokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
+  const PageCt = useContext(TitreContext);
 
   //#region States
 
@@ -129,7 +131,9 @@ const ClientSitePage = () => {
         ClientSiteCt.setClientSite(data);
         navigate("/");
       }
+      PageCt.setPageSubtitle(`${data.length > 1 ? data.length : 1} sites `);
       setIsLoaded(true);
+
     };
 
     GetClientSiteContrat(tokenCt, FetchSetClientSite);
@@ -146,6 +150,61 @@ const ClientSitePage = () => {
   //#endregion
 
   //#region Composants
+
+  //#region Table
+  function CreateHeaderForTable() {
+    let _headers = [];
+    _headers.push(
+      CreateNewHeader(
+        "NomCompletClientSite",
+        CreateFilter(true, false, false, true),
+        "Site"
+      )
+    );
+    _headers.push(
+      CreateNewHeader(
+        "AdresseClientSite",
+        CreateFilter(true, false, false, true),
+        "Adresse"
+      )
+    );
+    _headers.push(
+      CreateNewHeader(
+        "IdContrat",
+        CreateFilter(true, false, false, true),
+        "N° de contrat"
+      )
+    );
+
+    return _headers;
+  }
+
+
+  function CreateCellsForTable() {
+    let _cells = [];
+    _cells.push(CreateNewCell("NomCompletClientSite", false, true, true, null, "tagListeSite"));
+    _cells.push(CreateNewCell("AdresseClientSite", false, true, true, null, "tagListeSite"));
+    _cells.push(CreateNewCell("IdContrat", false, true, true, null, "tagListeSite"));
+
+    return _cells;
+  }
+
+  const TableSites = () => {
+    const _Headers = CreateHeaderForTable();
+    const _Cells = CreateCellsForTable();
+
+    return (
+      <TableData
+        Data={GetDataTrimed()}
+        Headers={_Headers}
+        Cells={_Cells}
+        IsLoaded={isLoaded}
+        Pagination
+      />
+    );
+  };
+
+//#endregion
 
   // const CardClientSite = ({ clientSite, actual }) => {
   //   let _isContact = false;
@@ -515,6 +574,8 @@ const ClientSitePage = () => {
   useEffect(() => {
     document.title = "Liste des sites";
 
+    PageCt.setPageTitle("Liste des sites");
+
     if (!isLoaded) {
       GetClientSites();
     }
@@ -523,80 +584,14 @@ const ClientSitePage = () => {
   }, [isLoaded]);
 
 
-  function CreateHeaderForTable() {
-    let _headers = [];
-    _headers.push(
-      CreateNewHeader(
-        "NomCompletClientSite",
-        CreateFilter(true, false, false, true),
-        "Site"
-      )
-    );
-    _headers.push(
-      CreateNewHeader(
-        "AdresseClientSite",
-        CreateFilter(true, false, false, true),
-        "Adresse"
-      )
-    );
-    _headers.push(
-      CreateNewHeader(
-        "IdContrat",
-        CreateFilter(true, false, false, true),
-        "N° de contrat"
-      )
-    );
-
-    return _headers;
-  }
-
-
-
-  function CreateCellsForTable() {
-    let _cells = [];
-    _cells.push(CreateNewCell("NomCompletClientSite", false, true, true, null, "tagListeSite"));
-    _cells.push(CreateNewCell("AdresseClientSite", false, true, true, null, "tagListeSite"));
-    _cells.push(CreateNewCell("IdContrat", false, true, true, null, "tagListeSite"));
-
-    return _cells;
-  }
-
-  const TableSites = () => {
-    const _Headers = CreateHeaderForTable();
-    const _Cells = CreateCellsForTable();
-
-    // const _CardModel = CreateNewCardModel(
-    //   EditorCardBody,
-    //   EditorCardTitle,
-    //   EditorCardSubtitle
-    // );
-
-    // const _ButtonFilters = CreateButtonFilters();
-
-    return (
-      <TableData
-        Data={GetDataTrimed()}
-        Headers={_Headers}
-        Cells={_Cells}
-        IsLoaded={isLoaded}
-        Pagination
-      // ButtonFilters={_ButtonFilters}
-      // FilterDefaultValue={CreateNewButtonFilter("IdEtat", 56, EditorFilter)}
-      // CardModel={_CardModel}
-      />
-    );
-  };
-
-
-
 
   return (
     <Container fluid>
-      <TitreOfPage
+      {/* <TitreOfPage
         titre={"Choix du site"}
         isLoaded={isLoaded}
         soustitre={`${listeClientSite.length > 1 ? listeClientSite.length : 1} sites `}
-      />
+      /> */}
 
       {/* <div className="m-2">{SearchBar()}</div> */}
 

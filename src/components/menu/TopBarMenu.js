@@ -12,7 +12,7 @@ import NavItem from "react-bootstrap/NavItem";
 import Popover from "react-bootstrap/Popover";
 // import Row from "react-bootstrap/Row";
 
-//#enregion
+//#endregion
 
 //#region Fontawsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -30,24 +30,122 @@ import { faCalendar, faFile } from "@fortawesome/free-regular-svg-icons";
 //#endregion
 
 //#region Components
-import { ClientSiteContratContext } from "../../App";
+import { ClientSiteContratContext, TitreContext, TokenContext } from "../../App";
 import logo from "../../image/favicon.ico";
 
 //#endregion
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GetClientSiteContrat } from "../../axios/WSGandara";
+import { Dropdown, DropdownButton } from "react-bootstrap";
 
 //#endregion
 
 const TopBarMenu = ({ accountName, handleDeconnexion }) => {
+
+  //#region Contexts
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
+  const PageCt = useContext(TitreContext);
+  const TokenCt = useContext(TokenContext);
+
+  //#endregion
+
+  //#region States
+  const [showMenu, setShowMenu] = useState(false);
+  //#endregion
+
   const navigate = useNavigate();
 
+  //Le titre et le soustitre de la page
   const { titre, soustitre } = getTitleAndSubtitle();
 
-  const [showMenu, setShowMenu] = useState(false);
-  const handleCloseMenu = () => setShowMenu(false);
+  //Le site selectionné et la liste des sites selectionnables
+  const { siteActuel, listeSites } = getListSites();
 
+  //#region Fonctions
+  function getListSites() {
+
+    let _retourSiteActuel = ClientSiteContratCtx.storedClientSite &&
+      ClientSiteContratCtx.storedClientSite.NomCompletClientSite
+
+
+    let _listeSites = ClientSiteContratCtx.listeSites;
+    if (_listeSites.length <= 0) {
+
+      const FetchSetClientSite = (data) => {
+        ClientSiteContratCtx.setListeSites(data);
+        _listeSites = data;
+      }
+
+      GetClientSiteContrat(TokenCt, FetchSetClientSite);
+    }
+    return { siteActuel: _retourSiteActuel, listeSites: _listeSites };
+
+    // function GetClientSites() {
+    //   setIsLoaded(false);
+
+    //   const FetchSetClientSite = (data) => {
+    //     setListeClientSite(data);
+    //     if (!Array.isArray(data)) {
+    //       ClientSiteCt.setClientSite(data);
+    //       navigate("/");
+    //     }
+    //     PageCt.setPageSubtitle(`${data.length > 1 ? data.length : 1} sites `);
+    //     setIsLoaded(true);
+
+    //   };
+
+    //   GetClientSiteContrat(tokenCt, FetchSetClientSite);
+    // }
+
+
+
+
+  }
+
+  function getTitleAndSubtitle() {
+    // const pathname = window.location.pathname;
+    
+    // console.log(PageCt.pageTitle);
+    // console.log(PageCt.pageSubtitle);
+    return { titre: PageCt.pageTitle, 
+      soustitre: PageCt.pageSubtitle}
+
+    //   switch (pathname) {
+    //     case "/devis":
+    //       return { titre: "Liste des devis", soustitre: `X` };
+
+    //     case "/factures":
+    //       return { titre: "Liste des factures", soustitre: `X` };
+
+    //     case "/appareils":
+    //       return { titre: "Liste des appareils", soustitre: `X` };
+
+    //     case "/interventions":
+    //       return { titre: "Liste des dépannages", soustitre: `X` };
+
+    //     case "/maintenance":
+    //       return { titre: "Liste des plannifications", soustitre: `X` };
+
+    //     case "/account":
+    //       return { titre: "Mon compte"};
+
+    //     case "/": // Page d'accueil
+    //       return { titre: "Tableau de bord" };
+
+
+    //       case "/sites": // Page d'accueil
+    //       return { titre: "Choix du site" };
+
+    //     default: // Page par défaut
+    //       return { titre: "Titre page" };
+    //   }
+  }
+
+  //#endregion
+
+
+  //#region Components
   const MenuNavLink = ({ href, text, icon, onClick }) => {
     return (
       <NavItem className="m-4" onClick={onClick}>
@@ -131,31 +229,27 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
     );
   };
 
-  // const handleAccount = () => {
-  //   navigate("/account");
-  // };
-  // const handleCookies = () => {
-  // };
+
   const PopoverAccount = (
     <Popover aria-label="Menu déconnexion" className="popover-menu">
       {/* <Popover.Header>{accountName}
       </Popover.Header> */}
       {/* <Popover.Body> */}
-        {/* <Row>
+      {/* <Row>
           <Button variant="" className="border mb-2" onClick={handleAccount}>
             <FontAwesomeIcon icon={faUser} /> Mon compte
           </Button>
         </Row> */}
-        {/* <Row> */}
-          <Button
-            variant=""
-            className="popover-btn"
-            onClick={handleDeconnexion}
-          >
-            <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
-          </Button>
-        {/* </Row> */}
-        {/* <Row>
+      {/* <Row> */}
+      <Button
+        variant=""
+        className="popover-btn"
+        onClick={handleDeconnexion}
+      >
+        <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
+      </Button>
+      {/* </Row> */}
+      {/* <Row>
           <Button variant="" className="border mb-2" onClick={handleCookies}>
             <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
           </Button>
@@ -164,9 +258,27 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
     </Popover>
   );
 
+
+  const GetDropdownTitle = () => {
+    return <span className="me-1">
+      <i className="fas fa-building"></i>
+    </span>
+      ;
+  }
+
+  //#endregion
+
+
+  //#region Events
+  const handleCloseMenu = () => setShowMenu(false);
+
+
   const handleChangerClientsite = () => {
     navigate("/sites");
   }
+
+  //#endregion
+
 
   return (
     <Navbar expand="lg" className="top-bar-menu">
@@ -189,9 +301,35 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
 
         <Navbar.Text className="d-flex align-items-center">
           <div className="title-site">
-            {ClientSiteContratCtx.storedClientSite &&
-              ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
+            {siteActuel}
+            {/* {ClientSiteContratCtx.storedClientSite &&
+              ClientSiteContratCtx.storedClientSite.NomCompletClientSite} */}
           </div>
+
+
+          <DropdownButton title={GetDropdownTitle()}
+            variant=""
+            className="ms-2 me-3 switch-site"
+          // onClick={handleChangerClientsite}
+
+          >
+
+            {
+              listeSites.map((site) => {
+                return (
+                  site.GUID !== ClientSiteContratCtx.storedClientSite.GUID &&
+                  <Dropdown.Item key={site.GUID}
+                    onClick={e => ClientSiteContratCtx.setClientSite(site)}
+                  >
+                    {site.NomCompletClientSite}
+                  </Dropdown.Item>
+
+
+                )
+              })
+            }
+
+          </DropdownButton>
           <Button
             variant=""
             className="ms-2 me-3 switch-site"
@@ -211,6 +349,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
             <Button variant="" className="icone-site">
               <FontAwesomeIcon icon={faCircleUser} />
             </Button>
+
           </OverlayTrigger>
         </Navbar.Text>
       </Container>
@@ -218,34 +357,4 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
   );
 };
 
-
-function getTitleAndSubtitle(data) {
-  const pathname = window.location.pathname;
-
-  switch (pathname) {
-    case "/devis":
-      return { titre: "Liste des devis", soustitre: `X` };
-
-    case "/factures":
-      return { titre: "Liste des factures", soustitre: `X` };
-
-    case "/appareils":
-      return { titre: "Liste des appareils", soustitre: `X` };
-
-    case "/interventions":
-      return { titre: "Liste des dépannages", soustitre: `X` };
-
-    case "/maintenance":
-      return { titre: "Liste des plannifications", soustitre: `X` };
-
-    case "/account":
-      return { titre: "Mon compte"};
-
-    case "/": // Page d'accueil
-      return { titre: "Tableau de bord" };
-
-    default: // Page par défaut
-      return { titre: "Titre page" };
-  }
-}
 export default TopBarMenu;

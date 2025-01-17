@@ -21,7 +21,7 @@ import {
   GetContratPrestationPeriodes,
   GetPrestationContrat,
 } from "../../../axios/WSGandara";
-import { ClientSiteContratContext, TokenContext } from "../../../App";
+import { ClientSiteContratContext, TitreContext, TokenContext } from "../../../App";
 import {
   DateSOAP,
   GetDateFromStringDDMMYYY,
@@ -35,6 +35,7 @@ import {
 const ContratPage = () => {
   const tokenCt = useContext(TokenContext);
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
+  const PageCt = useContext(TitreContext);
 
   //#region Données
 
@@ -154,6 +155,8 @@ const ContratPage = () => {
 
   const PrestationLoad = (data) => {
     SetPrestations(data);
+    PageCt.setPageSubtitle(`${data.length} prestations`);
+
     setIsLoadedPresta(true);
   };
 
@@ -248,6 +251,7 @@ const ContratPage = () => {
 
   useEffect(() => {
     document.title = "Maintenance";
+  PageCt.setPageTitle(`Maintenance`);
 
     setIsLoadedPresta(false);
     if (listePeriodes && listePeriodes.length === 0) {

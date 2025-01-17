@@ -37,11 +37,11 @@ import SideBarMenuLeft from "./components/menu/SideBarMenuLeft";
 
 //#region React
 
-import { React, createContext } from "react";
+import { React, createContext, useState } from "react";
 
 import { useCookies } from "react-cookie";
 
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#endregion
@@ -93,8 +93,19 @@ export const ToastContext = createContext(null);
 
 export const ViewerContext = createContext(null);
 
+export const TitreContext = createContext(null);
+
+
 //#endregion
 function App() {
+
+ //#region State
+ const [pageSubtitle,setPageSubtitle] = useState('');
+ const [pageTitle,setPageTitle] = useState('');
+ const [listeSites, setListeSites] = useState([]);
+
+
+ //#endregion
 
 
   //Fonction de hash : https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
@@ -113,6 +124,9 @@ function App() {
 
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
   };
+
+
+
 
   //#region ClientSiteContrat
 
@@ -190,6 +204,7 @@ function App() {
     removeListeParamsCookie(listParamName);
     removeClientSiteCookie(clientSiteName);
     removeAccountCookie(accountName);
+    // removeTitlePage(titlePageName);
   };
 
   if (!tokenCookie[tokenName] && ! window.location.href.toUpperCase().includes('changeMDP/'.toUpperCase())) {
@@ -309,15 +324,20 @@ function App() {
 
   //#endregion
 
+
+ 
+
   return (
     <TokenContext.Provider value={tokenCookie[tokenName]}>
       <ClientSiteContratContext.Provider
-        value={{ storedClientSite, setClientSite, removeclientSite }}
+        value={{ storedClientSite, setClientSite, removeclientSite,listeSites, setListeSites }}
       >
         <ParametresContext.Provider value={listeParamsCookie[listParamName]}>
           <ViewerContext.Provider
             value={{ viewerURL, setViewer, removeViewer }}
           >
+            <TitreContext.Provider value={{pageTitle,setPageTitle,pageSubtitle,setPageSubtitle}}>
+
             <Router>
 
               <BreakpointProvider>
@@ -325,6 +345,7 @@ function App() {
                 <LargeUp />
               </BreakpointProvider>
             </Router>
+            </TitreContext.Provider>
           </ViewerContext.Provider>
         </ParametresContext.Provider>
       </ClientSiteContratContext.Provider>

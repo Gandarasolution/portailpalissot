@@ -18,6 +18,7 @@ import {
 import { DateSOAP, base64toBlob } from "../../functions";
 import {
   ClientSiteContratContext,
+  TitreContext,
   TokenContext,
   ViewerContext,
 } from "../../App";
@@ -45,6 +46,7 @@ const FacturesPage = () => {
   const tokenCt = useContext(TokenContext);
   const clientSiteCt = useContext(ClientSiteContratContext);
   const viewerCt = useContext(ViewerContext);
+  const PageCt = useContext(TitreContext);
 
   //#region States
   const [isFacturesLoaded, setIsFactureLoaded] = useState(false);
@@ -359,7 +361,11 @@ const FacturesPage = () => {
     setIsFactureLoaded(false);
     const FetchSetData = (data) => {
       setListeFactures(data);
+
       setIsFactureLoaded(true);
+      // console.log("h");
+      let _trimmed = data.filter((fa) =>fa.Type && fa.Type !== "Chantier");
+      PageCt.setPageSubtitle(` ${_trimmed.length} factures`);
     };
     await GetListeFactures(
       tokenCt,
@@ -368,10 +374,14 @@ const FacturesPage = () => {
       DateSOAP(new Date()),
       FetchSetData
     );
+
+
   };
 
   useEffect(() => {
     document.title = "Factures";
+    PageCt.setPageTitle("Factures");
+
     GetFactures();
     //eslint-disable-next-line
   }, [clientSiteCt.storedClientSite.GUID]);
