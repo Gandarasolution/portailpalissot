@@ -1575,10 +1575,13 @@ const TableData = ({ ...props }) => {
   const [showModalListeTaches, setShowModalListeTaches] = useState(false);
   const [isLoadingTaches, setIsLoadingTaches] = useState(false);
   const [listeTaches, setListeTaches] = useState([]);
+  const [prestaName, setPrestaName] = useState("");
 
   const HandleShowModalListeTaches = async (presta) => {
     //Récupère les données
     if (isLoadingTaches) return;
+    // console.log(presta);
+    setPrestaName(presta.DescriptionPrestationContrat);
     setIsLoadingTaches(true);
     setShowModalListeTaches(true);
 
@@ -1689,7 +1692,9 @@ const TableData = ({ ...props }) => {
         <Modal.Header>
           <Modal.Title>
             <FontAwesomeIcon icon={faTasks} />
-            Liste des relevés de tâches </Modal.Title>
+            Liste des relevés de tâches 
+            <div className="modal-title h6" > {prestaName} </div>
+            </Modal.Title>
           <Button
             className="close-modal"
             onClick={() => setShowModalListeTaches(false)}
@@ -1697,6 +1702,7 @@ const TableData = ({ ...props }) => {
           </Button>
         </Modal.Header>
         <Modal.Body>
+        
           <CardListeTachesBodyL />
         </Modal.Body>
       </Modal>
