@@ -1040,10 +1040,9 @@ thead th,
 
 .modal.show .modal-dialog{
   position: absolute;
-  top: 45%;
+  top: 47%;
   transform: translate(-50%, -50%) !important;
   left: 50%;
-  max-height: 50vh;
 }
 
 .modal.show .modal-dialog.modal-listing{
@@ -1059,6 +1058,8 @@ thead th,
   background: var(--color-sky-blue);
   border-radius: 16px;
   font-family: var(--font-text);
+  min-height: 82vh;
+  max-height: 82vh;
 }
 
 .modal.show .modal-dialog .modal-content .modal-header{
@@ -1111,7 +1112,6 @@ thead th,
 }
 
 .modal.show .modal-dialog.modal-dialog.modal-listing .modal-content .modal-body{
-  max-height: 50vh;
   overflow-y: scroll;
   scrollbar-width: thin;  /* Pour les navigateurs compatibles (Firefox) */
   padding: 15px;
