@@ -68,6 +68,7 @@ import ViewerPDFPage from "./Views/Viewer/ViewerPDF";
 import ViewerWordPage from "./Views/Viewer/ViewerWord";
 import ViewerImagePage from "./Views/Viewer/ViewerImage";
 import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
+import { addOneYear, DateSOAP } from "./functions";
 // import AccountPage from "./Views/Home/AccountPage";
 
 library.add(
@@ -231,6 +232,23 @@ function App() {
   const AppRoutes = () => {
     const [pageSubtitle, setPageSubtitle] = useState('');
     const [pageTitle, setPageTitle] = useState('');
+    // const [showDropdownPeriode, setShowDropdownPeriode] = useState(false);
+    const [isSetPeriode, setIsSetPeriode] = useState(false);
+
+
+    const [periodeEnCours, setPeriodeEnCours] = useState({
+      k: DateSOAP(GetDatePeriodeInitial()),
+      v: DateSOAP(addOneYear(GetDatePeriodeInitial())),
+    });
+
+    function GetDatePeriodeInitial() {
+      let _day = 1;
+      // let _monthI = _dateContrat.getMonth();
+      let _monthI = 0;
+      let _year = new Date().getFullYear();
+      let _DateRetour = new Date(_year, _monthI, _day);
+      return _DateRetour;
+    }
 
     return (
       <>
@@ -239,6 +257,7 @@ function App() {
           handleDeconnexion={handleDeconnexion}
           pageSubtitle={pageSubtitle}
           pageTitle={pageTitle}
+          statePeriodes={{ periodeEnCours, setPeriodeEnCours, setIsSetPeriode }}
         />
         <Routes>
           <Route path="test" element={<PageTest />} />
@@ -254,7 +273,7 @@ function App() {
           {/* <Route path="account" element={<AccountPage accountName={account} />} /> */}
           <Route
             path="maintenance"
-            element={storedClientSite ? <ContratPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            element={storedClientSite ? <ContratPage IsSetPeriode={isSetPeriode} periodeEnCours={periodeEnCours} setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
           />
           <Route
             path="appareils"

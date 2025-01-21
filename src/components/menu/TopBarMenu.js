@@ -17,6 +17,8 @@ import Popover from "react-bootstrap/Popover";
 //#region Fontawsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faArrowLeft,
+  faArrowRight,
   faBook,
   faCircleUser,
   faCookieBite,
@@ -34,14 +36,15 @@ import { ClientSiteContratContext, TokenContext } from "../../App";
 import logo from "../../image/favicon.ico";
 
 //#endregion
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { GetClientSiteContrat } from "../../axios/WSGandara";
+import { GetClientSiteContrat, GetContratPrestationPeriodes } from "../../axios/WSGandara";
 import { Dropdown, DropdownButton } from "react-bootstrap";
+import { GetDateFromStringDDMMYYY, GetNomMois } from "../../functions";
 
 //#endregion
 
-const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded }) => {
+const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes }) => {
 
   //#region Contexts
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
@@ -52,6 +55,10 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
 
   //#region States
   const [showMenu, setShowMenu] = useState(false);
+  const [listePeriodes, setListePeriodes] = useState([]);
+  const [showDropdownPeriode, setShowDropdownPeriode] = useState(false);
+
+
   //#endregion
 
   const navigate = useNavigate();
@@ -83,6 +90,9 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
   }
 
   function getTitleAndSubtitle() {
+
+
+
     //Le titre et le sous titre sont donnés en paramètres du composant (states dans App.js parent)
     return { titre: pageTitle, soustitre: pageSubtitleLoaded ? "x" : pageSubtitle };
     // const pathname = window.location.pathname;
@@ -117,6 +127,59 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
     //       return { titre: "Titre page" };
     //   }
   }
+
+
+
+
+  const GetPeriodes = async () => {
+    const FetchSetDataPeriode = (data) => {
+      if (data.length > 1) {
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+          element.k = `01-01-${element.k}`;
+          element.v = `31-12-${element.v}`;
+        }
+      } else {
+        let _lData = [];
+        data.k = `01-01-${data.k}`;
+        data.v = `31-12-${data.v}`;
+        _lData[0] = data;
+        data = _lData;
+
+      }
+
+      setListePeriodes(data);
+      const PeriodeInitial = GetDatePeriodeInitial();
+      const _indexPeriode = data.findIndex((p) => {
+        return (
+          GetDateFromStringDDMMYYY(p.k).getTime() <= PeriodeInitial.getTime() &&
+          GetDateFromStringDDMMYYY(p.v).getTime() >= PeriodeInitial.getTime()
+        );
+      });
+      statePeriodes.setPeriodeEnCours(data[_indexPeriode]);
+      statePeriodes.setIsSetPeriode(true);
+    };
+
+
+
+    await GetContratPrestationPeriodes(
+      TokenCt,
+      ClientSiteContratCtx.storedClientSite.GUID,
+      FetchSetDataPeriode
+    );
+  };
+
+  function GetDatePeriodeInitial() {
+    let _day = 1;
+    // let _monthI = _dateContrat.getMonth();
+    let _monthI = 0;
+    let _year = new Date().getFullYear();
+    let _DateRetour = new Date(_year, _monthI, _day);
+    return _DateRetour;
+  }
+
+
+
 
   //#endregion
 
@@ -241,6 +304,63 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
       ;
   }
 
+
+
+  const DropdownPeriode = () => {
+    let _arrayPeriodes = [];
+
+    for (let index = 0; index < listePeriodes.length; index++) {
+      const element = listePeriodes[index];
+      let _dateStart = GetDateFromStringDDMMYYY(element.k);
+      let _dateEnd = GetDateFromStringDDMMYYY(element.v);
+
+      _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
+    }
+    return (
+
+      <>
+        <Button variant="" className="button-periode" onClick={() => SoustraireUnAnPeriode()} >
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </Button>
+
+        <DropdownButton variant="" className="button-periode" drop="down-centered" align="end" id="dropdown-datePeriode"
+          onSelect={(e) => {
+            HandleDropdownPeriodeSelect(e);
+          }}
+
+
+          title={`Contrat de maintenance de : ${GetNomMois(1, false)} ${GetDateFromStringDDMMYYY(
+            statePeriodes.periodeEnCours.k
+          ).getFullYear()} à ${GetNomMois(12, false)} ${GetDateFromStringDDMMYYY(
+            statePeriodes.periodeEnCours.v
+          ).getFullYear()}`}>
+
+
+          {_arrayPeriodes.map((periode, index) => {
+            return (
+              <Dropdown.Item key={index} eventKey={index}>
+                {` ${GetNomMois(
+                  periode.dateStart.getMonth() + 1
+                )} ${periode.dateStart.getFullYear()} à ${GetNomMois(
+                  periode.dateEnd.getMonth() + 1
+                )} ${periode.dateEnd.getFullYear()}`}
+              </Dropdown.Item>
+            );
+          })}
+        </DropdownButton>
+
+
+
+
+
+        <Button variant="" className="button-periode" onClick={() => AjouterUnAnPeriode()} >
+          <FontAwesomeIcon icon={faArrowRight} />
+        </Button>
+      </>
+    );
+
+  }
+
   //#endregion
 
 
@@ -252,8 +372,74 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
     navigate("/sites");
   }
 
+
+  const AjouterUnAnPeriode = async () => {
+    const _periodeEnCours = JSON.parse(JSON.stringify(statePeriodes.periodeEnCours));
+    const _indexPeriode = listePeriodes.findIndex(
+      (f) =>
+        GetDateFromStringDDMMYYY(f.k).getTime() ===
+        GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
+        GetDateFromStringDDMMYYY(f.v).getTime() ===
+        GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
+    );
+
+    if (_indexPeriode < listePeriodes.length - 1) {
+      statePeriodes.setPeriodeEnCours(listePeriodes[_indexPeriode + 1]);
+    }
+  };
+
+
+  const HandleDropdownPeriodeSelect = async (index) => {
+    const _periode = listePeriodes[index];
+    statePeriodes.setPeriodeEnCours(_periode);
+  };
+
+
+
+  const SoustraireUnAnPeriode = async () => {
+    const _periodeEnCours = JSON.parse(JSON.stringify(statePeriodes.periodeEnCours));
+    const _indexPeriode = listePeriodes.findIndex(
+      (f) =>
+        GetDateFromStringDDMMYYY(f.k).getTime() ===
+        GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
+        GetDateFromStringDDMMYYY(f.v).getTime() ===
+        GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
+    );
+
+    if (_indexPeriode > 0) {
+      statePeriodes.setPeriodeEnCours(listePeriodes[_indexPeriode - 1]);
+    }
+  };
+
+
+
   //#endregion
 
+
+
+
+  useEffect(() => {
+    const pathname = window.location.pathname;
+    statePeriodes.setIsSetPeriode(false);
+
+    let _isdropdownShown = false;
+    if (pathname === "/maintenance") {
+      _isdropdownShown = true;
+    }
+    setShowDropdownPeriode(_isdropdownShown)
+
+    // eslint-disable-next-line
+  }, [titre])
+
+
+
+
+  useEffect(() => {
+    if (showDropdownPeriode) {
+      GetPeriodes();
+    }
+    // eslint-disable-next-line
+  }, [showDropdownPeriode])
 
   return (
     <Navbar expand="lg" className="top-bar-menu">
@@ -274,30 +460,43 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
           )}
         </Navbar.Text>
 
+        <Navbar.Text className="d-flex align-item" >
+          {
+            showDropdownPeriode &&
+            <DropdownPeriode />
+          }
+        </Navbar.Text>
+
         <Navbar.Text className="d-flex align-items-center">
           <div className="title-site">
             {siteActuel}
           </div>
 
+          {
+            ClientSiteContratCtx.storedClientSite &&
 
-          <DropdownButton title={GetDropdownTitle()}
-            variant=""
-            className="ms-2 me-3 switch-site"
-          >
-            {
-              listeSites.map((site) => {
-                return (
-                  site.GUID !== ClientSiteContratCtx.storedClientSite.GUID &&
-                  <Dropdown.Item key={site.GUID}
-                    onClick={e => ClientSiteContratCtx.setClientSite(site)}
-                  >
-                    {site.NomCompletClientSite}
-                  </Dropdown.Item>
-                )
-              })
-            }
+            (
+              <DropdownButton title={GetDropdownTitle()}
+                variant=""
+                className="ms-2 me-3 switch-site"
+              >
+                {
+                  listeSites.map((site) => {
+                    return (
+                      site.GUID !== ClientSiteContratCtx.storedClientSite.GUID &&
+                      <Dropdown.Item key={site.GUID}
+                        onClick={e => ClientSiteContratCtx.setClientSite(site)}
+                      >
+                        {site.NomCompletClientSite}
+                      </Dropdown.Item>
+                    )
+                  })
+                }
 
-          </DropdownButton>
+              </DropdownButton>
+            )
+          }
+
           <Button
             variant=""
             className="ms-2 me-3 switch-site"
