@@ -141,17 +141,17 @@ const LoginPage = (props) => {
         <p>
           Si celle-ci est connu de notre
           service, vous recevrez un mail avec le <span>lien de réinitialisation du mot
-          de passe.</span>
+            de passe.</span>
         </p>
 
         <Form className="m-4" onSubmit={() => handleForgotPassword()}>
-            <Form.Control
-              type="email"
-              required
-              placeholder="Tapez votre adresse email"
-              value={mailRecup}
-              onChange={(e) => setMailRecup(e.target.value)}
-            />
+          <Form.Control
+            type="email"
+            required
+            placeholder="Tapez votre adresse email"
+            value={mailRecup}
+            onChange={(e) => setMailRecup(e.target.value)}
+          />
 
           <div>
             {/* <Button variant="primary" type="submit"> */}
@@ -201,7 +201,7 @@ const LoginPage = (props) => {
           <Button
             className="close-modal"
             variant=""
-            ><FontAwesomeIcon icon={faXmark} onClick={() => setShowModal(false)} />
+          ><FontAwesomeIcon icon={faXmark} onClick={() => setShowModal(false)} />
           </Button>
         </Modal.Header>
 
@@ -356,12 +356,12 @@ const LoginPage = (props) => {
           {/* Logo au-dessus du formulaire */}
           <div className="container-login-content">
             <div className="text-center mb-4">
-            <img
-              alt="Logo noir"
-              src={logoNoir}
-              width="60"
-              height="60"
-            />
+              <img
+                alt="Logo noir"
+                src={logoNoir}
+                width="60"
+                height="60"
+              />
               {/* <img
                 alt="Logo"
                 src={logo}

@@ -150,7 +150,7 @@ function App() {
 
   //#region Parametres
 
-  const listParamName = cyrb53("listeParamsHashed").toString();
+  const listParamName = cyrb53("listeParams").toString();
   const [listeParamsCookie, setListeParamsCookie, removeListeParamsCookie] =
     useCookies([listParamName]);
 
@@ -207,7 +207,6 @@ function App() {
     removeListeParamsCookie(listParamName);
     removeClientSiteCookie(clientSiteName);
     removeAccountCookie(accountName);
-    // removeTitlePage(titlePageName);
   };
 
   if (!tokenCookie[tokenName] && !window.location.href.toUpperCase().includes('changeMDP/'.toUpperCase())) {
@@ -229,6 +228,11 @@ function App() {
   //#endregion
 
   //#region Composants
+
+
+
+
+  
   const AppRoutes = () => {
     const [pageSubtitle, setPageSubtitle] = useState('');
     const [pageTitle, setPageTitle] = useState('');

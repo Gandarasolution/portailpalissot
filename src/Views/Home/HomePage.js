@@ -37,12 +37,13 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
   const SpanLink = ({ title, to, img, kv, disable }) => {
 
     return (
-      <Nav.Link href={to} disabled={disable ? true : false}>
+
+      <NavLink href={to} disabled={disable ? true : false}>
         <div className="content  position-relative d-inline-block">
           <div>{title}</div>
 
         </div>
-      </Nav.Link>
+      </NavLink>
     );
   };
 

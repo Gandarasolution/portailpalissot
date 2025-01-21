@@ -1,12 +1,9 @@
 
-const PageTest =  () => {
-
-
+const PageTest = () => {
 
   return (
     <div>
-
-
+      Ceci est un test
     </div>
 
 
