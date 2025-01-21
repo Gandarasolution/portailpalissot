@@ -15,7 +15,7 @@
   --color-white: #fff;
   --color-black: #000;
   --color-blue-icone-site: #518097;
-  --color-blue-grey: #80949F;
+  --color-blue-grey:  ;
   --color-grey-icone-site: #F4F5F7;
   --font-bold: 'BorisBlackBloxx', sans-serif;
   --font-text: 'Corbel', sans-serif;
@@ -1112,20 +1112,32 @@ thead th,
 }
 
 .modal.show .modal-dialog.modal-dialog.modal-listing .modal-content .modal-body{
-  overflow-y: scroll;
-  scrollbar-width: thin;  /* Pour les navigateurs compatibles (Firefox) */
-  padding: 15px;
   box-sizing: border-box;
   width: 93%;
   margin: -10px auto 30px;
+  padding: 15px;
   padding-left: 20px;
+  position: relative;
+  overflow-y: auto;
 }
 
-/* Pour Chrome, Edge et autres navigateurs basés sur Webkit */
-.modal-content::-webkit-scrollbar {
-  width: 8px; /* Force la largeur de l'ascenseur */
+/* Ajout d'un voile en bas de la modale */
+.modal-body::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(to bottom, transparent, rgba(241, 246, 250, 0.95));
+  z-index: 1;
+  transition: opacity 0.3s ease;
 }
 
+/* Supprime le voile lors du premier scroll */
+.modal-body.no-scroll-indicator::after {
+  opacity: 0;
+}
 
 
 /* Password */
