@@ -19,7 +19,6 @@ import Placeholder from "react-bootstrap/Placeholder";
 //#endregion
 
 //#region Components
-import TitreOfPage from "../../../components/commun/TitreOfPage";
 import {
   ClientSiteContratContext,
   ParametresContext,
@@ -33,7 +32,7 @@ import { ParseKVAsArray } from "../../../functions";
 
 //#endregion
 
-const NouvelleInterventionPage = () => {
+const NouvelleInterventionPage = ({ setPageSubtitle, setPageTitle }) => {
   const ParamsCt = useContext(ParametresContext);
   const TokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
@@ -62,6 +61,7 @@ const NouvelleInterventionPage = () => {
   //#region Fonctions
 
   const GetData = () => {
+    setPageSubtitle("");
     const FetchSetSecteurs = (data) => {
       setListeSecteurs(data);
       setIsLoadedSecteurs(true);
@@ -123,13 +123,14 @@ const NouvelleInterventionPage = () => {
 
   useEffect(() => {
     document.title = "Demande de dépannage";
+    setPageTitle("Demande de dépannage");
     GetData();
     // eslint-disable-next-line
   }, [ClientSiteCt.storedClientSite.GUID]);
 
   return (
     <Container fluid>
-      <TitreOfPage titre={"Nouvelle intervention"} />
+      {/* <TitreOfPage titre={"Nouvelle intervention"} /> */}
       <Container fluid className="container-table ">
         <Form noValidate validated={validated} onSubmit={HandleSubmit}>
           <Row className="m-4">
@@ -216,9 +217,8 @@ const NouvelleInterventionPage = () => {
                   En cas d'urgence contactez le{" "}
                   <a
                     className="text-decoration-none"
-                    href={`tel:${
-                      ParamsCt.find((p) => p.k === "TelUrgenceIntervention").v
-                    }`}
+                    href={`tel:${ParamsCt.find((p) => p.k === "TelUrgenceIntervention").v
+                      }`}
                   >
                     {ParamsCt.find((p) => p.k === "TelUrgenceIntervention").v}
                   </a>{" "}

@@ -21,7 +21,7 @@ import {
   GetContratPrestationPeriodes,
   GetPrestationContrat,
 } from "../../../axios/WSGandara";
-import { ClientSiteContratContext, TitreContext, TokenContext } from "../../../App";
+import { ClientSiteContratContext, TokenContext } from "../../../App";
 import {
   DateSOAP,
   GetDateFromStringDDMMYYY,
@@ -32,10 +32,9 @@ import {
 
 //#endregion
 
-const ContratPage = () => {
+const ContratPage = ({ setPageSubtitle, setPageTitle }) => {
   const tokenCt = useContext(TokenContext);
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
-  const PageCt = useContext(TitreContext);
 
   //#region Données
 
@@ -101,15 +100,14 @@ const ContratPage = () => {
 
   const GetPeriodes = async () => {
     const FetchSetDataPeriode = (data) => {
-      if(data.length > 1)
-      {
+      if (data.length > 1) {
 
         for (let index = 0; index < data.length; index++) {
           const element = data[index];
           element.k = `01-01-${element.k}`;
           element.v = `31-12-${element.v}`;
         }
-      }else{
+      } else {
         let _lData = [];
         data.k = `01-01-${data.k}`;
         data.v = `31-12-${data.v}`;
@@ -117,7 +115,7 @@ const ContratPage = () => {
         data = _lData;
 
       }
-        
+
       setListePeriodes(data);
       const PeriodeInitial = GetDatePeriodeInitial();
       const _indexPeriode = data.findIndex((p) => {
@@ -155,7 +153,7 @@ const ContratPage = () => {
 
   const PrestationLoad = (data) => {
     SetPrestations(data);
-    PageCt.setPageSubtitle(`${data.length} prestations`);
+    setPageSubtitle(`${data.length}`);
 
     setIsLoadedPresta(true);
   };
@@ -169,9 +167,9 @@ const ContratPage = () => {
     const _indexPeriode = listePeriodes.findIndex(
       (f) =>
         GetDateFromStringDDMMYYY(f.k).getTime() ===
-          GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
+        GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
         GetDateFromStringDDMMYYY(f.v).getTime() ===
-          GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
+        GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
     );
 
     if (_indexPeriode < listePeriodes.length - 1) {
@@ -184,9 +182,9 @@ const ContratPage = () => {
     const _indexPeriode = listePeriodes.findIndex(
       (f) =>
         GetDateFromStringDDMMYYY(f.k).getTime() ===
-          GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
+        GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
         GetDateFromStringDDMMYYY(f.v).getTime() ===
-          GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
+        GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
     );
 
     if (_indexPeriode > 0) {
@@ -251,7 +249,7 @@ const ContratPage = () => {
 
   useEffect(() => {
     document.title = "Maintenance";
-  PageCt.setPageTitle(`Maintenance`);
+    setPageTitle(`Maintenance`);
 
     setIsLoadedPresta(false);
     if (listePeriodes && listePeriodes.length === 0) {

@@ -63,12 +63,12 @@ import {
   faWrench,
 } from "@fortawesome/free-solid-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
-import AccountPage from "./Views/Home/AccountPage";
 import HomePage from "./Views/Home/HomePage";
 import ViewerPDFPage from "./Views/Viewer/ViewerPDF";
 import ViewerWordPage from "./Views/Viewer/ViewerWord";
 import ViewerImagePage from "./Views/Viewer/ViewerImage";
 import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
+// import AccountPage from "./Views/Home/AccountPage";
 
 library.add(
   fas,
@@ -94,18 +94,20 @@ export const ToastContext = createContext(null);
 export const ViewerContext = createContext(null);
 
 export const TitreContext = createContext(null);
+export const SetTitreContext = createContext(null);
 
 
 //#endregion
 function App() {
 
- //#region State
- const [pageSubtitle,setPageSubtitle] = useState('');
- const [pageTitle,setPageTitle] = useState('');
- const [listeSites, setListeSites] = useState([]);
+  //#region State
+  // const [pageTitle, setPageTitle] = useState('');
+  // const [pageSubtitleLoaded, setPageSubtitleLoaded] = useState(false);
+
+  const [listeSites, setListeSites] = useState([]);
 
 
- //#endregion
+  //#endregion
 
 
   //Fonction de hash : https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
@@ -207,7 +209,7 @@ function App() {
     // removeTitlePage(titlePageName);
   };
 
-  if (!tokenCookie[tokenName] && ! window.location.href.toUpperCase().includes('changeMDP/'.toUpperCase())) {
+  if (!tokenCookie[tokenName] && !window.location.href.toUpperCase().includes('changeMDP/'.toUpperCase())) {
     return (
       <div className="App font-link background">
         <LoginPage
@@ -227,63 +229,75 @@ function App() {
 
   //#region Composants
   const AppRoutes = () => {
+    const [pageSubtitle, setPageSubtitle] = useState('');
+    const [pageTitle, setPageTitle] = useState('');
+
     return (
-      <Routes>
-        <Route path="test" element={<PageTest />} />
-        <Route path="/changemdp/:token" element={<ChangeMDPPage />}/>
-        {/* <Route
-          path="*"
-          element={storedClientSite ? <HomePage /> : <ClientSitePage />}
-        /> */}
-        <Route
-          path="/"
-          element={ storedClientSite ? <HomePage /> : <ClientSitePage />}
+      <>
+        <TopBarMenu
+          accountName={account}
+          handleDeconnexion={handleDeconnexion}
+          pageSubtitle={pageSubtitle}
+          pageTitle={pageTitle}
         />
-        <Route path="/sites" element={<ClientSitePage />} />
-        <Route path="waiting" element={<WaiterPage />} />
-        <Route path="error" element={<ErrorPage />} />
-        <Route path="viewerWord" element={<ViewerWord />} />
-        <Route path="account" element={<AccountPage accountName={account} />} />
-        <Route
-          path="maintenance"
-          element={storedClientSite ? <ContratPage /> : <ClientSitePage />}
-        />
-        <Route
-          path="appareils"
-          element={storedClientSite ? <AppareilsPage /> : <ClientSitePage />}
-        />
-        <Route
-          path="interventions"
-          exact
-          element={storedClientSite ? <InterventionPage /> : <ClientSitePage />}
-        />
-        <Route
-          path="nouvelleintervention"
-          element={
-            storedClientSite ? <NouvelleInterventionPage /> : <ClientSitePage />
-          }
-        />
-        <Route
-          path="devis"
-          element={storedClientSite ? <DevisPage /> : <ClientSitePage />}
-        />
-        <Route
-          path="factures"
-          element={storedClientSite ? <FacturesPage /> : <ClientSitePage />}
-        />
-        <Route
-          path="viewerPDF"
-          element={storedClientSite ? <ViewerPDFPage /> : <ClientSitePage />}
-        />{" "}
-        <Route
-          path="viewerDOC"
-          element={storedClientSite ? <ViewerWordPage /> : <ClientSitePage />}
-        />
-        <Route
-          path="viewerIMG"
-          element={storedClientSite ? <ViewerImagePage /> : <ClientSitePage />}
-        />
-      </Routes>
+        <Routes>
+          <Route path="test" element={<PageTest />} />
+          <Route path="/changemdp/:token" element={<ChangeMDPPage />} />
+          <Route
+            path="/"
+            element={storedClientSite ? <HomePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+          />
+          <Route path="waiting" element={<WaiterPage />} />
+          <Route path="error" element={<ErrorPage />} />
+
+          <Route path="/sites" element={<ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />} />
+          {/* <Route path="account" element={<AccountPage accountName={account} />} /> */}
+          <Route
+            path="maintenance"
+            element={storedClientSite ? <ContratPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+          />
+          <Route
+            path="appareils"
+            element={storedClientSite ? <AppareilsPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+          />
+          <Route
+            path="interventions"
+            exact
+            element={storedClientSite ? <InterventionPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+          />
+          <Route
+            path="nouvelleintervention"
+            element={
+              storedClientSite ? <NouvelleInterventionPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />
+            }
+          />
+          <Route
+            path="devis"
+            element={storedClientSite ? <DevisPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+
+          />
+          <Route
+            path="factures"
+            element={storedClientSite ? <FacturesPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+          />
+          <Route
+            path="viewerPDF"
+            element={storedClientSite ? <ViewerPDFPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+          />{" "}
+          <Route
+            path="viewerDOC"
+            element={storedClientSite ? <ViewerWordPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+          />
+          <Route
+            path="viewerIMG"
+            element={storedClientSite ? <ViewerImagePage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+          />
+          <Route path="viewerWord" element={<ViewerWord />} />
+        </Routes>
+
+
+      </>
+
     );
   };
 
@@ -311,10 +325,7 @@ function App() {
           )}
 
           <Col className="App font-link p-0">
-            <TopBarMenu
-              accountName={account}
-              handleDeconnexion={handleDeconnexion}
-            />
+
             <AppRoutes />
           </Col>
         </Row>
@@ -325,18 +336,15 @@ function App() {
   //#endregion
 
 
- 
-
   return (
     <TokenContext.Provider value={tokenCookie[tokenName]}>
       <ClientSiteContratContext.Provider
-        value={{ storedClientSite, setClientSite, removeclientSite,listeSites, setListeSites }}
+        value={{ storedClientSite, setClientSite, removeclientSite, listeSites, setListeSites }}
       >
         <ParametresContext.Provider value={listeParamsCookie[listParamName]}>
           <ViewerContext.Provider
             value={{ viewerURL, setViewer, removeViewer }}
           >
-            <TitreContext.Provider value={{pageTitle,setPageTitle,pageSubtitle,setPageSubtitle}}>
 
             <Router>
 
@@ -345,7 +353,8 @@ function App() {
                 <LargeUp />
               </BreakpointProvider>
             </Router>
-            </TitreContext.Provider>
+
+
           </ViewerContext.Provider>
         </ParametresContext.Provider>
       </ClientSiteContratContext.Provider>

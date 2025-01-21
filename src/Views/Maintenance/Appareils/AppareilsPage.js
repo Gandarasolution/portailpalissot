@@ -7,7 +7,6 @@ import { useState, useEffect, useContext } from "react";
 //#region Bootstrap
 
 import Container from "react-bootstrap/Container";
-import Image from "react-bootstrap/Image";
 import Badge from "react-bootstrap/Badge";
 
 //#endregion
@@ -26,13 +25,12 @@ import TableData, {
 //#region DEV
 import { GetListeAppareils } from "../../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
-import TitreOfPage from "../../../components/commun/TitreOfPage";
 
 //#endregion
 
 //#endregion
 
-const AppareilsPage = () => {
+const AppareilsPage = ({ setPageSubtitle, setPageTitle }) => {
   const tokenCx = useContext(TokenContext);
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
@@ -53,6 +51,7 @@ const AppareilsPage = () => {
   const FetchSetListeAppareils = (data) => {
     setListeAppareils(data);
     setIsLoaded(true);
+    setPageSubtitle(data.length)
   };
 
   const GetAppareils = async () => {
@@ -154,24 +153,24 @@ const AppareilsPage = () => {
   //#region Component
 
   //#region commun
-  const AppareilBlue = require("../../../image/bottle.png");
-  const AppareilGrey = require("../../../image/bottleGrey.png");
-  const AppareilRed = require("../../../image/bottleRed.png");
+  // const AppareilBlue = require("../../../image/bottle.png");
+  // const AppareilGrey = require("../../../image/bottleGrey.png");
+  // const AppareilRed = require("../../../image/bottleRed.png");
 
-  const GetImageAppareilEtat = ({ IdEtat, className }) => {
-    return (
-      <Image
-        className={className}
-        src={
-          IdEtat === 206
-            ? AppareilGrey
-            : IdEtat === 56
-            ? AppareilBlue
-            : AppareilRed
-        }
-      />
-    );
-  };
+  // const GetImageAppareilEtat = ({ IdEtat, className }) => {
+  //   return (
+  //     <Image
+  //       className={className}
+  //       src={
+  //         IdEtat === 206
+  //           ? AppareilGrey
+  //           : IdEtat === 56
+  //             ? AppareilBlue
+  //             : AppareilRed
+  //       }
+  //     />
+  //   );
+  // };
   //#endregion
 
   //#region TableData
@@ -188,7 +187,6 @@ const AppareilsPage = () => {
   const EditorFilter = (value) => {
     return (
       <span>
-        {/* <GetImageAppareilEtat IdEtat={value} className={"img-bt-filter"} /> */}
         {GetLibelleEtat(value)}
       </span>
     );
@@ -197,7 +195,6 @@ const AppareilsPage = () => {
   const EditorCardBody = (appareil) => {
     return (
       <span>
-        {/* <GetImageAppareilEtat IdEtat={appareil.IdEtat} /> */}
         <Badge pill bg={GetBGColorAppareilEtat(appareil.IdEtat)}>
           {GetLibelleEtat(appareil.IdEtat)}
         </Badge>
@@ -249,18 +246,13 @@ const AppareilsPage = () => {
 
   useEffect(() => {
     document.title = "Appareils";
-
+    setPageTitle("Appareils");
     GetAppareils();
     // eslint-disable-next-line
   }, [ClientSiteContratCtx.storedClientSite.GUID]);
 
   return (
     <Container fluid className="table-appareil">
-      {/* <TitreOfPage
-        titre={"Liste des appareils"}
-        soustitre={` ${listeAppareils.length} appareils`}
-        isLoaded={isLoaded}
-      /> */}
       <TableAppareils />
     </Container>
   );

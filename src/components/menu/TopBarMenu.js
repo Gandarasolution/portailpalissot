@@ -30,7 +30,7 @@ import { faCalendar, faFile } from "@fortawesome/free-regular-svg-icons";
 //#endregion
 
 //#region Components
-import { ClientSiteContratContext, TitreContext, TokenContext } from "../../App";
+import { ClientSiteContratContext, TokenContext } from "../../App";
 import logo from "../../image/favicon.ico";
 
 //#endregion
@@ -41,11 +41,11 @@ import { Dropdown, DropdownButton } from "react-bootstrap";
 
 //#endregion
 
-const TopBarMenu = ({ accountName, handleDeconnexion }) => {
+const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded }) => {
 
   //#region Contexts
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
-  const PageCt = useContext(TitreContext);
+  // const PageCt = useContext(TitreContext);
   const TokenCt = useContext(TokenContext);
 
   //#endregion
@@ -80,36 +80,12 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
       GetClientSiteContrat(TokenCt, FetchSetClientSite);
     }
     return { siteActuel: _retourSiteActuel, listeSites: _listeSites };
-
-    // function GetClientSites() {
-    //   setIsLoaded(false);
-
-    //   const FetchSetClientSite = (data) => {
-    //     setListeClientSite(data);
-    //     if (!Array.isArray(data)) {
-    //       ClientSiteCt.setClientSite(data);
-    //       navigate("/");
-    //     }
-    //     PageCt.setPageSubtitle(`${data.length > 1 ? data.length : 1} sites `);
-    //     setIsLoaded(true);
-
-    //   };
-
-    //   GetClientSiteContrat(tokenCt, FetchSetClientSite);
-    // }
-
-
-
-
   }
 
   function getTitleAndSubtitle() {
+    //Le titre et le sous titre sont donnés en paramètres du composant (states dans App.js parent)
+    return { titre: pageTitle, soustitre: pageSubtitleLoaded ? "x" : pageSubtitle };
     // const pathname = window.location.pathname;
-    
-    // console.log(PageCt.pageTitle);
-    // console.log(PageCt.pageSubtitle);
-    return { titre: PageCt.pageTitle, 
-      soustitre: PageCt.pageSubtitle}
 
     //   switch (pathname) {
     //     case "/devis":
@@ -197,7 +173,6 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
           <MenuNavLink href={"/account"} icon={faUser} text={"Mon compte"} />
           <MenuNavLink icon={faRightFromBracket} text={"Se déconnecter"} onClick={handleDeconnexion} />
           <MenuNavLink href={"/"} icon={faCookieBite} text={"Cookies"} />
-
           {/* 
           <Row>
           <Button variant="" className="border mb-2" onClick={handleAccount}>
@@ -302,18 +277,13 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
         <Navbar.Text className="d-flex align-items-center">
           <div className="title-site">
             {siteActuel}
-            {/* {ClientSiteContratCtx.storedClientSite &&
-              ClientSiteContratCtx.storedClientSite.NomCompletClientSite} */}
           </div>
 
 
           <DropdownButton title={GetDropdownTitle()}
             variant=""
             className="ms-2 me-3 switch-site"
-          // onClick={handleChangerClientsite}
-
           >
-
             {
               listeSites.map((site) => {
                 return (
@@ -323,8 +293,6 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
                   >
                     {site.NomCompletClientSite}
                   </Dropdown.Item>
-
-
                 )
               })
             }

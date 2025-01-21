@@ -2,67 +2,66 @@
 import { useContext, useEffect, useState } from "react";
 
 //#region FontAwsome
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEnvelope,
-  faLocationDot,
-  faPhone,
-} from "@fortawesome/free-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faEnvelope,
+//   faLocationDot,
+//   faPhone,
+// } from "@fortawesome/free-solid-svg-icons";
 //#endregion
 
 //#region Bootstrap
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
-import Placeholder from "react-bootstrap/Placeholder";
-import Row from "react-bootstrap/Row";
-import Table from "react-bootstrap/Table";
-import Form from "react-bootstrap/Form";
+// import Modal from "react-bootstrap/Modal";
+// import Button from "react-bootstrap/Button";
+// import Card from "react-bootstrap/Card";
+// import Col from "react-bootstrap/Col";
+// import Placeholder from "react-bootstrap/Placeholder";
+// import Row from "react-bootstrap/Row";
+// import Table from "react-bootstrap/Table";
+// import Form from "react-bootstrap/Form";
 
 //#endregion
 
 //#region Components
-import TitreOfPage from "../../components/commun/TitreOfPage";
 import {
   GetClientSiteContrat,
-  GetListeMails,
-  GetListeTels,
+  // GetListeMails,
+  // GetListeTels,
 } from "../../axios/WSGandara";
-import { ClientSiteContratContext, TitreContext, TokenContext } from "../../App";
-import {
-  IconeAppareil,
-  IconeContrat,
-  IconeDepannage,
-  IconeDevis,
-  IconeFacture,
-} from "../../components/commun/Icones";
-import { ParseKVAsArray } from "../../functions";
+import { ClientSiteContratContext, TokenContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import TableData, {
   CreateFilter,
   CreateNewCell,
   CreateNewHeader,
 } from "../../components/commun/TableData";
+// import {
+//   IconeAppareil,
+//   IconeContrat,
+//   IconeDepannage,
+//   IconeDevis,
+//   IconeFacture,
+// } from "../../components/commun/Icones";
+// import { ParseKVAsArray } from "../../functions";
 
 //#endregion
 
 //#endregion
 
-const ClientSitePage = () => {
-  
+const ClientSitePage = ({ setPageSubtitle, setPageTitle }) => {
+
   const navigate = useNavigate();
 
   const tokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
-  const PageCt = useContext(TitreContext);
 
   //#region States
 
   const [listeClientSite, setListeClientSite] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  //eslint-disable-next-line
   const [search, setSearch] = useState("");
 
   //#endregion
@@ -104,23 +103,23 @@ const ClientSitePage = () => {
     return _data;
   }
 
-  const reactStringReplace = require("react-string-replace");
-  function HighlightTextIfSearch(text) {
-    if (
-      String(search).length > 0 &&
-      String(text).toUpperCase().includes(String(search).toUpperCase())
-    ) {
-      return (
-        <span>
-          {reactStringReplace(String(text), String(search), (match, i) => (
-            <mark key={i}>{match}</mark>
-          ))}
-        </span>
-      );
-    } else {
-      return text;
-    }
-  }
+  // const reactStringReplace = require("react-string-replace");
+  // function HighlightTextIfSearch(text) {
+  //   if (
+  //     String(search).length > 0 &&
+  //     String(text).toUpperCase().includes(String(search).toUpperCase())
+  //   ) {
+  //     return (
+  //       <span>
+  //         {reactStringReplace(String(text), String(search), (match, i) => (
+  //           <mark key={i}>{match}</mark>
+  //         ))}
+  //       </span>
+  //     );
+  //   } else {
+  //     return text;
+  //   }
+  // }
 
   function GetClientSites() {
     setIsLoaded(false);
@@ -131,7 +130,7 @@ const ClientSitePage = () => {
         ClientSiteCt.setClientSite(data);
         navigate("/");
       }
-      PageCt.setPageSubtitle(`${data.length > 1 ? data.length : 1} sites `);
+      setPageSubtitle(`${data.length > 1 ? data.length : 1}`);
       setIsLoaded(true);
 
     };
@@ -143,9 +142,9 @@ const ClientSitePage = () => {
 
   //#region Evenements
 
-  const HandleSearchOnChange = (e) => {
-    setSearch(e.target.value);
-  };
+  // const HandleSearchOnChange = (e) => {
+  //   setSearch(e.target.value);
+  // };
 
   //#endregion
 
@@ -204,7 +203,7 @@ const ClientSitePage = () => {
     );
   };
 
-//#endregion
+  //#endregion
 
   // const CardClientSite = ({ clientSite, actual }) => {
   //   let _isContact = false;
@@ -574,7 +573,7 @@ const ClientSitePage = () => {
   useEffect(() => {
     document.title = "Liste des sites";
 
-    PageCt.setPageTitle("Liste des sites");
+    setPageTitle("Liste des sites");
 
     if (!isLoaded) {
       GetClientSites();

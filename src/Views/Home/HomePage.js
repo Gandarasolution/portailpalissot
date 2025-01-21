@@ -1,6 +1,5 @@
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
-// import Image from "react-bootstrap/Image";
 import Nav from "react-bootstrap/Nav";
 import NavLink from "react-bootstrap/NavLink";
 
@@ -18,25 +17,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
 //#region Components
-// import TitreOfPage from "../../components/commun/TitreOfPage";
 
 //#endregion
 
-import React, { useContext, useEffect } from "react";
-import { TitreContext } from "../../App";
-// import { useContext } from "react";
-// import { ClientSiteContratContext } from "../../App";
+import React, { useEffect } from "react";
+
 //#endregion
 
-const HomePage = () => {
-  const PageCt = useContext(TitreContext);
-  
-  
-  useEffect(()=>{
+const HomePage = ({ setPageSubtitle, setPageTitle }) => {
+
+
+  useEffect(() => {
     document.title = `Portail client`;
-    PageCt.setPageTitle(`Portail client`);
-    PageCt.setPageSubtitle(null);
-  },[PageCt])
+    setPageTitle(`Portail client`);
+    setPageSubtitle(null);
+    // eslint-disable-next-line
+  }, [])
 
   const SpanLink = ({ title, to, img, kv, disable }) => {
 
@@ -44,7 +40,7 @@ const HomePage = () => {
       <Nav.Link href={to} disabled={disable ? true : false}>
         <div className="content  position-relative d-inline-block">
           <div>{title}</div>
-        
+
         </div>
       </Nav.Link>
     );
@@ -116,7 +112,7 @@ const HomePage = () => {
               />
             </Nav.Item>
             <Nav.Item>
-            <FontAwesomeIcon
+              <FontAwesomeIcon
                 icon={faFile}
               />
               <SpanLink
