@@ -24,7 +24,6 @@ import TableData, {
 } from "../../../components/commun/TableData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile } from "@fortawesome/free-solid-svg-icons";
-import TitreOfPage from "../../../components/commun/TitreOfPage";
 import { GetListeInterventions } from "../../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
 import { Row } from "react-bootstrap";
@@ -32,9 +31,10 @@ import { Row } from "react-bootstrap";
 
 //#endregion
 
-const InterventionPage = () => {
+const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
   const TokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
+
   //#region States
 
   const [isLoaded, setIsLoaded] = useState(false);
@@ -48,6 +48,8 @@ const InterventionPage = () => {
     setIsLoaded(false);
     const FetchSetData = (data) => {
       setListeInterventions(data);
+      setPageSubtitle(`${data.length} interventions`);
+
       setIsLoaded(true);
     };
 
@@ -181,6 +183,7 @@ const InterventionPage = () => {
 
   useEffect(() => {
     document.title = "Dépannage";
+    setPageTitle(`Dépannage`);
 
     GetData();
     // eslint-disable-next-line
@@ -237,11 +240,11 @@ const InterventionPage = () => {
   const EditorCardBody = (inter) => {
     return (
       <>
-      <h6>{`Secteur : ${inter.DescriptionSecteur}`}</h6>
-      <Button
+        <h6>{`Secteur : ${inter.DescriptionSecteur}`}</h6>
+        <Button
           className={`m-2 p-2 noBorder bg-success`}
           onClick={() => {
-            }
+          }
           }
         >
           <FontAwesomeIcon icon={faFile} /> Liste des documents
@@ -256,11 +259,11 @@ const InterventionPage = () => {
       <>
         <Row>
           <Col>
-           {EditorDateFromDateTime(inter.DateDemandeDossierInterventionSAV)}
+            {EditorDateFromDateTime(inter.DateDemandeDossierInterventionSAV)}
           </Col>
 
           <Col>
-          {EditorEtat(inter.LibEtat)}
+            {EditorEtat(inter.LibEtat)}
           </Col>
         </Row>
       </>
@@ -307,13 +310,6 @@ const InterventionPage = () => {
 
   return (
     <Container fluid className="table-depannage">
-      {/* <TitreOfPage
-        titre={"Interventions dépannage"}
-        soustitre={` ${listeInterventions.length} intervention${
-          listeInterventions.length > 1 ? "s" : ""
-        } `}
-        isLoaded={isLoaded}
-      /> */}
       <Container fluid>
         <TableInterventions />
       </Container>

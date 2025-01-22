@@ -56,8 +56,7 @@ const Connexion = async (login, pass, setToken) => {
     data: { login: login, pass_clear: pass },
     success(data) {
       // console.log(data)
-      if (data === 'Erreur de connexion')
-      {setToken(500)}
+      if (data === 'Erreur de connexion') { setToken(500) }
       else {
         setToken(data);
 
@@ -71,7 +70,7 @@ const Connexion = async (login, pass, setToken) => {
 };
 
 
-const CreateTokenMDP = async (mail,setData) => {
+const CreateTokenMDP = async (mail, setData) => {
   $.ajax({
     type: "POST",
     url: urlAction + "CreateTokenMDP",
@@ -91,7 +90,7 @@ const CreateTokenMDP = async (mail,setData) => {
   });
 }
 
-const ChangeMDP = async (token,newMdp,setData) => {
+const ChangeMDP = async (token, newMdp, setData) => {
   $.ajax({
     type: "POST",
     url: urlAction + "ChangeMDP",
@@ -113,7 +112,7 @@ const ChangeMDP = async (token,newMdp,setData) => {
 }
 
 
-const UpdateMDP = async (token,newMdp, setData) => {
+const UpdateMDP = async (token, newMdp, setData) => {
   $.ajax({
     type: "POST",
     url: urlAction + "_UpdateMdp",
@@ -256,7 +255,7 @@ const GetDocumentPrestation = async (
     success(data) {
       setDocuments(data, presta);
     },
-   
+
   });
 };
 
@@ -466,7 +465,7 @@ const VoirDocument = (b64, filename, targetWindow) => {
     url: `${urlAction}File64`,
     data: { b64: b64, filename: HTMLEncode(filename) },
     success(data) {
-       const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
+      const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
       if (targetWindow) {
         //Ouvre dans cette fenêtre
         targetWindow.location.href = urlToOpen;
@@ -693,25 +692,24 @@ const GetDocumentFISAV = async (
   let targetWindow = undefined;
 
   let _return = undefined;
-if (returnData) {
-  await $.ajax({
-    type: "POST",
-    url: urlAction + "GetDocumentFISAV",
-    data : {
-      token: token,
-      IdFicheInterventionSAV: IdFicheInterventionSAV,
-    },
-    success(data){
-      _return = JSON.parse(data);
-    },
-    error(error)
-    {
-    }
+  if (returnData) {
+    await $.ajax({
+      type: "POST",
+      url: urlAction + "GetDocumentFISAV",
+      data: {
+        token: token,
+        IdFicheInterventionSAV: IdFicheInterventionSAV,
+      },
+      success(data) {
+        _return = JSON.parse(data);
+      },
+      error(error) {
+      }
 
-  })
+    })
 
-  return _return;
-}
+    return _return;
+  }
 
   if (!returnData) {
     targetWindow = window.open("/waiting");
@@ -792,7 +790,7 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
   let targetWindow = undefined;
 
 
-  
+
 
 
 
@@ -801,16 +799,15 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
     await $.ajax({
       type: "POST",
       url: urlAction + "GetdocumentDevis",
-      data : { token: token, IdDevis: IdDevis },
-      success(data){
+      data: { token: token, IdDevis: IdDevis },
+      success(data) {
         _return = JSON.parse(data);
       },
-      error(error)
-      {
+      error(error) {
       }
-  
+
     })
-  
+
     return _return;
   }
 

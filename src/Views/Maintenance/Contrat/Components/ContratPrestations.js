@@ -36,7 +36,6 @@ import TableData, {
   EditorDateFromDateTime,
 } from "../../../../components/commun/TableData";
 import { GetNomMois } from "../../../../functions";
-import TitreOfPage from "../../../../components/commun/TitreOfPage";
 
 //#endregion
 
@@ -46,7 +45,6 @@ export const PrestaContext = createContext(null);
 
 const ContratPrestation = ({
   Prestations,
-  ParentComponentPeriodeSelect,
   IsLoaded,
 }) => {
   const [showModalDoc, setShowModalDoc] = useState(false);
@@ -243,9 +241,8 @@ const ContratPrestation = ({
       <>
         <h6>{`Secteur : ${presta.Secteur}`}</h6>
         <Button
-          className={`m-2 p-2 noBorder ${
-            presta.IdEtat === 96 ? "bg-success" : "bg-secondary"
-          } `}
+          className={`m-2 p-2 noBorder ${presta.IdEtat === 96 ? "bg-success" : "bg-secondary"
+            } `}
           onClick={() => {
             if (presta.IdEtat === 96) {
               setShowModalDoc(true);
@@ -299,12 +296,12 @@ const ContratPrestation = ({
           {presta.IdEtat === 96 ? (
             <FontAwesomeIcon
               icon={faFileAlt}
-              // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
+            // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
             />
           ) : (
             <FontAwesomeIcon
               icon={faBan}
-              // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
+            // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
             />
           )}
         </OverlayTrigger>
@@ -357,11 +354,6 @@ const ContratPrestation = ({
           Cells={_Cells}
           IsLoaded={IsLoaded}
           Pagination
-          TopPannelRightToSearch={
-            <Col md={"auto"} className="m-1">
-              {ParentComponentPeriodeSelect}
-            </Col>
-          }
           CardModel={_CardModel}
           ButtonFilters={_ButtonFilters}
         />
@@ -373,11 +365,6 @@ const ContratPrestation = ({
 
   return (
     <Container fluid className="table-maintenance">
-      {/* <TitreOfPage
-        titre={"Plannification"}
-        soustitre={`${Prestations.length} prestations`}
-        isLoaded={IsLoaded}
-      /> */}
       <TablePrestation />
     </Container>
   );

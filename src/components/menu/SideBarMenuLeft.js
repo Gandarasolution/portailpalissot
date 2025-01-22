@@ -1,5 +1,5 @@
 //#region Imports
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 //#region Contrast
@@ -25,8 +25,9 @@ import { faCookieBite } from "@fortawesome/free-solid-svg-icons";
 //#region Interne
 
 import logo from "../../image/imageHome/logo_blanc.png";
-import { ClientSiteContratContext } from "../../App";
 
+import { ClientSiteContratContext, TokenContext } from "../../App";
+import { GetListeParametres } from "../../axios/WSGandara";
 //#endregion
 
 //#endregion
@@ -34,14 +35,35 @@ import { ClientSiteContratContext } from "../../App";
 //#endregion
 
 const SideBarMenuLeft = () => {
-  //#region States
   const ClientSiteCt = useContext(ClientSiteContratContext);
+  const TokenCt = useContext(TokenContext);
+
+  //#region States
+  const [logoClient, setLogoClient] = useState(null);
   //#endregion
 
   //#region Fonctions
   const handleCookies = () => {
     alert("Gestion des cookies");
   };
+
+
+  const GetLogo = async () => {
+
+    const FetchSetParams = (data) => {
+      if (data && data.length > 0 && data.find((p) => p.k === "GMAO.Logo.b64").v) {
+        let _b64Logo = data.find((p) => p.k === "GMAO.Logo.b64").v;
+        setLogoClient(`data:image/jpeg;base64,${_b64Logo}`);
+      } else {
+        setLogoClient(logo);
+      }
+    }
+
+    await GetListeParametres(TokenCt, FetchSetParams);
+
+  }
+
+
   //#endregion
 
   //#region Evenements
@@ -55,21 +77,19 @@ const SideBarMenuLeft = () => {
   const MenuNavLink = ({ href, text, icon }) => {
 
 
-    if(href === "/maintenance")
-    {
-      if(ClientSiteCt.storedClientSite.IdContrat <= 0 )
-      {
+    if (href === "/maintenance") {
+      if (ClientSiteCt.storedClientSite.IdContrat <= 0) {
         return;
       }
 
     }
 
-    
+
     return (
       <NavLink to={href}>
         <CDBSidebarMenuItem icon={icon} iconSize="xl">
           {text}
-          
+
         </CDBSidebarMenuItem>
       </NavLink>
     );
@@ -94,7 +114,7 @@ const SideBarMenuLeft = () => {
             <Container>
               <img
                 alt=""
-                src={logo}
+                src={logoClient}
                 width="80"
                 height="80"
                 className="d-inline-block align-top img-logo"
@@ -105,8 +125,8 @@ const SideBarMenuLeft = () => {
 
         <CDBSidebarContent className="sidebar-content sidebar-gmao">
           <CDBSidebarMenu>
-          <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
-           <MenuNavLink href={"/maintenance"} icon={"calendar"} text={"Maintenance"} />
+            <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
+            <MenuNavLink href={"/maintenance"} icon={"calendar"} text={"Maintenance"} />
             <MenuNavLink
               href={"/interventions"}
               icon={"wrench"}
@@ -122,8 +142,8 @@ const SideBarMenuLeft = () => {
           </CDBSidebarMenu>
         </CDBSidebarContent>
 
-          {/* Bouton gestion des cookies */}
-          <div className="sidebar-footer">
+        {/* Bouton gestion des cookies */}
+        <div className="sidebar-footer">
           <Button
             variant=""
             className="cookies-btn"
@@ -135,6 +155,17 @@ const SideBarMenuLeft = () => {
       </CDBSidebar>
     );
   };
+
+
+
+  useEffect(() => {
+
+
+    GetLogo();
+
+    //eslint-disable-next-line
+  }, [])
+
 
   return (
     <div className="container-sidebar">

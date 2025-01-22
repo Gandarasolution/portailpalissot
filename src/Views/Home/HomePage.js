@@ -1,6 +1,5 @@
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
-// import Image from "react-bootstrap/Image";
 import Nav from "react-bootstrap/Nav";
 import NavLink from "react-bootstrap/NavLink";
 
@@ -18,63 +17,33 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
 //#region Components
-// import TitreOfPage from "../../components/commun/TitreOfPage";
 
 //#endregion
 
-import React from "react";
-// import { useContext } from "react";
-// import { ClientSiteContratContext } from "../../App";
+import React, { useEffect } from "react";
+
 //#endregion
 
-const HomePage = () => {
-  // const ClientSiteCt = useContext(ClientSiteContratContext);
+const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
-  // const ImgAppareil = require("../../image/imageHome/appareilImage.jpg");
-  // const ImgPresta = require("../../image/imageHome/PrestaContraImage.jpg");
-  // const ImgMaintenance = require("../../image/imageHome/MaintenanceImage.jpg");
-  // const ImgUrgence = require("../../image/imageHome/UrgenceImage.jpg");
-  // const ImgDevis = require("../../image/imageHome/DevisImage.jpg");
-  // const ImgFacture = require("../../image/imageHome/FacturationImage.jpg");
-  // const ImgAccount = require("../../image/imageHome/accountImage.jpg");
+
+  useEffect(() => {
+    document.title = `Portail client`;
+    setPageTitle(`Portail client`);
+    setPageSubtitle(null);
+    // eslint-disable-next-line
+  }, [])
 
   const SpanLink = ({ title, to, img, kv, disable }) => {
-    // let _text = "";
-    // let _wBadge = false;
-
-    // if (kv) {
-    //   switch (kv.k) {
-    //     case "interventions":
-    //       _text = `interventio${kv.v > 1 ? "ns" : "n"} en cours`;
-    //       _wBadge = kv.v > 0;
-    //       break;
-    //     case "devis":
-    //       _text = "devis en attente de décision";
-    //       _wBadge = kv.v > 0;
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // }
 
     return (
-      <Nav.Link href={to} disabled={disable ? true : false}>
+
+      <NavLink href={to} disabled={disable ? true : false}>
         <div className="content  position-relative d-inline-block">
           <div>{title}</div>
-          {/* <div>
-            <Image src={img} height={150} alt={`image-${to}`} />
-          </div> */}
-          {/* {kv && kv.v > 0 && (
-            <>
-              <div className="position-absolute top-0 start-100 translate-middle p-2 circle-danger"></div>
-              {_wBadge && (
-                <div className=" badge badge-bg-danger-nowrap ">{`${kv.v} ${_text}`}</div>
-              )}
-            </>
-          )} */}
-          {/* {disable} */}
+
         </div>
-      </Nav.Link>
+      </NavLink>
     );
   };
 
@@ -144,7 +113,7 @@ const HomePage = () => {
               />
             </Nav.Item>
             <Nav.Item>
-            <FontAwesomeIcon
+              <FontAwesomeIcon
                 icon={faFile}
               />
               <SpanLink

@@ -68,7 +68,7 @@ import {
 } from "../../axios/WSGandara";
 
 //#region Contexts
-import { TokenContext, ViewerContext } from "../../App";
+import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
 
 //#endregion
@@ -85,13 +85,16 @@ const TAGSELECTION = "_xSelection";
 //#endregion
 
 /**
- * @param {*} {Data : [], Headers: [], Cells: [], CardModel:{},  IsLoaded: bool,  Pagination: bool, ?ButtonFilters: [], ?FilterDefaultValue: {}, ?TopPannelRightToSearch: <></>, ?TopPannelLeftToSearch: <></>  ,?placeholdeNbLine; int,  }
+ * @param {*} {Data : [], Headers: [], Cells: [], CardModel:{},  IsLoaded: bool,  Pagination: bool, ?ButtonFilters: [], ?FilterDefaultValue: {}, ?TopPannelRightToSearch: <></>, ?TopPannelLeftToSearch: <></>  ,?placeholdeNbLine; int,   }
  * @returns Une table
  */
 const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
   const viewerCt = useContext(ViewerContext);
+
+  const ClientSiteCt = useContext(ClientSiteContratContext);
+
 
   const Data = () => {
     let _lData = [];
@@ -875,10 +878,11 @@ const TableData = ({ ...props }) => {
    * @returns Une ligne de la table
    */
   const TableBodyRow = ({ item, index }) => {
+    // console.log(item);
     return (
       <tr
         className={
-          index === rowIndexSelected || arraySelector.includes(index)
+          index === rowIndexSelected || arraySelector.includes(index) || (ClientSiteCt.storedClientSite && item.GUID && item.GUID === ClientSiteCt.storedClientSite.GUID)
             ? "table-presta-row-selected"
             : ""
         }
@@ -1313,7 +1317,7 @@ const TableData = ({ ...props }) => {
             onClick={HandleTelechargerSelection}
             className="btn-upload-file"
           >
-              <FontAwesomeIcon icon={faDownload} className="mr-2" />
+            <FontAwesomeIcon icon={faDownload} className="mr-2" />
             Télécharger {arraySelector.length} document
             {arraySelector.length > 1 && "s"}
           </Button>
@@ -1527,8 +1531,11 @@ const TableData = ({ ...props }) => {
       case "tagInterventionDocuments":
         HandleAfficherFacture(Data()[index]);
         break;
+      case "tagListeSite":
+        HandleChoixDuSite(Data()[index]);
+        break;
       default:
-        if (tagMethod.includes("selection_")) {
+        if (tagMethod && tagMethod.includes("selection_")) {
           let _arrSelector = JSON.parse(JSON.stringify(arraySelector));
 
           if (_arrSelector.includes(index)) {
@@ -1545,6 +1552,21 @@ const TableData = ({ ...props }) => {
     }
   };
 
+
+  //#region Liste des sites
+
+  const HandleChoixDuSite = (siteAChoisir) => {
+    //Pas de changement si même site
+    let _actualClientSite = ClientSiteCt.storedClientSite;
+    if (!(_actualClientSite) || (_actualClientSite.GUID !== siteAChoisir.GUID)  ) {
+      ClientSiteCt.setClientSite(siteAChoisir);
+    }
+  }
+
+
+  //#endregion
+
+
   //#region Prestation contrat
 
   const PrestaCtx = useContext(PrestaContext);
@@ -1553,10 +1575,13 @@ const TableData = ({ ...props }) => {
   const [showModalListeTaches, setShowModalListeTaches] = useState(false);
   const [isLoadingTaches, setIsLoadingTaches] = useState(false);
   const [listeTaches, setListeTaches] = useState([]);
+  const [prestaName, setPrestaName] = useState("");
 
   const HandleShowModalListeTaches = async (presta) => {
     //Récupère les données
     if (isLoadingTaches) return;
+    // console.log(presta);
+    setPrestaName(presta.DescriptionPrestationContrat);
     setIsLoadingTaches(true);
     setShowModalListeTaches(true);
 
@@ -1667,7 +1692,9 @@ const TableData = ({ ...props }) => {
         <Modal.Header>
           <Modal.Title>
             <FontAwesomeIcon icon={faTasks} />
-            Liste des relevés de tâches </Modal.Title>
+            Liste des relevés de tâches 
+            <div className="modal-title h6" > {prestaName} </div>
+            </Modal.Title>
           <Button
             className="close-modal"
             onClick={() => setShowModalListeTaches(false)}
@@ -1675,6 +1702,7 @@ const TableData = ({ ...props }) => {
           </Button>
         </Modal.Header>
         <Modal.Body>
+        
           <CardListeTachesBodyL />
         </Modal.Body>
       </Modal>
@@ -2502,7 +2530,14 @@ const EditorSelection = (e) => {
 //#endregion
 
 //#region Helpers
-
+/**
+ * 
+ * @param {string} fieldname 
+ * @param {boolean} filter 
+ * @param {string} caption 
+ * @param {Function} editor 
+ * @returns 
+ */
 export const CreateNewHeader = (fieldname, filter, caption, editor) => {
   let _header = {
     fieldname: fieldname,
@@ -2529,6 +2564,16 @@ export const CreateFilter = (
   };
 };
 
+/**
+ * 
+ * @param {string} fieldname 
+ * @param {boolean} isH1 
+ * @param {boolean} isSearchable 
+ * @param {boolean} isSelectable 
+ * @param {Function} editor 
+ * @param {string} tagMethod 
+ * @returns 
+ */
 export const CreateNewCell = (
   fieldname,
   isH1,

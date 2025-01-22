@@ -7,8 +7,6 @@ import Container from "react-bootstrap/Container";
 //#endregion
 
 //#region Components
-import TopBarMenu from "../../components/menu/TopBarMenu";
-import TitreOfPage from "../../components/commun/TitreOfPage";
 import TableData, {
   CreateFilter,
   CreateNewButtonFilter,
@@ -30,7 +28,7 @@ import { saveAs } from "file-saver";
 
 //#endregion
 
-const DevisPage = () => {
+const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
   const tokenCt = useContext(TokenContext);
   const clientSiteCt = useContext(ClientSiteContratContext);
   const viewerCt = useContext(ViewerContext);
@@ -43,11 +41,13 @@ const DevisPage = () => {
 
   //#region Fonctions
 
+  //#region Data
   const GetDevis = () => {
     setIsLoaded(false);
 
     const FetchSetDevis = (data) => {
       setListeDevis(data);
+      setPageSubtitle(`${data.length}`);
       setIsLoaded(true);
     };
 
@@ -64,6 +64,11 @@ const DevisPage = () => {
     }
     return _lDevis;
   };
+
+  //#endregion
+
+
+  //#region Table
 
   function CreateHeaderForTable() {
     let _headers = [];
@@ -212,7 +217,14 @@ const DevisPage = () => {
 
   //#endregion
 
+
+
+  //#endregion
+
   //#region Composant
+
+  //#region Table
+
 
   //#region Editors
 
@@ -241,9 +253,7 @@ const DevisPage = () => {
     return "En attente";
   };
 
-  //#endregion
   const EditorCardBody = (devis) => {
-    // console.log(devis)
     return (
       <>
         <h6>{`Secteur : ${devis.DescriptionSecteur}`}</h6>
@@ -300,6 +310,7 @@ const DevisPage = () => {
     return `${devis.IdDevis} - ${devis.DescriptionDevis}`;
   };
 
+  //#endregion
 
 
   const TableDevis = () => {
@@ -332,8 +343,11 @@ const DevisPage = () => {
 
   //#endregion
 
+  //#endregion
+
   useEffect(() => {
     document.title = "Devis";
+    setPageTitle("Liste des devis");
     GetDevis();
     // eslint-disable-next-line
   }, [clientSiteCt.storedClientSite]);
@@ -341,11 +355,6 @@ const DevisPage = () => {
   return (
     <>
       <Container fluid className="table-devis">
-        {/*<TitreOfPage
-          titre={"Liste des devis"}
-          soustitre={` ${listeDevis.length} devis`}
-          isLoaded={isLoaded}
-        />*/}
         <TableDevis />
       </Container>
     </>

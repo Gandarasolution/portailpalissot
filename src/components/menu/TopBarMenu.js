@@ -12,11 +12,13 @@ import NavItem from "react-bootstrap/NavItem";
 import Popover from "react-bootstrap/Popover";
 // import Row from "react-bootstrap/Row";
 
-//#enregion
+//#endregion
 
 //#region Fontawsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faArrowLeft,
+  faArrowRight,
   faBook,
   faCircleUser,
   faCookieBite,
@@ -30,24 +32,159 @@ import { faCalendar, faFile } from "@fortawesome/free-regular-svg-icons";
 //#endregion
 
 //#region Components
-import { ClientSiteContratContext } from "../../App";
+import { ClientSiteContratContext, TokenContext } from "../../App";
 import logo from "../../image/favicon.ico";
 
 //#endregion
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GetClientSiteContrat, GetContratPrestationPeriodes } from "../../axios/WSGandara";
+import { Dropdown, DropdownButton } from "react-bootstrap";
+import { GetDateFromStringDDMMYYY, GetNomMois } from "../../functions";
 
 //#endregion
 
-const TopBarMenu = ({ accountName, handleDeconnexion }) => {
+const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes }) => {
+
+  //#region Contexts
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
+  // const PageCt = useContext(TitreContext);
+  const TokenCt = useContext(TokenContext);
+
+  //#endregion
+
+  //#region States
+  const [showMenu, setShowMenu] = useState(false);
+  const [listePeriodes, setListePeriodes] = useState([]);
+  const [showDropdownPeriode, setShowDropdownPeriode] = useState(false);
+
+
+  //#endregion
+
   const navigate = useNavigate();
 
+  //Le titre et le soustitre de la page
   const { titre, soustitre } = getTitleAndSubtitle();
 
-  const [showMenu, setShowMenu] = useState(false);
-  const handleCloseMenu = () => setShowMenu(false);
+  //Le site selectionné et la liste des sites selectionnables
+  const { siteActuel, listeSites } = getListSites();
 
+  //#region Fonctions
+  function getListSites() {
+
+    let _retourSiteActuel = ClientSiteContratCtx.storedClientSite &&
+      ClientSiteContratCtx.storedClientSite.NomCompletClientSite
+
+
+    let _listeSites = ClientSiteContratCtx.listeSites;
+    if (_listeSites.length <= 0) {
+
+      const FetchSetClientSite = (data) => {
+        ClientSiteContratCtx.setListeSites(data);
+        _listeSites = data;
+      }
+
+      GetClientSiteContrat(TokenCt, FetchSetClientSite);
+    }
+    return { siteActuel: _retourSiteActuel, listeSites: _listeSites };
+  }
+
+  function getTitleAndSubtitle() {
+
+
+
+    //Le titre et le sous titre sont donnés en paramètres du composant (states dans App.js parent)
+    return { titre: pageTitle, soustitre: pageSubtitleLoaded ? "x" : pageSubtitle };
+    // const pathname = window.location.pathname;
+
+    //   switch (pathname) {
+    //     case "/devis":
+    //       return { titre: "Liste des devis", soustitre: `X` };
+
+    //     case "/factures":
+    //       return { titre: "Liste des factures", soustitre: `X` };
+
+    //     case "/appareils":
+    //       return { titre: "Liste des appareils", soustitre: `X` };
+
+    //     case "/interventions":
+    //       return { titre: "Liste des dépannages", soustitre: `X` };
+
+    //     case "/maintenance":
+    //       return { titre: "Liste des plannifications", soustitre: `X` };
+
+    //     case "/account":
+    //       return { titre: "Mon compte"};
+
+    //     case "/": // Page d'accueil
+    //       return { titre: "Tableau de bord" };
+
+
+    //       case "/sites": // Page d'accueil
+    //       return { titre: "Choix du site" };
+
+    //     default: // Page par défaut
+    //       return { titre: "Titre page" };
+    //   }
+  }
+
+
+
+
+  const GetPeriodes = async () => {
+    const FetchSetDataPeriode = (data) => {
+      if (data.length > 1) {
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+          element.k = `01-01-${element.k}`;
+          element.v = `31-12-${element.v}`;
+        }
+      } else {
+        let _lData = [];
+        data.k = `01-01-${data.k}`;
+        data.v = `31-12-${data.v}`;
+        _lData[0] = data;
+        data = _lData;
+
+      }
+
+      setListePeriodes(data);
+      const PeriodeInitial = GetDatePeriodeInitial();
+      const _indexPeriode = data.findIndex((p) => {
+        return (
+          GetDateFromStringDDMMYYY(p.k).getTime() <= PeriodeInitial.getTime() &&
+          GetDateFromStringDDMMYYY(p.v).getTime() >= PeriodeInitial.getTime()
+        );
+      });
+      statePeriodes.setPeriodeEnCours(data[_indexPeriode]);
+      statePeriodes.setIsSetPeriode(true);
+    };
+
+
+
+    await GetContratPrestationPeriodes(
+      TokenCt,
+      ClientSiteContratCtx.storedClientSite.GUID,
+      FetchSetDataPeriode
+    );
+  };
+
+  function GetDatePeriodeInitial() {
+    let _day = 1;
+    // let _monthI = _dateContrat.getMonth();
+    let _monthI = 0;
+    let _year = new Date().getFullYear();
+    let _DateRetour = new Date(_year, _monthI, _day);
+    return _DateRetour;
+  }
+
+
+
+
+  //#endregion
+
+
+  //#region Components
   const MenuNavLink = ({ href, text, icon, onClick }) => {
     return (
       <NavItem className="m-4" onClick={onClick}>
@@ -99,7 +236,6 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
           <MenuNavLink href={"/account"} icon={faUser} text={"Mon compte"} />
           <MenuNavLink icon={faRightFromBracket} text={"Se déconnecter"} onClick={handleDeconnexion} />
           <MenuNavLink href={"/"} icon={faCookieBite} text={"Cookies"} />
-
           {/* 
           <Row>
           <Button variant="" className="border mb-2" onClick={handleAccount}>
@@ -131,31 +267,27 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
     );
   };
 
-  // const handleAccount = () => {
-  //   navigate("/account");
-  // };
-  // const handleCookies = () => {
-  // };
+
   const PopoverAccount = (
     <Popover aria-label="Menu déconnexion" className="popover-menu">
       {/* <Popover.Header>{accountName}
       </Popover.Header> */}
       {/* <Popover.Body> */}
-        {/* <Row>
+      {/* <Row>
           <Button variant="" className="border mb-2" onClick={handleAccount}>
             <FontAwesomeIcon icon={faUser} /> Mon compte
           </Button>
         </Row> */}
-        {/* <Row> */}
-          <Button
-            variant=""
-            className="popover-btn"
-            onClick={handleDeconnexion}
-          >
-            <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
-          </Button>
-        {/* </Row> */}
-        {/* <Row>
+      {/* <Row> */}
+      <Button
+        variant=""
+        className="popover-btn"
+        onClick={handleDeconnexion}
+      >
+        <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
+      </Button>
+      {/* </Row> */}
+      {/* <Row>
           <Button variant="" className="border mb-2" onClick={handleCookies}>
             <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
           </Button>
@@ -164,9 +296,150 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
     </Popover>
   );
 
+
+  const GetDropdownTitle = () => {
+    return <span className="me-1">
+      <i className="fas fa-building"></i>
+    </span>
+      ;
+  }
+
+
+
+  const DropdownPeriode = () => {
+    let _arrayPeriodes = [];
+
+    for (let index = 0; index < listePeriodes.length; index++) {
+      const element = listePeriodes[index];
+      let _dateStart = GetDateFromStringDDMMYYY(element.k);
+      let _dateEnd = GetDateFromStringDDMMYYY(element.v);
+
+      _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
+    }
+    return (
+
+      <>
+        <Button variant="" className="button-periode" onClick={() => SoustraireUnAnPeriode()} >
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </Button>
+
+        <DropdownButton variant="" className="button-periode" drop="down-centered" align="end" id="dropdown-datePeriode"
+          onSelect={(e) => {
+            HandleDropdownPeriodeSelect(e);
+          }}
+
+
+          title={`Contrat de maintenance de : ${GetNomMois(1, false)} ${GetDateFromStringDDMMYYY(
+            statePeriodes.periodeEnCours.k
+          ).getFullYear()} à ${GetNomMois(12, false)} ${GetDateFromStringDDMMYYY(
+            statePeriodes.periodeEnCours.v
+          ).getFullYear()}`}>
+
+
+          {_arrayPeriodes.map((periode, index) => {
+            return (
+              <Dropdown.Item key={index} eventKey={index}>
+                {` ${GetNomMois(
+                  periode.dateStart.getMonth() + 1
+                )} ${periode.dateStart.getFullYear()} à ${GetNomMois(
+                  periode.dateEnd.getMonth() + 1
+                )} ${periode.dateEnd.getFullYear()}`}
+              </Dropdown.Item>
+            );
+          })}
+        </DropdownButton>
+
+
+
+
+
+        <Button variant="" className="button-periode" onClick={() => AjouterUnAnPeriode()} >
+          <FontAwesomeIcon icon={faArrowRight} />
+        </Button>
+      </>
+    );
+
+  }
+
+  //#endregion
+
+
+  //#region Events
+  const handleCloseMenu = () => setShowMenu(false);
+
+
   const handleChangerClientsite = () => {
     navigate("/sites");
   }
+
+
+  const AjouterUnAnPeriode = async () => {
+    const _periodeEnCours = JSON.parse(JSON.stringify(statePeriodes.periodeEnCours));
+    const _indexPeriode = listePeriodes.findIndex(
+      (f) =>
+        GetDateFromStringDDMMYYY(f.k).getTime() ===
+        GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
+        GetDateFromStringDDMMYYY(f.v).getTime() ===
+        GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
+    );
+
+    if (_indexPeriode < listePeriodes.length - 1) {
+      statePeriodes.setPeriodeEnCours(listePeriodes[_indexPeriode + 1]);
+    }
+  };
+
+
+  const HandleDropdownPeriodeSelect = async (index) => {
+    const _periode = listePeriodes[index];
+    statePeriodes.setPeriodeEnCours(_periode);
+  };
+
+
+
+  const SoustraireUnAnPeriode = async () => {
+    const _periodeEnCours = JSON.parse(JSON.stringify(statePeriodes.periodeEnCours));
+    const _indexPeriode = listePeriodes.findIndex(
+      (f) =>
+        GetDateFromStringDDMMYYY(f.k).getTime() ===
+        GetDateFromStringDDMMYYY(_periodeEnCours.k).getTime() &&
+        GetDateFromStringDDMMYYY(f.v).getTime() ===
+        GetDateFromStringDDMMYYY(_periodeEnCours.v).getTime()
+    );
+
+    if (_indexPeriode > 0) {
+      statePeriodes.setPeriodeEnCours(listePeriodes[_indexPeriode - 1]);
+    }
+  };
+
+
+
+  //#endregion
+
+
+
+
+  useEffect(() => {
+    const pathname = window.location.pathname;
+    statePeriodes.setIsSetPeriode(false);
+
+    let _isdropdownShown = false;
+    if (pathname === "/maintenance") {
+      _isdropdownShown = true;
+    }
+    setShowDropdownPeriode(_isdropdownShown)
+
+    // eslint-disable-next-line
+  }, [titre])
+
+
+
+
+  useEffect(() => {
+    if (showDropdownPeriode) {
+      GetPeriodes();
+    }
+    // eslint-disable-next-line
+  }, [showDropdownPeriode])
 
   return (
     <Navbar expand="lg" className="top-bar-menu">
@@ -187,11 +460,43 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
           )}
         </Navbar.Text>
 
+        <Navbar.Text className="d-flex align-item" >
+          {
+            showDropdownPeriode &&
+            <DropdownPeriode />
+          }
+        </Navbar.Text>
+
         <Navbar.Text className="d-flex align-items-center">
           <div className="title-site">
-            {ClientSiteContratCtx.storedClientSite &&
-              ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
+            {siteActuel}
           </div>
+
+          {
+            ClientSiteContratCtx.storedClientSite &&
+
+            (
+              <DropdownButton title={GetDropdownTitle()}
+                variant=""
+                className="ms-2 me-3 switch-site"
+              >
+                {
+                  listeSites.map((site) => {
+                    return (
+                      site.GUID !== ClientSiteContratCtx.storedClientSite.GUID &&
+                      <Dropdown.Item key={site.GUID}
+                        onClick={e => ClientSiteContratCtx.setClientSite(site)}
+                      >
+                        {site.NomCompletClientSite}
+                      </Dropdown.Item>
+                    )
+                  })
+                }
+
+              </DropdownButton>
+            )
+          }
+
           <Button
             variant=""
             className="ms-2 me-3 switch-site"
@@ -211,6 +516,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
             <Button variant="" className="icone-site">
               <FontAwesomeIcon icon={faCircleUser} />
             </Button>
+
           </OverlayTrigger>
         </Navbar.Text>
       </Container>
@@ -218,34 +524,4 @@ const TopBarMenu = ({ accountName, handleDeconnexion }) => {
   );
 };
 
-
-function getTitleAndSubtitle(data) {
-  const pathname = window.location.pathname;
-
-  switch (pathname) {
-    case "/devis":
-      return { titre: "Liste des devis", soustitre: `X` };
-
-    case "/factures":
-      return { titre: "Liste des factures", soustitre: `X` };
-
-    case "/appareils":
-      return { titre: "Liste des appareils", soustitre: `X` };
-
-    case "/interventions":
-      return { titre: "Liste des dépannages", soustitre: `X` };
-
-    case "/maintenance":
-      return { titre: "Liste des plannifications", soustitre: `X` };
-
-    case "/account":
-      return { titre: "Mon compte"};
-
-    case "/": // Page d'accueil
-      return { titre: "Tableau de bord" };
-
-    default: // Page par défaut
-      return { titre: "Titre page" };
-  }
-}
 export default TopBarMenu;

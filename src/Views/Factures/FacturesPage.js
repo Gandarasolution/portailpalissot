@@ -10,17 +10,20 @@ import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
 //#endregion
 
-//#region Components
+//#Region Components
+
 import {
   GetListeFactures,
   VoirFactureDocument,
 } from "../../axios/WSGandara";
+
 import { DateSOAP, base64toBlob } from "../../functions";
 import {
   ClientSiteContratContext,
   TokenContext,
   ViewerContext,
 } from "../../App";
+
 import TableData, {
   CreateFilter,
   CreateNewButtonFilter,
@@ -34,14 +37,14 @@ import TableData, {
   EditorDateFromDateTime,
   EditorMontant,
 } from "../../components/commun/TableData";
-import TitreOfPage from "../../components/commun/TitreOfPage";
+
 //#endregion
 
 //#endregion
 
 export const FactureContext = createContext(null);
 
-const FacturesPage = () => {
+const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
   const tokenCt = useContext(TokenContext);
   const clientSiteCt = useContext(ClientSiteContratContext);
   const viewerCt = useContext(ViewerContext);
@@ -359,7 +362,10 @@ const FacturesPage = () => {
     setIsFactureLoaded(false);
     const FetchSetData = (data) => {
       setListeFactures(data);
+
       setIsFactureLoaded(true);
+      let _trimmed = data.filter((fa) => fa.Type && fa.Type !== "Chantier");
+      setPageSubtitle(` ${_trimmed.length}`);
     };
     await GetListeFactures(
       tokenCt,
@@ -368,21 +374,20 @@ const FacturesPage = () => {
       DateSOAP(new Date()),
       FetchSetData
     );
+
+
   };
 
   useEffect(() => {
     document.title = "Factures";
+    setPageTitle("Factures");
+
     GetFactures();
     //eslint-disable-next-line
   }, [clientSiteCt.storedClientSite.GUID]);
 
   return (
     <Container fluid className="table-facture">
-      {/* <TitreOfPage
-        titre={"Factures"}
-        soustitre={` ${GetListeFactureTrimed().length} factures`}
-        isLoaded={isFacturesLoaded}
-      /> */}
       <TableFactures />
     </Container>
   );
