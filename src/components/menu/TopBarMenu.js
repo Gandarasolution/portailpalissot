@@ -150,12 +150,15 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
 
       setListePeriodes(data);
       const PeriodeInitial = GetDatePeriodeInitial();
-      const _indexPeriode = data.findIndex((p) => {
+      let _indexPeriode = data.findIndex((p) => {
         return (
           GetDateFromStringDDMMYYY(p.k).getTime() <= PeriodeInitial.getTime() &&
           GetDateFromStringDDMMYYY(p.v).getTime() >= PeriodeInitial.getTime()
         );
       });
+      if (_indexPeriode <= -1) {
+        _indexPeriode = data.length - 1;
+      }
       statePeriodes.setPeriodeEnCours(data[_indexPeriode]);
       statePeriodes.setIsSetPeriode(true);
     };
@@ -420,6 +423,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
 
   useEffect(() => {
     const pathname = window.location.pathname;
+
     statePeriodes.setIsSetPeriode(false);
 
     let _isdropdownShown = false;
