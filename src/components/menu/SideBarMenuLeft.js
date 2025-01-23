@@ -78,7 +78,7 @@ const SideBarMenuLeft = () => {
 
 
     if (href === "/maintenance") {
-      if (ClientSiteCt.storedClientSite.IdContrat <= 0) {
+      if (ClientSiteCt.storedClientSite && ClientSiteCt.storedClientSite.IdContrat <= 0) {
         return;
       }
 

@@ -1337,6 +1337,7 @@ const TableData = ({ ...props }) => {
         {props.TopPannelLeftToSearch && props.TopPannelLeftToSearch}
         <Col className="m-1 search-bar">
           <Form.Control
+            id="search-bar-table-data"
             type="search"
             placeholder="Rechercher dans la liste..."
             aria-label="Search"
