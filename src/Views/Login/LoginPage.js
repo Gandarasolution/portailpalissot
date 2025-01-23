@@ -18,7 +18,7 @@ import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region Components
-import { Connexion, CreateTokenMDP, GetListeParametres } from "../../axios/WSGandara";
+import { Connexion, CreateTokenMDP, GetListeParametres, GetURLWs } from "../../axios/WSGandara";
 
 //#endregion
 
@@ -34,6 +34,7 @@ const LoginPage = (props) => {
 
   const [password, setPassword] = useState("");
   const [login, setLogin] = useState("");
+  const [codeEntreprise, setCodeEntreprise] = useState("");
 
   const [showModal, setShowModal] = useState(false);
   const [mailRecup, setMailRecup] = useState("");
@@ -45,7 +46,8 @@ const LoginPage = (props) => {
   const [recupAlertText, setRecupAlertText] = useState("");
   const [recupAlertVariant, setRecupAlertVariant] = useState("danger");
 
-  const inputRef = useRef(null);
+  const inputRefPassword = useRef(null);
+  const inputRefLogin = useRef(null);
 
   //#endregion
 
@@ -60,9 +62,15 @@ const LoginPage = (props) => {
     setRevealed(_revealed);
   };
 
+  const handleCodeEntrepriseKeyPress = (event) => {
+    if (event.key === "Enter") {
+      inputRefLogin.current.focus();
+    }
+  };
+
   const handleLoginKeyPress = (event) => {
     if (event.key === "Enter") {
-      inputRef.current.focus();
+      inputRefPassword.current.focus();
     }
   };
 
@@ -75,10 +83,31 @@ const LoginPage = (props) => {
   const handleSubmit = async () => {
     setIsLoading(true);
 
+    let _wsForToken = "";
+    const GetResponseURLWS = (data) => {
+      if (isNaN(data)) {
+        _wsForToken = data;
+      }
+
+    }
+
+    await GetURLWs(codeEntreprise, GetResponseURLWS);
+
+    //Vérification WS
+    if (_wsForToken.length <= 0) {
+      setIdError(500);
+      return;
+    }
+
+
     //2 -> Callback de Connexion :
     const getToken = async (response) => {
       //?2.5 -> On va récupérer la liste des parametres de l'application
       if (isNaN(response)) {
+
+        props.setUrlWs(_wsForToken);
+
+
         //4 -> CallBack de GetListeParamètres : on enregistre les infos retournées
         const FetchSetListeParams = async (data) => {
           props.setParams(data);
@@ -97,8 +126,9 @@ const LoginPage = (props) => {
       setIsLoading(false);
     };
 
+
     //1 -> On envoie les infos pour demander un token
-    await Connexion(login, password, getToken);
+    await Connexion(login, password, _wsForToken, getToken);
   };
 
   //#endregion
@@ -278,10 +308,26 @@ const LoginPage = (props) => {
   const FormSubmit = () => {
     return (
       <Form className="m-4 p-2">
+        <Form.Group className="mb-4" controlId="formCodeEntreprise">
+
+
+
+          <Form.Label>Code entreprise</Form.Label>
+          <Form.Control
+            type="number"
+            required
+            placeholder="000-000"
+            value={codeEntreprise}
+            onChange={(e) => setCodeEntreprise(e.target.value)}
+            onKeyUp={handleCodeEntrepriseKeyPress}
+          />
+        </Form.Group>
         <Form.Group className="mb-4" controlId="formLogin">
+
           <Form.Label>Email</Form.Label>
 
           <Form.Control
+            ref={inputRefLogin}
             type="email"
             required
             placeholder="@"
@@ -295,7 +341,7 @@ const LoginPage = (props) => {
           <Form.Label>Mot de passe</Form.Label>
           <InputGroup>
             <Form.Control
-              ref={inputRef}
+              ref={inputRefPassword}
               type={revealed ? "text" : "password"}
               required
               placeholder="****"

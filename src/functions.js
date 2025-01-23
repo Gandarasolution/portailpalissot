@@ -58,9 +58,9 @@ function FiltrerUnSeuilDate(fieldname, _lData, arrayFilters) {
         _arColonne.filter((filter) => {
           return (
             ParseDateFormat(data[fieldname]).getTime() <=
-              new Date(filter.max).getTime() &&
+            new Date(filter.max).getTime() &&
             ParseDateFormat(data[fieldname]).getTime() >=
-              new Date(filter.min).getTime()
+            new Date(filter.min).getTime()
           );
         }).length > 0
       );
@@ -257,12 +257,12 @@ function DateSOAP(date) {
 }
 
 
-function GetDateFromStringDDMMYYY(dateStr){
-  const Day = dateStr.substring(0,2);
-      const Month = dateStr.substring(3,5);
-      const Year = dateStr.substring(6,10);
+function GetDateFromStringDDMMYYY(dateStr) {
+  const Day = dateStr.substring(0, 2);
+  const Month = dateStr.substring(3, 5);
+  const Year = dateStr.substring(6, 10);
   return new Date(Year, Number(Month) - 1, Day);
- 
+
 }
 
 
@@ -327,19 +327,35 @@ const GetURLLocationViewerFromExtension = (extension) => {
   switch (extension.toUpperCase()) {
     case "PDF":
       return "/viewerPDF";
-      case "DOCX":
-        case "DOC":
-          return "/viewerDOC";
-          case "PNG":
-            case "JPG":
-              return"/viewerIMG";
+    case "DOCX":
+    case "DOC":
+      return "/viewerDOC";
+    case "PNG":
+    case "JPG":
+      return "/viewerIMG";
     default:
       return "/";
-    
-    }
-  
+
   }
-  
+
+}
+
+//Fonction de hash : https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
+const cyrb53 = (str, seed = 0) => {
+  let h1 = 0xdeadbeef ^ seed,
+    h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+};
 
 export {
   FiltrerParSeuilDate,
@@ -360,4 +376,5 @@ export {
   GetDateFromStringDDMMYYY,
   base64toBlob,
   GetURLLocationViewerFromExtension,
+  cyrb53,
 };

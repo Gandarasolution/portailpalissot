@@ -1,6 +1,6 @@
 //#region Imports
 import $ from "jquery";
-import { HTMLEncode } from "../functions";
+import { cyrb53, HTMLEncode } from "../functions";
 
 //#endregion
 
@@ -8,13 +8,38 @@ import { HTMLEncode } from "../functions";
 // const urlAction = "https://phpgao.000webhostapp.com/?endpoint=GMAO";
 // const urlAction = `http://localhost:8000/WSGandara.php?endpoint=GMAO`;
 // const urlAction = `https://dev.extranet.gandarasolution.fr/extranet/inc_librairie/WSGandara.fct.php?endpoint=GMAO`;
-const urlAction = `https://extranet.palissot.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO`;
 
-//#endregionhttps://dev.extranet.gandarasolution.fr/extranet/inc_librairie/WSGandara.fct.php
+
+
+// const urlAction = `https://extranet.palissot.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO`;
+// urlAction = "";
+// https://dev.extranet.gandarasolution.fr/extranet/inc_librairie/WSGandara.fct.php
+
+//#endregion 
+
+
+const getUrlFromCookie = () => {
+  let _cookieName = cyrb53("wsEntrepriseNameHashed");
+
+  const cookieValue = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${_cookieName}=`))
+    ?.split("=")[1];
+  return decodeURIComponent(cookieValue);
+}
+
+
 
 const callEndpoint = async (endpoint, data, setData, returnData) => {
   let _data = undefined;
-  // const currentURL = window.location.href;
+  let _cookieName = cyrb53("wsEntrepriseNameHashed");
+
+  const cookieValue = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${_cookieName}=`))
+    ?.split("=")[1];
+
+  // console.log(decodeURIComponent(cookieValue));
 
   function ErrorHandling(error) {
     setData([]);
@@ -25,7 +50,9 @@ const callEndpoint = async (endpoint, data, setData, returnData) => {
 
   $.ajax({
     type: "POST",
-    url: urlAction + endpoint,
+
+    // url: getUrlFromCookie() + endpoint,
+    url: decodeURIComponent(cookieValue) + endpoint,
     data: data,
     success(data) {
       if (JSON.parse(JSON.stringify(data)) === "500") {
@@ -45,17 +72,38 @@ const callEndpoint = async (endpoint, data, setData, returnData) => {
   });
 };
 
+
+
 //#region Fonction publics
 
 //#region Login
 
-const Connexion = async (login, pass, setToken) => {
+const GetURLWs = async (code, setResponse) => {
+  let _urlTemp = "https://extranet.palissot.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO";
+
+  await $.ajax({
+    type: "POST",
+    url: _urlTemp + "GetURLWsEntreprise",
+    data: { codeEntreprise: code },
+    success(data) {
+      if (data) {
+        setResponse(data);
+      } else { setResponse(500); }
+    }, error(xhr, status, error) {
+      setResponse(xhr.status);
+    }
+  })
+}
+
+
+
+const Connexion = async (login, pass, wsForToken, setToken) => {
+
   $.ajax({
     type: "POST",
-    url: urlAction + "Connexion",
+    url: wsForToken + "Connexion",
     data: { login: login, pass_clear: pass },
     success(data) {
-      // console.log(data)
       if (data === 'Erreur de connexion') { setToken(500) }
       else {
         setToken(data);
@@ -73,7 +121,7 @@ const Connexion = async (login, pass, setToken) => {
 const CreateTokenMDP = async (mail, setData) => {
   $.ajax({
     type: "POST",
-    url: urlAction + "CreateTokenMDP",
+    url: getUrlFromCookie() + "CreateTokenMDP",
     data: {
       mail: mail
     },
@@ -93,7 +141,7 @@ const CreateTokenMDP = async (mail, setData) => {
 const ChangeMDP = async (token, newMdp, setData) => {
   $.ajax({
     type: "POST",
-    url: urlAction + "ChangeMDP",
+    url: getUrlFromCookie() + "ChangeMDP",
     data: {
       token: token,
       newMDP: newMdp,
@@ -115,7 +163,7 @@ const ChangeMDP = async (token, newMdp, setData) => {
 const UpdateMDP = async (token, newMdp, setData) => {
   $.ajax({
     type: "POST",
-    url: urlAction + "_UpdateMdp",
+    url: getUrlFromCookie() + "_UpdateMdp",
     data: {
       token: token,
       newMdp: newMdp,
@@ -134,7 +182,7 @@ const UpdateMDP = async (token, newMdp, setData) => {
 const GetListeParametres = async (token, setData) => {
   $.ajax({
     type: "POST",
-    url: urlAction + "GetListeParametres",
+    url: getUrlFromCookie() + "GetListeParametres",
     data: {
       token: token,
     },
@@ -151,7 +199,7 @@ const GetListeParametres = async (token, setData) => {
 const GetClientSiteContrat = async (token, setData) => {
   await $.ajax({
     type: "POST",
-    url: urlAction + "GetClientSiteContrat",
+    url: getUrlFromCookie() + "GetClientSiteContrat",
     data: { token: token },
     success(data) {
       if (JSON.parse(JSON.stringify(data)) === "500") {
@@ -221,7 +269,7 @@ const GetPrestationReleveTache = async (
 ) => {
   $.ajax({
     type: "POST",
-    url: urlAction + "GetListeTaches",
+    url: getUrlFromCookie() + "GetListeTaches",
 
     data: {
       token: token,
@@ -250,7 +298,7 @@ const GetDocumentPrestation = async (
 ) => {
   $.ajax({
     type: "POST",
-    url: urlAction + "GetDocumentsPrestation",
+    url: getUrlFromCookie() + "GetDocumentsPrestation",
     data: { token: token, IdDossierIntervention: IdDossierIntervention },
     success(data) {
       setDocuments(data, presta);
@@ -269,10 +317,9 @@ const GetDocumentPrestationRapport = async (
     let _return = undefined;
     await $.ajax({
       type: "POST",
-      url: urlAction + "GetDocumentPrestationRapport",
+      url: getUrlFromCookie() + "GetDocumentPrestationRapport",
       data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
       success(data) {
-        // console.log(data);
         _return = JSON.parse(data);
       },
     });
@@ -284,7 +331,7 @@ const GetDocumentPrestationRapport = async (
 
   $.ajax({
     type: "POST",
-    url: urlAction + "GetDocumentPrestationRapport",
+    url: getUrlFromCookie() + "GetDocumentPrestationRapport",
     data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
     success(data) {
       if (data === "500") {
@@ -313,7 +360,7 @@ const GetDocumentPrestationCERFA = async (
     let _return = undefined;
     await $.ajax({
       type: "POST",
-      url: urlAction + "GetDocumentPrestationCERFA",
+      url: getUrlFromCookie() + "GetDocumentPrestationCERFA",
       data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
       success(data) {
         _return = JSON.parse(data);
@@ -327,7 +374,7 @@ const GetDocumentPrestationCERFA = async (
 
   $.ajax({
     type: "POST",
-    url: urlAction + "GetDocumentPrestationCERFA",
+    url: getUrlFromCookie() + "GetDocumentPrestationCERFA",
     data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
     success(data) {
       if (data === "500") {
@@ -356,7 +403,7 @@ const GetDocumentPrestationExtranet = async (
     let _return = undefined;
     await $.ajax({
       type: "POST",
-      url: urlAction + "GetDocumentPrestationExtranet",
+      url: getUrlFromCookie() + "GetDocumentPrestationExtranet",
       data: { token: token, fullPath: fullPath },
       success(data) {
         _return = JSON.parse(data);
@@ -370,7 +417,7 @@ const GetDocumentPrestationExtranet = async (
 
   $.ajax({
     type: "POST",
-    url: urlAction + "GetDocumentPrestationExtranet",
+    url: getUrlFromCookie() + "GetDocumentPrestationExtranet",
     data: { token: token, fullPath: fullPath },
     success(data) {
       if (data === "500") {
@@ -399,7 +446,7 @@ const GetDocumentPrestationTicket = async (
     let _return = undefined;
     await $.ajax({
       type: "POST",
-      url: urlAction + "GetDocumentPrestationTicket",
+      url: getUrlFromCookie() + "GetDocumentPrestationTicket",
       data: { token: token, IdPJ: IdPJ },
       success(data) {
         let _data = JSON.parse(data);
@@ -425,7 +472,7 @@ const GetDocumentPrestationTicket = async (
 
   $.ajax({
     type: "POST",
-    url: urlAction + "GetDocumentPrestationTicket",
+    url: getUrlFromCookie() + "GetDocumentPrestationTicket",
     data: { token: token, IdPJ: IdPJ },
     success(data) {
       if (data === "500") {
@@ -462,10 +509,10 @@ const GetDocumentPrestationTicket = async (
 const VoirDocument = (b64, filename, targetWindow) => {
   $.ajax({
     type: "POST",
-    url: `${urlAction}File64`,
+    url: `${getUrlFromCookie()}File64`,
     data: { b64: b64, filename: HTMLEncode(filename) },
     success(data) {
-      const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
+      const urlToOpen = `${getUrlFromCookie()}SeeDocument&filename=${data}`;
       if (targetWindow) {
         //Ouvre dans cette fenêtre
         targetWindow.location.href = urlToOpen;
@@ -481,10 +528,10 @@ const VoirDocumentOffice = async (b64, filename) => {
   let _urlRetour = undefined;
   await $.ajax({
     type: "POST",
-    url: `${urlAction}File64`,
+    url: `${getUrlFromCookie()}File64`,
     data: { b64: b64, filename: HTMLEncode(filename) },
     success(data) {
-      const urlToOpen = `${urlAction}SeeDocument&filename=${data}`;
+      const urlToOpen = `${getUrlFromCookie()}SeeDocument&filename=${data}`;
       _urlRetour = urlToOpen;
     },
   });
@@ -494,10 +541,10 @@ const VoirDocumentOffice = async (b64, filename) => {
 const TelechargerDocument = (b64, filename, targetWindow) => {
   $.ajax({
     type: "POST",
-    url: `${urlAction}File64`,
+    url: `${getUrlFromCookie()}File64`,
     data: { b64: b64, filename: filename },
     success(data) {
-      const urlToOpen = `${urlAction}DownloadDocument&filename=${data}`;
+      const urlToOpen = `${getUrlFromCookie()}DownloadDocument&filename=${data}`;
       if (targetWindow) {
         // targetWindow.location.href=urlToOpen;
         window.open(urlToOpen, "_blank");
@@ -512,10 +559,10 @@ const TelechargerDocument = (b64, filename, targetWindow) => {
 const TelechargerZIP = (files, filename) => {
   $.ajax({
     type: "POST",
-    url: `${urlAction}ZIPDocs`,
+    url: `${getUrlFromCookie()}ZIPDocs`,
     data: { arrayDocs: files, filename: filename },
     success(data) {
-      const urlToOpen = `${urlAction}DownloadDocument&filename=${data}`;
+      const urlToOpen = `${getUrlFromCookie()}DownloadDocument&filename=${data}`;
       window.open(urlToOpen, "_blank");
     },
   });
@@ -527,7 +574,7 @@ const TelechargerZIP = (files, filename) => {
 const GetListeAppareils = async (token, guid, setData) => {
   $.ajax({
     type: "POST",
-    url: urlAction + "GetAppareils",
+    url: getUrlFromCookie() + "GetAppareils",
 
     data: {
       token: token,
@@ -548,7 +595,7 @@ const GetListeAppareils = async (token, guid, setData) => {
 const GetListeFactures = async (token, guid, dateDebut, dateFin, setData) => {
   $.ajax({
     type: "POST",
-    url: urlAction + "GetFactures",
+    url: getUrlFromCookie() + "GetFactures",
 
     data: {
       token: token,
@@ -577,7 +624,7 @@ const VoirFactureDocument = async (
     let _return = undefined;
     await $.ajax({
       type: "POST",
-      url: urlAction + "GetFactureDocument",
+      url: getUrlFromCookie() + "GetFactureDocument",
       data: {
         token: token,
         IdFacture: IdFacture,
@@ -595,7 +642,7 @@ const VoirFactureDocument = async (
     let targetWindow = window.open("/waiting");
     $.ajax({
       type: "POST",
-      url: urlAction + "GetFactureDocument",
+      url: getUrlFromCookie() + "GetFactureDocument",
       data: {
         token: token,
         IdFacture: IdFacture,
@@ -622,7 +669,7 @@ const TelechargerFactureDocument = async (
   let targetWindow = window.open("/waiting");
   $.ajax({
     type: "POST",
-    url: urlAction + "GetFactureDocument",
+    url: getUrlFromCookie() + "GetFactureDocument",
     data: {
       token: token,
       IdFacture: IdFacture,
@@ -695,7 +742,7 @@ const GetDocumentFISAV = async (
   if (returnData) {
     await $.ajax({
       type: "POST",
-      url: urlAction + "GetDocumentFISAV",
+      url: getUrlFromCookie() + "GetDocumentFISAV",
       data: {
         token: token,
         IdFicheInterventionSAV: IdFicheInterventionSAV,
@@ -751,7 +798,7 @@ const GetListeSecteur = async (token, guid, setData) => {
   );
   // return $.ajax({
   //   type: "POST",
-  //   url: urlAction + "GetListeSecteur",
+  //   url: getUrlFromCookie() + "GetListeSecteur",
 
   //   data: {
   //     token: token,
@@ -798,7 +845,7 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
   if (returnData) {
     await $.ajax({
       type: "POST",
-      url: urlAction + "GetdocumentDevis",
+      url: getUrlFromCookie() + "GetdocumentDevis",
       data: { token: token, IdDevis: IdDevis },
       success(data) {
         _return = JSON.parse(data);
@@ -843,6 +890,7 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
 //#endregion
 
 export {
+  GetURLWs,
   Connexion,
   GetListeParametres,
   GetClientSiteContrat,
