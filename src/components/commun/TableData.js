@@ -45,6 +45,7 @@ import {
   FiltrerParSearch,
   FiltrerParSeuil,
   FiltrerParSeuilDate,
+  GenerateUid,
   GetURLLocationViewerFromExtension,
   RegexTestAndReturnMatch,
   base64toBlob,
@@ -692,6 +693,7 @@ const TableData = ({ ...props }) => {
                   if (item[0] === "undefined") return null;
                   return (
                     <Form.Check
+                      id={`ppvr-check-${index}`}
                       key={index}
                       type="checkbox"
                       checked={IsFiltercheckboxShouldBeCheck(
@@ -1559,7 +1561,7 @@ const TableData = ({ ...props }) => {
   const HandleChoixDuSite = (siteAChoisir) => {
     //Pas de changement si même site
     let _actualClientSite = ClientSiteCt.storedClientSite;
-    if (!(_actualClientSite) || (_actualClientSite.GUID !== siteAChoisir.GUID)  ) {
+    if (!(_actualClientSite) || (_actualClientSite.GUID !== siteAChoisir.GUID)) {
       ClientSiteCt.setClientSite(siteAChoisir);
     }
   }
@@ -1693,9 +1695,9 @@ const TableData = ({ ...props }) => {
         <Modal.Header>
           <Modal.Title>
             <FontAwesomeIcon icon={faTasks} />
-            Liste des relevés de tâches 
+            Liste des relevés de tâches
             <div className="modal-title h6" > {prestaName} </div>
-            </Modal.Title>
+          </Modal.Title>
           <Button
             className="close-modal"
             onClick={() => setShowModalListeTaches(false)}
@@ -1703,7 +1705,7 @@ const TableData = ({ ...props }) => {
           </Button>
         </Modal.Header>
         <Modal.Body>
-        
+
           <CardListeTachesBodyL />
         </Modal.Body>
       </Modal>
@@ -2525,7 +2527,8 @@ const CreateEditorDocument = (
 };
 
 const EditorSelection = (e) => {
-  return <Form.Check defaultChecked={e} />;
+  let _uid = GenerateUid();
+  return <Form.Check id={`selector-check-${_uid}`} defaultChecked={e} />;
 };
 
 //#endregion

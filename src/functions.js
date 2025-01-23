@@ -357,6 +357,12 @@ const cyrb53 = (str, seed = 0) => {
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 };
 
+
+const GenerateUid = ()=>{
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+
 export {
   FiltrerParSeuilDate,
   FiltrerParSearch,
@@ -377,4 +383,5 @@ export {
   base64toBlob,
   GetURLLocationViewerFromExtension,
   cyrb53,
+  GenerateUid,
 };
