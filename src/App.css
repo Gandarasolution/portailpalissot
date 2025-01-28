@@ -160,7 +160,7 @@ input.form-control:focus{
 }
 
 .sidebar-gmao .img-logo{
-  background: var(--color-red);
+  /*background: var(--color-red);*/
   padding: 4px;
   border-radius: 16px;
 }
@@ -320,7 +320,7 @@ nav ul li:hover {
   background-color: var(--color-grey);
 }
 
-.top-bar-menu .switch-site{
+.top-bar-menu .switch-site .btn{
   background: var(--color-white);
   border-radius: 16px;
   border: 1px solid transparent;
@@ -328,8 +328,61 @@ nav ul li:hover {
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.top-bar-menu .switch-site{
+.top-bar-menu .switch-site .btn{
   font-size: 20px;
+}
+
+button.switch-site{
+  display: none;
+}
+
+/* Conteneur global du dropdown et du titre SIMU 1 */
+.navbar-text-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Appliquer le fond blanc et l'ombre lorsque le dropdown est ouvert */
+.navbar-text-wrapper.show {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+/* Pour éviter le double fond blanc dans le dropdown */
+.switch-site .dropdown-menu {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 11;
+}
+
+/* Ajustement du bouton de sélection */
+.switch-site {
+  transition: background-color 0.3s ease;
+}
+
+.switch-site.show {
+  background-color: transparent;
+}
+
+/* Animation d’apparition du menu déroulant */
+.navbar-text:has(.switch-site.show) {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 5px 12px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .top-bar-menu .chevron-down{
@@ -737,6 +790,11 @@ sup {
   padding: 5px;
 }
 
+.table-presta thead{
+  position: sticky;
+  top: 0px;
+}
+
 .table-presta th {
   padding: 0px !important;
   border: transparent;
@@ -841,6 +899,10 @@ thead th,
 .table-facture tbody td:nth-child(8),
 .table-facture tbody td:nth-child(9){
   color: var(--color-grey);
+}
+
+.table-sites tbody tr:first-child{
+  background: whitesmoke;
 }
 
 .table-presta td {
@@ -1294,4 +1356,27 @@ thead th,
 .pagination-icon {
   font-weight: 100;
   color: var(--color-pastel-green-text);
+}
+
+/* ---- SCROLL TO TOP ---- */
+.scroll-to-top-button {
+  position: fixed;
+  bottom: 60px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-grey);
+  background-color: var(--color-white);
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-grey);
+  font-size: 10px;
+}
+
+.scroll-to-top-button:hover {
+  background-color: rgba(255,255,255,0.1);
 }
