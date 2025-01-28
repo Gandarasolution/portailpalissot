@@ -18,7 +18,7 @@ import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region Components
-import { Connexion, CreateTokenMDP, GetListeParametres, GetURLWs } from "../../axios/WSGandara";
+import { Connexion, CreateTokenMDP, GetCanonicalURI, GetListeParametres, GetURLWs } from "../../axios/WSGandara";
 
 //#endregion
 
@@ -29,12 +29,14 @@ import logoNoir from "../../image/imageLogin/logo_noir.png";
 
 const LoginPage = (props) => {
   //#region States
-
   const [revealed, setRevealed] = useState(false);
 
   const [password, setPassword] = useState("");
   const [login, setLogin] = useState("");
   const [codeEntreprise, setCodeEntreprise] = useState("");
+
+
+  const [showCodeEntreprise, setShowCodeEntreprise] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
   const [mailRecup, setMailRecup] = useState("");
@@ -48,6 +50,7 @@ const LoginPage = (props) => {
 
   const inputRefPassword = useRef(null);
   const inputRefLogin = useRef(null);
+
 
   //#endregion
 
@@ -81,6 +84,12 @@ const LoginPage = (props) => {
   };
 
   const handleSubmit = async () => {
+    //Vérification identifiants renseignés
+    if (codeEntreprise.length <= 0 || login.length <= 0 || password.length <= 0) {
+      setIdError(400);
+      return;
+    }
+
     setIsLoading(true);
 
     let _wsForToken = "";
@@ -90,6 +99,9 @@ const LoginPage = (props) => {
       }
 
     }
+
+
+
 
     await GetURLWs(codeEntreprise, GetResponseURLWS);
 
@@ -262,6 +274,38 @@ const LoginPage = (props) => {
     );
   };
 
+  const ErreurChampsManquant = () => {
+    let _messagesChamps = [];
+
+    const pushMessageIfCondition = (_var, message) => {
+      if (_var.length <= 0) {
+        _messagesChamps.push(message);
+      }
+    }
+    pushMessageIfCondition(codeEntreprise, "le code entreprise");
+    pushMessageIfCondition(login, "l'email");
+    pushMessageIfCondition(password, "le mot de passe");
+    return (
+      <span>
+        Champs manquants. Merci de renseigner{
+          _messagesChamps.map((msg, i, _messagesChamps) => {
+            if (i === 0) {
+              return ` ${msg}`;
+            }
+
+            if (i + 1 === _messagesChamps.length) {
+              return ` et ${msg}`;
+            }
+
+            return `, ${msg}`;
+          })
+        } pour vous connecter.
+      </span>
+    );
+
+
+  }
+
   const Erreur401 = () => {
     return (
       <span>
@@ -280,6 +324,8 @@ const LoginPage = (props) => {
   const ErreurConnexion = () => {
     let _IdError = Number(idError);
     switch (true) {
+      case _IdError === 400:
+        return ErreurChampsManquant();
       case _IdError > 499:
         return Erreur500();
       case _IdError === 401:
@@ -301,27 +347,51 @@ const LoginPage = (props) => {
 
   //#endregion
 
+  const CanonicalURICodeEntreprise = async () => {
+
+    let _curentHost = window.location.host;
+    let _arrURI = await GetCanonicalURI();
+    if (_arrURI.includes(_curentHost)) {
+      setCodeEntreprise(_curentHost);
+      setShowCodeEntreprise(false);
+    } else {
+      setShowCodeEntreprise(true);
+    }
+
+
+
+    // console.log(window.location.host);
+    // console.log(_arrURI.includes(window.location.host));
+
+  }
+
   useEffect(() => {
     document.title = "Connexion";
+    CanonicalURICodeEntreprise();
   }, [login]);
 
   const FormSubmit = () => {
+
     return (
       <Form className="m-4 p-2">
-        <Form.Group className="mb-4" controlId="formCodeEntreprise">
+        {
+          showCodeEntreprise &&
+          <Form.Group className="mb-4" controlId="formCodeEntreprise">
 
 
 
-          <Form.Label>Code entreprise</Form.Label>
-          <Form.Control
-            type="number"
-            required
-            placeholder="000-000"
-            value={codeEntreprise}
-            onChange={(e) => setCodeEntreprise(e.target.value)}
-            onKeyUp={handleCodeEntrepriseKeyPress}
-          />
-        </Form.Group>
+            <Form.Label>Code entreprise</Form.Label>
+            <Form.Control
+              type="number"
+              required
+              placeholder="000-000"
+              value={codeEntreprise}
+              onChange={(e) => setCodeEntreprise(e.target.value)}
+              onKeyUp={handleCodeEntrepriseKeyPress}
+            />
+          </Form.Group>
+        }
+
         <Form.Group className="mb-4" controlId="formLogin">
 
           <Form.Label>Email</Form.Label>

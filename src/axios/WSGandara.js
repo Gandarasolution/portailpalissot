@@ -31,6 +31,7 @@ const getUrlFromCookie = () => {
 
 
 const callEndpoint = async (endpoint, data, setData, returnData) => {
+
   let _data = undefined;
   let _cookieName = cyrb53("wsEntrepriseNameHashed");
 
@@ -77,6 +78,14 @@ const callEndpoint = async (endpoint, data, setData, returnData) => {
 //#region Fonction publics
 
 //#region Login
+
+const GetCanonicalURI = async ()=>{
+  let _urlTemp = "https://extranet.palissot.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO";
+  
+  return ["test.gandarasolution.fr:3000",];
+
+}
+
 
 const GetURLWs = async (code, setResponse) => {
   let _urlTemp = "https://extranet.palissot.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO";
@@ -923,4 +932,5 @@ export {
   UpdateMDP,
   ChangeMDP,
   CreateTokenMDP,
+  GetCanonicalURI,
 };
