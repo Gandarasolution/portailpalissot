@@ -2552,6 +2552,15 @@ export const CreateNewHeader = (fieldname, filter, caption, editor) => {
   return _header;
 };
 
+/**
+ * 
+ * @param {boolean} isFilter 
+ * @param {boolean} isCheckbox 
+ * @param {boolean} isRange 
+ * @param {boolean} isSearchCol 
+ * @param {boolean} isRangeDate 
+ * @returns 
+ */
 export const CreateFilter = (
   isFilter,
   isCheckbox,

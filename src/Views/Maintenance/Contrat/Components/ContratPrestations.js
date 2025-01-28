@@ -87,7 +87,6 @@ const ContratPrestation = ({
 
   const GetPrestationTrimmed = () => {
     let _lPrestation = Prestations;
-
     if (_lPrestation.length) {
       _lPrestation = _lPrestation.sort(
         (a, b) => a.DateInterventionPrestation - b.DateInterventionPrestation
@@ -120,7 +119,7 @@ const ContratPrestation = ({
     _headers.push(
       CreateNewHeader(
         "IdPrestationContrat",
-        CreateFilter(true, true, true, true),
+        CreateFilter(true, true, false, true),
         "N°"
       )
     );
