@@ -710,18 +710,18 @@ sup {
   font-size: 1rem;
 }
 
-.btn-primary.btn-upload-file,
-.btn-primary.btn-upload-file:hover{
-  background: var(--color-white);
-  color: var(--color-grey);
+.btn-primary.btn-upload-file{
+  background: var(--color-red) !important;
+  color: var(--color-white) !important;
   border: 1px solid transparent;
 }
 
 .btn-primary.btn-upload-file:active,
+.btn-primary.btn-upload-file:hover,
 .btn-primary.btn-upload-file:focus,
 .btn-primary.btn-upload-file:focus-visible{
-  background: var(--color-red) !important;
-  color: var(--color-white);
+  background: var(--color-white) !important;
+  color: var(--color-grey) !important;
   border: 1px solid transparent !important;
 }
 
