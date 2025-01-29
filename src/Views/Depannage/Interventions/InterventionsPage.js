@@ -24,7 +24,7 @@ import TableData, {
 } from "../../../components/commun/TableData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile } from "@fortawesome/free-solid-svg-icons";
-import { GetListeInterventions } from "../../../axios/WSGandara";
+import { GetListeInterventions } from "../../../axios/OLD_WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
 import { Row } from "react-bootstrap";
 //#endregion

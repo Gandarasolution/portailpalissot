@@ -15,7 +15,7 @@ import Row from "react-bootstrap/Row";
 import {
   GetListeFactures,
   VoirFactureDocument,
-} from "../../axios/WSGandara";
+} from "../../axios/OLD_WSGandara";
 
 import { DateSOAP, base64toBlob } from "../../functions";
 import {

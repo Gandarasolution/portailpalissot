@@ -18,7 +18,7 @@ import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region Components
-import { Connexion, CreateTokenMDP, GetCanonicalURI, GetListeParametres, GetURLWs } from "../../axios/WSGandara";
+import {  CreateTokenMDP, IsURICanonnical,Connexion,  GetListeParametres, GetURLWs } from "../../axios/WS_User";
 
 //#endregion
 
@@ -99,7 +99,6 @@ const LoginPage = (props) => {
       }
 
     }
-
 
 
 
@@ -350,18 +349,25 @@ const LoginPage = (props) => {
   const CanonicalURICodeEntreprise = async () => {
 
     let _curentHost = window.location.host;
-    let _arrURI = await GetCanonicalURI();
-    if (_arrURI.includes(_curentHost)) {
-      setCodeEntreprise(_curentHost);
-      setShowCodeEntreprise(false);
+
+    let _isCannon = await IsURICanonnical();
+
+    if (_isCannon) {
+
+      let _wsForToken = "";
+      const GetResponseURLWS = (data) => {
+        if (isNaN(data)) {
+          _wsForToken = data;
+        }
+        setCodeEntreprise(_curentHost);
+        setShowCodeEntreprise(false);
+      }
+  
+      await GetURLWs(_curentHost, GetResponseURLWS);
+
     } else {
       setShowCodeEntreprise(true);
     }
-
-
-
-    // console.log(window.location.host);
-    // console.log(_arrURI.includes(window.location.host));
 
   }
 

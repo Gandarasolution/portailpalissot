@@ -66,7 +66,7 @@ import {
   //TelechargerFactureDocument,
   TelechargerZIP,
   VoirFactureDocument,
-} from "../../axios/WSGandara";
+} from "../../axios/OLD_WSGandara";
 
 //#region Contexts
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";

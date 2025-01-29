@@ -38,7 +38,8 @@ import logo from "../../image/favicon.ico";
 //#endregion
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { GetClientSiteContrat, GetContratPrestationPeriodes } from "../../axios/WSGandara";
+import {  GetContratPrestationPeriodes } from "../../axios/OLD_WSGandara";
+import { GetClientSiteContrat } from "../../axios/WS_User";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { GetDateFromStringDDMMYYY, GetNomMois } from "../../functions";
 

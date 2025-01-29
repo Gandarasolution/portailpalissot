@@ -23,7 +23,7 @@ import TableData, {
 //#endregion
 
 //#region DEV
-import { GetListeAppareils } from "../../../axios/WSGandara";
+import { GetListeAppareils } from "../../../axios/OLD_WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
 
 //#endregion

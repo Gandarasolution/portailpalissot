@@ -25,7 +25,7 @@ import {
   TokenContext,
 } from "../../../App";
 import { useEffect } from "react";
-import { GetListeSecteur, GetListeTels } from "../../../axios/WSGandara";
+import { GetListeSecteur, GetListeTels } from "../../../axios/OLD_WSGandara";
 import { ParseKVAsArray } from "../../../functions";
 
 //#endregion

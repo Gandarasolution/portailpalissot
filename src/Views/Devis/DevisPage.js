@@ -18,7 +18,7 @@ import TableData, {
   EditorDateFromDateTime,
   EditorMontant,
 } from "../../components/commun/TableData";
-import { GetListeDevis, GetdocumentDevis } from "../../axios/WSGandara";
+import { GetListeDevis, GetdocumentDevis } from "../../axios/OLD_WSGandara";
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
 import { Button, Col, Row } from "react-bootstrap";
 import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";

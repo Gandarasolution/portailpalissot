@@ -12,7 +12,7 @@ import Container from "react-bootstrap/Container";
 import ContratPrestation from "./Components/ContratPrestations";
 import {
   GetPrestationContrat,
-} from "../../../axios/WSGandara";
+} from "../../../axios/OLD_WSGandara";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
 import {
   DateSOAP,

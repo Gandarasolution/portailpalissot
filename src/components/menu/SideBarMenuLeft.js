@@ -27,7 +27,7 @@ import { faCookieBite } from "@fortawesome/free-solid-svg-icons";
 import logo from "../../image/imageHome/logo_blanc.png";
 
 import { ClientSiteContratContext, TokenContext } from "../../App";
-import { GetListeParametres } from "../../axios/WSGandara";
+import { GetListeParametres } from "../../axios/WS_User";
 //#endregion
 
 //#endregion
