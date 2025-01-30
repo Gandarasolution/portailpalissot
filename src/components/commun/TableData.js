@@ -56,17 +56,28 @@ import RowDocument from "./RowDocument";
 import {
   GeTListeFactureIntervention,
   GetDocumentFISAV,
-  GetDocumentPrestation,
-  GetDocumentPrestationCERFA,
-  GetDocumentPrestationExtranet,
-  GetDocumentPrestationRapport,
-  GetDocumentPrestationTicket,
+  // GetDocumentPrestation,
+  // GetDocumentPrestationCERFA,
+  // GetDocumentPrestationExtranet,
+  // GetDocumentPrestationRapport,
+  // GetDocumentPrestationTicket,
   GetListeFIIntervention,
-  GetPrestationReleveTache,
+  // GetPrestationReleveTache,
   //TelechargerFactureDocument,
-  TelechargerZIP,
+  // TelechargerZIP,
   VoirFactureDocument,
 } from "../../axios/OLD_WSGandara";
+
+import {
+  TelechargerZIP,
+} from "../../axios/WSGandara"
+
+import { GetPrestationReleveTache, GetDocumentPrestation,  GetDocumentPrestationCERFA,
+  GetDocumentPrestationExtranet,
+  GetDocumentPrestationRapport,
+  GetDocumentPrestationTicket, } from "../../axios/WS_Contrat";
+
+
 
 //#region Contexts
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
@@ -2034,7 +2045,7 @@ const TableData = ({ ...props }) => {
   const FetchSetDocuments = async (data, presta) => {
     let _arrDocs = [];
 
-    const arrData = JSON.parse(data);
+    const arrData = data;
     if (arrData === 500) {
       const _arrError = [CreatePropError()];
       //Erreur

@@ -1,0 +1,461 @@
+//Ce fichier rassemble toutes les fonctions d'appel utilisée en rapport avec les contrats
+
+import { HTMLEncode } from "../functions";
+import { callEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
+
+
+
+/**
+ * 
+ * @param {string} token 
+ * @param {DateSOAP} dateDebut 
+ * @param {DateSOAP} dateFin 
+ * @param {guid} guid 
+ * @param {Function} setData 
+ * @returns 
+ */
+const GetPrestationContrat = (token, dateDebut, dateFin, guid, setData) => {
+    return callEndpoint(
+        "GetPrestationContrat",
+        {
+            token: token,
+            dateDebut: dateDebut,
+            dateFin: dateFin,
+            guid: guid,
+        },
+        setData
+    );
+};
+
+
+/**
+ * 
+ * @param {string} token 
+ * @param {guid} guid 
+ * @param {Function} setData 
+ * @returns 
+ */
+const GetContratPrestationPeriodes = (token, guid, setData) => {
+    return callEndpoint(
+        "GetContratPrestationPeriodes",
+        {
+            token: token,
+            guid: guid,
+        },
+        setData
+    );
+};
+
+/**
+ * 
+ * @param {string} token 
+ * @param {number} IdPrestationContrat 
+ * @param {Function} setData 
+ */
+const GetPrestationReleveTache = async (
+    token,
+    IdPrestationContrat,
+    setData
+) => {
+
+    const callBackSet = (data) => {
+        if (data === "Erreur de connexion") {
+            setData(500);
+            return;
+        }
+        if (JSON.parse(JSON.stringify(data)) === "500") {
+            window.location.href = "/error";
+            setData([]);
+        } else {
+            setData(data);
+        }
+    }
+
+    await callEndpoint("GetListeTaches", {
+        token: token,
+        IdPrestationContrat: IdPrestationContrat,
+    }, callBackSet);
+
+
+};
+
+
+//#region Documents
+
+/**
+ * 
+ * @param {string} token 
+ * @param {Number} IdDossierIntervention 
+ * @param {Function} setDocuments 
+ * @param {Object} presta 
+ */
+const GetDocumentPrestation = async (
+    token,
+    IdDossierIntervention,
+    setDocuments,
+    presta
+) => {
+
+    await callEndpoint("GetDocumentsPrestation", { token: token, IdDossierIntervention: IdDossierIntervention }, setDocuments)
+    // $.ajax({
+    //   type: "POST",
+    //   url: getUrlFromCookie() + "GetDocumentsPrestation",
+    //   data: { token: token, IdDossierIntervention: IdDossierIntervention },
+    //   success(data) {
+    //     setDocuments(data, presta);
+    //   },
+
+    // });
+};
+
+
+/**
+ * 
+ * @param {string} token 
+ * @param {Number} IdMobiliteIntervention 
+ * @param {Boolean} telecharger 
+ * @param {Boolean} returnData 
+ * @returns 
+ */
+const GetDocumentPrestationRapport = async (
+    token,
+    IdMobiliteIntervention,
+    telecharger,
+    returnData
+) => {
+
+    if (returnData) {
+        let _return = undefined;
+        _return = await callEndpoint("GetDocumentPrestationRapport", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, null, true);
+        return _return;
+    }
+
+
+    let targetWindow = window.open("/waiting");
+
+    const callbackResponseSuccess = (data) => {
+        if (data === "500") {
+            targetWindow.location.href = `/error?error=500`;
+        }
+        const _kv = JSON.parse(data);
+        if (telecharger) {
+            TelechargerDocument(_kv.v, _kv.k, targetWindow);
+        } else {
+            VoirDocument(_kv.v, _kv.k, targetWindow);
+        }
+    }
+
+    callEndpoint("GetDocumentPrestationRapport", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, callbackResponseSuccess)
+
+    // $.ajax({
+    //   type: "POST",
+    //   url: getUrlFromCookie() + "GetDocumentPrestationRapport",
+    //   data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
+    //   success(data) {
+    //     if (data === "500") {
+    //       targetWindow.location.href = `/error?error=500`;
+    //     }
+    //     const _kv = JSON.parse(data);
+    //     if (telecharger) {
+    //       TelechargerDocument(_kv.v, _kv.k, targetWindow);
+    //     } else {
+    //       VoirDocument(_kv.v, _kv.k, targetWindow);
+    //     }
+    //   },
+    //   error(error) {
+    //     targetWindow.location.href = `/error?error=${error.status}`;
+    //   },
+    // });
+};
+
+/**
+ * 
+ * @param {string} token 
+ * @param {Number} IdMobiliteIntervention 
+ * @param {boolean} telecharger 
+ * @param {Boolean} returnData 
+ * @returns 
+ */
+const GetDocumentPrestationCERFA = async (
+    token,
+    IdMobiliteIntervention,
+    telecharger,
+    returnData
+) => {
+
+    if (returnData) {
+        return await callEndpoint("GetDocumentPrestationCERFA", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, null, true);
+    }
+
+    let targetWindow = window.open("/waiting");
+
+    const callbackResponseSuccess = (data) => {
+        if (data === "500") {
+            targetWindow.location.href = `/error?error=500`;
+        }
+        const _kv = JSON.parse(data);
+        if (telecharger) {
+            TelechargerDocument(_kv.v, _kv.k, targetWindow);
+        } else {
+            VoirDocument(_kv.v, _kv.k, targetWindow);
+        }
+    }
+    callEndpoint("GetDocumentPrestationCERFA", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, callbackResponseSuccess);
+
+    // if (returnData) {
+    //   let _return = undefined;
+    //   await $.ajax({
+    //     type: "POST",
+    //     url: getUrlFromCookie() + "GetDocumentPrestationCERFA",
+    //     data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
+    //     success(data) {
+    //       _return = JSON.parse(data);
+    //     },
+    //   });
+
+    //   return _return;
+    // }
+
+    // // let targetWindow = window.open("/waiting");
+
+    // $.ajax({
+    //   type: "POST",
+    //   url: getUrlFromCookie() + "GetDocumentPrestationCERFA",
+    //   data: { token: token, IdMobiliteIntervention: IdMobiliteIntervention },
+    //   success(data) {
+    //     if (data === "500") {
+    //       targetWindow.location.href = `/error?error=500`;
+    //     }
+    //     const _kv = JSON.parse(data);
+    //     if (telecharger) {
+    //       TelechargerDocument(_kv.v, _kv.k, targetWindow);
+    //     } else {
+    //       VoirDocument(_kv.v, _kv.k, targetWindow);
+    //     }
+    //   },
+    //   error(error) {
+    //     targetWindow.location.href = `/error?error=${error.status}`;
+    //   },
+    // });
+};
+
+
+
+
+
+
+
+
+/**
+ * 
+ * @param {string} token 
+ * @param {string} fullPath 
+ * @param {boolean} telecharger 
+ * @param {boolean} returnData 
+ * @returns 
+ */
+const GetDocumentPrestationExtranet = async (
+    token,
+    fullPath,
+    telecharger,
+    returnData
+) => {
+
+    if (returnData) {
+        return await callEndpoint("GetDocumentPrestationExtranet", { token: token, fullPath: fullPath }, null, true);
+    }
+
+    let targetWindow = window.open("/waiting");
+
+    const callbackResponseSuccess = (data) => {
+        if (data === "500") {
+            targetWindow.location.href = `/error?error=500`;
+        }
+        const _kv = JSON.parse(data);
+        if (telecharger) {
+            TelechargerDocument(_kv.v, _kv.k, targetWindow);
+        } else {
+            VoirDocument(_kv.v, _kv.k, targetWindow);
+        }
+
+    }
+    callEndpoint("GetDocumentPrestationExtranet", { token: token, fullPath: fullPath }, callbackResponseSuccess);
+
+    // if (returnData) {
+    //   let _return = undefined;
+    //   await $.ajax({
+    //     type: "POST",
+    //     url: getUrlFromCookie() + "GetDocumentPrestationExtranet",
+    //     data: { token: token, fullPath: fullPath },
+    //     success(data) {
+    //       _return = JSON.parse(data);
+    //     },
+    //   });
+
+    //   return _return;
+    // }
+
+    // // let targetWindow = window.open("/waiting");
+
+    // $.ajax({
+    //   type: "POST",
+    //   url: getUrlFromCookie() + "GetDocumentPrestationExtranet",
+    //   data: { token: token, fullPath: fullPath },
+    //   success(data) {
+    //     if (data === "500") {
+    //       targetWindow.location.href = `/error?error=500`;
+    //     }
+    //     const _kv = JSON.parse(data);
+    //     if (telecharger) {
+    //       TelechargerDocument(_kv.v, _kv.k, targetWindow);
+    //     } else {
+    //       VoirDocument(_kv.v, _kv.k, targetWindow);
+    //     }
+    //   },
+    //   error(error) {
+    //     targetWindow.location.href = `/error?error=${error.status}`;
+    //   },
+    // });
+};
+
+
+
+/**
+ * 
+ * @param {string} token 
+ * @param {number} IdPJ 
+ * @param {boolean} telecharger 
+ * @param {boolean} returnData 
+ * @returns 
+ */
+const GetDocumentPrestationTicket = async (
+    token,
+    IdPJ,
+    telecharger,
+    returnData
+) => {
+
+    if (returnData) {
+        let _return;
+        const callBackReturnData = (data) => {
+            if (
+                data.k
+                    .substring(0, data.k.length - 4)
+                    .split(".")
+                    .pop() === "jpg"
+            ) {
+                data.k = data.k.substring(0, data.k.length - 4);
+                _return = data;
+            } else {
+                _return = JSON.parse(data);
+            }
+        }
+
+        await callEndpoint("GetDocumentPrestationTicket", { token: token, IdPJ: IdPJ }, callBackReturnData);
+        return _return;
+    }
+
+    let targetWindow = window.open("/waiting");
+
+    const callbackResponseSuccess = (data) => {
+        if (data === "500") {
+            targetWindow.location.href = `/error?error=500`;
+        }
+        const _kv = JSON.parse(data);
+
+        if (
+            _kv.k
+                .substring(0, _kv.k.length - 4)
+                .split(".")
+                .pop() === "jpg"
+        ) {
+            _kv.k = _kv.k.substring(0, _kv.k.length - 4);
+        }
+
+        if (telecharger) {
+            // TelechargerDocument(_kv.v, _kv.k, targetWindow);
+            TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
+        } else {
+            VoirDocument(_kv.v, _kv.k, targetWindow);
+        }
+    }
+
+    callEndpoint("GetDocumentPrestationTicket", { token: token, IdPJ: IdPJ }, callbackResponseSuccess);
+
+
+
+    // if (returnData) {
+    //   let _return = undefined;
+    //   await $.ajax({
+    //     type: "POST",
+    //     url: getUrlFromCookie() + "GetDocumentPrestationTicket",
+    //     data: { token: token, IdPJ: IdPJ },
+    //     success(data) {
+    //       let _data = JSON.parse(data);
+
+    //       if (
+    //         _data.k
+    //           .substring(0, _data.k.length - 4)
+    //           .split(".")
+    //           .pop() === "jpg"
+    //       ) {
+    //         _data.k = _data.k.substring(0, _data.k.length - 4);
+    //         _return = _data;
+    //       } else {
+    //         _return = JSON.parse(data);
+    //       }
+    //     },
+    //   });
+
+    //   return _return;
+    // }
+
+    // // let targetWindow = window.open("/waiting");
+
+    // $.ajax({
+    //   type: "POST",
+    //   url: getUrlFromCookie() + "GetDocumentPrestationTicket",
+    //   data: { token: token, IdPJ: IdPJ },
+    //   success(data) {
+    //     if (data === "500") {
+    //       targetWindow.location.href = `/error?error=500`;
+    //     }
+    //     const _kv = JSON.parse(data);
+
+    //     if (
+    //       _kv.k
+    //         .substring(0, _kv.k.length - 4)
+    //         .split(".")
+    //         .pop() === "jpg"
+    //     ) {
+    //       _kv.k = _kv.k.substring(0, _kv.k.length - 4);
+    //     }
+
+    //     if (telecharger) {
+    //       // TelechargerDocument(_kv.v, _kv.k, targetWindow);
+    //       TelechargerDocument(_kv.v, HTMLEncode(_kv.k), targetWindow);
+    //     } else {
+    //       VoirDocument(_kv.v, _kv.k, targetWindow);
+    //     }
+    //   },
+    //   error(error) {
+    //     targetWindow.location.href = `/error?error=${error.status}`;
+    //   },
+    // });
+};
+
+
+
+//#endregion
+
+export {
+    GetContratPrestationPeriodes
+    , GetPrestationContrat
+    , GetPrestationReleveTache
+    //Documents
+    , GetDocumentPrestation
+    , GetDocumentPrestationRapport
+    , GetDocumentPrestationCERFA
+    , GetDocumentPrestationExtranet
+    , GetDocumentPrestationTicket
+}

@@ -1,5 +1,18 @@
 import $ from "jquery";
-import { cyrb53 } from "../functions";
+import { cyrb53, HTMLEncode } from "../functions";
+
+
+const getUrlFromCookie = () => {
+    let _cookieName = cyrb53("wsEntrepriseNameHashed");
+    const cookieValue = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(`${_cookieName}=`))
+        ?.split("=")[1];
+
+    if (cookieValue && cookieValue?.length > 0) {
+        return decodeURIComponent(cookieValue);
+    }
+}
 
 /**
  * Appel le WS (ajax) via l'url stocké en cookie ou l'url fourni 
@@ -18,15 +31,7 @@ const callEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
         _url = urlToUse;
     } else {
         //Récupération de l'URL dans le cookie
-        let _cookieName = cyrb53("wsEntrepriseNameHashed");
-        const cookieValue = document.cookie
-            .split("; ")
-            .find((row) => row.startsWith(`${_cookieName}=`))
-            ?.split("=")[1];
-
-        if (cookieValue && cookieValue?.length > 0) {
-            _url = decodeURIComponent(cookieValue);
-        }
+        _url = getUrlFromCookie();
     }
 
     //Si aucun url récupéré
@@ -89,4 +94,108 @@ const callEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
 };
 
 
-export { callEndpoint, };
+
+//#region Documents
+
+
+const VoirDocument = (b64, filename, targetWindow) => {
+
+    const callbackResponseSuccess = (data) => {
+        const urlToOpen = `${getUrlFromCookie()}SeeDocument&filename=${data}`;
+        if (targetWindow) {
+            //Ouvre dans cette fenêtre
+            targetWindow.location.href = urlToOpen;
+        } else {
+            //Ouvre dans une nouvelle fenetre
+            window.open(urlToOpen, "_blank");
+        }
+    }
+    callEndpoint("File64", { b64: b64, filename: HTMLEncode(filename), callbackResponseSuccess })
+};
+
+
+
+const VoirDocumentOffice = async (b64, filename) => {
+    let _urlRetour = undefined;
+
+    const callbackResponseSuccess = (data) => {
+        const urlToOpen = `${getUrlFromCookie()}SeeDocument&filename=${data}`;
+        _urlRetour = urlToOpen;
+    }
+    await callEndpoint("File64", { b64: b64, filename: HTMLEncode(filename) }, callbackResponseSuccess)
+
+    // await $.ajax({
+    //   type: "POST",
+    //   url: `${getUrlFromCookie()}File64`,
+    //   data: { b64: b64, filename: HTMLEncode(filename) },
+    //   success(data) {
+    //     const urlToOpen = `${getUrlFromCookie()}SeeDocument&filename=${data}`;
+    //     _urlRetour = urlToOpen;
+    //   },
+    // });
+    return _urlRetour;
+};
+
+
+
+const  TelechargerDocument = (b64, filename, targetWindow) => {
+
+    const callbackResponseSuccess = (data) => {
+        const urlToOpen = `${getUrlFromCookie()}DownloadDocument&filename=${data}`;
+        if (targetWindow) {
+            // targetWindow.location.href=urlToOpen;
+            window.open(urlToOpen, "_blank");
+            targetWindow.close();
+        } else {
+            window.open(urlToOpen, "_blank");
+        }
+    };
+    callEndpoint("File64", { b64: b64, filename: filename }, callbackResponseSuccess)
+
+    // $.ajax({
+    //   type: "POST",
+    //   url: `${getUrlFromCookie()}File64`,
+    //   data: { b64: b64, filename: filename },
+    //   success(data) {
+    //     const urlToOpen = `${getUrlFromCookie()}DownloadDocument&filename=${data}`;
+    //     if (targetWindow) {
+    //       // targetWindow.location.href=urlToOpen;
+    //       window.open(urlToOpen, "_blank");
+    //       targetWindow.close();
+    //     } else {
+    //       window.open(urlToOpen, "_blank");
+    //     }
+    //   },
+    // });
+};
+
+const TelechargerZIP = (files, filename) => {
+    const callbackResponseSuccess = (data) => {
+        const urlToOpen = `${getUrlFromCookie()}DownloadDocument&filename=${data}`;
+        window.open(urlToOpen, "_blank");
+    }
+    callEndpoint("ZIPDocs", { arrayDocs: files, filename: filename }, callbackResponseSuccess);
+
+    // $.ajax({
+    //   type: "POST",
+    //   url: `${getUrlFromCookie()}ZIPDocs`,
+    //   data: { arrayDocs: files, filename: filename },
+    //   success(data) {
+    //     const urlToOpen = `${getUrlFromCookie()}DownloadDocument&filename=${data}`;
+    //     window.open(urlToOpen, "_blank");
+    //   },
+    // });
+};
+
+
+
+//#endregion
+
+
+export { callEndpoint
+    //Documents
+    ,VoirDocument
+    ,VoirDocumentOffice
+    ,TelechargerDocument
+    ,TelechargerZIP
+ };

@@ -899,22 +899,28 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
 //#endregion
 
 //#endregion
-
+/*
+    , GetDocumentPrestation
+    , GetDocumentPrestationRapport
+    , GetDocumentPrestationCERFA
+    , GetDocumentPrestationExtranet
+    , GetDocumentPrestationTicket
+*/
 export {
   // GetURLWs,
   // Connexion,
   // GetListeParametres,
   // GetClientSiteContrat,
-  VoirDocument,
-  TelechargerDocument,
-  TelechargerZIP,
-  GetPrestationContrat,
-  GetPrestationReleveTache,
-  GetDocumentPrestation,
-  GetDocumentPrestationRapport,
-  GetDocumentPrestationCERFA,
-  GetDocumentPrestationTicket,
-  GetDocumentPrestationExtranet,
+  // VoirDocument,
+  // TelechargerDocument,
+  // TelechargerZIP,
+  // GetPrestationContrat,
+  // GetPrestationReleveTache,
+  // GetDocumentPrestation,
+  // GetDocumentPrestationRapport,
+  // GetDocumentPrestationCERFA,
+  // GetDocumentPrestationTicket,
+  // GetDocumentPrestationExtranet,
   GetListeAppareils,
   GetListeFactures,
   VoirFactureDocument,
@@ -930,7 +936,7 @@ export {
   // GetListeTels,
   // GetListeMails,
   // GetNombrePortails,
-  GetContratPrestationPeriodes,
+  // GetContratPrestationPeriodes,
   // UpdateMDP,
   // ChangeMDP,
   // CreateTokenMDP,
