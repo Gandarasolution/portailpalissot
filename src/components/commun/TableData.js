@@ -65,13 +65,14 @@ import {
   // GetPrestationReleveTache,
   //TelechargerFactureDocument,
   // TelechargerZIP,
-  VoirFactureDocument,
+  // VoirFactureDocument,
 } from "../../axios/OLD_WSGandara";
 
 import {
   TelechargerZIP,
 } from "../../axios/WSGandara"
 
+import { VoirFactureDocument } from "../../axios/WS_Factures";
 import { GetPrestationReleveTache, GetDocumentPrestation,  GetDocumentPrestationCERFA,
   GetDocumentPrestationExtranet,
   GetDocumentPrestationRapport,

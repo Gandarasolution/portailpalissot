@@ -12,10 +12,17 @@ import Row from "react-bootstrap/Row";
 
 //#Region Components
 
+// import {
+//   // GetListeFactures,
+//   VoirFactureDocument,
+// } from "../../axios/OLD_WSGandara";
+
 import {
   GetListeFactures,
   VoirFactureDocument,
-} from "../../axios/OLD_WSGandara";
+} from "../../axios/WS_Factures";
+
+
 
 import { DateSOAP, base64toBlob } from "../../functions";
 import {
