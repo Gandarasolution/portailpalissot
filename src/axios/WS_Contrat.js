@@ -79,6 +79,36 @@ const GetPrestationReleveTache = async (
 
 };
 
+/**
+ * 
+ * @param {string} token 
+ * @param {guid} guid 
+ * @param {Function} setData 
+ */
+const GetListeAppareils = async (token, guid, setData) => {
+    
+    callEndpoint("GetAppareils", {
+        token: token,
+        guid: guid,
+      },setData);
+    
+    // $.ajax({
+    //   type: "POST",
+    //   url: getUrlFromCookie() + "GetAppareils",
+  
+    //   data: {
+    //     token: token,
+    //     guid: guid,
+    //   },
+    //   success(data) {
+    //     if (JSON.parse(JSON.stringify(data)) === "500") {
+    //       setData([]);
+    //     } else {
+    //       setData(JSON.parse(data));
+    //     }
+    //   },
+    // });
+  };
 
 //#region Documents
 
@@ -452,6 +482,7 @@ export {
     GetContratPrestationPeriodes
     , GetPrestationContrat
     , GetPrestationReleveTache
+    , GetListeAppareils
     //Documents
     , GetDocumentPrestation
     , GetDocumentPrestationRapport
