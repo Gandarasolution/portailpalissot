@@ -53,31 +53,13 @@ import {
 } from "../../functions";
 import RowDocument from "./RowDocument";
 
-import {
-  GeTListeFactureIntervention,
-  GetDocumentFISAV,
-  // GetDocumentPrestation,
-  // GetDocumentPrestationCERFA,
-  // GetDocumentPrestationExtranet,
-  // GetDocumentPrestationRapport,
-  // GetDocumentPrestationTicket,
-  GetListeFIIntervention,
-  // GetPrestationReleveTache,
-  //TelechargerFactureDocument,
-  // TelechargerZIP,
-  // VoirFactureDocument,
-} from "../../axios/OLD_WSGandara";
-
-import {
-  TelechargerZIP,
-} from "../../axios/WSGandara"
+import { TelechargerZIP, } from "../../axios/WSGandara"
 
 import { VoirFactureDocument } from "../../axios/WS_Factures";
-import { GetPrestationReleveTache, GetDocumentPrestation,  GetDocumentPrestationCERFA,
-  GetDocumentPrestationExtranet,
-  GetDocumentPrestationRapport,
-  GetDocumentPrestationTicket, } from "../../axios/WS_Contrat";
-
+import {
+  GetPrestationReleveTache, GetDocumentPrestation, GetDocumentPrestationCERFA, GetDocumentPrestationExtranet, GetDocumentPrestationRapport, GetDocumentPrestationTicket,
+} from "../../axios/WS_Contrat";
+import { GetListeFIIntervention, GetListeFactureIntervention, GetDocumentFISAV } from "../../axios/WS_Intervention";
 
 
 //#region Contexts
@@ -2409,7 +2391,7 @@ const TableData = ({ ...props }) => {
     );
 
     //3 - Demande les factures
-    GeTListeFactureIntervention(
+    GetListeFactureIntervention(
       tokenCt,
       IdDossierInterventionSAV,
       FetchSetDataFacturePart
