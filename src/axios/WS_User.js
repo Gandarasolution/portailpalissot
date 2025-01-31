@@ -1,6 +1,6 @@
 //Ce fichier rassemble toutes les fonctions d'appel utilisée en rapport avec l'utilisateur
 
-import { callEndpoint } from "./WSGandara";
+import { CallEndpoint } from "./WSGandara";
 
 
 
@@ -22,7 +22,7 @@ const IsURICanonnical = async () => {
 
   //
 
-  return await callEndpoint("IsURICannonical", { uri: _uri }, () => { }, true, _urlTemp);
+  return await CallEndpoint("IsURICannonical", { uri: _uri }, () => { }, true, _urlTemp);
 
 }
 
@@ -36,7 +36,7 @@ const GetURLWs = async (codeOrURL, setResponse) => {
   //L'url utilisé pour récupérer l'url du webservice
   let _urlTemp = "https://extranet.palissot.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO";
 
-  await callEndpoint("GetURLWsEntreprise", { codeEntreprise: codeOrURL }, setResponse, false, _urlTemp);
+  await CallEndpoint("GetURLWsEntreprise", { codeEntreprise: codeOrURL }, setResponse, false, _urlTemp);
 }
 
 
@@ -55,7 +55,7 @@ const Connexion = async (login, pass, wsForToken, setToken) => {
       setToken(data);
     }
   }
-  await callEndpoint("Connexion", { login: login, pass_clear: pass }, callbackSet, false, wsForToken);
+  await CallEndpoint("Connexion", { login: login, pass_clear: pass }, callbackSet, false, wsForToken);
 };
 
 //#endregion
@@ -69,7 +69,7 @@ const Connexion = async (login, pass, wsForToken, setToken) => {
  * @param {Function} setData 
  */
 const CreateTokenMDP = async (mail, setData) => {
-  await callEndpoint("CreateTokenMDP", { mail: mail }, setData);
+  await CallEndpoint("CreateTokenMDP", { mail: mail }, setData);
 }
 
 
@@ -80,7 +80,7 @@ const CreateTokenMDP = async (mail, setData) => {
  * @param {Function} setData 
  */
 const ChangeMDP = async (token, newMdp, setData) => {
-  await callEndpoint("ChangeMDP", {
+  await CallEndpoint("ChangeMDP", {
     token: token,
     newMDP: newMdp,
   }, setData);
@@ -94,7 +94,7 @@ const ChangeMDP = async (token, newMdp, setData) => {
  * @param {Function} setData 
  */
 const UpdateMDP = async (token, newMdp, setData) => {
-  await callEndpoint("_UpdateMdp", {
+  await CallEndpoint("_UpdateMdp", {
     token: token,
     newMdp: newMdp,
   }, setData);
@@ -111,7 +111,7 @@ const UpdateMDP = async (token, newMdp, setData) => {
  * @param {Function} setData 
  */
 const GetListeParametres = async (token, setData) => {
-  await callEndpoint("GetListeParametres", {
+  await CallEndpoint("GetListeParametres", {
     token: token,
   }, setData);
 };
@@ -123,7 +123,7 @@ const GetListeParametres = async (token, setData) => {
  * @param {Function} setData 
  */
 const GetClientSiteContrat = async (token, setData) => {
-  await callEndpoint("GetClientSiteContrat", { token: token }, setData);
+  await CallEndpoint("GetClientSiteContrat", { token: token }, setData);
 };
 
 //#endregion

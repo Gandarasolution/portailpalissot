@@ -36,8 +36,8 @@ import SideBarMenuLeft from "./components/menu/SideBarMenuLeft";
 //#endregion
 
 //#region React
-
-import { React, createContext, useState } from "react";
+import React from "react";
+import { createContext, useState } from "react";
 
 import { useCookies } from "react-cookie";
 
@@ -69,6 +69,7 @@ import ViewerWordPage from "./Views/Viewer/ViewerWord";
 import ViewerImagePage from "./Views/Viewer/ViewerImage";
 import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
 import { addOneYear, cyrb53, DateSOAP } from "./functions";
+import { Toast, ToastContainer } from "react-bootstrap";
 // import AccountPage from "./Views/Home/AccountPage";
 
 library.add(
@@ -97,19 +98,20 @@ export const ViewerContext = createContext(null);
 export const TitreContext = createContext(null);
 export const SetTitreContext = createContext(null);
 
-
 //#endregion
+
+
 function App() {
 
   //#region State
   const [listeSites, setListeSites] = useState([]);
+
+  const [isErrorMenu, setIsErrorMenu] = useState(false);
+  const [isErrorData, setIsErrorData] = useState(false);
   //#endregion
 
 
-
-
-
-
+  //#region Cookies
   //#region ClientSiteContrat
 
   const clientSiteName = cyrb53("clientSiteHashed").toString();
@@ -211,14 +213,58 @@ function App() {
 
   //#endregion
 
-  //#region Toast
+  //#endregion
+
+  //#region ErrorBoundary
+  class ErrorBoundaryMenu extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { hasError: false };
+    }
+
+    static getDerivedStateFromError(error) {
+      return { hasError: true };
+    }
+
+    componentDidCatch(error, info) {
+      this.props.fallback(true);
+    }
+
+    render() {
+
+      return <>
+        {this.props.children}
+      </>
+    }
+
+  }
+
+  class ErrorBoundaryData extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { hasError: false };
+    }
+
+    static getDerivedStateFromError(error) {
+      return { hasError: true };
+    }
+
+    componentDidCatch(error, info) {
+      this.props.fallback(true);
+    }
+
+    render() {
+
+      return <>
+        {this.props.children}
+      </>
+    }
+
+  }
 
   //#endregion
 
   //#region Composants
-
-
-
 
 
   const AppRoutes = () => {
@@ -244,69 +290,89 @@ function App() {
 
     return (
       <>
-        <TopBarMenu
-          accountName={account}
-          handleDeconnexion={handleDeconnexion}
-          pageSubtitle={pageSubtitle}
-          pageTitle={pageTitle}
-          statePeriodes={{ periodeEnCours, setPeriodeEnCours, setIsSetPeriode }}
-        />
-        <Routes>
-          <Route path="test" element={<PageTest />} />
-          <Route path="/changemdp/:token" element={<ChangeMDPPage />} />
-          <Route
-            path="/"
-            element={storedClientSite ? <HomePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-          />
-          <Route path="waiting" element={<WaiterPage />} />
-          <Route path="error" element={<ErrorPage />} />
+        <ErrorBoundaryMenu fallback={setIsErrorMenu}>
 
-          <Route path="/sites" element={<ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />} />
-          {/* <Route path="account" element={<AccountPage accountName={account} />} /> */}
-          <Route
-            path="maintenance"
-            element={storedClientSite ? <ContratPage IsSetPeriode={isSetPeriode} periodeEnCours={periodeEnCours} setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+          <TopBarMenu
+            accountName={account}
+            handleDeconnexion={handleDeconnexion}
+            pageSubtitle={pageSubtitle}
+            pageTitle={pageTitle}
+            statePeriodes={{ periodeEnCours, setPeriodeEnCours, setIsSetPeriode }}
+            isError={isErrorMenu}
           />
-          <Route
-            path="appareils"
-            element={storedClientSite ? <AppareilsPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-          />
-          <Route
-            path="interventions"
-            exact
-            element={storedClientSite ? <InterventionPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-          />
-          <Route
-            path="nouvelleintervention"
-            element={
-              storedClientSite ? <NouvelleInterventionPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />
-            }
-          />
-          <Route
-            path="devis"
-            element={storedClientSite ? <DevisPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+        </ErrorBoundaryMenu>
+        <ErrorBoundaryData fallback={setIsErrorData}>
 
-          />
-          <Route
-            path="factures"
-            element={storedClientSite ? <FacturesPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-          />
-          <Route
-            path="viewerPDF"
-            element={storedClientSite ? <ViewerPDFPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-          />{" "}
-          <Route
-            path="viewerDOC"
-            element={storedClientSite ? <ViewerWordPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-          />
-          <Route
-            path="viewerIMG"
-            element={storedClientSite ? <ViewerImagePage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-          />
-          <Route path="viewerWord" element={<ViewerWord />} />
-        </Routes>
+          <ToastContainer className="p-3" position="bottom-end" style={{ zIndex: 1 }} >
+            <Toast show={isErrorData} bg={'danger'} onClose={() => {
+              setIsErrorData(false);
+            }} >
+              <Toast.Header closeButton={false}>
+
+                <strong className="me-auto">Une erreur est survenue</strong>
+              </Toast.Header>
+              <Toast.Body>Nous sommes désolé, une erreur est survenue.
+                Veuillez réessayer plus tard.
+              </Toast.Body>
+            </Toast>
+          </ToastContainer>
+          <Routes>
+            <Route path="test" element={<PageTest />} />
+            <Route path="/changemdp/:token" element={<ChangeMDPPage />} />
+            <Route
+              path="/"
+              element={storedClientSite ? <HomePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            />
+            <Route path="waiting" element={<WaiterPage />} />
+            <Route path="error" element={<ErrorPage />} />
+
+            <Route path="/sites" element={<ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />} />
+            {/* <Route path="account" element={<AccountPage accountName={account} />} /> */}
+            <Route
+              path="maintenance"
+              element={storedClientSite ? <ContratPage IsSetPeriode={isSetPeriode} periodeEnCours={periodeEnCours} setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            />
+            <Route
+              path="appareils"
+              element={storedClientSite ? <AppareilsPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            />
+            <Route
+              path="interventions"
+              exact
+              element={storedClientSite ? <InterventionPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            />
+            <Route
+              path="nouvelleintervention"
+              element={
+                storedClientSite ? <NouvelleInterventionPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />
+              }
+            />
+            <Route
+              path="devis"
+              element={storedClientSite ? <DevisPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+
+            />
+            <Route
+              path="factures"
+              element={storedClientSite ? <FacturesPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            />
+            <Route
+              path="viewerPDF"
+              element={storedClientSite ? <ViewerPDFPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            />{" "}
+            <Route
+              path="viewerDOC"
+              element={storedClientSite ? <ViewerWordPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            />
+            <Route
+              path="viewerIMG"
+              element={storedClientSite ? <ViewerImagePage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            />
+            <Route path="viewerWord" element={<ViewerWord />} />
+          </Routes>
 
 
+        </ErrorBoundaryData>
       </>
 
     );
@@ -347,8 +413,10 @@ function App() {
   //#endregion
 
 
+
   return (
     <TokenContext.Provider value={tokenCookie[tokenName]}>
+
       <ClientSiteContratContext.Provider
         value={{ storedClientSite, setClientSite, removeclientSite, listeSites, setListeSites }}
       >
@@ -358,6 +426,7 @@ function App() {
           >
 
             <Router>
+
 
               <BreakpointProvider>
                 <SmallDown />
@@ -369,6 +438,7 @@ function App() {
           </ViewerContext.Provider>
         </ParametresContext.Provider>
       </ClientSiteContratContext.Provider>
+
     </TokenContext.Provider>
   );
 }

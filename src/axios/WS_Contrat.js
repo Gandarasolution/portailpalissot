@@ -1,7 +1,7 @@
 //Ce fichier rassemble toutes les fonctions d'appel utilisée en rapport avec les contrats
 
 import { HTMLEncode } from "../functions";
-import { callEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
+import { CallEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
 
 
 
@@ -15,7 +15,7 @@ import { callEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
  * @returns 
  */
 const GetPrestationContrat = (token, dateDebut, dateFin, guid, setData) => {
-    return callEndpoint(
+    return CallEndpoint(
         "GetPrestationContrat",
         {
             token: token,
@@ -36,7 +36,7 @@ const GetPrestationContrat = (token, dateDebut, dateFin, guid, setData) => {
  * @returns 
  */
 const GetContratPrestationPeriodes = (token, guid, setData) => {
-    return callEndpoint(
+    return CallEndpoint(
         "GetContratPrestationPeriodes",
         {
             token: token,
@@ -71,7 +71,7 @@ const GetPrestationReleveTache = async (
         }
     }
 
-    await callEndpoint("GetListeTaches", {
+    await CallEndpoint("GetListeTaches", {
         token: token,
         IdPrestationContrat: IdPrestationContrat,
     }, callBackSet);
@@ -87,7 +87,7 @@ const GetPrestationReleveTache = async (
  */
 const GetListeAppareils = async (token, guid, setData) => {
     
-    callEndpoint("GetAppareils", {
+    CallEndpoint("GetAppareils", {
         token: token,
         guid: guid,
       },setData);
@@ -126,7 +126,7 @@ const GetDocumentPrestation = async (
     presta
 ) => {
 
-    await callEndpoint("GetDocumentsPrestation", { token: token, IdDossierIntervention: IdDossierIntervention }, setDocuments)
+    await CallEndpoint("GetDocumentsPrestation", { token: token, IdDossierIntervention: IdDossierIntervention }, setDocuments)
     // $.ajax({
     //   type: "POST",
     //   url: getUrlFromCookie() + "GetDocumentsPrestation",
@@ -156,7 +156,7 @@ const GetDocumentPrestationRapport = async (
 
     if (returnData) {
         let _return = undefined;
-        _return = await callEndpoint("GetDocumentPrestationRapport", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, null, true);
+        _return = await CallEndpoint("GetDocumentPrestationRapport", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, null, true);
         return _return;
     }
 
@@ -175,7 +175,7 @@ const GetDocumentPrestationRapport = async (
         }
     }
 
-    callEndpoint("GetDocumentPrestationRapport", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, callbackResponseSuccess)
+    CallEndpoint("GetDocumentPrestationRapport", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, callbackResponseSuccess)
 
     // $.ajax({
     //   type: "POST",
@@ -214,7 +214,7 @@ const GetDocumentPrestationCERFA = async (
 ) => {
 
     if (returnData) {
-        return await callEndpoint("GetDocumentPrestationCERFA", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, null, true);
+        return await CallEndpoint("GetDocumentPrestationCERFA", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, null, true);
     }
 
     let targetWindow = window.open("/waiting");
@@ -230,7 +230,7 @@ const GetDocumentPrestationCERFA = async (
             VoirDocument(_kv.v, _kv.k, targetWindow);
         }
     }
-    callEndpoint("GetDocumentPrestationCERFA", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, callbackResponseSuccess);
+    CallEndpoint("GetDocumentPrestationCERFA", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, callbackResponseSuccess);
 
     // if (returnData) {
     //   let _return = undefined;
@@ -292,7 +292,7 @@ const GetDocumentPrestationExtranet = async (
 ) => {
 
     if (returnData) {
-        return await callEndpoint("GetDocumentPrestationExtranet", { token: token, fullPath: fullPath }, null, true);
+        return await CallEndpoint("GetDocumentPrestationExtranet", { token: token, fullPath: fullPath }, null, true);
     }
 
     let targetWindow = window.open("/waiting");
@@ -309,7 +309,7 @@ const GetDocumentPrestationExtranet = async (
         }
 
     }
-    callEndpoint("GetDocumentPrestationExtranet", { token: token, fullPath: fullPath }, callbackResponseSuccess);
+    CallEndpoint("GetDocumentPrestationExtranet", { token: token, fullPath: fullPath }, callbackResponseSuccess);
 
     // if (returnData) {
     //   let _return = undefined;
@@ -381,7 +381,7 @@ const GetDocumentPrestationTicket = async (
             }
         }
 
-        await callEndpoint("GetDocumentPrestationTicket", { token: token, IdPJ: IdPJ }, callBackReturnData);
+        await CallEndpoint("GetDocumentPrestationTicket", { token: token, IdPJ: IdPJ }, callBackReturnData);
         return _return;
     }
 
@@ -410,7 +410,7 @@ const GetDocumentPrestationTicket = async (
         }
     }
 
-    callEndpoint("GetDocumentPrestationTicket", { token: token, IdPJ: IdPJ }, callbackResponseSuccess);
+    CallEndpoint("GetDocumentPrestationTicket", { token: token, IdPJ: IdPJ }, callbackResponseSuccess);
 
 
 

@@ -45,7 +45,7 @@ import { GetDateFromStringDDMMYYY, GetNomMois } from "../../functions";
 
 //#endregion
 
-const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes }) => {
+const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes,isError }) => {
 
   //#region Contexts
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
@@ -424,7 +424,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
 
   useEffect(() => {
     const pathname = window.location.pathname;
-
+    if(isError)return;
     statePeriodes.setIsSetPeriode(false);
 
     let _isdropdownShown = false;
@@ -440,6 +440,8 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
 
 
   useEffect(() => {
+    if(isError)return;
+
     if (showDropdownPeriode) {
       GetPeriodes();
     }
@@ -467,7 +469,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
 
         <Navbar.Text className="d-flex align-item" >
           {
-            showDropdownPeriode &&
+           (!isError) && showDropdownPeriode &&
             <DropdownPeriode />
           }
         </Navbar.Text>
@@ -477,16 +479,16 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
             {siteActuel}
           </div>
 
-          {
-            ClientSiteContratCtx.storedClientSite &&
+          { (!isError) &&
+          ClientSiteContratCtx.storedClientSite &&
 
             (
               <DropdownButton title={GetDropdownTitle()}
                 variant=""
                 className="ms-2 me-3 switch-site"
               >
-                {
-                  listeSites.map((site) => {
+                { 
+                  listeSites && listeSites.length && listeSites.length >=1 && listeSites.map((site) => {
                     return (
                       site.GUID !== ClientSiteContratCtx.storedClientSite.GUID &&
                       <Dropdown.Item key={site.GUID}
@@ -495,7 +497,8 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
                         {site.NomCompletClientSite}
                       </Dropdown.Item>
                     )
-                  })
+                  })               
+
                 }
 
               </DropdownButton>

@@ -1,6 +1,6 @@
 //Ce fichier rassemble toutes les fonctions d'appel utilisée en rapport avec les clients/Sites
 
-import { callEndpoint } from "./WSGandara";
+import { CallEndpoint } from "./WSGandara";
 
 
 
@@ -12,7 +12,7 @@ import { callEndpoint } from "./WSGandara";
  * @returns 
  */
 const GetListeTels = (token, guid, setData) => {
-    return callEndpoint("ListeTelsSelect", { token: token, guid: guid }, setData);
+    return CallEndpoint("ListeTelsSelect", { token: token, guid: guid }, setData);
 };
 
 /**
@@ -23,7 +23,7 @@ const GetListeTels = (token, guid, setData) => {
  * @returns 
  */
 const GetListeMails = (token, guid, setData) => {
-    return callEndpoint(
+    return CallEndpoint(
         "ListeMailsSelect",
         { token: token, guid: guid },
         setData
@@ -38,7 +38,7 @@ const GetListeMails = (token, guid, setData) => {
  * @returns 
  */
 const GetNombrePortails = (token, guid, setData) => {
-    return callEndpoint(
+    return CallEndpoint(
         "GetNombrePortails",
         { token: token, guid: guid },
         setData
@@ -53,7 +53,7 @@ const GetNombrePortails = (token, guid, setData) => {
  * @returns 
  */
 const GetListeSecteur = async (token, guid, setData) => {
-    return callEndpoint(
+    return CallEndpoint(
         "GetListeSecteur",
         {
             token: token,
