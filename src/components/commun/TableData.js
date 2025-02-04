@@ -26,6 +26,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 
 //#region fontAwsome
 import {
+  faArrowDown,
   faClose,
   faDownload,
   faEye,
@@ -1645,6 +1646,61 @@ const TableData = ({ ...props }) => {
   };
 
   const ModalListeTaches = () => {
+    const modalBodyRef = useRef(null);
+    const [isScrollable, setIsScrollable] = useState(false);
+    const [isAtTop, setIsAtTop] = useState(true);
+
+    useEffect(() => {
+      const checkScrollability = () => {
+        if (modalBodyRef.current) {
+          const { scrollHeight, clientHeight } = modalBodyRef.current;
+
+          if (scrollHeight > clientHeight) {
+            setIsScrollable(true);
+          } else {
+            setIsScrollable(false);
+          }
+        }
+      };
+      const handleScroll = () => {
+        if (modalBodyRef.current) {
+          const { scrollTop } = modalBodyRef.current;
+
+          if (scrollTop > 0) {
+            modalBodyRef.current.classList.add("no-scroll-indicator");
+            setIsAtTop(false);
+          } else {
+            modalBodyRef.current.classList.remove("no-scroll-indicator");
+            setIsAtTop(true);
+          }
+        }
+      };
+
+      checkScrollability();
+
+      if (modalBodyRef.current) {
+        modalBodyRef.current.addEventListener("scroll", handleScroll);
+      }
+
+      window.addEventListener("resize", checkScrollability);
+
+      return () => {
+        if (modalBodyRef.current) {
+          modalBodyRef.current.removeEventListener("scroll", handleScroll);
+        }
+        window.removeEventListener("resize", checkScrollability);
+      };
+    }, [listeTaches]);
+
+    const scrollToBottom = () => {
+      if (modalBodyRef.current) {
+        modalBodyRef.current.scrollTo({
+          top: modalBodyRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    };
+
     const CardListeTachesBodyL = () => {
       if (isLoadingTaches)
         return (
@@ -1724,9 +1780,13 @@ const TableData = ({ ...props }) => {
           ><FontAwesomeIcon icon={faXmark} />
           </Button>
         </Modal.Header>
-        <Modal.Body>
-
+        <Modal.Body ref={modalBodyRef} className={`modal-body ${isScrollable ? "scrollable" : ""}`}>
           <CardListeTachesBodyL />
+          {isScrollable && (
+            <button onClick={scrollToBottom} className="scroll-modal">
+              <FontAwesomeIcon icon={faArrowDown} size="lg" />
+            </button>
+          )}
         </Modal.Body>
       </Modal>
     );
