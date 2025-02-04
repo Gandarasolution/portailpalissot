@@ -53,20 +53,14 @@ import {
 } from "../../functions";
 import RowDocument from "./RowDocument";
 
+import { TelechargerZIP, } from "../../axios/WSGandara"
+
+import { VoirFactureDocument } from "../../axios/WS_Factures";
 import {
-  GeTListeFactureIntervention,
-  GetDocumentFISAV,
-  GetDocumentPrestation,
-  GetDocumentPrestationCERFA,
-  GetDocumentPrestationExtranet,
-  GetDocumentPrestationRapport,
-  GetDocumentPrestationTicket,
-  GetListeFIIntervention,
-  GetPrestationReleveTache,
-  //TelechargerFactureDocument,
-  TelechargerZIP,
-  VoirFactureDocument,
-} from "../../axios/WSGandara";
+  GetPrestationReleveTache, GetDocumentPrestation, GetDocumentPrestationCERFA, GetDocumentPrestationExtranet, GetDocumentPrestationRapport, GetDocumentPrestationTicket,
+} from "../../axios/WS_Contrat";
+import { GetListeFIIntervention, GetListeFactureIntervention, GetDocumentFISAV } from "../../axios/WS_Intervention";
+
 
 //#region Contexts
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
@@ -2034,7 +2028,7 @@ const TableData = ({ ...props }) => {
   const FetchSetDocuments = async (data, presta) => {
     let _arrDocs = [];
 
-    const arrData = JSON.parse(data);
+    const arrData = data;
     if (arrData === 500) {
       const _arrError = [CreatePropError()];
       //Erreur
@@ -2397,7 +2391,7 @@ const TableData = ({ ...props }) => {
     );
 
     //3 - Demande les factures
-    GeTListeFactureIntervention(
+    GetListeFactureIntervention(
       tokenCt,
       IdDossierInterventionSAV,
       FetchSetDataFacturePart
@@ -2552,6 +2546,15 @@ export const CreateNewHeader = (fieldname, filter, caption, editor) => {
   return _header;
 };
 
+/**
+ * 
+ * @param {boolean} isFilter 
+ * @param {boolean} isCheckbox 
+ * @param {boolean} isRange 
+ * @param {boolean} isSearchCol 
+ * @param {boolean} isRangeDate 
+ * @returns 
+ */
 export const CreateFilter = (
   isFilter,
   isCheckbox,

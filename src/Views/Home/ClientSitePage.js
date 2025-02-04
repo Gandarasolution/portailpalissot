@@ -26,9 +26,7 @@ import Container from "react-bootstrap/Container";
 //#region Components
 import {
   GetClientSiteContrat,
-  // GetListeMails,
-  // GetListeTels,
-} from "../../axios/WSGandara";
+} from "../../axios/WS_User";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import TableData, {

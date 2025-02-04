@@ -5,6 +5,7 @@ import { useState, useEffect, useContext } from "react";
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
 //#endregion
+import { GetListeDevis, GetdocumentDevis } from "../../axios/WS_Devis";
 
 //#region Components
 import TableData, {
@@ -18,7 +19,6 @@ import TableData, {
   EditorDateFromDateTime,
   EditorMontant,
 } from "../../components/commun/TableData";
-import { GetListeDevis, GetdocumentDevis } from "../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
 import { Button, Col, Row } from "react-bootstrap";
 import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";
