@@ -30,7 +30,7 @@ import ErrorPage from "./Views/ErrorHandling/Error";
 
 import TopBarMenu from "./components/menu/TopBarMenu";
 import SideBarMenuLeft from "./components/menu/SideBarMenuLeft";
-
+import ScrollToTopButton from "./components/commun/ScrollToTopButton";
 //#endregion
 
 //#endregion
@@ -364,7 +364,7 @@ function App() {
                 <LargeUp />
               </BreakpointProvider>
             </Router>
-
+            <ScrollToTopButton />
 
           </ViewerContext.Provider>
         </ParametresContext.Provider>
