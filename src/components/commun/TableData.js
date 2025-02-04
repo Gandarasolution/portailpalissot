@@ -70,7 +70,7 @@ import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/Contra
 
 //#endregion
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import { saveAs } from "file-saver";
@@ -1287,6 +1287,32 @@ const TableData = ({ ...props }) => {
   //#region Selection
 
   const SelectionInfo = () => {
+    const containerRef = useRef(null);
+    const [isSticky, setIsSticky] = useState(false);
+
+    useEffect(() => {
+      const handleScroll = () => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          setIsSticky(window.scrollY > 100);
+        }
+      };
+
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    // Met à jour isSticky quand un document est sélectionné
+    useEffect(() => {
+      if (arraySelector.length > 0) {
+        if (window.scrollY > 100) {
+          setIsSticky(true);
+        }
+      } else {
+        setIsSticky(false);
+      }
+    }, [arraySelector.length]);
+
     const SwitchTagSelection = async (tagMethod) => {
       switch (tagMethod) {
         case "selection_factures":
@@ -1308,7 +1334,7 @@ const TableData = ({ ...props }) => {
 
     if (arraySelector.length > 0) {
       return (
-        <Container>
+        <Container ref={containerRef} className={`download-container ${isSticky ? "is-sticky" : ""}`}>
           <Button
             onClick={HandleTelechargerSelection}
             className="btn-upload-file"

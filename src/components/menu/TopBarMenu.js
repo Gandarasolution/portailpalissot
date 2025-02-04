@@ -36,9 +36,9 @@ import { ClientSiteContratContext, TokenContext } from "../../App";
 import logo from "../../image/favicon.ico";
 
 //#endregion
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {  GetContratPrestationPeriodes } from "../../axios/WS_Contrat";
+import { GetContratPrestationPeriodes } from "../../axios/WS_Contrat";
 import { GetClientSiteContrat } from "../../axios/WS_User";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { GetDateFromStringDDMMYYY, GetNomMois } from "../../functions";
@@ -58,6 +58,9 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
   const [showMenu, setShowMenu] = useState(false);
   const [listePeriodes, setListePeriodes] = useState([]);
   const [showDropdownPeriode, setShowDropdownPeriode] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
+
+  const navbarRef = useRef(null);
 
 
   //#endregion
@@ -446,6 +449,18 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
     // eslint-disable-next-line
   }, [showDropdownPeriode])
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (navbarRef.current) {
+        const rect = navbarRef.current.getBoundingClientRect();
+        setIsSticky(window.scrollY > 100);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <Navbar expand="lg" className="top-bar-menu">
       <Container fluid>
@@ -456,7 +471,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
         />
         <OffcanvasMenu />
 
-        <Navbar.Text className="navbar-title-container">
+        <Navbar.Text ref={navbarRef} className={`navbar-title-container ${isSticky ? "is-sticky" : ""}`}>
           <h1>{titre}</h1>
           {soustitre && (
             <div className="box-length">
