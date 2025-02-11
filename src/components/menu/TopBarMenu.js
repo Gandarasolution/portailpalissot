@@ -546,7 +546,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
                       className="btn-see-all-sites"
                       onClick={() => navigate("/sites")}
                     >
-                      Voir toutes la liste
+                      Voir toute la liste
                     </Dropdown.Item>
                   </div>
                 </DropdownButton>
