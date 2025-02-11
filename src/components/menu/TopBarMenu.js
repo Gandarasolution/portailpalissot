@@ -36,9 +36,9 @@ import { ClientSiteContratContext, TokenContext } from "../../App";
 import logo from "../../image/favicon.ico";
 
 //#endregion
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {  GetContratPrestationPeriodes } from "../../axios/WS_Contrat";
+import { GetContratPrestationPeriodes } from "../../axios/WS_Contrat";
 import { GetClientSiteContrat } from "../../axios/WS_User";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { GetDateFromStringDDMMYYY, GetNomMois } from "../../functions";
@@ -58,6 +58,13 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
   const [showMenu, setShowMenu] = useState(false);
   const [listePeriodes, setListePeriodes] = useState([]);
   const [showDropdownPeriode, setShowDropdownPeriode] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
+  const [isSwitchSiteOpen, setIsSwitchSiteOpen] = useState(false);
+  const [dropdownWidth, setDropdownWidth] = useState("auto"); 
+
+  const navbarRef = useRef(null);
+  const titleDropdownRef = useRef(null);
+  const dropdownButtonRef = useRef(null);
 
 
   //#endregion
@@ -448,6 +455,30 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
     // eslint-disable-next-line
   }, [showDropdownPeriode])
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (navbarRef.current) {
+        const rect = navbarRef.current.getBoundingClientRect();
+        setIsSticky(window.scrollY > 100);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (isSwitchSiteOpen && titleDropdownRef.current && dropdownButtonRef.current) {
+      const textWidth = titleDropdownRef.current.scrollWidth;
+      const buttonWidth = dropdownButtonRef.current.offsetWidth;
+      const computedWidth = textWidth + buttonWidth;
+  
+      setDropdownWidth(`${computedWidth}px`);
+    } else {
+      setDropdownWidth("auto");
+    }
+  }, [isSwitchSiteOpen, siteActuel]);
+
   return (
     <Navbar expand="lg" className="top-bar-menu">
       <Container fluid>
@@ -458,7 +489,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
         />
         <OffcanvasMenu />
 
-        <Navbar.Text className="navbar-title-container">
+        <Navbar.Text ref={navbarRef} className={`navbar-title-container ${isSticky ? "is-sticky" : ""}`}>
           <h1>{titre}</h1>
           {soustitre && (
             <div className="box-length">
@@ -474,47 +505,47 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
           }
         </Navbar.Text>
 
-        <Navbar.Text className="d-flex align-items-center">
-          <div className="title-site">
-            {siteActuel}
-          </div>
+        <Navbar.Text className="d-flex align-items-center site-container">
+          <div
+            className={`d-flex align-items-start me-3 wrapper-site ${isSwitchSiteOpen ? "is-switching" : ""}`}
+          >
+            <div className="title-site me-2">
+              {siteActuel}
+            </div>
 
-          { (!isError) &&
-          ClientSiteContratCtx.storedClientSite &&
+            {(!isError) && ClientSiteContratCtx.storedClientSite && (
+              <div className="dropdown-container d-flex flex-column align-items-start">
+                <div className="title-site-in-dropdown me-2 ms-3" ref={titleDropdownRef}>
+                  {siteActuel}
+                </div>
+                <DropdownButton
+                  ref={dropdownButtonRef}
+                  title={GetDropdownTitle()}
+                  variant=""
+                  className="switch-site d-flex flex-column align-items-end"
+                  show={isSwitchSiteOpen}
+                  onToggle={(nextShow, event, metadata) => {
+                    setIsSwitchSiteOpen(nextShow);
+                  }}
+                  style={{ width: dropdownWidth }}
+                >
+                  {listeSites && listeSites.length && listeSites.length >=1 && listeSites.map((site) => (
+                    site.GUID !== ClientSiteContratCtx.storedClientSite.GUID && (
+                      <Dropdown.Item
+                        key={site.GUID}
+                        onClick={() => ClientSiteContratCtx.setClientSite(site)}
+                         className="ms-3"
 
-            (
-              <DropdownButton title={GetDropdownTitle()}
-                variant=""
-                className="ms-2 me-3 switch-site"
-              >
-                { 
-                  listeSites && listeSites.length && listeSites.length >=1 && listeSites.map((site) => {
-                    return (
-                      site.GUID !== ClientSiteContratCtx.storedClientSite.GUID &&
-                      <Dropdown.Item key={site.GUID}
-                        onClick={e => ClientSiteContratCtx.setClientSite(site)}
                       >
                         {site.NomCompletClientSite}
                       </Dropdown.Item>
                     )
-                  })               
+                  ))}
+                </DropdownButton>
+              </div>
+            )}
+          </div>
 
-                }
-
-              </DropdownButton>
-            )
-          }
-
-          <Button
-            variant=""
-            className="ms-2 me-3 switch-site"
-            onClick={handleChangerClientsite}
-          >
-            <span className="me-1">
-              <i className="fas fa-building"></i>
-            </span>
-            <span className="chevron-down">&gt;</span>
-          </Button>
 
           <OverlayTrigger
             trigger={"click"}
@@ -524,7 +555,6 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
             <Button variant="" className="icone-site">
               <FontAwesomeIcon icon={faCircleUser} />
             </Button>
-
           </OverlayTrigger>
         </Navbar.Text>
       </Container>

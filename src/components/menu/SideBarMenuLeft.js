@@ -115,8 +115,6 @@ const SideBarMenuLeft = () => {
               <img
                 alt=""
                 src={logoClient}
-                width="80"
-                height="80"
                 className="d-inline-block align-top img-logo"
               />
             </Container>
