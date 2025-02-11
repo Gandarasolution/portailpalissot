@@ -1,7 +1,7 @@
 //Ce fichier rassemble toutes les fonctions d'appel utilisée en rapport avec les Devis
 
 import { HTMLEncode } from "../functions";
-import { callEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
+import { CallEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
 
 
 
@@ -15,7 +15,7 @@ import { callEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
  * @returns 
  */
 const GetListeDevis = (token, guid, setData) => {
-    return callEndpoint(
+    return CallEndpoint(
         "GetListeDevis",
         {
             token: token,
@@ -42,7 +42,7 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
     let _return = undefined;
 
     if (returnData) {
-        return await callEndpoint("GetdocumentDevis", { token: token, IdDevis: IdDevis }, null, true);
+        return await CallEndpoint("GetdocumentDevis", { token: token, IdDevis: IdDevis }, null, true);
     }
 
     targetWindow = window.open("/waiting");
@@ -57,7 +57,7 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
         }
     };
 
-    return callEndpoint(
+    return CallEndpoint(
         "GetdocumentDevis",
         { token: token, IdDevis: IdDevis },
         callbackResponseSuccess,
@@ -94,7 +94,7 @@ const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
     //   }
     // };
 
-    // return callEndpoint(
+    // return CallEndpoint(
     //   "GetdocumentDevis",
     //   { token: token, IdDevis: IdDevis },
     //   SetData,

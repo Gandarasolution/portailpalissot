@@ -1,7 +1,8 @@
 //Ce fichier rassemble toutes les fonctions d'appel utilisée en rapport avec les interventions SAV
 
+import { error } from "jquery";
 import { HTMLEncode } from "../functions";
-import { callEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
+import { CallEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
 
 
 
@@ -13,7 +14,7 @@ import { callEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
  * @returns 
  */
 const GetListeInterventions = async (token, guid, setData) => {
-    return callEndpoint(
+    return CallEndpoint(
         "GetListeInterventions",
         {
             token: token,
@@ -37,7 +38,7 @@ const GetListeFIIntervention = async (
     IdDossierInterventionSAV,
     setData
 ) => {
-    return callEndpoint(
+    return CallEndpoint(
         "GetListeFIIntervention",
         {
             token: token,
@@ -63,7 +64,7 @@ const GetListeFactureIntervention = async (
     IdDossierInterventionSAV,
     setData
 ) => {
-    return callEndpoint(
+    return CallEndpoint(
         "GeTListeFactureIntervention",
         {
             token: token,
@@ -82,7 +83,7 @@ const GetListeFactureIntervention = async (
  * @returns 
  */
 const GetListeSecteur = async (token, guid, setData) => {
-    return callEndpoint(
+    return CallEndpoint(
         "GetListeSecteur",
         {
             token: token,
@@ -130,7 +131,7 @@ const GetDocumentFISAV = async (
     let targetWindow = undefined;
 
     if (returnData) {
-        return callEndpoint("GetDocumentFISAV", {
+        return CallEndpoint("GetDocumentFISAV", {
             token: token,
             IdFicheInterventionSAV: IdFicheInterventionSAV,
         }, null, true);
@@ -146,7 +147,7 @@ const GetDocumentFISAV = async (
         }
     };
 
-    return callEndpoint(
+    return CallEndpoint(
         "GetDocumentFISAV",
         {
             token: token,
@@ -188,7 +189,7 @@ const GetDocumentFISAV = async (
     //   }
     // };
 
-    // return callEndpoint(
+    // return CallEndpoint(
     //   "GetDocumentFISAV",
     //   {
     //     token: token,

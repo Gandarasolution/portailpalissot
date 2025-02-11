@@ -1,7 +1,7 @@
 //Ce fichier rassemble toutes les fonctions d'appel utilisée en rapport avec les factures
 
 import { HTMLEncode } from "../functions";
-import { callEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
+import { CallEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
 
 
 
@@ -14,7 +14,7 @@ import { callEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
  * @param {Function} setData 
  */
 const GetListeFactures = async (token, guid, dateDebut, dateFin, setData) => {
-    await callEndpoint("GetFactures", {
+    await CallEndpoint("GetFactures", {
         token: token,
         guid: guid,
         dateDebut: dateDebut,
@@ -59,7 +59,7 @@ const VoirFactureDocument = async (
 ) => {
 
     if (returnData) {
-        return await callEndpoint("GetFactureDocument", {
+        return await CallEndpoint("GetFactureDocument", {
             token: token,
             IdFacture: IdFacture,
             TypeFacture: TypeFacture,
@@ -69,7 +69,7 @@ const VoirFactureDocument = async (
 
     let targetWindow = window.open("/waiting");
 
-    await callEndpoint("GetFactureDocument", {
+    await CallEndpoint("GetFactureDocument", {
         token: token,
         IdFacture: IdFacture,
         TypeFacture: TypeFacture,
@@ -133,7 +133,7 @@ const TelechargerFactureDocument = async (
 ) => {
     let targetWindow = window.open("/waiting");
 
-    await callEndpoint("GetFactureDocument", {
+    await CallEndpoint("GetFactureDocument", {
         token: token,
         IdFacture: IdFacture,
         TypeFacture: TypeFacture,

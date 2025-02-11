@@ -22,7 +22,8 @@ const getUrlFromCookie = () => {
  * @param {Boolean} mustReturnResponse  Si vrai la fonction retourne la réponse
  * @param {?string} urlToUse L'url à utiliser (autre que celle stocké en cookie)
  */
-const callEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnResponse, urlToUse) => {
+const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnResponse, urlToUse) => {
+
 
     //Récupération de l'URL 
     let _url = "";
@@ -46,10 +47,15 @@ const callEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
      * @param {?Object} error 
      */
     function ErrorHandling(xhr, status, error) {
-        callbackResponseSuccess(xhr?.status);
-        console.log(error);
-        console.log("Erreur lors du endpoint ", endpoint);
-        console.log("avec les donnes ", data);
+        let _thrownError = new Error("Une erreur s'est produite");
+        if(mustReturnResponse){
+            return _thrownError;
+        }
+        callbackResponseSuccess(_thrownError);
+        // callbackResponseSuccess(xhr?.status);
+        // console.log(xhr, status, error);
+        // console.log("Erreur lors du endpoint ", endpoint);
+        // console.log("avec les donnes ", data);
     }
 
     let _data = undefined;
@@ -110,7 +116,7 @@ const VoirDocument = (b64, filename, targetWindow) => {
             window.open(urlToOpen, "_blank");
         }
     }
-    callEndpoint("File64", { b64: b64, filename: HTMLEncode(filename), callbackResponseSuccess })
+    CallEndpoint("File64", { b64: b64, filename: HTMLEncode(filename), callbackResponseSuccess })
 };
 
 
@@ -122,7 +128,7 @@ const VoirDocumentOffice = async (b64, filename) => {
         const urlToOpen = `${getUrlFromCookie()}SeeDocument&filename=${data}`;
         _urlRetour = urlToOpen;
     }
-    await callEndpoint("File64", { b64: b64, filename: HTMLEncode(filename) }, callbackResponseSuccess)
+    await CallEndpoint("File64", { b64: b64, filename: HTMLEncode(filename) }, callbackResponseSuccess)
 
     // await $.ajax({
     //   type: "POST",
@@ -150,7 +156,7 @@ const  TelechargerDocument = (b64, filename, targetWindow) => {
             window.open(urlToOpen, "_blank");
         }
     };
-    callEndpoint("File64", { b64: b64, filename: filename }, callbackResponseSuccess)
+    CallEndpoint("File64", { b64: b64, filename: filename }, callbackResponseSuccess)
 
     // $.ajax({
     //   type: "POST",
@@ -174,7 +180,7 @@ const TelechargerZIP = (files, filename) => {
         const urlToOpen = `${getUrlFromCookie()}DownloadDocument&filename=${data}`;
         window.open(urlToOpen, "_blank");
     }
-    callEndpoint("ZIPDocs", { arrayDocs: files, filename: filename }, callbackResponseSuccess);
+    CallEndpoint("ZIPDocs", { arrayDocs: files, filename: filename }, callbackResponseSuccess);
 
     // $.ajax({
     //   type: "POST",
@@ -192,7 +198,7 @@ const TelechargerZIP = (files, filename) => {
 //#endregion
 
 
-export { callEndpoint
+export { CallEndpoint
     //Documents
     ,VoirDocument
     ,VoirDocumentOffice
