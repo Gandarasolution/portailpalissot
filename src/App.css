@@ -392,8 +392,36 @@ button.switch-site{
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  bottom: -25px;
+  position: absolute;
+  top: 0;
+  right: 5%;
+  z-index: 99999999;
 } 
+
+.top-bar-menu .navbar-text .wrapper-site .dropdown-menu.show a:first-child{
+  margin-top: -20px;
+}
+
+.top-bar-menu .navbar-text .wrapper-site .dropdown-footer{
+  background: var(--color-red);
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  margin-top: 25px;
+}
+
+.top-bar-menu .navbar-text .wrapper-site .btn-see-all-sites{
+  color: var(--color-white) !important;
+  font-weight: bold;
+  text-align: center;
+  padding: 12px 0;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.top-bar-menu .navbar-text .wrapper-site .btn-see-all-sites:active{
+  background: var(--color-red);
+  margin: 0 !important;
+}
 
 .top-bar-menu .navbar-text .wrapper-site .title-site{
   top: 12px;
@@ -448,6 +476,7 @@ button.switch-site{
 .top-bar-menu .navbar-text .wrapper-site .dropdown-menu{
   position: relative;
   border-width: 0;
+  padding-bottom: 0;
 }
 
 .top-bar-menu .chevron-down{

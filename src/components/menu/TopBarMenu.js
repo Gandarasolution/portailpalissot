@@ -60,7 +60,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
   const [showDropdownPeriode, setShowDropdownPeriode] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [isSwitchSiteOpen, setIsSwitchSiteOpen] = useState(false);
-  const [dropdownWidth, setDropdownWidth] = useState("auto"); 
+  const [dropdownWidth, setDropdownWidth] = useState("auto");
 
   const navbarRef = useRef(null);
   const titleDropdownRef = useRef(null);
@@ -470,7 +470,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
       const textWidth = titleDropdownRef.current.scrollWidth;
       const buttonWidth = dropdownButtonRef.current.offsetWidth;
       const computedWidth = textWidth + buttonWidth;
-  
+
       setDropdownWidth(`${computedWidth}px`);
     } else {
       setDropdownWidth("auto");
@@ -532,12 +532,20 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
                       <Dropdown.Item
                         key={site.GUID}
                         onClick={() => ClientSiteContratCtx.setClientSite(site)}
-                         className="ms-3"
+                        className="ms-3"
                       >
                         {site.NomCompletClientSite}
                       </Dropdown.Item>
                     )
                   ))}
+                  <div className="dropdown-footer">
+                    <Dropdown.Item
+                      className="ms-3 btn-see-all-sites"
+                      onClick={() => navigate("/sites")}
+                    >
+                      Voir toutes la liste
+                    </Dropdown.Item>
+                  </div>
                 </DropdownButton>
               </div>
             )}
