@@ -45,7 +45,7 @@ import { GetDateFromStringDDMMYYY, GetNomMois } from "../../functions";
 
 //#endregion
 
-const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes }) => {
+const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes,isError }) => {
 
   //#region Contexts
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
@@ -431,7 +431,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
 
   useEffect(() => {
     const pathname = window.location.pathname;
-
+    if(isError)return;
     statePeriodes.setIsSetPeriode(false);
 
     let _isdropdownShown = false;
@@ -447,6 +447,8 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
 
 
   useEffect(() => {
+    if(isError)return;
+
     if (showDropdownPeriode) {
       GetPeriodes();
     }
@@ -498,7 +500,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
 
         <Navbar.Text className="d-flex align-item" >
           {
-            showDropdownPeriode &&
+           (!isError) && showDropdownPeriode &&
             <DropdownPeriode />
           }
         </Navbar.Text>
@@ -511,7 +513,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
               {siteActuel}
             </div>
 
-            {ClientSiteContratCtx.storedClientSite && (
+            {(!isError) && ClientSiteContratCtx.storedClientSite && (
               <div className="dropdown-container d-flex flex-column align-items-start">
                 <div className="title-site-in-dropdown me-2 ms-3" ref={titleDropdownRef}>
                   {siteActuel}
@@ -527,12 +529,13 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
                   }}
                   style={{ width: dropdownWidth }}
                 >
-                  {listeSites.map((site) => (
+                  {listeSites && listeSites.length && listeSites.length >=1 && listeSites.map((site) => (
                     site.GUID !== ClientSiteContratCtx.storedClientSite.GUID && (
                       <Dropdown.Item
                         key={site.GUID}
                         onClick={() => ClientSiteContratCtx.setClientSite(site)}
                          className="ms-3"
+
                       >
                         {site.NomCompletClientSite}
                       </Dropdown.Item>
@@ -542,6 +545,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
               </div>
             )}
           </div>
+
 
           <OverlayTrigger
             trigger={"click"}
