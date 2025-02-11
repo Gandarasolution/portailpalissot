@@ -418,9 +418,9 @@ button.switch-site{
   border-bottom-left-radius: 8px;
 }
 
-.top-bar-menu .navbar-text .wrapper-site .btn-see-all-sites:active{
+.top-bar-menu .navbar-text .wrapper-site .btn-see-all-sites:active,
+.top-bar-menu .navbar-text .wrapper-site .btn-see-all-sites:focus{
   background: var(--color-red);
-  margin: 0 !important;
 }
 
 .top-bar-menu .navbar-text .wrapper-site .title-site{

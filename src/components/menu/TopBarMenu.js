@@ -543,7 +543,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
                   ))}
                   <div className="dropdown-footer">
                     <Dropdown.Item
-                      className="ms-3 btn-see-all-sites"
+                      className="btn-see-all-sites"
                       onClick={() => navigate("/sites")}
                     >
                       Voir toutes la liste
