@@ -950,13 +950,13 @@ tbody{
   border-radius: 16px;
 }
 
-tbody tr:first-child td{
+/*tbody tr:first-child td{
   padding-top: 35px;
 }
 
 tbody tr:last-child td{
   padding-bottom: 35px;
-}
+}*/
 
 tbody tr:first-child td:first-child {
   border-top-left-radius: 16px;
@@ -1028,7 +1028,8 @@ thead th,
 .table-presta td {
   text-align: start;
   border-bottom-width: 0 !important;
-  height: 100px;
+  height: 80px;
+  padding-top: 25px !important;
 }
 
 
@@ -1063,6 +1064,28 @@ thead th,
 .table-presta-row-selected {
   background-color: whitesmoke;
 }
+
+.table-presta-row-selected td:first-child{
+  position: relative;
+}
+
+.table-presta-row-selected td:first-child::before {
+  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: var(--color-darker);
+  margin-right: 4px;
+  /*position: absolute;
+  left: -6%;*/
+}
+/*
+.table-presta-row-selected td:first-child::after{
+  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: var(--color-darker);
+  margin-left: 4px;
+}*/
 
 
 .table-presta button {
