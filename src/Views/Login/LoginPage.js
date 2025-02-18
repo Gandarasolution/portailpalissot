@@ -25,7 +25,7 @@ import {  CreateTokenMDP, IsURICanonnical,Connexion,  GetListeParametres, GetURL
 //#endregion
 import backgroundLogin from "../../image/imageLogin/login.jpg";
 // import logo from "../../image/favicon.ico";
-import logoNoir from "../../image/imageLogin/logo_noir.png";
+import { ReactComponent as LogoNoir } from "../../image/imageLogin/login-gandara-propulsee-noir.svg";
 
 const LoginPage = (props) => {
   //#region States
@@ -477,28 +477,13 @@ const LoginPage = (props) => {
         <Col md={3} className="d-flex align-items-center justify-content-around flex-column login-content-wrapper">
           {/* Logo au-dessus du formulaire */}
           <div className="container-login-content">
-            <div className="text-center mb-4">
-              <img
-                alt="Logo noir"
-                src={logoNoir}
-                width="60"
-                height="60"
-              />
-              {/* <img
-                alt="Logo"
-                src={logo}
-                width="50"
-                height="50"
-                className="d-inline-block align-top"
-              />
-              <h2 className="mt-2">GMAO</h2> */}
-            </div>
             {FormSubmit()}
           </div>
           {/* Image logo_noir en dessous du formulaire */}
-          {/* <div className="text-center mt-4">
-            
-          </div> */}
+          <div className="container-powered-by">
+            <p className="text-center text-powered-by">Application propulsée <br></br>par</p>
+              <LogoNoir className="d-inline-block align-top svg-powered-by" />
+          </div> 
         </Col>
       </Row>
       {ModalForgotPassword()}

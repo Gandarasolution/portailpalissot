@@ -28,6 +28,8 @@ import logo from "../../image/imageHome/logo_blanc.png";
 
 import { ClientSiteContratContext, TokenContext } from "../../App";
 import { GetListeParametres } from "../../axios/WS_User";
+import { ReactComponent as LogoNoir } from "../../image/imageLogin/login-gandara-propulsee-noir.svg";
+
 //#endregion
 
 //#endregion
@@ -142,13 +144,19 @@ const SideBarMenuLeft = () => {
 
         {/* Bouton gestion des cookies */}
         <div className="sidebar-footer">
-          <Button
+          {/* <Button
             variant=""
+            id="tarteaucitron"
             className="cookies-btn"
             onClick={handleCookies}
           >
             <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
-          </Button>
+          </Button> */}
+
+          <div className="container-powered-by">
+            <p className="text-center text-powered-by">Application propulsée <br /> par</p>
+            <LogoNoir className="d-inline-block align-top svg-powered-by" />
+          </div>
         </div>
       </CDBSidebar>
     );
