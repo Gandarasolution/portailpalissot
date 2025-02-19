@@ -51,7 +51,7 @@ const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
         if(mustReturnResponse){
             return _thrownError;
         }
-        callbackResponseSuccess(_thrownError);
+        if(callbackResponseSuccess) callbackResponseSuccess(_thrownError);
         // callbackResponseSuccess(xhr?.status);
         // console.log(xhr, status, error);
         // console.log("Erreur lors du endpoint ", endpoint);

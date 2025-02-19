@@ -70,6 +70,7 @@ import ViewerImagePage from "./Views/Viewer/ViewerImage";
 import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
 import { addOneYear, cyrb53, DateSOAP } from "./functions";
 import { Toast, ToastContainer } from "react-bootstrap";
+import { SetLastSite } from "./axios/WS_ClientSite";
 // import AccountPage from "./Views/Home/AccountPage";
 
 library.add(
@@ -120,6 +121,7 @@ function App() {
 
   function setClientSite(clientSite) {
     setClientSiteCookie(clientSiteName, clientSite);
+    SetLastSite(tokenCookie[tokenName],clientSite.GUID);
   }
   const storedClientSite = clientSiteCookie[clientSiteName];
 

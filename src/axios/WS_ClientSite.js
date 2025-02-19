@@ -65,11 +65,26 @@ const GetListeSecteur = async (token, guid, setData) => {
 
 
 
+/**
+ * Enregistre le dernier site visité
+ * @param {string} token 
+ * @param {guid} guid 
+ * @returns 
+ */
+const SetLastSite = async (token,guid) =>{
+    return CallEndpoint("SetLastSite",{
+        token: token,
+        guid: guid
+    })
+}
+
+
 export {
     GetListeTels
     , GetListeMails
     , GetNombrePortails
     , GetListeSecteur
+    ,SetLastSite
 }
 
 

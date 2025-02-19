@@ -128,6 +128,15 @@ const ClientSitePage = ({ setPageSubtitle, setPageTitle }) => {
         ClientSiteCt.setClientSite(data);
         navigate("/");
       }
+      // Si un site est tagué comme étant le dernier visité, le selectionner
+      if (!ClientSiteCt.storedClientSite) {
+
+        var _found = data.find((e) => e.IsLastSiteVisite);
+        if (_found) {
+          ClientSiteCt.setClientSite(_found);
+        }
+
+      }
       setPageSubtitle(`${data.length > 1 ? data.length : 1}`);
       setIsLoaded(true);
 
