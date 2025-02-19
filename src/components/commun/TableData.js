@@ -667,7 +667,7 @@ const TableData = ({ ...props }) => {
       removeValue(arraySearch, setArraySearch);
     };
 
-    if (_headerToApply.filter.isCheckbox && _arFilters.length > 10) {
+    if (_headerToApply.filter.isCheckbox && _arFilters.length >= 20) {
       _headerToApply.filter.isCheckbox = false;
     }
     return (
