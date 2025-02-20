@@ -407,7 +407,7 @@ const TableData = ({ ...props }) => {
   const TableHeaderCellFilter = ({ header }) => {
     return (
       <th key={header.fieldname}>
-        <div className="row-height">
+        <div className="row-height th-with-icon">
           {header.caption ? header.caption : header.fieldname}
           <OverlayTrigger
             trigger="click"
@@ -746,9 +746,8 @@ const TableData = ({ ...props }) => {
                     onChange={HandleMaxDateRangeValueChanged}
                   />
                 </Col>
-
-                <Button onClick={HandleFilterDateClick}>Appliquer</Button>
               </div>
+              <Button className="btn-filter" onClick={HandleFilterDateClick}>Valider</Button>
             </Tab>
           )}
           {/* Num max min */}
@@ -783,9 +782,8 @@ const TableData = ({ ...props }) => {
                     onChange={(e) => setMaxValue(e.target.value)}
                   />
                 </Col>
-
-                <Button onClick={HandleFilterSeuilClick}>Appliquer</Button>
               </div>
+              <Button className="btn-filter" onClick={HandleFilterSeuilClick}>Valider</Button>
             </Tab>
           )}
           {/* Recherche sur cette colonne */}
@@ -802,7 +800,6 @@ const TableData = ({ ...props }) => {
 
                   <Button
                     onClick={HandleSearchOnClick}
-                    variant="outline-secondary"
                     id="button-addon2"
                   >
                     <FontAwesomeIcon icon={faSearch} />
@@ -812,18 +809,13 @@ const TableData = ({ ...props }) => {
             </Tab>
           )}
 
-          <Tab
+          <Tab 
             title={
-              <span>
-                {" "}
-                <OverlayTrigger
-                  overlay={<Popover>Supprimer les filtres</Popover>}
-                >
+              <span class="remove-filter">
                   <FontAwesomeIcon
                     onClick={SupprimerFiltreColonne}
-                    icon={faFilterCircleXmark}
+                    icon={faXmark}
                   />
-                </OverlayTrigger>
               </span>
             }
           />
