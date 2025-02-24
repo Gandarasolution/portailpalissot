@@ -20,17 +20,35 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 //#endregion
 
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { GetDashboardData } from "../../axios/WS_ClientSite";
+import { ClientSiteContratContext, TokenContext } from "../../App";
 
 //#endregion
 
 const HomePage = ({ setPageSubtitle, setPageTitle }) => {
+
+  const tokenCt = useContext(TokenContext);
+  const ClientSiteContratCtx = useContext(ClientSiteContratContext);
+
+  const [dashboardData, setDashboardData] = useState([]);
+  
+
+  const DashboardData = async () =>{
+    const callBackData = (data)=>{
+      if(data){
+        setDashboardData(data);
+      }
+    }
+    await GetDashboardData(tokenCt,ClientSiteContratCtx.storedClientSite.GUID,callBackData);
+  }
 
 
   useEffect(() => {
     document.title = `Portail client`;
     setPageTitle(`Portail client`);
     setPageSubtitle(null);
+    DashboardData();
     // eslint-disable-next-line
   }, [])
 

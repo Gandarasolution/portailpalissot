@@ -79,12 +79,26 @@ const SetLastSite = async (token,guid) =>{
 }
 
 
+/**
+ * 
+ * @param {string} token 
+ * @param {guid} guid 
+ * @returns 
+ */
+const GetDashboardData = async (token, guid,setData) =>{
+    return CallEndpoint("GetDashboardData",{
+        token:token,
+        guid: guid
+    },setData)
+}
+
 export {
     GetListeTels
     , GetListeMails
     , GetNombrePortails
     , GetListeSecteur
     ,SetLastSite
+    ,GetDashboardData
 }
 
 
