@@ -12,6 +12,7 @@ import {
   faBook,
   faFile,
   faBell,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
@@ -32,15 +33,15 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   const [dashboardData, setDashboardData] = useState([]);
-  
 
-  const DashboardData = async () =>{
-    const callBackData = (data)=>{
-      if(data){
+
+  const DashboardData = async () => {
+    const callBackData = (data) => {
+      if (data) {
         setDashboardData(data);
       }
     }
-    await GetDashboardData(tokenCt,ClientSiteContratCtx.storedClientSite.GUID,callBackData);
+    await GetDashboardData(tokenCt, ClientSiteContratCtx.storedClientSite.GUID, callBackData);
   }
 
 
@@ -49,8 +50,10 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     setPageTitle(`Portail client`);
     setPageSubtitle(null);
     DashboardData();
+    console.log("Données Dashboard:", dashboardData);
     // eslint-disable-next-line
-  }, [])
+  }, [dashboardData])
+
 
   const SpanLink = ({ title, to, img, kv, disable }) => {
 
@@ -65,16 +68,18 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     );
   };
 
+  // Récupération des données du timeline (activités récentes)
+  const timelineData =
+    dashboardData?.WidgetTimeline?.Activites?.GMAO_WidgetTimeline_Data || [];
+
+  // Récupération des données de stats (WidgetsNombre)
+  const statsData =
+    dashboardData?.WidgetsNombre?.GMAO_WidgetNombre || [];
+
   return (
-    <Container fluid className="h-100 p-0">
-      {/* <TitreOfPage
-        titre={"Portail client"}
-        soustitre={ClientSiteCt.storedClientSite.NomCompletClientSite}
-        isLoaded
-      /> */}
+    <Container fluid className="h- p-0">
       <Container fluid className="container-table">
         <div>
-
           <h2>Raccourcis</h2>
         </div>
 
@@ -87,23 +92,8 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
               <SpanLink
                 title={"Maintenances"}
                 to={"/maintenance"}
-              // img={ImgMaintenance}
-              // disable={
-              //   ClientSiteCt.storedClientSite.IdContrat <= 0 ? (
-              //     <div className=" badge badge-bg-danger-nowrap ">
-              //       Aucun contrat actif
-              //     </div>
-              //   ) : undefined
-              // }
               />
             </Nav.Item>
-            {/* <Nav.Item>
-              <SpanLink
-                title={"Voir la liste des appareils enregistrés"}
-                to={"/appareils"}
-                img={ImgAppareil}
-              />
-            </Nav.Item> */}
             <Nav.Item>
               <FontAwesomeIcon
                 icon={faWrench}
@@ -111,10 +101,6 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
               <SpanLink
                 title={"Dépannages"}
                 to={"/interventions"}
-              // img={ImgMaintenance}
-              // kv={ClientSiteCt.storedClientSite.NbPortail.KV.find(
-              //   (kv) => kv.k === "interventions"
-              // )}
               />
             </Nav.Item>
             <Nav.Item>
@@ -124,10 +110,6 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
               <SpanLink
                 title={"Devis"}
                 to={"/devis"}
-              // img={ImgDevis}
-              // kv={ClientSiteCt.storedClientSite.NbPortail.KV.find(
-              //   (kv) => kv.k === "devis"
-              // )}
               />
             </Nav.Item>
             <Nav.Item>
@@ -137,34 +119,111 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
               <SpanLink
                 title={"Factures"}
                 to={"/factures"}
-              // img={ImgFacture}
               />
 
               <NavLink></NavLink>
             </Nav.Item>
-            <Nav.Item>
-              <FontAwesomeIcon
-                icon={faBell}
-              />
-              <SpanLink
-                title={"Demande d'intervention"}
-                to={"/nouvelleIntervention"}
-              // img={ImgUrgence}
-              />
-            </Nav.Item>
-            {/* <Nav.Item>
-              <SpanLink
-                title={"Gérer mon compte"}
-                to={"/account"}
-                img={ImgAccount}
-              />
-
-              <NavLink></NavLink>
-            </Nav.Item> */}
           </Nav>
         </span>
       </Container>
+
+      <Container fluid className="container-table">
+        <h2>Statistiques du moment</h2>
+
+        <div className="row">
+          {statsData.map((item, idx) => {
+            // Ex. item = {
+            //   "IdEtat": 9,
+            //   "IdTypeDocument": 0,
+            //   "NombreAffiche": 0,
+            //   "SousTitre": "En attente de décision",
+            //   "Titre": "Devis"
+            // }
+            return (
+              <div className="col-sm-3 mb-3" key={idx}>
+                <h4>{item.Titre}</h4>
+                <p>
+                  {item.NombreAffiche} {item.SousTitre}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </Container>
+      <Container fluid className="container-table d-flex">
+        <div className="p-4 d-flex align-items-center justify-content-center dashboard-request-intervention">
+          <div className="d-flex flex-column align-items-center justify-content-center">
+            <FontAwesomeIcon icon={faBell} size="2x" />
+
+            <h5>Demande d’intervention</h5>
+            <p>
+              Remplissez notre formulaire directement <br></br>
+              depuis cette application.
+            </p>
+            <a href="/nouvelleintervention" className="btn">
+              Faire une demande maintenant &gt;
+            </a>
+          </div>
+        </div>
+
+        <div className="dashboard-last-activities">
+          <h2 className="mt-4">
+            Activités récentes <span className="last-activities-subtitle">( 30 derniers jours )</span>
+          </h2>
+          <div className="last-activities-listing">
+            <h5>
+              <FontAwesomeIcon icon={faChartLine} className="me-2" />
+              {dashboardData?.WidgetTimeline?.Texte ||
+                ""}
+            </h5>
+
+            <ul className="last-activities-list">
+              {timelineData.map((event, index) => {
+                const colorMapping = {
+                  Primary: "#007bff",
+                  Secondary: "#6c757d",
+                  Success: "#28a745",
+                  Danger: "#dc3545",
+                  Warning: "#ffc107",
+                  Info: "#17a2b8",
+                  Dark: "#343a40",
+                };
+
+                const timestamp = parseInt(event.DateStrUNIX, 10) * 1000;
+                const dateObj = new Date(timestamp);
+                const dateLocale = dateObj.toLocaleString("fr-FR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
+                const bulletColor = colorMapping[event.CouleurTag] || "#ccc";
+
+                return (
+                  <li key={index} className="last-activity-item">
+                    {/* Puce colorée */}
+                    <span className="activity-bullet" style={{ borderColor: bulletColor }}></span>
+
+                    {/* Texte de l'événement */}
+                    <span className="activity-text">
+                      {dateLocale} – {event.Texte}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+
+          </div>
+        </div>
+
+
+
+      </Container>
     </Container>
+
+
   );
 };
 

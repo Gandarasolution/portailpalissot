@@ -71,7 +71,9 @@ input.form-control:focus{
 .modal .modal-dialog.modal-password input.form-control,
 .shortcut-link .nav-item,
 .btn-upload-file,
-.popover-filters{
+.popover-filters,
+.dashboard-request-intervention,
+.last-activities-listing{
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06);
 }
 
@@ -960,16 +962,17 @@ sup {
 /* ---- HOMEPAGE ---- */
 .shortcut-link{
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-wrap: wrap;
 }
 .shortcut-link .nav-item{
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 10px 20px;
+  padding: 20px;
   border-radius: 16px;
-  width: 18%;
+  width: 20%;
+  margin-right: 2.5%;
 }
 
 .shortcut-link .nav-item{
@@ -1248,7 +1251,8 @@ thead th,
   text-align: start;
   border-bottom-width: 0 !important;
   height: 60px;
-  padding-top: 25px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
 }
 
 
@@ -1476,7 +1480,7 @@ thead th,
 
 .modal.show .modal-dialog.modal-listing{
   max-width: 80vw;
-  width: 60vw;
+  width: 75vw;
 }
 
 .modal.show .modal-dialog.modal-password{
@@ -1498,6 +1502,10 @@ thead th,
   border-radius: 16px;
 }
 
+.modal-titles-subtitle{
+  width: 100%;
+}
+
 .modal.show .modal-dialog .modal-content .modal-header .modal-title:not(svg),
 .modal.show .modal-dialog .modal-content .modal-header h1{
   font-family: var(--font-bold);
@@ -1517,6 +1525,10 @@ thead th,
   font-size: 1.75rem;
 }
 
+.modal.show .modal-dialog .modal-content .modal-header .modal-titles{
+  display: flex;
+}
+
 .modal.show .modal-dialog .modal-content .modal-header .modal-title.h4::after{
   content: "";
   position: absolute;
@@ -1527,11 +1539,11 @@ thead th,
   background-color: transparent;
 }
 
-.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.actif::after{
+.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.active::after{
   background-color: var(--color-red);
 }
 
-.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.actif{
+.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.active{
   color: var(--color-black);
 }
 
@@ -1794,4 +1806,158 @@ thead th,
 
 .scroll-to-top-button:hover {
   background-color: rgba(255,255,255,0.1);
+}
+
+
+/* Page dashboard */
+
+.dashboard-request-intervention{
+  background: linear-gradient(to right, #ff7e5f, #ffb347);
+  color: white;
+  width: 42.5%;
+  position: relative;
+  max-height: 300px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-right: 2.5%;
+  margin-top: 75px;
+}
+
+.dashboard-request-intervention::before {
+  content: "\f0f3";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  font-size: 130px;
+  color: #DC5A29;
+  top: 60px;
+  right: -20px;
+}
+
+
+.dashboard-request-intervention svg{
+  width: 25px;
+  height: 25px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 99px;
+}
+
+.dashboard-request-intervention svg path{
+  fill: #ffb347;
+}
+
+.dashboard-request-intervention h5{
+  font-weight: bolder;
+  margin: 20px 0;
+}
+
+.dashboard-request-intervention p{
+  font-size: 0.9rem;
+}
+
+.dashboard-request-intervention a{
+  font-weight: bolder;
+  color: white;
+  text-decoration: underline;
+}
+
+h2 span.last-activities-subtitle{
+  color: #7A909B;
+}
+
+.dashboard-last-activities{
+  width: 54%;
+}
+
+
+.dashboard-last-activities .last-activities-listing{
+  background: white;
+  border-radius: 16px;
+  margin-top: 30px;
+  max-height: 300px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.dashboard-last-activities .last-activities-listing::before {
+  content: "\f201";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  font-size: 130px;
+  color: rgba(157, 173, 181, 0.15);
+  bottom: -20px;
+  right: -20px;
+}
+
+.dashboard-last-activities .last-activities-listing h5,
+.dashboard-last-activities .last-activities-listing ul{
+  text-align: left;
+  padding: 20px 0 5px 4%;
+}
+
+.dashboard-last-activities .last-activities-listing h5{
+  font-weight: bold;
+  position: relative;
+}
+
+.dashboard-last-activities .last-activities-listing h5::after {
+  content: "";
+  height: 1px;
+  background-color:rgba(157, 173, 181, 0.15);
+  position: absolute;
+  width: 95%;
+  top: 55px;
+  left: 2%;
+  z-index: 1000;
+}
+
+
+.dashboard-last-activities .last-activities-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: scroll;
+}
+
+/* Ligne verticale (timeline) */
+.last-activities-list::before {
+  content: "";
+  position: absolute;
+  left: 4.75%;
+  top: 70px;
+  bottom: 15px;
+  width: 3px;
+  background-color: #ddd;
+}
+
+.last-activity-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.activity-bullet {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+  background: white;
+  border: 3px solid;
+}
+
+/* Espacement du dernier élément pour éviter que la ligne descende trop bas */
+.last-activity-item:last-child::after {
+  content: "";
+  display: block;
+  height: 5px;
+}
+
+.activity-text {
+  font-size: 0.9rem;
+  color: #9DADB5;
 }
