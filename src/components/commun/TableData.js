@@ -53,6 +53,7 @@ import {
   groupBy,
 } from "../../functions";
 import RowDocument from "./RowDocument";
+import { ReactComponent as Filter } from "../../image/filtre.svg";
 
 import { TelechargerZIP, } from "../../axios/WSGandara"
 
@@ -405,6 +406,7 @@ const TableData = ({ ...props }) => {
   };
 
   const TableHeaderCellFilter = ({ header }) => {
+    const [showPopover, setShowPopover] = useState(false);
     return (
       <th key={header.fieldname}>
         <div className="row-height th-with-icon">
@@ -412,21 +414,22 @@ const TableData = ({ ...props }) => {
           <OverlayTrigger
             trigger="click"
             rootClose
-            overlay={PopoverFilter(header.fieldname)}
+            show={showPopover}
+            onToggle={(isOpen) => setShowPopover(isOpen)}
+            overlay={PopoverFilter(header.fieldname, setShowPopover)}
             placement="bottom"
           >
-            <FontAwesomeIcon
-              icon={faFilter}
-              className={`icon-bt ${IsButtonShouldBeCheck(header.fieldname) && "filter-actif"
-                } `}
+            <Filter
+              className={`icon-bt ${IsButtonShouldBeCheck(header.fieldname) ? "filter-actif" : ""} ${showPopover ? "filter-open" : ""}`}
             />
+
           </OverlayTrigger>
         </div>
       </th>
     );
   };
 
-  const PopoverFilter = (fieldname) => {
+  const PopoverFilter = (fieldname, setShowPopover) => {
     let _arFilters = [];
 
     _arFilters = Object.entries(groupBy(props.Data, fieldname));
@@ -655,7 +658,7 @@ const TableData = ({ ...props }) => {
 
     //#endregion
 
-    const SupprimerFiltreColonne = () => {
+    const ResetFilterCol = () => {
       function removeValue(array, setArray) {
         let _array = JSON.parse(JSON.stringify(array));
         _array = _array.filter((f) => f.fieldname !== fieldname);
@@ -665,7 +668,13 @@ const TableData = ({ ...props }) => {
       removeValue(arrayFilterRangeDate, setArrayFilterRangeDate);
       removeValue(arrayFilterSeuis, setArrayFilterSeuils);
       removeValue(arraySearch, setArraySearch);
+
     };
+
+    const ClosePopover = () => {
+      setShowPopover(false);
+    };
+
 
     if (_headerToApply.filter.isCheckbox && _arFilters.length >= 20) {
       _headerToApply.filter.isCheckbox = false;
@@ -748,6 +757,15 @@ const TableData = ({ ...props }) => {
                 </Col>
               </div>
               <Button className="btn-filter" onClick={HandleFilterDateClick}>Valider</Button>
+              <Button
+                className="btn-filter cancel"
+                onClick={() => {
+                  ResetFilterCol();
+                }}
+              >
+                Annuler
+              </Button>
+
             </Tab>
           )}
           {/* Num max min */}
@@ -783,7 +801,16 @@ const TableData = ({ ...props }) => {
                   />
                 </Col>
               </div>
-              <Button className="btn-filter" onClick={HandleFilterSeuilClick}>Valider</Button>
+              <Button className="btn-filter validate" onClick={HandleFilterSeuilClick}>Valider</Button>
+              <Button
+                className="btn-filter cancel"
+                onClick={() => {
+                  ResetFilterCol();
+                }}
+              >
+                Annuler
+              </Button>
+
             </Tab>
           )}
           {/* Recherche sur cette colonne */}
@@ -809,13 +836,13 @@ const TableData = ({ ...props }) => {
             </Tab>
           )}
 
-          <Tab 
+          <Tab
             title={
               <span class="remove-filter">
-                  <FontAwesomeIcon
-                    onClick={SupprimerFiltreColonne}
-                    icon={faXmark}
-                  />
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  onClick={ClosePopover}
+                />
               </span>
             }
           />

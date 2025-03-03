@@ -5,7 +5,8 @@
   --color-info: #85c7f9;
   --color-dark: #282c34;
   --color-darker: #3e4148;
-  --color-red: #c80059;
+  --color-red: #c74b74;
+  --color-red-pastel: #f7eaee;
   --color-sky-blue: #F1F6FA;
   --color-pastel-green: #D9F3EA;
   --color-pastel-green-text: #01B075;
@@ -879,10 +880,6 @@ sup {
   color: var(--bs-secondary) !important;
 }
 
-.filter-actif {
-  color: var(--bs-primary);
-}
-
 .icon-bt:hover {
   color: var(--bs-primary);
   cursor: pointer;
@@ -975,12 +972,8 @@ sup {
   width: 18%;
 }
 
-.shortcut-link .nav-item:not(:last-child){
+.shortcut-link .nav-item{
   background-color: var(--color-red);
-}
-
-.shortcut-link .nav-item:last-child{
-  background-color: var(--color-black);
 }
 
 .shortcut-link .nav-item svg{
@@ -1145,14 +1138,25 @@ sup {
 .table-presta .th-with-icon svg{
   padding: 5px 6px;
   border-radius: 99px;
+  height: 27px;
+  width: 27px;
+  margin-right: 8px;
 }
 
-.table-presta .th-with-icon svg:hover{
-  background: var(--color-white);
+.table-presta .th-with-icon svg:hover,
+.table-presta .th-with-icon svg.filter-actif,
+.table-presta .th-with-icon svg.filter-open{
+  background: var(--color-red-pastel);
 }
 
 .table-presta .th-with-icon svg path{
   fill: var(--color-darker);
+}
+
+.table-presta .th-with-icon svg:hover path,
+.table-presta .th-with-icon svg.filter-actif path,
+.table-presta .th-with-icon svg.filter-open path{
+  fill: var(--color-red);
 }
 
 .table-presta th > div:not(.th-with-icon){
@@ -1243,7 +1247,7 @@ thead th,
 .table-presta td {
   text-align: start;
   border-bottom-width: 0 !important;
-  height: 80px;
+  height: 60px;
   padding-top: 25px !important;
 }
 
@@ -1288,10 +1292,8 @@ thead th,
   content: "\f00c";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
-  color: var(--color-darker);
+  color: var(--color-success);
   margin-right: 4px;
-  /*position: absolute;
-  left: -6%;*/
 }
 /*
 .table-presta-row-selected td:first-child::after{
@@ -1752,12 +1754,16 @@ thead th,
 .page-link{
   border: none !important;
   background: transparent !important;
-  color: var(--color-black) !important;
+  color: var(--color-darker) !important;
+}
+
+.page-link svg line{
+  stroke: #212529 !important;
 }
 
 #root .active>.page-link{
-  background: var(--color-pastel-green) !important;
-  color: var(--color-pastel-green-text) !important;
+  background: var(--color-red-pastel) !important;
+  color: var(--color-red) !important;
   border-radius: 20px !important;
   padding: 8px 16px !important;
 }
