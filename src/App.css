@@ -6,6 +6,7 @@
   --color-dark: #282c34;
   --color-darker: #3e4148;
   --color-red: #c74b74;
+  --color-red-camaieu: #ae2d58;
   --color-red-pastel: #f7eaee;
   --color-sky-blue: #F1F6FA;
   --color-pastel-green: #D9F3EA;
@@ -22,7 +23,6 @@
   --font-text: 'Corbel', sans-serif;
   --font-arial: 'ArialMT', sans-serif;
 }
-
 /* Boris Black Bloxx */
 @font-face {
   font-family: 'BorisBlackBloxx';
@@ -73,7 +73,12 @@ input.form-control:focus{
 .btn-upload-file,
 .popover-filters,
 .dashboard-request-intervention,
-.last-activities-listing{
+.last-activities-listing,
+.dashboard-stats .stats-maintenance .stats-card,
+.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-devis,
+.stats-états-des-paiements,
+.dashboard-stats a.stats-link{
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06);
 }
 
@@ -119,8 +124,8 @@ input.form-control:focus{
 
 .popover-filters .btn-primary.btn-filter{
   margin-left: 5%;
-  padding: 5px 13%;
   border-radius: 8px;
+  width: 43%;
 }
 
 .popover-filters .btn-primary.btn-filter,
@@ -203,6 +208,10 @@ input[type="range"]::-webkit-slider-thumb:active{
 .tab-content #ppvr-rangeDate,
 .tab-content #ppvr-range{
   display: flex;
+}
+
+.tab-content #ppvr-range .col{
+   width: max-content;
 }
 
 .popover-filters{
@@ -971,26 +980,26 @@ sup {
   align-items: center;
   padding: 20px;
   border-radius: 16px;
-  width: 20%;
-  margin-right: 2.5%;
+  width: 19%;
+  margin-right: 1.75%;
 }
 
 .shortcut-link .nav-item{
-  background-color: var(--color-red);
+  background: linear-gradient(to right, var(--color-red-camaieu), var(--color-red));
 }
 
 .shortcut-link .nav-item svg{
   background: var(--color-white);
   color: var(--color-red);
-  font-size: 1.25em;
-  padding: 13px;
+  font-size: 1em;
+  padding: 10px;
   border-radius: 99px;
 }
 
 .shortcut-link .nav-item a{
   color: var(--color-white);
   font-family: var(--font-text);
-  font-size: 1.25em;
+  font-size: 1.15em;
   text-align: left;
 }
 
@@ -1811,11 +1820,125 @@ thead th,
 
 /* Page dashboard */
 
+.dashboard-stats .stats-card{
+  height: 275px;
+  max-height: 275px;
+}
+
+.dashboard-stats .stats-maintenance .stats-card,
+.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-devis,
+.stats-états-des-paiements{
+  background: white;
+  border-radius: 16px;
+}
+
+.dashboard-stats .stats-maintenance{
+  width: 40%;
+  margin-right: 2%;
+}
+
+.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-devis,
+.stats-états-des-paiements{
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-devis{
+  width: 19%;
+}
+
+.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-devis{
+  margin-right: 2%;
+}
+
+.stats-dépannages::after,
+.stats-devis::after,
+.stats-états-des-paiements::after{
+  content: "\f0ad";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  font-size: 100px;
+  color: rgba(157, 173, 181, 0.15);
+  top: 40px;
+  right: -20px;
+}
+
+.stats-dépannages::after{
+  content: "\f0ad";
+}
+
+.stats-devis::after{
+  content: "\f02d";
+}
+
+.stats-états-des-paiements::after{
+  content: "\f15b";
+}
+
+.dashboard-stats .stats-card h5{
+  text-align: left;
+  padding-left: 3%;
+  font-size: 1.15em;
+  white-space: nowrap;
+}
+
+.dashboard-stats .stats-card h5::after{
+  top: 30px;
+  position: relative;
+}
+
+.dashboard-stats .stats-title span.stats-subtitle{
+  color: #7A909B;
+  font-size: 0.95rem;
+  position: absolute;
+  right: 20px;
+}
+
+.dashboard-stats .stats-data{
+  text-align: left;
+  margin-top: -30px;
+}
+
+.dashboard-stats .stats-data .stats-number{
+  font-size: 4.5rem;
+  font-weight: bold;
+}
+
+.dashboard-stats .stats-data .stats-number-title{
+  margin-top: -25px;
+  font-size: 1.15em;
+  color: #7A909B;
+  width: 65%;
+}
+
+.dashboard-stats a.stats-link{
+  background: linear-gradient(to right, var(--color-red-camaieu), var(--color-red));
+  color: white;
+  display: inline-block;
+  width: max-content;
+  border: 1px solid var(--color-red);
+  border-radius: 8px;
+  padding: 6px 25px 6px 15px;
+  text-decoration: none;
+  font-size: 1em;
+}
+
+.dashboard-stats a.stats-link:hover{
+  background: white;
+  color: var(--color-red);
+}
+
 .dashboard-request-intervention{
   background: linear-gradient(to right, #ff7e5f, #ffb347);
   color: white;
-  width: 42.5%;
+  width: 40%;
   position: relative;
+  height: 300px;
   max-height: 300px;
   border-radius: 16px;
   overflow: hidden;
@@ -1850,6 +1973,7 @@ thead th,
 .dashboard-request-intervention h5{
   font-weight: bolder;
   margin: 20px 0;
+  font-size: 1.15em ;
 }
 
 .dashboard-request-intervention p{
@@ -1867,7 +1991,7 @@ h2 span.last-activities-subtitle{
 }
 
 .dashboard-last-activities{
-  width: 54%;
+  width: 58%;
 }
 
 
@@ -1875,19 +1999,22 @@ h2 span.last-activities-subtitle{
   background: white;
   border-radius: 16px;
   margin-top: 30px;
+  height: 300px;
   max-height: 300px;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .dashboard-last-activities .last-activities-listing::before {
-  content: "\f201";
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
+  content: "";
   position: absolute;
-  font-size: 130px;
-  color: rgba(157, 173, 181, 0.15);
-  bottom: -20px;
+  width: 130px;
+  height: 130px;
+  background-image: url("image/coeur.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.15;
+  bottom: -5px;
   right: -20px;
 }
 
@@ -1897,22 +2024,31 @@ h2 span.last-activities-subtitle{
   padding: 20px 0 5px 4%;
 }
 
+.dashboard-last-activities .last-activities-listing svg{
+  width: 30px;
+  height: 30px;
+}
+
+.dashboard-stats .stats-card h5, 
 .dashboard-last-activities .last-activities-listing h5{
-  font-weight: bold;
+  font-weight: normal;
   position: relative;
 }
 
+.dashboard-stats .stats-card h5::after,
 .dashboard-last-activities .last-activities-listing h5::after {
   content: "";
   height: 1px;
   background-color:rgba(157, 173, 181, 0.15);
   position: absolute;
   width: 95%;
-  top: 55px;
   left: 2%;
   z-index: 1000;
 }
 
+.dashboard-last-activities .last-activities-listing h5::after {
+  top: 55px
+}
 
 .dashboard-last-activities .last-activities-list {
   list-style: none;

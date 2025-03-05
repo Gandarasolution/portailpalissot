@@ -8,6 +8,7 @@ import NavLink from "react-bootstrap/NavLink";
 //#region fontAwsome
 import {
   faCalendar,
+  faCalendarAlt,
   faWrench,
   faBook,
   faFile,
@@ -24,6 +25,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useContext, useEffect, useState } from "react";
 import { GetDashboardData } from "../../axios/WS_ClientSite";
 import { ClientSiteContratContext, TokenContext } from "../../App";
+import { ReactComponent as Rythme } from "../../image/coeur.svg";
 
 //#endregion
 
@@ -127,30 +129,82 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
         </span>
       </Container>
 
-      <Container fluid className="container-table">
+      <Container fluid className="container-table dashboard-stats">
         <h2>Statistiques du moment</h2>
 
-        <div className="row">
-          {statsData.map((item, idx) => {
-            // Ex. item = {
-            //   "IdEtat": 9,
-            //   "IdTypeDocument": 0,
-            //   "NombreAffiche": 0,
-            //   "SousTitre": "En attente de décision",
-            //   "Titre": "Devis"
-            // }
-            return (
-              <div className="col-sm-3 mb-3" key={idx}>
-                <h4>{item.Titre}</h4>
-                <p>
-                  {item.NombreAffiche} {item.SousTitre}
-                </p>
-              </div>
-            );
-          })}
+        <div className="d-flex mt-4">
+          {statsData.length > 0 ? (
+            statsData.map((item, idx) => {
+              const formattedTitle = item.Titre.toLowerCase().replace(/\s+/g, "-"); // Transforme le titre en classe CSS-friendly
+              return (
+                <div className={`mb-3 stats-${formattedTitle}`} key={idx}>
+                  <div className="stats-card p-3">
+                    <h5 className="stats-title">
+                      {item.Titre}
+                      {item.Titre === "Maintenance" && (
+                        <span className="stats-subtitle d-flex flex-column justify-content-between">
+                          <FontAwesomeIcon icon={faCalendarAlt} className="me-2 text-secondary" />
+                          Période du xx/xx/2024 au xx/xx/2025
+                        </span>
+                      )}
+                    </h5>
+
+                    <div className="stats-data">
+                      {/* Cas spécifique : Maintenance (avec date et roue) */}
+                      {item.Titre === "Maintenance" ? (
+                        <>
+                          <div className="stats-wheel-placeholder"></div>
+                        </>
+                      ) : (
+                        <p className="stats-number">{item.NombreAffiche} <span>{item.SousTitre}</span></p>
+                      )}
+                    </div>
+                    <a href="#" className="stats-link">Voir le détail &gt;</a>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            // Contenu temporaire en attendant les données
+            <>
+              {["Maintenance", "Dépannages", "Devis", "États des paiements"].map((title, idx) => {
+                const formattedTitle = title.toLowerCase().replace(/\s+/g, "-"); // Format classe CSS
+                return (
+                  <div className={`mb-3 stats-${formattedTitle}`} key={idx}>
+                    <div className="stats-card p-3 d-flex flex-column justify-content-between">
+                      <h5 className="stats-title">
+                        {title}
+                        {title === "Maintenance" && (
+                          <span className="stats-subtitle">
+                            <FontAwesomeIcon icon={faCalendar} className="me-2 text-secondary" />
+                            Période du xx/xx/2024 au xx/xx/2025
+                          </span>
+                        )}
+                      </h5>
+
+
+                      <div className="stats-data">
+                        {title === "Maintenance" ? (
+                          <div className="stats-wheel-placeholder"></div>
+                        ) : (
+                          <>
+                            <p className="stats-number"><span>19</span></p>
+                            <p className="stats-number-title"><span>Interventions en cours</span></p>
+                          </>
+                        )}
+                      </div>
+
+                      <a href="#" className="stats-link">Voir le détail &gt;</a>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          )}
         </div>
       </Container>
-      <Container fluid className="container-table d-flex">
+
+      <Container fluid className="container-table d-flex mb-4">
         <div className="p-4 d-flex align-items-center justify-content-center dashboard-request-intervention">
           <div className="d-flex flex-column align-items-center justify-content-center">
             <FontAwesomeIcon icon={faBell} size="2x" />
@@ -172,7 +226,8 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
           </h2>
           <div className="last-activities-listing">
             <h5>
-              <FontAwesomeIcon icon={faChartLine} className="me-2" />
+              <Rythme
+                className="me-2" />
               {dashboardData?.WidgetTimeline?.Texte ||
                 ""}
             </h5>
