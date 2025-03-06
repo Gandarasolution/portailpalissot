@@ -164,6 +164,21 @@ function App() {
 
   //#region Token
 
+  const themeName = cyrb53("themeName").toString();
+  const[themeCookie,setThemeCookie,removeThemeCookie] = useCookies({themeName});
+
+  function setTheme(theme){
+    setThemeCookie(themeName,theme);
+  }
+
+  const wsEndpointName = cyrb53("wsEndpointName").toString();
+  const [wsEndpointCookie, setWsEndpointCookie, removeWSEndpointCookie] = useCookies({wsEndpointName});
+
+  function setWsEndpoint(ws) {
+    setWsEndpointCookie(wsEndpointName, ws);
+  }
+
+
   const wsEntrepriseName = cyrb53("wsEntrepriseNameHashed").toString();
   const [wsEntrepriseCookie, setWsEntrepriseCookie, removeWsEntrepriseCookie] = useCookies([wsEntrepriseName,]);
 
@@ -198,6 +213,8 @@ function App() {
     removeClientSiteCookie(clientSiteName);
     removeAccountCookie(accountName);
     removeWsEntrepriseCookie(wsEntrepriseName);
+    removeWSEndpointCookie(wsEndpointName);
+    removeThemeCookie(themeName);
   };
 
   if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName]) && !window.location.href.toUpperCase().includes('changeMDP/'.toUpperCase())) {
@@ -208,6 +225,8 @@ function App() {
           setParams={setListeParamsViaCookies}
           setAccountName={setAccountName}
           setUrlWs={setWsEntrepriseURL}
+          setWsEndpoint={setWsEndpoint}
+          setTheme={setTheme}
         />
       </div>
     );

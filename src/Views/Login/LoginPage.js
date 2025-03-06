@@ -26,7 +26,7 @@ import {  CreateTokenMDP, IsURICanonnical,Connexion,  GetListeParametres, GetURL
 import backgroundLogin from "../../image/imageLogin/login.jpg";
 // import logo from "../../image/favicon.ico";
 import { ReactComponent as LogoNoir } from "../../image/imageLogin/login-gandara-propulsee-noir.svg";
-
+import logoDefault from "../../image/imageLogin/logo_noir.png";
 const LoginPage = (props) => {
   //#region States
   const [revealed, setRevealed] = useState(false);
@@ -34,7 +34,7 @@ const LoginPage = (props) => {
   const [password, setPassword] = useState("");
   const [login, setLogin] = useState("");
   const [codeEntreprise, setCodeEntreprise] = useState("");
-
+  const [imageLogo, setImageLogo] = useState(logoDefault);
 
   const [showCodeEntreprise, setShowCodeEntreprise] = useState(false);
 
@@ -93,9 +93,15 @@ const LoginPage = (props) => {
     setIsLoading(true);
 
     let _wsForToken = "";
+    let _themeFromWS = "";
+     let _wsEndpoint = "";
     const GetResponseURLWS = (data) => {
-      if (isNaN(data)) {
-        _wsForToken = data;
+      if (isNaN(data) && data.urlWSClient) {
+        _wsForToken = data.urlWSClient;
+        _wsEndpoint = data.urlWSEndpoint
+        _themeFromWS = data?.themeClient;
+        props.setWsEndpoint(_wsEndpoint)
+
       }
 
     }
@@ -118,12 +124,12 @@ const LoginPage = (props) => {
 
         props.setUrlWs(_wsForToken);
 
-
         //4 -> CallBack de GetListeParamètres : on enregistre les infos retournées
         const FetchSetListeParams = async (data) => {
           props.setParams(data);
           props.setToken(response);
           props.setAccountName(login);
+          props.setTheme(_themeFromWS);
         };
 
         //3 -> On récupère la liste des paramètres de l'application
@@ -355,12 +361,15 @@ const LoginPage = (props) => {
     if (_isCannon) {
 
       let _wsForToken = "";
+      let _b64Image = "";
       const GetResponseURLWS = (data) => {
-        if (isNaN(data)) {
-          _wsForToken = data;
+        if (isNaN(data) && data.urlWSClient) {
+          _wsForToken = data.urlWSClient;
+          _b64Image = data?.logoClient;
         }
         setCodeEntreprise(_curentHost);
         setShowCodeEntreprise(false);
+        setImageLogo(_b64Image);
       }
   
       await GetURLWs(_curentHost, GetResponseURLWS);
@@ -477,6 +486,7 @@ const LoginPage = (props) => {
         <Col md={3} className="d-flex align-items-center justify-content-around flex-column login-content-wrapper">
           {/* Logo au-dessus du formulaire */}
           <div className="container-login-content">
+          <img src={imageLogo} height={80} />
             {FormSubmit()}
           </div>
           {/* Image logo_noir en dessous du formulaire */}

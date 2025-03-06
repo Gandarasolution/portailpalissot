@@ -14,6 +14,19 @@ const getUrlFromCookie = () => {
     }
 }
 
+
+const getWsFromCookie = ()=>{
+    let _cookieName = cyrb53("wsEndpointName");
+    const cookieValue = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(`${_cookieName}=`))
+        ?.split("=")[1];
+
+    if (cookieValue && cookieValue?.length > 0) {
+        return decodeURIComponent(cookieValue);
+    }}
+
+
 /**
  * Appel le WS (ajax) via l'url stocké en cookie ou l'url fourni 
  * @param {string} endpoint La terminaison à joindre
@@ -34,6 +47,12 @@ const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
         //Récupération de l'URL dans le cookie
         _url = getUrlFromCookie();
     }
+
+
+    //EndpointTerm
+    let _ws = "&ws=";
+     _ws += getWsFromCookie();
+
 
     //Si aucun url récupéré
     if (_url.length === 0) {
@@ -70,7 +89,7 @@ const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
     //Appel ajax
     await $.ajax({
         type: "POST",
-        url: _url + endpoint,
+        url: _url + endpoint + _ws,
         data: data,
         success(data) {
             //Vérification erreur 500 manuelle
