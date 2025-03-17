@@ -54,6 +54,7 @@ import {
 } from "../../functions";
 import RowDocument from "./RowDocument";
 import { ReactComponent as Filter } from "../../image/filtre.svg";
+import { ReactComponent as TooltipSvg } from "../../image/tooltip.svg";
 
 import { TelechargerZIP, } from "../../axios/WSGandara"
 
@@ -2603,6 +2604,44 @@ export const EditorActionTelecharger = (e) => {
         <FontAwesomeIcon icon={faDownload} />
       </OverlayTrigger>
     </Button>
+  );
+};
+
+export const EditorActionsTooltip = ({ actions }) => {
+  const [isActive, setIsActive] = useState(false);
+
+
+
+  const popover = (
+    <Popover className="editor-actions-tooltip">
+      <Popover.Body>
+        {actions.map((action, index) => (
+          <div
+            key={index}
+            className={`editor-action-item ${action.className || ""}`}
+            onClick={action.onClick}
+          >
+            <FontAwesomeIcon icon={action.icon} className="action-icon" />
+            <span>{action.label}</span>
+          </div>
+        ))}
+      </Popover.Body>
+    </Popover>
+  );
+
+  return (
+    <OverlayTrigger
+      placement="left"
+      overlay={popover}
+      trigger="click"
+      rootClose
+      container={document.body}
+      onToggle={(isOpen) => setIsActive(isOpen)}
+    >
+      <Button variant="link" className={`btn-tooltip ${isActive ? "active" : ""}`}>
+        <TooltipSvg />
+      </Button>
+    </OverlayTrigger>
   );
 };
 
