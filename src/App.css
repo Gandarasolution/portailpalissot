@@ -5,7 +5,9 @@
   --color-info: #85c7f9;
   --color-dark: #282c34;
   --color-darker: #3e4148;
-  --color-red: #c80059;
+  --color-red: #c74b74;
+  --color-red-camaieu: #ae2d58;
+  --color-red-pastel: #f7eaee;
   --color-sky-blue: #F1F6FA;
   --color-pastel-green: #D9F3EA;
   --color-pastel-green-text: #01B075;
@@ -21,7 +23,6 @@
   --font-text: 'Corbel', sans-serif;
   --font-arial: 'ArialMT', sans-serif;
 }
-
 /* Boris Black Bloxx */
 @font-face {
   font-family: 'BorisBlackBloxx';
@@ -70,7 +71,15 @@ input.form-control:focus{
 .modal .modal-dialog.modal-password input.form-control,
 .shortcut-link .nav-item,
 .btn-upload-file,
-.popover-filters{
+.popover-filters,
+.dashboard-request-intervention,
+.last-activities-listing,
+.dashboard-stats .stats-maintenance .stats-card,
+.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-devis,
+.stats-états-des-paiements,
+.dashboard-stats a.stats-link,
+.bs-popover-start{
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06);
 }
 
@@ -116,8 +125,8 @@ input.form-control:focus{
 
 .popover-filters .btn-primary.btn-filter{
   margin-left: 5%;
-  padding: 5px 13%;
   border-radius: 8px;
+  width: 43%;
 }
 
 .popover-filters .btn-primary.btn-filter,
@@ -200,6 +209,10 @@ input[type="range"]::-webkit-slider-thumb:active{
 .tab-content #ppvr-rangeDate,
 .tab-content #ppvr-range{
   display: flex;
+}
+
+.tab-content #ppvr-range .col{
+   width: max-content;
 }
 
 .popover-filters{
@@ -879,10 +892,6 @@ sup {
   color: var(--bs-secondary) !important;
 }
 
-.filter-actif {
-  color: var(--bs-primary);
-}
-
 .icon-bt:hover {
   color: var(--bs-primary);
   cursor: pointer;
@@ -965,36 +974,34 @@ sup {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  width: 80%;
 }
+
 .shortcut-link .nav-item{
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 10px 20px;
+  padding: 20px;
   border-radius: 16px;
-  width: 18%;
+  width: 23.5%;
 }
 
-.shortcut-link .nav-item:not(:last-child){
-  background-color: var(--color-red);
-}
-
-.shortcut-link .nav-item:last-child{
-  background-color: var(--color-black);
+.shortcut-link .nav-item{
+  background: linear-gradient(to right, var(--color-red-camaieu), var(--color-red));
 }
 
 .shortcut-link .nav-item svg{
   background: var(--color-white);
   color: var(--color-red);
-  font-size: 1.25em;
-  padding: 13px;
+  font-size: 1em;
+  padding: 10px;
   border-radius: 99px;
 }
 
 .shortcut-link .nav-item a{
   color: var(--color-white);
   font-family: var(--font-text);
-  font-size: 1.25em;
+  font-size: 1.15em;
   text-align: left;
 }
 
@@ -1145,14 +1152,25 @@ sup {
 .table-presta .th-with-icon svg{
   padding: 5px 6px;
   border-radius: 99px;
+  height: 27px;
+  width: 27px;
+  margin-right: 3px;
 }
 
-.table-presta .th-with-icon svg:hover{
-  background: var(--color-white);
+.table-presta .th-with-icon svg:hover,
+.table-presta .th-with-icon svg.filter-actif,
+.table-presta .th-with-icon svg.filter-open{
+  background: var(--color-red-pastel);
 }
 
 .table-presta .th-with-icon svg path{
   fill: var(--color-darker);
+}
+
+.table-presta .th-with-icon svg:hover path,
+.table-presta .th-with-icon svg.filter-actif path,
+.table-presta .th-with-icon svg.filter-open path{
+  fill: var(--color-red);
 }
 
 .table-presta th > div:not(.th-with-icon){
@@ -1243,10 +1261,14 @@ thead th,
 .table-presta td {
   text-align: start;
   border-bottom-width: 0 !important;
-  height: 80px;
-  padding-top: 25px !important;
+  height: 60px;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
 }
 
+.table-presta .btn-link svg circle{
+  fill: var(--color-grey);
+}
 
 .table-presta h1 {
   font-size: 15px;
@@ -1288,10 +1310,8 @@ thead th,
   content: "\f00c";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
-  color: var(--color-darker);
+  color: var(--color-success);
   margin-right: 4px;
-  /*position: absolute;
-  left: -6%;*/
 }
 /*
 .table-presta-row-selected td:first-child::after{
@@ -1474,7 +1494,7 @@ thead th,
 
 .modal.show .modal-dialog.modal-listing{
   max-width: 80vw;
-  width: 60vw;
+  width: 75vw;
 }
 
 .modal.show .modal-dialog.modal-password{
@@ -1496,6 +1516,10 @@ thead th,
   border-radius: 16px;
 }
 
+.modal-titles-subtitle{
+  width: 100%;
+}
+
 .modal.show .modal-dialog .modal-content .modal-header .modal-title:not(svg),
 .modal.show .modal-dialog .modal-content .modal-header h1{
   font-family: var(--font-bold);
@@ -1515,6 +1539,10 @@ thead th,
   font-size: 1.75rem;
 }
 
+.modal.show .modal-dialog .modal-content .modal-header .modal-titles{
+  display: flex;
+}
+
 .modal.show .modal-dialog .modal-content .modal-header .modal-title.h4::after{
   content: "";
   position: absolute;
@@ -1525,11 +1553,11 @@ thead th,
   background-color: transparent;
 }
 
-.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.actif::after{
+.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.active::after{
   background-color: var(--color-red);
 }
 
-.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.actif{
+.modal.show .modal-dialog .modal-content .modal-header .modal-title.h4.active{
   color: var(--color-black);
 }
 
@@ -1737,6 +1765,59 @@ thead th,
 }
 
 
+/* Popover tooltip */
+.bs-popover-start{
+  border-radius: 16px;
+  border: 1px solid transparent !important;
+  right: -3% !important;
+  top: 20px !important;
+}
+
+.bs-popover-start:has(.popover-body .action-view-maintenance){
+  top: 0px !important;
+}
+
+.bs-popover-start .popover-arrow{
+  display: none !important;
+}
+
+.bs-popover-start .popover-body{
+  min-width: 300px;
+}
+
+.editor-action-item{
+  cursor: pointer;
+}
+
+.editor-action-item:not(:last-child){
+  margin-bottom: 18px;
+}
+
+.table-presta td:last-child{
+  /*vertical-align: middle;*/
+}
+
+.table-presta .btn.btn-link{
+  position: relative;
+  padding: 10px 1px 5px 1px !important;
+  border-radius: 25px;
+}
+
+.table-presta .btn.btn-link.active{
+  z-index: 9999;
+}
+
+.editor-action-item svg{
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+}
+
+.table-presta .btn.btn-link.active,
+.table-presta .btn.btn-link:hover{
+  background: var(--color-sky-blue) !important;
+}
+
 /* ---- PAGINATION ---- */
 .content-pagination{
   margin-top: 20px;
@@ -1752,12 +1833,16 @@ thead th,
 .page-link{
   border: none !important;
   background: transparent !important;
-  color: var(--color-black) !important;
+  color: var(--color-darker) !important;
+}
+
+.page-link svg line{
+  stroke: #212529 !important;
 }
 
 #root .active>.page-link{
-  background: var(--color-pastel-green) !important;
-  color: var(--color-pastel-green-text) !important;
+  background: var(--color-red-pastel) !important;
+  color: var(--color-red) !important;
   border-radius: 20px !important;
   padding: 8px 16px !important;
 }
@@ -1788,4 +1873,287 @@ thead th,
 
 .scroll-to-top-button:hover {
   background-color: rgba(255,255,255,0.1);
+}
+
+
+/* Page dashboard */
+
+.dashboard-stats > div{
+  justify-content: space-between;
+}
+
+.dashboard-stats .stats-card{
+  height: 275px;
+  max-height: 275px;
+}
+
+.dashboard-stats .stats-maintenance .stats-card,
+.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-devis,
+.stats-états-des-paiements{
+  background: white;
+  border-radius: 16px;
+}
+
+.dashboard-stats .stats-maintenance{
+  width: 39%;
+}
+
+.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-devis,
+.stats-états-des-paiements{
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-devis{
+  width: 18.5%;
+}
+
+.dashboard-stats .stats-états-des-paiements{
+  width: 18%;
+}
+
+.stats-dépannages::after,
+.stats-devis::after,
+.stats-états-des-paiements::after{
+  content: "\f0ad";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  font-size: 100px;
+  color: rgba(157, 173, 181, 0.15);
+  top: 40px;
+  right: -20px;
+}
+
+.stats-dépannages::after{
+  content: "\f0ad";
+}
+
+.stats-devis::after{
+  content: "\f02d";
+}
+
+.stats-états-des-paiements::after{
+  content: "\f15b";
+}
+
+.dashboard-stats .stats-card h5{
+  text-align: left;
+  padding-left: 3%;
+  font-size: 1.15em;
+  white-space: nowrap;
+}
+
+.dashboard-stats .stats-card h5::after{
+  top: 30px;
+  position: relative;
+}
+
+.dashboard-stats .stats-title span.stats-subtitle{
+  color: #7A909B;
+  font-size: 0.95rem;
+  position: absolute;
+  right: 20px;
+}
+
+.dashboard-stats .stats-data{
+  text-align: left;
+  margin-top: -30px;
+}
+
+.dashboard-stats .stats-data .stats-number{
+  font-size: 4.5rem;
+  font-weight: bold;
+}
+
+.dashboard-stats .stats-data .stats-number-title{
+  margin-top: -25px;
+  font-size: 1.15em;
+  color: #7A909B;
+  width: 65%;
+}
+
+.dashboard-stats a.stats-link{
+  background: linear-gradient(to right, var(--color-red-camaieu), var(--color-red));
+  color: white;
+  display: inline-block;
+  width: max-content;
+  border: 1px solid var(--color-red);
+  border-radius: 8px;
+  padding: 6px 25px 6px 15px;
+  text-decoration: none;
+  font-size: 1em;
+}
+
+.dashboard-stats a.stats-link:hover{
+  background: white;
+  color: var(--color-red);
+}
+
+.dashboard-request-intervention{
+  background: linear-gradient(to right, #ff7e5f, #ffb347);
+  color: white;
+  width: 39%;
+  position: relative;
+  height: 300px;
+  max-height: 300px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-right: 2%;
+  margin-top: 75px;
+}
+
+.dashboard-request-intervention::before {
+  content: "\f0f3";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  font-size: 130px;
+  color: #DC5A29;
+  top: 60px;
+  right: -20px;
+}
+
+
+.dashboard-request-intervention svg{
+  width: 25px;
+  height: 25px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 99px;
+}
+
+.dashboard-request-intervention svg path{
+  fill: #ffb347;
+}
+
+.dashboard-request-intervention h5{
+  font-weight: bolder;
+  margin: 20px 0;
+  font-size: 1.15em ;
+}
+
+.dashboard-request-intervention p{
+  font-size: 0.9rem;
+}
+
+.dashboard-request-intervention a{
+  font-weight: bolder;
+  color: white;
+  text-decoration: underline;
+}
+
+h2 span.last-activities-subtitle{
+  color: #7A909B;
+}
+
+.dashboard-last-activities{
+  width: 59%;
+}
+
+
+.dashboard-last-activities .last-activities-listing{
+  background: white;
+  border-radius: 16px;
+  margin-top: 30px;
+  height: 300px;
+  max-height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-last-activities .last-activities-listing::before {
+  content: "";
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  background-image: url("image/coeur.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.15;
+  bottom: -5px;
+  right: -20px;
+}
+
+.dashboard-last-activities .last-activities-listing h5,
+.dashboard-last-activities .last-activities-listing ul{
+  text-align: left;
+  padding: 20px 0 5px 4%;
+}
+
+.dashboard-last-activities .last-activities-listing svg{
+  width: 30px;
+  height: 30px;
+}
+
+.dashboard-stats .stats-card h5, 
+.dashboard-last-activities .last-activities-listing h5{
+  font-weight: normal;
+  position: relative;
+}
+
+.dashboard-stats .stats-card h5::after,
+.dashboard-last-activities .last-activities-listing h5::after {
+  content: "";
+  height: 1px;
+  background-color:rgba(157, 173, 181, 0.15);
+  position: absolute;
+  width: 95%;
+  left: 2%;
+  z-index: 1000;
+}
+
+.dashboard-last-activities .last-activities-listing h5::after {
+  top: 55px
+}
+
+.dashboard-last-activities .last-activities-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: scroll;
+}
+
+/* Ligne verticale (timeline) */
+.last-activities-list::before {
+  content: "";
+  position: absolute;
+  left: 4.75%;
+  top: 70px;
+  bottom: 15px;
+  width: 3px;
+  background-color: #ddd;
+}
+
+.last-activity-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.activity-bullet {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+  background: white;
+  border: 3px solid;
+}
+
+/* Espacement du dernier élément pour éviter que la ligne descende trop bas */
+.last-activity-item:last-child::after {
+  content: "";
+  display: block;
+  height: 5px;
+}
+
+.activity-text {
+  font-size: 0.9rem;
+  color: #9DADB5;
 }

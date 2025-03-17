@@ -10,6 +10,14 @@ import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
 //#endregion
 
+//#region fontAwsome
+import {
+  faFile,
+  faFilePdf,
+} from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//#endregion
+
 //#Region Components
 
 // import {
@@ -43,7 +51,9 @@ import TableData, {
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
   EditorMontant,
+  EditorActionsTooltip
 } from "../../components/commun/TableData";
+
 
 //#endregion
 
@@ -145,11 +155,9 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
       )
     );
     _headers.push(
-      CreateNewUnboundHeader(CreateFilter(), "Actions", [
-        "tagFactureVoir",
-        "tagFactureTelecharger",
-      ])
+      CreateNewHeader("Action", CreateFilter(), "Action")
     );
+    
 
     return _headers;
   }
@@ -222,8 +230,26 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
       setVoirFacture(false);
     };
 
+    // Créer les actions
+    const actionsForFacture = (facture) => [
+      {
+        label: "Voir la facture",
+        onClick: () => methodVoir(facture),
+        className: "action-view-facture",
+        icon: faFile,
+      },
+      {
+        label: "Télécharger la facture",
+        onClick: () => methodTelecharger(facture),
+        className: "action-download-facture",
+        icon: faFilePdf,
+      }
+    ];
+  
     _cells.push(
-      CreateNewDocumentCell(methodTitle, "PDF", methodTelecharger, methodVoir)
+      CreateNewCell("Action", false, true, false, (val, row) =>
+        <EditorActionsTooltip actions={actionsForFacture(row)} />
+      )
     );
 
     return _cells;
