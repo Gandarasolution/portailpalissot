@@ -7,6 +7,14 @@ import Container from "react-bootstrap/Container";
 //#endregion
 import { GetListeDevis, GetdocumentDevis } from "../../axios/WS_Devis";
 
+//#region fontAwsome
+import {
+  faFile,
+  faFilePdf,
+} from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//#endregion
+
 //#region Components
 import TableData, {
   CreateFilter,
@@ -18,11 +26,14 @@ import TableData, {
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
   EditorMontant,
+  EditorActionsTooltip
 } from "../../components/commun/TableData";
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
 import { Button, Col, Row } from "react-bootstrap";
 import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";
 import { saveAs } from "file-saver";
+
+
 
 //#endregion
 
@@ -105,7 +116,9 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
     _headers.push(
       CreateNewHeader("LibEtat", CreateFilter(true, true), "État", EditorEtat)
     );
-    _headers.push(CreateNewUnboundHeader(false, "Action"));
+    _headers.push(
+      CreateNewHeader("Action", CreateFilter(), "Action")
+    );
 
     return _headers;
   }
@@ -134,14 +147,39 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
       return `${dateFR} Devis N°${e.IdDevis}.pdf`;
     };
 
+    const actionsForDevis = (devis) => [
+      {
+        label: "Voir le devis",
+        onClick: () => {
+          console.log("Voir le devis cliqué pour", devis);
+          Voir(devis);
+        },
+        className: "action-view-devis",
+        icon: faFile
+      },
+      {
+        label: "Télécharger le devis",
+        onClick: (e) => {
+          console.log("Télécharger le devis cliqué pour", devis);
+          if (e && e.stopPropagation) {
+            e.stopPropagation(); // On s'assure que l'événement est arrêté si présent
+          } else {
+            console.log("Aucun événement transmis dans le onClick");
+          }
+          Telechargement(devis);
+        },
+        className: "action-download-facture",
+        icon: faFilePdf
+      }
+    ];
+    
+    
 
     _cells.push(
-      CreateNewDocumentCell(
-        methodTitleDoc,
-        "PDF",
-        Telechargement,
-        Voir
-      )
+      CreateNewCell("Action", false, true, false, (val, row, index) =>{
+        console.log("EditorActionsTooltip reçoit row:", row);
+        return <EditorActionsTooltip actions={actionsForDevis(row)} />;
+      })
     );
     return _cells;
   }
@@ -161,22 +199,16 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
   const Telechargement = async (e) => {
     //Affichage d'un toast
     // setShowToast(true);
+    console.log("Téléchargement lancé pour", e);
     const _kv = await methodTelecharger(e);
-
+    console.log("Données reçues :", _kv);
     try {
-      //Transformation en blob
       const base64data = _kv.v;
       const _bblob = base64toBlob(base64data);
-      //Téléchargement
-      // saveAs(_bblob, props.title);
+      console.log("Blob créé :", _bblob);
       saveAs(_bblob, _kv.k);
-
-
-    } finally {
-
-      //Cacher le toast
-      // setShowToast(false);
-
+    } catch (error) {
+      console.error("Erreur lors du téléchargement :", error);
     }
   };
 

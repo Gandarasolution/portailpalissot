@@ -78,7 +78,8 @@ input.form-control:focus{
 .dashboard-stats .stats-dépannages,
 .dashboard-stats .stats-devis,
 .stats-états-des-paiements,
-.dashboard-stats a.stats-link{
+.dashboard-stats a.stats-link,
+.bs-popover-start{
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06);
 }
 
@@ -971,17 +972,18 @@ sup {
 /* ---- HOMEPAGE ---- */
 .shortcut-link{
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   flex-wrap: wrap;
+  width: 80%;
 }
+
 .shortcut-link .nav-item{
   display: flex;
   justify-content: flex-start;
   align-items: center;
   padding: 20px;
   border-radius: 16px;
-  width: 19%;
-  margin-right: 1.75%;
+  width: 23.5%;
 }
 
 .shortcut-link .nav-item{
@@ -1152,7 +1154,7 @@ sup {
   border-radius: 99px;
   height: 27px;
   width: 27px;
-  margin-right: 8px;
+  margin-right: 3px;
 }
 
 .table-presta .th-with-icon svg:hover,
@@ -1264,6 +1266,9 @@ thead th,
   padding-bottom: 10px !important;
 }
 
+.table-presta .btn-link svg circle{
+  fill: var(--color-grey);
+}
 
 .table-presta h1 {
   font-size: 15px;
@@ -1760,6 +1765,59 @@ thead th,
 }
 
 
+/* Popover tooltip */
+.bs-popover-start{
+  border-radius: 16px;
+  border: 1px solid transparent !important;
+  right: -3% !important;
+  top: 20px !important;
+}
+
+.bs-popover-start:has(.popover-body .action-view-maintenance){
+  top: 0px !important;
+}
+
+.bs-popover-start .popover-arrow{
+  display: none !important;
+}
+
+.bs-popover-start .popover-body{
+  min-width: 300px;
+}
+
+.editor-action-item{
+  cursor: pointer;
+}
+
+.editor-action-item:not(:last-child){
+  margin-bottom: 18px;
+}
+
+.table-presta td:last-child{
+  /*vertical-align: middle;*/
+}
+
+.table-presta .btn.btn-link{
+  position: relative;
+  padding: 10px 1px 5px 1px !important;
+  border-radius: 25px;
+}
+
+.table-presta .btn.btn-link.active{
+  z-index: 9999;
+}
+
+.editor-action-item svg{
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+}
+
+.table-presta .btn.btn-link.active,
+.table-presta .btn.btn-link:hover{
+  background: var(--color-sky-blue) !important;
+}
+
 /* ---- PAGINATION ---- */
 .content-pagination{
   margin-top: 20px;
@@ -1820,6 +1878,10 @@ thead th,
 
 /* Page dashboard */
 
+.dashboard-stats > div{
+  justify-content: space-between;
+}
+
 .dashboard-stats .stats-card{
   height: 275px;
   max-height: 275px;
@@ -1834,8 +1896,7 @@ thead th,
 }
 
 .dashboard-stats .stats-maintenance{
-  width: 40%;
-  margin-right: 2%;
+  width: 39%;
 }
 
 .dashboard-stats .stats-dépannages,
@@ -1847,12 +1908,11 @@ thead th,
 
 .dashboard-stats .stats-dépannages,
 .dashboard-stats .stats-devis{
-  width: 19%;
+  width: 18.5%;
 }
 
-.dashboard-stats .stats-dépannages,
-.dashboard-stats .stats-devis{
-  margin-right: 2%;
+.dashboard-stats .stats-états-des-paiements{
+  width: 18%;
 }
 
 .stats-dépannages::after,
@@ -1936,13 +1996,13 @@ thead th,
 .dashboard-request-intervention{
   background: linear-gradient(to right, #ff7e5f, #ffb347);
   color: white;
-  width: 40%;
+  width: 39%;
   position: relative;
   height: 300px;
   max-height: 300px;
   border-radius: 16px;
   overflow: hidden;
-  margin-right: 2.5%;
+  margin-right: 2%;
   margin-top: 75px;
 }
 
@@ -1991,7 +2051,7 @@ h2 span.last-activities-subtitle{
 }
 
 .dashboard-last-activities{
-  width: 58%;
+  width: 59%;
 }
 
 

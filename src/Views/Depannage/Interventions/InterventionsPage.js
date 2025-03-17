@@ -21,9 +21,15 @@ import TableData, {
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
+  EditorActionsTooltip
 } from "../../../components/commun/TableData";
+
+import {
+  faFile,
+  faFilePdf,
+} from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFile } from "@fortawesome/free-solid-svg-icons";
+
 import { GetListeInterventions } from "../../../axios/WS_Intervention";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
 import { Row } from "react-bootstrap";
@@ -131,7 +137,9 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
       CreateNewHeader("LibEtat", CreateFilter(true, true, false, false), "État")
     );
 
-    _headers.push(CreateNewUnboundHeader(false, "Action"));
+    _headers.push(
+      CreateNewHeader("Action", CreateFilter(), "Action")
+    );
     return _headers;
   }
 
@@ -152,13 +160,20 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
       CreateNewCell("DescriptionDossierInterventionSAV", true, true, false)
     );
     _cells.push(CreateNewCell("LibEtat", false, false, false, EditorEtat));
+
+
+    const actionsForIntervention = (inter) => [
+      {
+        label: "Voir les documents",
+        onClick: () => EditorActionDocuments,
+        className: "action-view-maintenance",
+        icon: faFile
+      }
+    ];
+    
     _cells.push(
-      CreateNewUnboundCell(
-        false,
-        false,
-        true,
-        EditorActionDocuments,
-        "tagInterventionDocuments"
+      CreateNewCell("Action", false, true, false, (val, row) =>
+        <EditorActionsTooltip actions={actionsForIntervention(row)} />
       )
     );
 

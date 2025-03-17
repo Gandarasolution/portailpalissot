@@ -12,15 +12,13 @@ import Tooltip from "react-bootstrap/Tooltip";
 
 //#region FontAwsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  // faCaretDown,
-  // faCaretUp,
-  faListCheck,
-  faList,
-  faFile,
-  faFileAlt,
-  faBan,
-} from "@fortawesome/free-solid-svg-icons";
+
+// Importer depuis FontAwesome Solid
+import { faListCheck, faList,faFileAlt, faBan } from "@fortawesome/free-solid-svg-icons";
+
+// Importer depuis FontAwesome Regular
+import { faFile as faFileRegular } from "@fortawesome/free-regular-svg-icons";
+
 
 //#endregion
 
@@ -34,7 +32,9 @@ import TableData, {
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
+  EditorActionsTooltip
 } from "../../../../components/commun/TableData";
+
 import { GetNomMois } from "../../../../functions";
 
 //#endregion
@@ -140,7 +140,9 @@ const ContratPrestation = ({
         }
       )
     );
-    _headers.push(CreateNewUnboundHeader(CreateFilter(false), "Actions"));
+    _headers.push(
+      CreateNewUnboundHeader(CreateFilter(false), "Actions", "tagListeActions")
+    );
 
     return _headers;
   }
@@ -178,19 +180,31 @@ const ContratPrestation = ({
         false,
         false,
         true,
-        EditorActionTaches,
-        "tagListeTaches"
+        (val, row, index) => (
+          <EditorActionsTooltip
+            actions={[
+              {
+                label: "Liste des documents",
+                onClick: () => {
+                  row.___forcedTag = "tagListeDocuments";
+                },
+                icon: faFileRegular
+              },
+              {
+                label: "Liste des relevés de tâches",
+                onClick: () => {
+                  row.___forcedTag = "tagListeTaches";
+                },
+                icon: faList
+              },
+            ]}
+          />
+        ),
+        "tagListeActions"
       )
     );
-    _cells.push(
-      CreateNewUnboundCell(
-        false,
-        false,
-        true,
-        EditorActionDocuments,
-        "tagListeDocuments"
-      )
-    );
+    
+    
     return _cells;
   }
 
@@ -249,7 +263,7 @@ const ContratPrestation = ({
             }
           }}
         >
-          <FontAwesomeIcon icon={faFile} /> Liste des documents
+          <FontAwesomeIcon icon={faFileRegular} /> Liste des documents
         </Button>
         <Button
           className="m-2 p-2 noBorder bg-success"
