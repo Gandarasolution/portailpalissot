@@ -166,8 +166,7 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
       {
         label: "Voir les documents",
         onClick: () => EditorActionDocuments,
-        className: "action-view-maintenance",
-        icon: faFile
+        className: "action-view-maintenance icon-visualize",
       }
     ];
     

@@ -124,21 +124,50 @@ input.form-control:focus{
 }
 
 .popover-filters .btn-primary.btn-filter{
-  margin-left: 5%;
   border-radius: 8px;
+}
+
+.popover-filters .btn-primary.btn-filter:not(.cancel){
+  margin-left: 5%;
   width: 43%;
 }
 
-.popover-filters .btn-primary.btn-filter,
-.popover-filters .btn-primary.btn-filter:focus{
+.popover-filters .btn-primary.btn-filter.cancel{
+  width: auto;
+  position: absolute;
+  left: 75%;
+  transform: translateX(-75%);
+}
+
+.popover-filters .btn-primary.btn-filter:not(.cancel),
+.popover-filters .btn-primary.btn-filter:not(.cancel):focus{
   background: var(--color-red);
   border: 1px solid var(--color-red);
 }
 
-.popover-filters .btn-primary.btn-filter:hover{
+.popover-filters .btn-primary.btn-filter:not(.cancel):hover{
   background: var(--color-white);
   color: var(--color-red);
   border: 1px solid var(--color-red);
+}
+
+.popover-filters .btn-primary.btn-filter.cancel{
+  background: var(--color-white);
+  border: 1px solid var(--color-red);
+}
+
+.popover-filters .btn-primary.btn-filter.cancel path{
+  fill: var(--color-red);
+}
+
+.popover-filters .btn-primary.btn-filter.cancel:hover,
+.popover-filters .btn-primary.btn-filter.cancel:focus{
+  background: var(--color-red);
+}
+
+.popover-filters .btn-primary.btn-filter.cancel:hover path,
+.popover-filters .btn-primary.btn-filter.cancel:focus path{
+  fill: var(--color-white);
 }
 
 .popover-filters span.remove-filter{
@@ -1807,11 +1836,35 @@ thead th,
   z-index: 9999;
 }
 
-.editor-action-item svg{
-  width: 15px;
-  height: 15px;
+.icon-pdf::before,
+.icon-visualize::before,
+.icon-download::before{
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  vertical-align: top;
   margin-right: 10px;
 }
+
+.editor-action-item svg{
+  height: 15px;
+  width: 15px;
+  margin-right: 10px;
+}
+
+.icon-visualize::before{
+  content: url('image/visualisation.svg');
+}
+
+.icon-pdf::before{
+  content: url('image/pdf.svg');
+}
+
+.icon-download::before{
+  content: url('image/telecharger.svg');
+  margin-top: -1px;
+}
+
 
 .table-presta .btn.btn-link.active,
 .table-presta .btn.btn-link:hover{

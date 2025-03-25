@@ -55,6 +55,7 @@ import {
 import RowDocument from "./RowDocument";
 import { ReactComponent as Filter } from "../../image/filtre.svg";
 import { ReactComponent as TooltipSvg } from "../../image/tooltip.svg";
+import { ReactComponent as FilterReset } from "../../image/filtre-effacer.svg";
 
 import { TelechargerZIP, } from "../../axios/WSGandara"
 
@@ -764,7 +765,7 @@ const TableData = ({ ...props }) => {
                   ResetFilterCol();
                 }}
               >
-                Annuler
+              <FilterReset title="Réinitialiser les filtres"/>
               </Button>
 
             </Tab>
@@ -809,7 +810,7 @@ const TableData = ({ ...props }) => {
                   ResetFilterCol();
                 }}
               >
-                Annuler
+                <FilterReset title="Réinitialiser les filtres" />
               </Button>
 
             </Tab>
