@@ -75,9 +75,7 @@ input.form-control:focus{
 .dashboard-request-intervention,
 .last-activities-listing,
 .dashboard-stats .stats-maintenance .stats-card,
-.dashboard-stats .stats-dépannages,
-.dashboard-stats .stats-devis,
-.stats-états-des-paiements,
+.dashboard-stats .stats-other
 .dashboard-stats a.stats-link,
 .bs-popover-start{
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06);
@@ -441,7 +439,20 @@ nav ul li:hover {
   margin-top: 30px;
   margin-bottom: 10px;
   padding-left: 1% !important;
+  background-color: var(--color-sky-blue);
 }
+
+.top-bar-menu .is-sticky{
+  position: fixed;
+  top: 0;
+  background: var(--color-sky-blue);
+  width: 100%;
+  margin-left: -2.5%;
+  padding-top: 20px;
+  padding-bottom: 40px;
+  z-index: 10;
+} 
+
 
 /* Title page + length */
 .top-bar-menu .navbar-title-container{
@@ -505,51 +516,6 @@ nav ul li:hover {
 
 button.switch-site{
   display: none;
-}
-
-/* Conteneur global du dropdown et du titre SIMU 1 */
-.navbar-text-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 12px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Appliquer le fond blanc et l'ombre lorsque le dropdown est ouvert */
-.navbar-text-wrapper.show {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-/* Pour éviter le double fond blanc dans le dropdown */
-.switch-site .dropdown-menu {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  z-index: 11;
-}
-
-/* Ajustement du bouton de sélection */
-.switch-site {
-  transition: background-color 0.3s ease;
-}
-
-.switch-site.show {
-  background-color: transparent;
-}
-
-/* Animation d’apparition du menu déroulant */
-.navbar>.container-fluid{
-  max-height: 50px;
 }
 
 .top-bar-menu .navbar-text .wrapper-site.is-switching{
@@ -670,6 +636,69 @@ button.switch-site{
   border-color: inherit;
 }
 
+
+@media screen and (max-width: 1024px){
+
+}
+
+
+@media screen and (max-width:767px){
+  .top-bar-menu {
+    margin-top: 30px;
+  }
+}
+
+
+@media screen and (max-width: 399px){
+
+}
+
+
+/* Conteneur global du dropdown et du titre SIMU 1 */
+.navbar-text-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Appliquer le fond blanc et l'ombre lorsque le dropdown est ouvert */
+.navbar-text-wrapper.show {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+/* Pour éviter le double fond blanc dans le dropdown */
+.switch-site .dropdown-menu {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 11;
+}
+
+/* Ajustement du bouton de sélection */
+.switch-site {
+  transition: background-color 0.3s ease;
+}
+
+.switch-site.show {
+  background-color: transparent;
+}
+
+/* Animation d’apparition du menu déroulant */
+.navbar>.container-fluid{
+  max-height: 50px;
+}
+
 /* Menu deconnexion */
 .popover-body{
   padding: 0;
@@ -690,6 +719,12 @@ button.switch-site{
   border-radius: 10px;
 }*/
 .login-content-wrapper{
+  height: 100vh;
+}
+
+.login-background{
+  background-size: cover;
+  background-position: center;
   height: 100vh;
 }
 
@@ -789,6 +824,38 @@ button.switch-site{
 .sidebar-footer .container-powered-by svg{
   margin-left: -25%;
 }
+
+@media screen and (min-width: 1025px){
+  .login-background{
+    height: 100vh;
+  }
+}
+
+@media screen and (max-width: 1024px){
+  .login-background{
+    display: none;
+  }
+
+  .login-content-wrapper{
+    margin-top: -150px !important;
+  }
+}
+
+@media screen and (max-width: 399px){
+  .container-login-content img{
+    display: none;
+  }
+
+  .container-login-content + .container-powered-by{
+    bottom: -30px;
+  }
+
+  .container-login-content + .container-powered-by svg{
+    transform: scale(0.65);
+  }
+}
+
+/* Viewport */
 
 .viewport-height {
   height: 75vh;
@@ -1034,6 +1101,25 @@ sup {
   text-align: left;
 }
 
+
+@media screen and (max-width: 1024px){
+ 
+}
+
+@media screen and (max-width: 767px){
+  .shortcut-link{
+    
+  }
+  .shortcut-link .nav-item{
+    width: 47.5%;
+  }  
+}
+
+@media screen and (max-width: 399px){
+ 
+}
+
+
 /* ---- CONTENT SEARCH ---- */
 #root .App .container-fluid .row.content-search{
   margin-bottom: 30px !important;
@@ -1110,21 +1196,6 @@ sup {
   padding: 5px;
 }
 
-.top-bar-menu{
-  background-color: var(--color-sky-blue);
-}
-
-.top-bar-menu .is-sticky{
-  position: fixed;
-  top: 0;
-  background: var(--color-sky-blue);
-  width: 100%;
-  margin-left: -2.5%;
-  padding-top: 20px;
-  padding-bottom: 40px;
-  z-index: 10;
-} 
-
 .download-container.is-sticky{
   position: fixed;
   top: 0;
@@ -1133,7 +1204,6 @@ sup {
   right: 1%;
   margin-top: 10px;
 }
-
 
 .table-presta thead{
   position: sticky;
@@ -1521,21 +1591,92 @@ thead th,
   left: 50%;
 }
 
+@media screen and (min-width: 1025px){
+  .modal.show .modal-dialog{
+    top: 47%;
+    transform: translate(-50%, -50%) !important;
+    left: 50%;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px){
+  .modal.show .modal-dialog{
+    top: 42%;
+  }
+
+  .modal-dialog.modal-password .modal-body{
+    display: flex;
+    align-items: center;
+  }
+}
+
+
+@media screen and (min-width: 400px) and (max-width: 767px){
+  .modal.show .modal-dialog{
+    top: 43%;
+    transform: translate(0%, -50%) !important;
+    left: 4%;
+  }
+}
+
+@media screen and (max-width: 399px){
+  .modal.show .modal-dialog{
+    top: 20px;
+    transform: translate(0%, 0%) !important;
+    left: 4%;
+  }
+
+  .modal-dialog.modal-password .modal-body p,
+  .modal-dialog.modal-password .modal-body input{
+    font-size: 1.15rem;
+  }
+}
+
+
 .modal.show .modal-dialog.modal-listing{
   max-width: 80vw;
   width: 75vw;
 }
 
-.modal.show .modal-dialog.modal-password{
-  max-width: 60vw;
-}
 
 .modal.show .modal-dialog .modal-content{
   background: var(--color-sky-blue);
   border-radius: 16px;
   font-family: var(--font-text);
-  min-height: 82vh;
-  max-height: 82vh;
+}
+
+@media screen and (min-width: 1025px){
+  .modal.show .modal-dialog.modal-password{
+    max-width: 60vw;
+  }
+
+  .modal.show .modal-dialog .modal-content{
+    min-height: 82vh;
+    /* max-height: 82vh; */
+  }
+}
+
+
+@media screen and (min-width: 768px) and (max-width: 1024px){
+  .modal.show .modal-dialog.modal-password{
+    max-width: 92vw;
+    width: 100%;
+  }
+
+  .modal.show .modal-dialog .modal-content{
+    min-height: 70vh;
+    /* max-height: 82vh; */
+  }
+}
+
+@media screen and (max-width: 767px){
+  .modal.show .modal-dialog.modal-password{
+    max-width: 87vw;
+  }
+
+  .modal.show .modal-dialog .modal-content{
+    min-height: 73vh;
+  }
 }
 
 .modal.show .modal-dialog .modal-content .modal-header{
@@ -1566,6 +1707,18 @@ thead th,
   font-family: var(--font-bold);
   margin: 0 auto;
   font-size: 1.75rem;
+}
+
+@media screen and (min-width: 400px) and (max-width: 767px) {
+  .modal.show .modal-dialog .modal-content .modal-header h1{
+    font-size: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 399px){
+  .modal.show .modal-dialog .modal-content .modal-header h1{
+    font-size: 1.25rem;
+  }
 }
 
 .modal.show .modal-dialog .modal-content .modal-header .modal-titles{
@@ -1930,7 +2083,6 @@ thead th,
 
 
 /* Page dashboard */
-
 .dashboard-stats > div{
   justify-content: space-between;
 }
@@ -1941,25 +2093,42 @@ thead th,
 }
 
 .dashboard-stats .stats-maintenance .stats-card,
-.dashboard-stats .stats-dépannages,
-.dashboard-stats .stats-devis,
-.stats-états-des-paiements{
+.dashboard-stats .stats-other{
   background: white;
   border-radius: 16px;
+  position: relative;
 }
+
+/* STATS MAINTENANCE */
 
 .dashboard-stats .stats-maintenance{
   width: 39%;
 }
 
-.dashboard-stats .stats-dépannages,
-.dashboard-stats .stats-devis,
-.stats-états-des-paiements{
+.dashboard-stats .stats-maintenance .stats-wheel{
+  display: flex;
+}
+
+.dashboard-stats .stats-maintenance .stats-wheel ul{
+  list-style: none;
+  text-align: left;
+  margin-top: 40px;
+  margin-right: 7%;
+  padding-left: 10px;
+}
+
+.dashboard-stats .stats-maintenance .stats-wheel ul li{
+  white-space: nowrap;
+}
+
+
+/* STATS OTHER : Dépannages / Devis / Etats des paiements */
+.dashboard-stats .stats-other{
   position: relative;
   overflow: hidden;
 }
 
-.dashboard-stats .stats-dépannages,
+.dashboard-stats .stats-dépannage,
 .dashboard-stats .stats-devis{
   width: 18.5%;
 }
@@ -1968,9 +2137,7 @@ thead th,
   width: 18%;
 }
 
-.stats-dépannages::after,
-.stats-devis::after,
-.stats-états-des-paiements::after{
+.dashboard-stats .stats-other::after{
   content: "\f0ad";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
@@ -2012,7 +2179,7 @@ thead th,
   right: 20px;
 }
 
-.dashboard-stats .stats-data{
+.dashboard-stats .stats-data:not(.stats-wheel){
   text-align: left;
   margin-top: -30px;
 }
@@ -2020,6 +2187,7 @@ thead th,
 .dashboard-stats .stats-data .stats-number{
   font-size: 4.5rem;
   font-weight: bold;
+  margin-top: 25px;
 }
 
 .dashboard-stats .stats-data .stats-number-title{
@@ -2039,6 +2207,9 @@ thead th,
   padding: 6px 25px 6px 15px;
   text-decoration: none;
   font-size: 1em;
+  position: absolute;
+  left: 15Px;
+  bottom: 15px;
 }
 
 .dashboard-stats a.stats-link:hover{
@@ -2189,7 +2360,7 @@ h2 span.last-activities-subtitle{
   position: relative;
 }
 
-.activity-bullet {
+.stats-bullet{
   width: 13px;
   height: 13px;
   border-radius: 50%;
@@ -2210,3 +2381,4 @@ h2 span.last-activities-subtitle{
   font-size: 0.9rem;
   color: #9DADB5;
 }
+
