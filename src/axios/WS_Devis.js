@@ -39,10 +39,10 @@ const GetListeDevis = (token, guid, setData) => {
  */
 const GetdocumentDevis = async (token, IdDevis, telecharger, returnData) => {
     let targetWindow = undefined;
-    let _return = undefined;
 
     if (returnData) {
-        return await CallEndpoint("GetdocumentDevis", { token: token, IdDevis: IdDevis }, null, true);
+        let _data = await CallEndpoint("GetdocumentDevis", { token: token, IdDevis: IdDevis }, null, true);
+        return JSON.parse(_data);
     }
 
     targetWindow = window.open("/waiting");

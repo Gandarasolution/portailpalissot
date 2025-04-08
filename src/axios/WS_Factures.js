@@ -59,12 +59,13 @@ const VoirFactureDocument = async (
 ) => {
 
     if (returnData) {
-        return await CallEndpoint("GetFactureDocument", {
+        let _return = await CallEndpoint("GetFactureDocument", {
             token: token,
             IdFacture: IdFacture,
             TypeFacture: TypeFacture,
             Avoir: Number(Avoir),
         }, null, true);
+        return JSON.parse(_return);
     }
 
     let targetWindow = window.open("/waiting");

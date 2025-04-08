@@ -155,11 +155,11 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
               const formattedTitle = item.Titre ? item.Titre.toLowerCase().replace(/\s+/g, "-") : item.Texte.toLowerCase().replace(/\s+/g, "-"); // Transforme le titre en classe CSS-friendly
               return (
                 <div className={`mb-3 stats-${formattedTitle}`} key={idx}>
-                  <div className="stats-card p-3">
+                  <div className="stats-card p-3 d-flex flex-column justify-content-between">
                     <h5 className="stats-title">
                       {item?.Titre || item.Texte}
                       {item.IdTypeDocument === 33 && (
-                        <span className="stats-subtitle d-flex flex-column justify-content-between">
+                        <span className="stats-subtitle">
                           <FontAwesomeIcon icon={faCalendarAlt} className="me-2 text-secondary" />
                           Période du xx/xx/2024 au xx/xx/2025
                         </span>

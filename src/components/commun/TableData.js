@@ -895,7 +895,6 @@ const TableData = ({ ...props }) => {
    * @returns Une ligne de la table
    */
   const TableBodyRow = ({ item, index }) => {
-    // console.log(item);
     return (
       <tr
         className={
@@ -1624,7 +1623,6 @@ const TableData = ({ ...props }) => {
   const HandleShowModalListeTaches = async (presta) => {
     //Récupère les données
     if (isLoadingTaches) return;
-    // console.log(presta);
     setPrestaName(presta.DescriptionPrestationContrat);
     setIsLoadingTaches(true);
     setShowModalListeTaches(true);
@@ -1637,7 +1635,6 @@ const TableData = ({ ...props }) => {
   };
 
   const FetchSetListeTache = (data) => {
-    // console.log(data);
     if (data.length) {
       const groups = data.reduce((groups, item) => {
         const k = groups[item.k] || [];
@@ -1915,7 +1912,6 @@ const TableData = ({ ...props }) => {
    */
   const CreatePropsDocumentMaintenance = (element) => {
     const _obj = {};
-
     //le titre et l'extension
     _obj.title = element.k;
     _obj.extension = element.k.split(".").pop();
@@ -1955,7 +1951,7 @@ const TableData = ({ ...props }) => {
 
     //La fonction appelé lors de l'appuye du bouton télécharger
     _obj.TelechargerDocumentSup = async () => {
-      return await await GetDocumentFISAV(tokenCt, element.v, false, true);
+      return await GetDocumentFISAV(tokenCt, element.v, false, true);
     };
 
     _obj.data = element;
@@ -2097,7 +2093,8 @@ const TableData = ({ ...props }) => {
       for (let index = 0; index < _arrDocT.length; index++) {
         const element = _arrDocT[index];
 
-        let _kv = await DocumentMaintenanceGetFile(element.data.v, false, true);
+        let _data = await DocumentMaintenanceGetFile(element.data.v, false, true);
+        let _kv = JSON.parse(_data);
         if (_kv) {
           _arrDocs.push([_kv.v, _kv.k]);
         }
@@ -2133,7 +2130,6 @@ const TableData = ({ ...props }) => {
 
   const FetchSetDocuments = async (data, presta) => {
     let _arrDocs = [];
-
     const arrData = data;
     if (arrData === 500) {
       const _arrError = [CreatePropError()];
@@ -2346,7 +2342,6 @@ const TableData = ({ ...props }) => {
     //La fonction appelé lors de l'appuye du bouton 'Voir'
     _obj.VoirDocumentSup = () => FactureMaintenanceVoirDocumentSup(element);
 
-
     //La fonction appelé lors de l'appuye du bouton télécharger
     _obj.TelechargerDocumentSup = async () => {
       return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
@@ -2462,7 +2457,6 @@ const TableData = ({ ...props }) => {
         //Il y a plusieurs factures
         for (let index = 0; index < data.length; index++) {
           const element = data[index];
-
           const _obj = CreatePropsDocumentInterventionFacture(element);
 
           _arrFA.push(_obj);

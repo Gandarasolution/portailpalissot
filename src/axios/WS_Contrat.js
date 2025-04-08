@@ -157,7 +157,8 @@ const GetDocumentPrestationRapport = async (
     if (returnData) {
         let _return = undefined;
         _return = await CallEndpoint("GetDocumentPrestationRapport", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, null, true);
-        return _return;
+        return  JSON.parse(_return);
+
     }
 
 
@@ -214,7 +215,8 @@ const GetDocumentPrestationCERFA = async (
 ) => {
 
     if (returnData) {
-        return await CallEndpoint("GetDocumentPrestationCERFA", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, null, true);
+        let _return = await CallEndpoint("GetDocumentPrestationCERFA", { token: token, IdMobiliteIntervention: IdMobiliteIntervention }, null, true);
+        return JSON.parse(_return);
     }
 
     let targetWindow = window.open("/waiting");
@@ -292,7 +294,8 @@ const GetDocumentPrestationExtranet = async (
 ) => {
 
     if (returnData) {
-        return await CallEndpoint("GetDocumentPrestationExtranet", { token: token, fullPath: fullPath }, null, true);
+        let _return = await CallEndpoint("GetDocumentPrestationExtranet", { token: token, fullPath: fullPath }, null, true);
+        return JSON.parse(_return);
     }
 
     let targetWindow = window.open("/waiting");
@@ -382,7 +385,7 @@ const GetDocumentPrestationTicket = async (
         }
 
         await CallEndpoint("GetDocumentPrestationTicket", { token: token, IdPJ: IdPJ }, callBackReturnData);
-        return _return;
+        return JSON.parse(_return);
     }
 
     let targetWindow = window.open("/waiting");

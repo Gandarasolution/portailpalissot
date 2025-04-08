@@ -51,8 +51,10 @@ import TableData, {
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
   EditorMontant,
-  EditorActionsTooltip
+  EditorActionsTooltip,
+  CreateNewUnboundCell
 } from "../../components/commun/TableData";
+import { saveAs } from "file-saver";
 
 
 //#endregion
@@ -155,9 +157,9 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
       )
     );
     _headers.push(
-      CreateNewHeader("Action", CreateFilter(), "Action")
+      CreateNewUnboundHeader(CreateFilter(), "Action")
     );
-    
+
 
     return _headers;
   }
@@ -184,21 +186,19 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
     };
 
     const methodTelecharger = async (facture) => {
-      // TelechargerFactureDocument(
-      //   tokenCt,
-      //   facture.IdFacture,
-      //   facture.Type,
-      //   facture.Avoir
-      // );
-      // setTelechargerFacture(false);
-
-      return await await VoirFactureDocument(
+      let _kv = await VoirFactureDocument(
         tokenCt,
         facture.IdFacture,
         facture.Type,
         facture.Avoir,
         true
       );
+
+      const base64data = _kv.v;
+      const _bblob = base64toBlob(base64data);
+      //Téléchargement
+      saveAs(_bblob, _kv.k);
+
     };
 
     const methodVoir = async (facture) => {
@@ -245,10 +245,10 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
         icon: faFilePdf,
       }
     ];
-  
+
     _cells.push(
-      CreateNewCell("Action", false, true, false, (val, row) =>
-        <EditorActionsTooltip actions={actionsForFacture(row)} />
+      CreateNewUnboundCell(false, true, false, (facture, index) =>
+        <EditorActionsTooltip actions={actionsForFacture(facture)} />
       )
     );
 
