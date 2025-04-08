@@ -162,17 +162,20 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
     _cells.push(CreateNewCell("LibEtat", false, false, false, EditorEtat));
 
 
-    const actionsForIntervention = (inter) => [
+    const actionsForIntervention = (item, i, _method) => [
       {
         label: "Voir les documents",
-        onClick: () => EditorActionDocuments,
-        className: "action-view-maintenance icon-visualize",
+        onClick: () =>  {
+          _method('tagInterventionDocuments',item,i);}
+          ,
+        className: "action-view-maintenance",
+        icon: faFile
       }
     ];
     
     _cells.push(
-      CreateNewCell("Action", false, true, false, (val, row) =>
-        <EditorActionsTooltip actions={actionsForIntervention(row)} />
+      CreateNewCell("Action", false, true, false, (item, i, _method) =>
+        <EditorActionsTooltip actions={actionsForIntervention(item, i, _method)} />
       )
     );
 

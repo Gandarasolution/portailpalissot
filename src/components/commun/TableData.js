@@ -958,7 +958,7 @@ const TableData = ({ ...props }) => {
 
     //Marquage par l'editor
     _textFinal = _cellToApply.editor
-      ? _cellToApply.editor(_textFinal)
+      ? _cellToApply.editor(_textFinal,index,SwitchTagMethod)
       : _textFinal;
 
     //Marquage en <mark></mark>

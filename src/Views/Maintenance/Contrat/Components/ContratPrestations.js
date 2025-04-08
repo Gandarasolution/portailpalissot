@@ -179,28 +179,29 @@ const ContratPrestation = ({
       CreateNewUnboundCell(
         false,
         false,
-        true,
-        (val, row, index) => (
+        false,
+        (item, i, _method) => (
           <EditorActionsTooltip
             actions={[
               {
                 label: "Liste des documents",
-                onClick: () => {
-                  row.___forcedTag = "tagListeDocuments";
+                icon: faFileRegular,
+                onClick: ()=>{
+                  _method('tagListeDocuments',item,i);
                 },
-                icon: faFileRegular
+                tagMethod : "tagListeDocuments",
               },
               {
                 label: "Liste des relevés de tâches",
-                onClick: () => {
-                  row.___forcedTag = "tagListeTaches";
+                icon: faList,
+                onClick: ()=>{
+                  _method('tagListeTaches',item,i);
                 },
-                icon: faList
+               
               },
             ]}
           />
-        ),
-        "tagListeActions"
+        ),"tagAction"
       )
     );
     
