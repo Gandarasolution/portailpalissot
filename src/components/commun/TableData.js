@@ -919,6 +919,7 @@ const TableData = ({ ...props }) => {
   };
 
   const handleTdClick = (index, _cellToApply, item) => {
+    // console.log(_cellToApply,item,index)
     if (_cellToApply.isSelectable) {
       setRowIndexSelected(index);
       SwitchTagMethod(_cellToApply.tagMethod, item, index);
@@ -940,7 +941,7 @@ const TableData = ({ ...props }) => {
     if (_cellToApplys.length <= 0) {
       return <td></td>;
     }
-    return _cellToApplys.map((_cellToApply, i) => {
+    return _cellToApplys.map((_cellToApply, i, ) => {
       return (
         <TableBodyCellBody
           key={i}
@@ -957,7 +958,7 @@ const TableData = ({ ...props }) => {
 
     //Marquage par l'editor
     _textFinal = _cellToApply.editor
-      ? _cellToApply.editor(_textFinal)
+      ? _cellToApply.editor(_textFinal,index, SwitchTagMethod)
       : _textFinal;
 
     //Marquage en <mark></mark>
@@ -1566,6 +1567,8 @@ const TableData = ({ ...props }) => {
 
   const SwitchTagMethod = (tagMethod, item, index) => {
     switch (tagMethod) {
+      case "tagAction":
+        break;
       case "tagListeTaches":
         HandleShowModalListeTaches(item);
         break;
@@ -2610,8 +2613,6 @@ export const EditorActionTelecharger = (e) => {
 export const EditorActionsTooltip = ({ actions }) => {
   const [isActive, setIsActive] = useState(false);
 
-
-
   const popover = (
     <Popover className="editor-actions-tooltip">
       <Popover.Body>
@@ -2619,7 +2620,7 @@ export const EditorActionsTooltip = ({ actions }) => {
           <div
             key={index}
             className={`editor-action-item ${action.className || ""}`}
-            onClick={action.onClick}
+            onClick={action.onClick? action.onClick : () =>  console.log(action)}
           >
             <FontAwesomeIcon icon={action.icon} className="action-icon" />
             <span>{action.label}</span>
@@ -2638,7 +2639,7 @@ export const EditorActionsTooltip = ({ actions }) => {
       container={document.body}
       onToggle={(isOpen) => setIsActive(isOpen)}
     >
-      <Button variant="link" className={`btn-tooltip ${isActive ? "active" : ""}`}>
+      <Button  variant="link" className={`btn-tooltip ${isActive ? "active" : ""}`}>
         <TooltipSvg />
       </Button>
     </OverlayTrigger>

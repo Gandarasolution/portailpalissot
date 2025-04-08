@@ -52,7 +52,7 @@ const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
     //EndpointTerm
     let _ws = "&ws=";
      _ws += getWsFromCookie();
-
+    
 
     //Si aucun url récupéré
     if (_url.length === 0) {
