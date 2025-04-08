@@ -13,6 +13,7 @@ import {
   faBook,
   faFile,
   faBell,
+  faChevronDown,
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,12 +27,15 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
 //#endregion
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useRef, useEffect, useState } from "react";
 import { GetDashboardData } from "../../axios/WS_ClientSite";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 import { ReactComponent as Rythme } from "../../image/coeur.svg";
 
 //#endregion
+
+
+
 
 const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
@@ -160,7 +164,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
       <Container fluid className="container-table dashboard-stats">
         <h2>Statistiques du moment</h2>
 
-        <div className="d-flex mt-4 flex-wrap gap-4">
+        <div className="d-flex mt-4 flex-wrap">
           {/* Bloc Maintenance séparé */}
 
           {roueData.length > 0 && (
@@ -178,7 +182,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                   <ul>
                     {maintenanceChartData.map((item, idx) => (
                       <li key={idx} style={{ color: item.fill }}>
-                         <span className="stats-bullet"></span>
+                        <span className="stats-bullet"></span>
                         {item.name} – {item.percent}%
                       </li>
                     ))}
@@ -203,7 +207,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                   </PieChart>
                 </div>
 
-                <a href="#" className="stats-link">Voir le détail &gt;</a>
+                <a href="/maintenance" className="stats-link">Voir le détail &gt;</a>
               </div>
             </div>
           )}
@@ -216,6 +220,19 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
               const nombreAffiche = item.NombreAffiche ?? 0;
               const sousTitre = item.SousTitre?.trim() || "Aucune donnée";
 
+              const getHref = (key) => {
+                switch (key) {
+                  case "dépannages":
+                    return "/interventions";
+                  case "devis":
+                    return "/devis";
+                  case "états-des-paiements":
+                    return "/factures";
+                  default:
+                    return "#";
+                }
+              };
+
               return (
                 <div className={`mb-3 stats-other stats-${formattedTitle}`} key={idx}>
                   <div className="stats-card p-3">
@@ -223,14 +240,14 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
                     <div className="stats-data">
                       <p className="stats-number">
-                        <span>{nombreAffiche}</span>
+                        <span>{nombreAffiche}  {formattedTitle === "états-des-paiements" && " €"}</span>
                       </p>
                       <p className="stats-number-title">
                         <span>{sousTitre}</span>
                       </p>
                     </div>
 
-                    <a href="#" className="stats-link">Voir le détail &gt;</a>
+                    <a href={getHref(formattedTitle)} className="stats-link">Voir le détail &gt;</a>
                   </div>
                 </div>
               );
@@ -304,6 +321,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                 );
               })}
             </ul>
+
 
           </div>
         </div>
