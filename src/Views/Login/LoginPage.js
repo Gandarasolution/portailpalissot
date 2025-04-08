@@ -473,17 +473,14 @@ const LoginPage = (props) => {
   return (
     <Container fluid>
       <Row className="align-items-center" style={{ minHeight: "100vh" }}>
-        <Col md={9} className="p-0">
-          <div
+        <Col md={12} xl={9} className="p-0">
+          <div className="login-background"
             style={{
               backgroundImage: `url(${backgroundLogin})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              height: "100vh",
             }}
           />
         </Col>
-        <Col md={3} className="d-flex align-items-center justify-content-around flex-column login-content-wrapper">
+        <Col md={12} xl={3} className="d-flex align-items-center justify-content-around flex-column login-content-wrapper">
           {/* Logo au-dessus du formulaire */}
           <div className="container-login-content">
           <img src={imageLogo} height={80} />
