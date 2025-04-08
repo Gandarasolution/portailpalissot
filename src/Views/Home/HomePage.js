@@ -26,6 +26,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { GetDashboardData } from "../../axios/WS_ClientSite";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 import { ReactComponent as Rythme } from "../../image/coeur.svg";
+import { Placeholder, Spinner } from "react-bootstrap";
+import { GetRedirectionFromIdTypeDocument } from "../../functions";
 
 //#endregion
 
@@ -35,12 +37,16 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   const [dashboardData, setDashboardData] = useState([]);
-
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const DashboardData = async () => {
+    setDataLoaded(false);
     const callBackData = (data) => {
       if (data) {
         setDashboardData(data);
+        setDataLoaded(true);
+        console.log("Données Dashboard:", data);
+
       }
     }
     await GetDashboardData(tokenCt, ClientSiteContratCtx.storedClientSite.GUID, callBackData);
@@ -52,9 +58,8 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     setPageTitle(`Portail client`);
     setPageSubtitle(null);
     DashboardData();
-    console.log("Données Dashboard:", dashboardData);
     // eslint-disable-next-line
-  }, [dashboardData])
+  }, [])
 
 
   const SpanLink = ({ title, to, img, kv, disable }) => {
@@ -70,13 +75,19 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     );
   };
 
+
   // Récupération des données du timeline (activités récentes)
   const timelineData =
     dashboardData?.WidgetTimeline?.Activites?.GMAO_WidgetTimeline_Data || [];
 
+
+  const roueData = dashboardData?.WidgetsRoue?.GMAO_WidgetRoue || [];
+  const nombreData = dashboardData?.WidgetsNombre?.GMAO_WidgetNombre || [];
+
   // Récupération des données de stats (WidgetsNombre)
   const statsData =
-    dashboardData?.WidgetsNombre?.GMAO_WidgetNombre || [];
+    [].concat(roueData).concat(nombreData);
+  // [];
 
   return (
     <Container fluid className="h- p-0">
@@ -129,19 +140,25 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
         </span>
       </Container>
 
-      <Container fluid className="container-table dashboard-stats">
+      <Spinner hidden={dataLoaded} animation="border" role="status">
+        <span className="visually-hidden">Chargement...</span>
+      </Spinner>
+      <Container fluid className="container-table dashboard-stats"  >
+
         <h2>Statistiques du moment</h2>
 
-        <div className="d-flex mt-4">
+
+
+        <div className="d-flex mt-4" >
           {statsData.length > 0 ? (
             statsData.map((item, idx) => {
-              const formattedTitle = item.Titre.toLowerCase().replace(/\s+/g, "-"); // Transforme le titre en classe CSS-friendly
+              const formattedTitle = item.Titre ? item.Titre.toLowerCase().replace(/\s+/g, "-") : item.Texte.toLowerCase().replace(/\s+/g, "-"); // Transforme le titre en classe CSS-friendly
               return (
                 <div className={`mb-3 stats-${formattedTitle}`} key={idx}>
                   <div className="stats-card p-3">
                     <h5 className="stats-title">
-                      {item.Titre}
-                      {item.Titre === "Maintenance" && (
+                      {item?.Titre || item.Texte}
+                      {item.IdTypeDocument === 33 && (
                         <span className="stats-subtitle d-flex flex-column justify-content-between">
                           <FontAwesomeIcon icon={faCalendarAlt} className="me-2 text-secondary" />
                           Période du xx/xx/2024 au xx/xx/2025
@@ -156,10 +173,19 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                           <div className="stats-wheel-placeholder"></div>
                         </>
                       ) : (
-                        <p className="stats-number">{item.NombreAffiche} <span>{item.SousTitre}</span></p>
+
+                        <>
+                          <p className="stats-number"><span>{item.NombreAffiche}</span></p>
+                          <p className="stats-number-title">
+                            <span>
+                              {item.SousTitre}
+                            </span>
+                          </p>
+                        </>
+
                       )}
                     </div>
-                    <a href="#" className="stats-link">Voir le détail &gt;</a>
+                    <a href={GetRedirectionFromIdTypeDocument(item.IdTypeDocument, item.IdEtat)} className="stats-link">Voir le détail &gt;</a>
                   </div>
                 </div>
               );
@@ -187,14 +213,21 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                         {title === "Maintenance" ? (
                           <div className="stats-wheel-placeholder"></div>
                         ) : (
-                          <>
-                            <p className="stats-number"><span>19</span></p>
-                            <p className="stats-number-title"><span>Interventions en cours</span></p>
-                          </>
+                          <span>
+                            <span className="stats-number"><Spinner animation="grow" /></span>
+                            <p className="stats-number-title">
+                              <Placeholder as="span" animation="wave">
+                                <Placeholder xs={12} />
+                              </Placeholder>
+                            </p>
+
+                          </span>
+                          // <>
+                          // </>
                         )}
                       </div>
 
-                      <a href="#" className="stats-link">Voir le détail &gt;</a>
+                      <a disabled className="stats-link">Voir le détail &gt;</a>
                     </div>
                   </div>
                 );
@@ -204,7 +237,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
         </div>
       </Container>
 
-      <Container fluid className="container-table d-flex mb-4">
+      <Container fluid className="container-table d-flex mb-4" >
         <div className="p-4 d-flex align-items-center justify-content-center dashboard-request-intervention">
           <div className="d-flex flex-column align-items-center justify-content-center">
             <FontAwesomeIcon icon={faBell} size="2x" />
@@ -220,7 +253,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
           </div>
         </div>
 
-        <div className="dashboard-last-activities">
+        <div className="dashboard-last-activities" >
           <h2 className="mt-4">
             Activités récentes <span className="last-activities-subtitle">( 30 derniers jours )</span>
           </h2>
