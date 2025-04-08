@@ -18,6 +18,10 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
+//#region recharts
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+//#endregion
+
 //#region Components
 
 //#endregion
@@ -46,16 +50,17 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     await GetDashboardData(tokenCt, ClientSiteContratCtx.storedClientSite.GUID, callBackData);
   }
 
-
   useEffect(() => {
-    document.title = `Portail client`;
-    setPageTitle(`Portail client`);
-    setPageSubtitle(null);
     DashboardData();
-    console.log("Données Dashboard:", dashboardData);
-    // eslint-disable-next-line
-  }, [dashboardData])
 
+    // Attendre un peu pour s'assurer que les données soient bien chargées
+    setTimeout(() => {
+      if (dashboardData) {
+
+        console.log('dashboard data : ', dashboardData);
+      }
+    }, 1000);
+  }, []);
 
   const SpanLink = ({ title, to, img, kv, disable }) => {
 
@@ -70,13 +75,37 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     );
   };
 
-  // Récupération des données du timeline (activités récentes)
-  const timelineData =
-    dashboardData?.WidgetTimeline?.Activites?.GMAO_WidgetTimeline_Data || [];
+  // Récupération des données de stats (WidgetsRoue)
+  const roueData =
+    dashboardData?.WidgetsRoue?.GMAO_WidgetRoue?.Valeurs?.GMAO_WidgetRoue_Data || [];
+
+  const étatTypes = [
+    { TexteEtat: "Non planifiée", color: "#1f77b4", background: "#195C9D" },
+    { TexteEtat: "Planifiée", color: "#9467bd", background: "#45276A" },
+    { TexteEtat: "En cours", color: "#ff7f0e", background: "#E65833" },
+    { TexteEtat: "Terminée", color: "#2ca02c", background: "#3B863D" },
+  ];
+
+  const total = roueData.reduce((sum, item) => sum + item.Nombre, 0);
+
+  const maintenanceChartData = étatTypes.map(({ TexteEtat, background }) => {
+    const item = roueData.find((r) => r.TexteEtat === TexteEtat);
+    const nombre = item?.Nombre || 0;
+    return {
+      name: TexteEtat,
+      value: nombre,
+      percent: total > 0 ? Math.round((nombre / total) * 100) : 0,
+      fill: background,
+    };
+  });
 
   // Récupération des données de stats (WidgetsNombre)
   const statsData =
     dashboardData?.WidgetsNombre?.GMAO_WidgetNombre || [];
+
+  // Récupération des données du timeline (activités récentes)
+  const timelineData =
+    dashboardData?.WidgetTimeline?.Activites?.GMAO_WidgetTimeline_Data || [];
 
   return (
     <Container fluid className="h- p-0">
@@ -128,81 +157,87 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
           </Nav>
         </span>
       </Container>
-
       <Container fluid className="container-table dashboard-stats">
         <h2>Statistiques du moment</h2>
 
-        <div className="d-flex mt-4">
-          {statsData.length > 0 ? (
+        <div className="d-flex mt-4 flex-wrap gap-4">
+          {/* Bloc Maintenance séparé */}
+
+          {roueData.length > 0 && (
+            <div className="mb-3 stats-maintenance">
+              <div className="stats-card p-3">
+                <h5 className="stats-title">
+                  Maintenance
+                  {/*  <span className="stats-subtitle d-flex flex-column justify-content-between">
+                    <FontAwesomeIcon icon={faCalendarAlt} className="me-2 text-secondary" />
+                    Période du xx/xx/2024 au xx/xx/2025
+                  </span>*/}
+                </h5>
+
+                <div className="stats-data stats-wheel">
+                  <ul>
+                    {maintenanceChartData.map((item, idx) => (
+                      <li key={idx} style={{ color: item.fill }}>
+                         <span className="stats-bullet"></span>
+                        {item.name} – {item.percent}%
+                      </li>
+                    ))}
+                  </ul>
+                  <PieChart width={230} height={230}>
+                    <Pie
+                      data={maintenanceChartData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={85}
+                      paddingAngle={2}
+                      isAnimationActive={true}
+                    >
+                      {maintenanceChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </div>
+
+                <a href="#" className="stats-link">Voir le détail &gt;</a>
+              </div>
+            </div>
+          )}
+
+
+          {/* Autres stats : Devis, Dépannages, États des paiements */}
+          {statsData.length > 0 &&
             statsData.map((item, idx) => {
-              const formattedTitle = item.Titre.toLowerCase().replace(/\s+/g, "-"); // Transforme le titre en classe CSS-friendly
+              const formattedTitle = item.Titre.toLowerCase().replace(/\s+/g, "-");
+              const nombreAffiche = item.NombreAffiche ?? 0;
+              const sousTitre = item.SousTitre?.trim() || "Aucune donnée";
+
               return (
-                <div className={`mb-3 stats-${formattedTitle}`} key={idx}>
+                <div className={`mb-3 stats-other stats-${formattedTitle}`} key={idx}>
                   <div className="stats-card p-3">
-                    <h5 className="stats-title">
-                      {item.Titre}
-                      {item.Titre === "Maintenance" && (
-                        <span className="stats-subtitle d-flex flex-column justify-content-between">
-                          <FontAwesomeIcon icon={faCalendarAlt} className="me-2 text-secondary" />
-                          Période du xx/xx/2024 au xx/xx/2025
-                        </span>
-                      )}
-                    </h5>
+                    <h5 className="stats-title">{item.Titre}</h5>
 
                     <div className="stats-data">
-                      {/* Cas spécifique : Maintenance (avec date et roue) */}
-                      {item.Titre === "Maintenance" ? (
-                        <>
-                          <div className="stats-wheel-placeholder"></div>
-                        </>
-                      ) : (
-                        <p className="stats-number">{item.NombreAffiche} <span>{item.SousTitre}</span></p>
-                      )}
+                      <p className="stats-number">
+                        <span>{nombreAffiche}</span>
+                      </p>
+                      <p className="stats-number-title">
+                        <span>{sousTitre}</span>
+                      </p>
                     </div>
+
                     <a href="#" className="stats-link">Voir le détail &gt;</a>
                   </div>
                 </div>
               );
-            })
-          ) : (
-            // Contenu temporaire en attendant les données
-            <>
-              {["Maintenance", "Dépannages", "Devis", "États des paiements"].map((title, idx) => {
-                const formattedTitle = title.toLowerCase().replace(/\s+/g, "-"); // Format classe CSS
-                return (
-                  <div className={`mb-3 stats-${formattedTitle}`} key={idx}>
-                    <div className="stats-card p-3 d-flex flex-column justify-content-between">
-                      <h5 className="stats-title">
-                        {title}
-                        {title === "Maintenance" && (
-                          <span className="stats-subtitle">
-                            <FontAwesomeIcon icon={faCalendar} className="me-2 text-secondary" />
-                            Période du xx/xx/2024 au xx/xx/2025
-                          </span>
-                        )}
-                      </h5>
-
-
-                      <div className="stats-data">
-                        {title === "Maintenance" ? (
-                          <div className="stats-wheel-placeholder"></div>
-                        ) : (
-                          <>
-                            <p className="stats-number"><span>19</span></p>
-                            <p className="stats-number-title"><span>Interventions en cours</span></p>
-                          </>
-                        )}
-                      </div>
-
-                      <a href="#" className="stats-link">Voir le détail &gt;</a>
-                    </div>
-                  </div>
-                );
-              })}
-            </>
-          )}
+            })}
         </div>
       </Container>
+
 
       <Container fluid className="container-table d-flex mb-4">
         <div className="p-4 d-flex align-items-center justify-content-center dashboard-request-intervention">
@@ -259,7 +294,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                 return (
                   <li key={index} className="last-activity-item">
                     {/* Puce colorée */}
-                    <span className="activity-bullet" style={{ borderColor: bulletColor }}></span>
+                    <span className="stats-bullet" style={{ borderColor: bulletColor }}></span>
 
                     {/* Texte de l'événement */}
                     <span className="activity-text">
@@ -276,8 +311,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
 
       </Container>
-    </Container>
-
+    </Container >
 
   );
 };
