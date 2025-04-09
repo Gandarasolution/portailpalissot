@@ -129,12 +129,12 @@ const GetDocumentFISAV = async (
     returnData
 ) => {
     let targetWindow = undefined;
-
     if (returnData) {
-        return CallEndpoint("GetDocumentFISAV", {
+        let _return = await CallEndpoint("GetDocumentFISAV", {
             token: token,
             IdFicheInterventionSAV: IdFicheInterventionSAV,
         }, null, true);
+        return JSON.parse(_return);
     }
 
     targetWindow = window.open("/waiting");

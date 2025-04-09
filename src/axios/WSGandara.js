@@ -36,7 +36,7 @@ const getWsFromCookie = ()=>{
  * @param {?string} urlToUse L'url à utiliser (autre que celle stocké en cookie)
  */
 const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnResponse, urlToUse) => {
-
+    let _return;
 
     //Récupération de l'URL 
     let _url = "";
@@ -52,7 +52,7 @@ const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
     //EndpointTerm
     let _ws = "&ws=";
      _ws += getWsFromCookie();
-    
+
 
     //Si aucun url récupéré
     if (_url.length === 0) {
@@ -87,7 +87,7 @@ const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
         }
     }
     //Appel ajax
-    await $.ajax({
+   _return = await $.ajax({
         type: "POST",
         url: _url + endpoint + _ws,
         data: data,
@@ -102,9 +102,9 @@ const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
             if (isJSON(data)) {
                 _data = JSON.parse(data);
             }
-
-            if (mustReturnResponse) return _data;
-
+            if (mustReturnResponse) {
+                return _data;
+            }
             if (callbackResponseSuccess) callbackResponseSuccess(_data);
 
         },
@@ -114,8 +114,7 @@ const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnR
         }
 
     })
-
-
+    if(mustReturnResponse) return _return;
 };
 
 

@@ -26,7 +26,8 @@ import TableData, {
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
   EditorMontant,
-  EditorActionsTooltip
+  EditorActionsTooltip,
+  CreateNewUnboundCell
 } from "../../components/commun/TableData";
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
 import { Button, Col, Row } from "react-bootstrap";
@@ -116,7 +117,7 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
       CreateNewHeader("LibEtat", CreateFilter(true, true), "État", EditorEtat)
     );
     _headers.push(
-      CreateNewHeader("Action", CreateFilter(), "Action")
+      CreateNewUnboundHeader(CreateFilter(),"Action")
     );
 
     return _headers;
@@ -173,9 +174,10 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
 
 
     _cells.push(
-      CreateNewCell("Action", false, true, false, (val, row, index) => {
-        console.log("EditorActionsTooltip reçoit row:", row);
-        return <EditorActionsTooltip actions={actionsForDevis(row)} />;
+      // CreateNewCell("Action", false, true, false, (val, index, method) =>{
+      CreateNewUnboundCell( false, true, false, (val) =>{
+        console.log("EditorActionsTooltip reçoit row:", val);
+        return <EditorActionsTooltip actions={actionsForDevis(val)} />;
       })
     );
     return _cells;

@@ -10,10 +10,10 @@ import {
   faCalendar,
   faCalendarAlt,
   faWrench,
+  faArrowDown,
   faBook,
   faFile,
   faBell,
-  faChevronDown,
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -27,15 +27,14 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
 //#endregion
 
-import React, { useContext, useRef, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { GetDashboardData } from "../../axios/WS_ClientSite";
 import { ClientSiteContratContext, TokenContext } from "../../App";
 import { ReactComponent as Rythme } from "../../image/coeur.svg";
+import { Placeholder, Spinner } from "react-bootstrap";
+import { GetRedirectionFromIdTypeDocument } from "../../functions";
 
 //#endregion
-
-
-
 
 const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
@@ -43,28 +42,30 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
 
   const [dashboardData, setDashboardData] = useState([]);
-
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const DashboardData = async () => {
+    setDataLoaded(false);
     const callBackData = (data) => {
       if (data) {
         setDashboardData(data);
+        setDataLoaded(true);
+        console.log("Données Dashboard:", data);
+
       }
     }
     await GetDashboardData(tokenCt, ClientSiteContratCtx.storedClientSite.GUID, callBackData);
   }
 
+
   useEffect(() => {
+    document.title = `Portail client`;
+    setPageTitle(`Portail client`);
+    setPageSubtitle(null);
     DashboardData();
+    // eslint-disable-next-line
+  }, [])
 
-    // Attendre un peu pour s'assurer que les données soient bien chargées
-    setTimeout(() => {
-      if (dashboardData) {
-
-        console.log('dashboard data : ', dashboardData);
-      }
-    }, 1000);
-  }, []);
 
   const SpanLink = ({ title, to, img, kv, disable }) => {
 
@@ -80,8 +81,8 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
   };
 
   // Récupération des données de stats (WidgetsRoue)
-  const roueData =
-    dashboardData?.WidgetsRoue?.GMAO_WidgetRoue?.Valeurs?.GMAO_WidgetRoue_Data || [];
+  const rawRoueData = dashboardData?.WidgetsRoue?.GMAO_WidgetRoue?.Valeurs?.GMAO_WidgetRoue_Data;
+  const roueData = Array.isArray(rawRoueData) ? rawRoueData : (rawRoueData ? [rawRoueData] : []);
 
   const étatTypes = [
     { TexteEtat: "Non planifiée", color: "#1f77b4", background: "#195C9D" },
@@ -103,13 +104,43 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     };
   });
 
-  // Récupération des données de stats (WidgetsNombre)
-  const statsData =
-    dashboardData?.WidgetsNombre?.GMAO_WidgetNombre || [];
+
 
   // Récupération des données du timeline (activités récentes)
   const timelineData =
     dashboardData?.WidgetTimeline?.Activites?.GMAO_WidgetTimeline_Data || [];
+
+
+  // Récupération des données de stats (WidgetsNombre)
+  const statsData = dashboardData?.WidgetsNombre?.GMAO_WidgetNombre || [];
+
+  // Flèche scrollable activités 
+  const activitiesRef = useRef(null);
+  const [isActivitiesScrollable, setIsActivitiesScrollable] = useState(false);
+
+  useEffect(() => {
+    const checkScrollability = () => {
+      if (activitiesRef.current) {
+        const { scrollHeight, clientHeight } = activitiesRef.current;
+        setIsActivitiesScrollable(scrollHeight > clientHeight);
+      }
+    };
+
+    checkScrollability();
+    window.addEventListener("resize", checkScrollability);
+
+    return () => {
+      window.removeEventListener("resize", checkScrollability);
+    };
+  }, [timelineData]);
+  const scrollToBottomActivities = () => {
+    if (activitiesRef.current) {
+      activitiesRef.current.scrollTo({
+        top: activitiesRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
 
   return (
     <Container fluid className="h- p-0">
@@ -161,77 +192,93 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
           </Nav>
         </span>
       </Container>
+
+
       <Container fluid className="container-table dashboard-stats">
         <h2>Statistiques du moment</h2>
 
         <div className="d-flex mt-4 flex-wrap">
           {/* Bloc Maintenance séparé */}
 
-          {roueData.length > 0 && (
+          {dataLoaded ? (
+            roueData.length > 0 && (
+              <div className="mb-3 stats-maintenance">
+                <div className="stats-card p-3">
+                  <h5 className="stats-title">
+                    Maintenance
+                  </h5>
+
+                  <div className="stats-data stats-wheel">
+                    <ul>
+                      {maintenanceChartData.map((item, idx) => (
+                        <li key={idx} style={{ color: item.fill }}>
+                          <span className="stats-bullet"></span>
+                          {item.name} – {item.percent}%
+                        </li>
+                      ))}
+                    </ul>
+                    <PieChart width={230} height={230}>
+                      <Pie
+                        data={maintenanceChartData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={85}
+                        paddingAngle={2}
+                        isAnimationActive={true}
+                      >
+                        {maintenanceChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </div>
+                  <a href="/maintenance" className="stats-link">Voir le détail &gt;</a>
+                </div>
+              </div>
+            )
+          ) : (
             <div className="mb-3 stats-maintenance">
               <div className="stats-card p-3">
-                <h5 className="stats-title">
-                  Maintenance
-                  {/*  <span className="stats-subtitle d-flex flex-column justify-content-between">
-                    <FontAwesomeIcon icon={faCalendarAlt} className="me-2 text-secondary" />
-                    Période du xx/xx/2024 au xx/xx/2025
-                  </span>*/}
-                </h5>
-
+                <h5 className="stats-title">Maintenance</h5>
                 <div className="stats-data stats-wheel">
                   <ul>
-                    {maintenanceChartData.map((item, idx) => (
-                      <li key={idx} style={{ color: item.fill }}>
-                        <span className="stats-bullet"></span>
-                        {item.name} – {item.percent}%
+                    {[...Array(4)].map((_, i) => (
+                      <li key={i}>
+                        <Placeholder as="span" animation="wave">
+                          <Placeholder xs={6} />
+                        </Placeholder>
                       </li>
                     ))}
                   </ul>
-                  <PieChart width={230} height={230}>
-                    <Pie
-                      data={maintenanceChartData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={55}
-                      outerRadius={85}
-                      paddingAngle={2}
-                      isAnimationActive={true}
-                    >
-                      {maintenanceChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
+                  <div
+                    style={{
+                      width: 230,
+                      height: 230,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Spinner animation="border" />
+                  </div>
                 </div>
-
-                <a href="/maintenance" className="stats-link">Voir le détail &gt;</a>
+                <a disabled className="stats-link">Voir le détail &gt;</a>
               </div>
             </div>
           )}
 
 
           {/* Autres stats : Devis, Dépannages, États des paiements */}
-          {statsData.length > 0 &&
+          {dataLoaded ? (
+            statsData.length > 0 &&
             statsData.map((item, idx) => {
-              const formattedTitle = item.Titre.toLowerCase().replace(/\s+/g, "-");
+              const formattedTitle = item.Titre?.toLowerCase().replace(/\s+/g, "-") || item.Texte?.toLowerCase().replace(/\s+/g, "-") || "inconnu";
               const nombreAffiche = item.NombreAffiche ?? 0;
               const sousTitre = item.SousTitre?.trim() || "Aucune donnée";
-
-              const getHref = (key) => {
-                switch (key) {
-                  case "dépannages":
-                    return "/interventions";
-                  case "devis":
-                    return "/devis";
-                  case "états-des-paiements":
-                    return "/factures";
-                  default:
-                    return "#";
-                }
-              };
 
               return (
                 <div className={`mb-3 stats-other stats-${formattedTitle}`} key={idx}>
@@ -240,23 +287,52 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
                     <div className="stats-data">
                       <p className="stats-number">
-                        <span>{nombreAffiche}  {formattedTitle === "états-des-paiements" && " €"}</span>
+                        <span>{nombreAffiche}{formattedTitle === "états-des-paiements" && " €"}</span>
                       </p>
                       <p className="stats-number-title">
                         <span>{sousTitre}</span>
                       </p>
                     </div>
 
-                    <a href={getHref(formattedTitle)} className="stats-link">Voir le détail &gt;</a>
+                    <a href={GetRedirectionFromIdTypeDocument(item.IdTypeDocument, item.IdEtat)} className="stats-link">Voir le détail &gt;</a>
+
                   </div>
                 </div>
               );
-            })}
+            })
+          ) : (
+            // Affichage temporaire de 3 cartes avec Placeholder
+            ["Dépannages", "Devis", "États des paiements"].map((title, idx) => {
+              const formattedTitle = title.toLowerCase().replace(/\s+/g, "-");
+              return (
+                <div className={`mb-3 stats-other stats-${formattedTitle}`} key={idx}>
+                  <div className="stats-card p-3">
+                    <h5 className="stats-title">{title}</h5>
+                    <div className="stats-data">
+                      <p className="stats-number">
+                        <Placeholder as="span" animation="wave">
+                          <Placeholder xs={3} />
+                        </Placeholder>
+                      </p>
+                      <p className="stats-number-title">
+                        <Placeholder as="span" animation="wave">
+                          <Placeholder xs={6} />
+                        </Placeholder>
+                      </p>
+                    </div>
+                    <a disabled className="stats-link">Voir le détail &gt;</a>
+                  </div>
+                </div>
+              );
+            })
+          )}
+
+
         </div>
       </Container>
 
 
-      <Container fluid className="container-table d-flex mb-4">
+      <Container fluid className="container-table d-flex mb-4" >
         <div className="p-4 d-flex align-items-center justify-content-center dashboard-request-intervention">
           <div className="d-flex flex-column align-items-center justify-content-center">
             <FontAwesomeIcon icon={faBell} size="2x" />
@@ -284,43 +360,65 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                 ""}
             </h5>
 
-            <ul className="last-activities-list">
-              {timelineData.map((event, index) => {
-                const colorMapping = {
-                  Primary: "#007bff",
-                  Secondary: "#6c757d",
-                  Success: "#28a745",
-                  Danger: "#dc3545",
-                  Warning: "#ffc107",
-                  Info: "#17a2b8",
-                  Dark: "#343a40",
-                };
+            <ul className="last-activities-list" ref={activitiesRef}>
+              {dataLoaded ? (
+                timelineData.map((event, index) => {
+                  const colorMapping = {
+                    Primary: "#007bff",
+                    Secondary: "#6c757d",
+                    Success: "#28a745",
+                    Danger: "#dc3545",
+                    Warning: "#ffc107",
+                    Info: "#17a2b8",
+                    Dark: "#343a40",
+                  };
 
-                const timestamp = parseInt(event.DateStrUNIX, 10) * 1000;
-                const dateObj = new Date(timestamp);
-                const dateLocale = dateObj.toLocaleString("fr-FR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
+                  const timestamp = parseInt(event.DateStrUNIX, 10) * 1000;
+                  const dateObj = new Date(timestamp);
+                  const dateLocale = dateObj.toLocaleString("fr-FR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
 
-                const bulletColor = colorMapping[event.CouleurTag] || "#ccc";
+                  const bulletColor = colorMapping[event.CouleurTag] || "#ccc";
 
-                return (
+                  return (
+                    <li key={index} className="last-activity-item">
+                      <span
+                        className="stats-bullet"
+                        style={{ borderColor: bulletColor }}
+                      ></span>
+                      <span className="activity-text">
+                        {dateLocale} – {event.Texte}
+                      </span>
+                    </li>
+                  );
+                })
+              ) : (
+
+                [...Array(4)].map((_, index) => (
                   <li key={index} className="last-activity-item">
-                    {/* Puce colorée */}
-                    <span className="stats-bullet" style={{ borderColor: bulletColor }}></span>
-
-                    {/* Texte de l'événement */}
+                    <span
+                      className="stats-bullet"
+                      style={{ borderColor: "#ddd" }}
+                    ></span>
                     <span className="activity-text">
-                      {dateLocale} – {event.Texte}
+                      <Placeholder as="span" animation="wave">
+                        <Placeholder xs={10} />
+                      </Placeholder>
                     </span>
                   </li>
-                );
-              })}
+                ))
+              )}
             </ul>
+            {isActivitiesScrollable && (
+              <button onClick={scrollToBottomActivities} className="scroll-listing-activities">
+                <FontAwesomeIcon icon={faArrowDown} size="lg" />
+              </button>
+            )}
 
 
           </div>
@@ -328,8 +426,10 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
 
 
+
       </Container>
-    </Container >
+    </Container>
+
 
   );
 };

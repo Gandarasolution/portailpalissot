@@ -358,8 +358,29 @@ const cyrb53 = (str, seed = 0) => {
 };
 
 
-const GenerateUid = ()=>{
+const GenerateUid = () => {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+
+const GetRedirectionFromIdTypeDocument = (IdTypeDocument, IdEtat) => {
+  let _page = '';
+  switch (IdTypeDocument) {
+    case 0://Devis
+      _page = 'devis';
+      break;
+    case 25://DISAV
+      _page = 'interventions';
+      break;
+    case 3://Factures
+      return "factures";
+      break;
+    default:
+      return '#';
+      break;
+  }
+
+  return `${_page}?filtre=${IdEtat}`;
 }
 
 
@@ -384,4 +405,5 @@ export {
   GetURLLocationViewerFromExtension,
   cyrb53,
   GenerateUid,
+  GetRedirectionFromIdTypeDocument,
 };
