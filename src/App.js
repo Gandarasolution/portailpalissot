@@ -121,7 +121,7 @@ function App() {
 
   function setClientSite(clientSite) {
     setClientSiteCookie(clientSiteName, clientSite);
-    SetLastSite(tokenCookie[tokenName],clientSite.GUID);
+    SetLastSite(tokenCookie[tokenName], clientSite.GUID);
   }
   const storedClientSite = clientSiteCookie[clientSiteName];
 
@@ -165,14 +165,14 @@ function App() {
   //#region Token
 
   const themeName = cyrb53("themeName").toString();
-  const[themeCookie,setThemeCookie,removeThemeCookie] = useCookies({themeName});
+  const [themeCookie, setThemeCookie, removeThemeCookie] = useCookies({ themeName });
 
-  function setTheme(theme){
-    setThemeCookie(themeName,theme);
+  function setTheme(theme) {
+    setThemeCookie(themeName, theme);
   }
 
   const wsEndpointName = cyrb53("wsEndpointName").toString();
-  const [wsEndpointCookie, setWsEndpointCookie, removeWSEndpointCookie] = useCookies({wsEndpointName});
+  const [wsEndpointCookie, setWsEndpointCookie, removeWSEndpointCookie] = useCookies({ wsEndpointName });
 
   function setWsEndpoint(ws) {
     setWsEndpointCookie(wsEndpointName, ws);
@@ -402,12 +402,13 @@ function App() {
   const SmallDown = () => {
     return (
       <Breakpoint small down>
-        <TopBarMenu
-          accountName={account}
-          handleDeconnexion={handleDeconnexion}
-        />
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <AppRoutes />
+        <Row className="background  m-0">
+
+          <Col className="App font-link p-0">
+
+            <AppRoutes />
+          </Col>
+        </Row>
       </Breakpoint>
     );
   };
