@@ -1557,8 +1557,6 @@ const TableData = ({ ...props }) => {
     if (!PrestaCtx) return null;
 
 
-    console.log('presta ctx ' , PrestaCtx);
-
 
     return (
       <>
@@ -1578,26 +1576,20 @@ const TableData = ({ ...props }) => {
   const SwitchTagMethod = (tagMethod, item, index) => {
     switch (tagMethod) {
       case "tagListeTaches":
-        console.log('action lancée des tâches');
         HandleShowModalListeTaches(item);
         break;
       case "tagListeDocuments":
-        console.log('action des documents lancées');
         HandleAfficherDocuments(item);
         break;
       case "tagInterventionDocuments":
         HandleAfficherFacture(Data()[index]);
-        console.log('action des intervention des documents lancées');
         break;
       case "tagListeSite":
         HandleChoixDuSite(Data()[index]);
-        console.log('action liste des sites lancées');
         break;
       default:
-        console.log('autres');
         if (tagMethod && tagMethod.includes("selection_")) {
           let _arrSelector = JSON.parse(JSON.stringify(arraySelector));
-          console.log('tag ', tagMethod);
           if (_arrSelector.includes(index)) {
             _arrSelector = _arrSelector.filter((s) => s !== index);
           } else {
@@ -1831,7 +1823,6 @@ const TableData = ({ ...props }) => {
   useEffect(() => {
     if (PrestaCtx) {
       if (PrestaCtx.showModalTaches) {
-        console.log('show modal taches : ', PrestaCtx);
         HandleShowModalListeTaches(PrestaCtx.prestaSelected);
       }
     }
@@ -2181,7 +2172,6 @@ const TableData = ({ ...props }) => {
 
   const HandleAfficherDocuments = async (presta) => {
     if (presta.IdDossierIntervention > 0 && presta.IdEtat === 96) {
-      console.log('dans presta 96');
       setGridColMDValue(10);
       setIsDocumentLoaded(false);
       setShowModalDoc(true);
@@ -2193,7 +2183,6 @@ const TableData = ({ ...props }) => {
         presta
       );
     } else {
-      console.log('ailleurs');
       setGridColMDValue(12);
     }
   };
@@ -2316,7 +2305,6 @@ const TableData = ({ ...props }) => {
   useEffect(() => {
     if (PrestaCtx) {
       if (PrestaCtx.showModalDoc) {
-        console.log('show modal doc : ', PrestaCtx);
         HandleAfficherDocuments(PrestaCtx.prestaSelected);
       }
     }
@@ -2428,7 +2416,6 @@ const TableData = ({ ...props }) => {
     };
 
     const CardFacturesBody = () => {
-      console.log("isDocumentLoaded:", isDocumentLoaded, "documents:", documents);
       if (!isDocumentLoaded) {
         return (
           <>
@@ -2711,15 +2698,11 @@ const TableData = ({ ...props }) => {
 
   const HandleAfficherFacture = (inter) => {
     if (inter) {
-      console.log('inter ', inter);
       setDocuments([]);
       setGridColMDValue(10);
       // Charge les factures
       GetListeDocIntervention(inter.IdDossierInterventionSAV);
-      console.log('inter id dossier ', inter.IdDossierInterventionSAV);
-      console.log("Before setShowModalFacture(true) in HandleAfficherFacture");
       setShowModalFacture(true);
-      console.log("After setShowModalFacture(true) in HandleAfficherFacture, showModalFacture =", showModalFacture);      
       
     } else {
       setGridColMDValue(12);
