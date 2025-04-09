@@ -1,6 +1,6 @@
 //#region Imports
 
-import { useEffect, useState, useContext } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
@@ -21,7 +21,7 @@ import TableData, {
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
-  EditorActionsTooltip
+  EditorActionsTooltip,
 } from "../../../components/commun/TableData";
 
 import {
@@ -33,9 +33,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetListeInterventions } from "../../../axios/WS_Intervention";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
 import { Row } from "react-bootstrap";
+
+import { PrestaContext } from "../../Maintenance/Contrat/Components/ContratPrestations";
 //#endregion
 
 //#endregion
+
+
 
 const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
   const TokenCt = useContext(TokenContext);
@@ -45,6 +49,8 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeInterventions, setListeInterventions] = useState([]);
+  const [showModalFacture, setShowModalFacture] = useState(false);
+  const [prestaSelected, setPrestaSelected] = useState(null);
 
   //#endregion
 
@@ -165,14 +171,15 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
     const actionsForIntervention = (item, i, _method) => [
       {
         label: "Voir les documents",
-        onClick: () =>  {
-          _method('tagInterventionDocuments',item,i);}
-          ,
+        onClick: () => {
+          _method('tagInterventionDocuments', item, i);
+        }
+        ,
         className: "action-view-maintenance",
         icon: faFile
       }
     ];
-    
+
     _cells.push(
       CreateNewCell("Action", false, true, false, (item, i, _method) =>
         <EditorActionsTooltip actions={actionsForIntervention(item, i, _method)} />
@@ -302,33 +309,43 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
 
 
     return (
-      <TableData
-        Data={GetListeInterventionsTrimed()}
-        Headers={_Headers}
-        Cells={_Cells}
-        IsLoaded={isLoaded}
-        Pagination
-        ButtonFilters={_ButtonFilter}
-        // TopPannelRightToSearch={
-        //   <Col md={"auto"} className="m-1">
-        //     <Button
-        //       variant="danger"
-        //       onClick={() => (window.location.href = "/nouvelleintervention")}
-        //     >
-        //       Demander une nouvelle intervention
-        //     </Button>
-        //   </Col>
-        // }
+      <PrestaContext.Provider value={{
+        showModalFacture,
+        setShowModalFacture,
+        prestaSelected,
+        setPrestaSelected,
+        isInterventions: true,
+      }}>
+        <TableData
+          Data={GetListeInterventionsTrimed()}
+          Headers={_Headers}
+          Cells={_Cells}
+          IsLoaded={isLoaded}
+          Pagination
+          ButtonFilters={_ButtonFilter}
+          // TopPannelRightToSearch={
+          //   <Col md={"auto"} className="m-1">
+          //     <Button
+          //       variant="danger"
+          //       onClick={() => (window.location.href = "/nouvelleintervention")}
+          //     >
+          //       Demander une nouvelle intervention
+          //     </Button>
+          //   </Col>
+          // }
 
-        CardModel={_CardModel}
-      />
+          CardModel={_CardModel}
+        />
+      </PrestaContext.Provider>
     );
   };
 
   return (
     <Container fluid className="table-depannage">
       <Container fluid>
+
         <TableInterventions />
+
       </Container>
     </Container>
   );
