@@ -765,7 +765,7 @@ const TableData = ({ ...props }) => {
                 onClick={() => {
                   ResetFilterCol();
                 }}
-              >
+              >Effacer
                 <FilterReset title="Réinitialiser les filtres" />
               </Button>
 
@@ -810,7 +810,7 @@ const TableData = ({ ...props }) => {
                 onClick={() => {
                   ResetFilterCol();
                 }}
-              >
+              >Effacer
                 <FilterReset title="Réinitialiser les filtres" />
               </Button>
 
