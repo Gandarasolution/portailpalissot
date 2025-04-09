@@ -180,6 +180,7 @@ input.form-control:focus{
 
 .popover-filters .btn-primary.btn-filter.cancel svg{
   height: 20px;
+  margin-left: 5px;
 }
 
 .popover-filters .btn-primary.btn-filter:not(.cancel),
@@ -1628,7 +1629,13 @@ thead th,
   }
 }
 
-@media screen and (min-width: 768px) and (max-width: 1024px){
+@media screen and (min-width: 992px) and (max-width: 1024px){
+  .modal.show .modal-dialog{
+    top: 37%;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px){
   .modal.show .modal-dialog{
     top: 42%;
   }
@@ -1636,28 +1643,6 @@ thead th,
   .modal-dialog.modal-password .modal-body{
     display: flex;
     align-items: center;
-  }
-}
-
-
-@media screen and (min-width: 400px) and (max-width: 767px){
-  .modal.show .modal-dialog{
-    top: 43%;
-    transform: translate(0%, -50%) !important;
-    left: 4%;
-  }
-}
-
-@media screen and (max-width: 399px){
-  .modal.show .modal-dialog{
-    top: 20px;
-    transform: translate(0%, 0%) !important;
-    left: 4%;
-  }
-
-  .modal-dialog.modal-password .modal-body p,
-  .modal-dialog.modal-password .modal-body input{
-    font-size: 1.15rem;
   }
 }
 
@@ -1914,6 +1899,37 @@ thead th,
   font-size: 35px;
   height: 40px;
   width: 40px;
+}
+
+
+@media screen and (min-width: 400px) and (max-width: 767px){
+  .modal.show .modal-dialog{
+    top: 43%;
+    transform: translate(0%, -50%) !important;
+    left: 4%;
+  }
+}
+
+@media screen and (max-width: 399px){
+  .modal.show .modal-dialog.modal-password .modal-content{
+    min-height: 92vh;
+  }
+
+  .modal.show .modal-dialog.modal-password .modal-body {
+    overflow-y: hidden;
+    max-height: 78vh;
+  }
+  
+  .modal.show .modal-dialog{
+    top: 20px;
+    transform: translate(0%, 0%) !important;
+    left: 4%;
+  }
+
+  .modal.show .modal-dialog.modal-password .modal-content .modal-body>div p,
+  .modal.show .modal-dialog.modal-password .modal-content .modal-body input{
+    font-size: 1.15rem;
+  }
 }
 
 /* ASCENCEUR */
