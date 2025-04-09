@@ -98,43 +98,16 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
   }
 
   function getTitleAndSubtitle() {
-
-
-
-    //Le titre et le sous titre sont donnés en paramètres du composant (states dans App.js parent)
-    return { titre: pageTitle, soustitre: pageSubtitleLoaded ? "x" : pageSubtitle };
-    // const pathname = window.location.pathname;
-
-    //   switch (pathname) {
-    //     case "/devis":
-    //       return { titre: "Liste des devis", soustitre: `X` };
-
-    //     case "/factures":
-    //       return { titre: "Liste des factures", soustitre: `X` };
-
-    //     case "/appareils":
-    //       return { titre: "Liste des appareils", soustitre: `X` };
-
-    //     case "/interventions":
-    //       return { titre: "Liste des dépannages", soustitre: `X` };
-
-    //     case "/maintenance":
-    //       return { titre: "Liste des plannifications", soustitre: `X` };
-
-    //     case "/account":
-    //       return { titre: "Mon compte"};
-
-    //     case "/": // Page d'accueil
-    //       return { titre: "Tableau de bord" };
-
-
-    //       case "/sites": // Page d'accueil
-    //       return { titre: "Choix du site" };
-
-    //     default: // Page par défaut
-    //       return { titre: "Titre page" };
-    //   }
+    const titre = pageTitle;
+    // Si pageSubtitle est null, on lui assigne une chaîne vide
+    const soustitreRaw = pageSubtitleLoaded ? "x" : (pageSubtitle || "");
+    
+    const numberMatch = soustitreRaw.match(/\d+/);
+    const soustitreNumber = numberMatch ? numberMatch[0] : "";
+    
+    return { titre, soustitre: soustitreNumber };
   }
+  
 
 
 
