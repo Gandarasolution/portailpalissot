@@ -356,10 +356,10 @@ const LoginPage = (props) => {
 
     let _curentHost = window.location.host;
 
-    let _isCannon = await IsURICanonnical();
+    let _responseURI = await IsURICanonnical();
+    let _isCannon = _responseURI === "1";
 
     if (_isCannon) {
-
       let _wsForToken = "";
       let _b64Image = "";
       const GetResponseURLWS = (data) => {
