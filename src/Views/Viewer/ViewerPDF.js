@@ -9,7 +9,7 @@ const viewerCt = useContext(ViewerContext);
 
 const url =  viewerCt.viewerURL;
 
-viewerCt.removeViewer();
+// viewerCt.removeViewer();
 return (
     <div>
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">

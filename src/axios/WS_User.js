@@ -18,7 +18,7 @@ const IsURICanonnical = async () => {
   //TODO : Endpoint
   //TEMP
 
-  return ["test.gandarasolution.fr:3000",].includes(_uri);
+  // return ["test.gandarasolution.fr:3000",].includes(_uri);
 
   //
 
@@ -35,7 +35,7 @@ const IsURICanonnical = async () => {
 const GetURLWs = async (codeOrURL, setResponse) => {
   //L'url utilisé pour récupérer l'url du webservice
   let _urlTemp = "https://extranet.palissot.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO";
-  _urlTemp = "https://dev.extranet.gandarasolution.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO";
+  // _urlTemp = "https://dev.extranet.gandarasolution.fr/extranet/inc_librairie/GMAO/WSGandara.fct.php?endpoint=GMAO";
   // await CallEndpoint("GetURLWsEntreprise", { codeEntreprise: 'test2' }, setResponse, false, _urlTemp);
   await CallEndpoint("GetURLWsEntreprise", { codeEntreprise: codeOrURL }, setResponse, false, _urlTemp);
 
