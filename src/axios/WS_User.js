@@ -18,7 +18,7 @@ const IsURICanonnical = async () => {
   //TODO : Endpoint
   //TEMP
 
-  return ["test.gandarasolution.fr:3000",].includes(_uri);
+  // return ["test.gandarasolution.fr:3000",].includes(_uri);
 
   //
 
