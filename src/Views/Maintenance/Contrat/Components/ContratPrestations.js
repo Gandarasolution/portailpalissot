@@ -300,43 +300,7 @@ const ContratPrestation = ({
     );
   };
 
-  const EditorActionDocuments = (presta) => {
-    return (
-      <Button className="ms-2">
-        <OverlayTrigger
-          placement="bottom"
-          overlay={<Tooltip>Liste des documents</Tooltip>}
-        >
-          {presta.IdEtat === 96 ? (
-            <FontAwesomeIcon
-              icon={faFileAlt}
-            // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
-            />
-          ) : (
-            <FontAwesomeIcon
-              icon={faBan}
-            // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
-            />
-          )}
-        </OverlayTrigger>
-      </Button>
-    );
-  };
 
-  const EditorActionTaches = () => {
-    return (
-      <Button>
-        <OverlayTrigger
-          placement="bottom"
-          overlay={<Tooltip>Relevés de tâches</Tooltip>}
-        >
-          <span>
-            <FontAwesomeIcon icon={faListCheck} />
-          </span>
-        </OverlayTrigger>
-      </Button>
-    );
-  };
 
   //#endregion
 

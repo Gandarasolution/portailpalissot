@@ -235,14 +235,12 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
       {
         label: "Voir la facture",
         onClick: () => methodVoir(facture),
-        className: "action-view-facture",
-        icon: faFile,
+        className: "action-view-facture icon-visualize",
       },
       {
         label: "Télécharger la facture",
         onClick: () => methodTelecharger(facture),
-        className: "action-download-facture",
-        icon: faFilePdf,
+        className: "action-download-facture icon-download",
       }
     ];
 

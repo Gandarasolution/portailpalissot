@@ -30,6 +30,7 @@ import {
   faClose,
   faDownload,
   faEye,
+  faFile,
   faFilter,
   faFilterCircleXmark,
   //faList,
@@ -55,6 +56,7 @@ import {
 import RowDocument from "./RowDocument";
 import { ReactComponent as Filter } from "../../image/filtre.svg";
 import { ReactComponent as TooltipSvg } from "../../image/tooltip.svg";
+import { ReactComponent as FilterReset } from "../../image/filtre-effacer.svg";
 
 import { TelechargerZIP, } from "../../axios/WSGandara"
 
@@ -763,8 +765,8 @@ const TableData = ({ ...props }) => {
                 onClick={() => {
                   ResetFilterCol();
                 }}
-              >
-                Annuler
+              >Effacer
+                <FilterReset title="Réinitialiser les filtres" />
               </Button>
 
             </Tab>
@@ -808,8 +810,8 @@ const TableData = ({ ...props }) => {
                 onClick={() => {
                   ResetFilterCol();
                 }}
-              >
-                Annuler
+              >Effacer
+                <FilterReset title="Réinitialiser les filtres" />
               </Button>
 
             </Tab>
@@ -956,7 +958,7 @@ const TableData = ({ ...props }) => {
 
     //Marquage par l'editor
     _textFinal = _cellToApply.editor
-      ? _cellToApply.editor(_textFinal,index,SwitchTagMethod)
+      ? _cellToApply.editor(_textFinal, index, SwitchTagMethod)
       : _textFinal;
 
     //Marquage en <mark></mark>
@@ -1551,17 +1553,25 @@ const TableData = ({ ...props }) => {
   //#region Specifique
 
   const ModalList = () => {
+    const PrestaCtx = useContext(PrestaContext);
+    if (!PrestaCtx) return null;
+
+
+
     return (
-      <span>
-        {PrestaCtx && (
-          <span>
+      <>
+        {PrestaCtx.isInterventions ? (
+          <ModalFactures />
+        ) : (
+          <>
             <ModalListeTaches />
             <ModalDocuments />
-          </span>
+          </>
         )}
-      </span>
+      </>
     );
   };
+  
 
   const SwitchTagMethod = (tagMethod, item, index) => {
     switch (tagMethod) {
@@ -1580,7 +1590,6 @@ const TableData = ({ ...props }) => {
       default:
         if (tagMethod && tagMethod.includes("selection_")) {
           let _arrSelector = JSON.parse(JSON.stringify(arraySelector));
-
           if (_arrSelector.includes(index)) {
             _arrSelector = _arrSelector.filter((s) => s !== index);
           } else {
@@ -1820,19 +1829,9 @@ const TableData = ({ ...props }) => {
     // eslint-disable-next-line
   }, [PrestaCtx && PrestaCtx.showModalTaches]);
 
-  useEffect(() => {
-    if (PrestaCtx) {
-      if (PrestaCtx.showModalDoc) {
-        HandleAfficherDocuments(PrestaCtx.prestaSelected);
-      }
-    }
-    // eslint-disable-next-line
-  }, [PrestaCtx && PrestaCtx.showModalDoc]);
 
   //#region Documents
 
-  const [documents, setDocuments] = useState([]);
-  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   const [gridColMDValue, setGridColMDValue] = useState(12);
 
   const CardDocs = () => {
@@ -2128,8 +2127,16 @@ const TableData = ({ ...props }) => {
 
   //#endregion
 
+  //#region Documents
+
+  const [documents, setDocuments] = useState([]);
+  const [showModalDoc, setShowModalDoc] = useState(false);
+  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
+
+
   const FetchSetDocuments = async (data, presta) => {
     let _arrDocs = [];
+
     const arrData = data;
     if (arrData === 500) {
       const _arrError = [CreatePropError()];
@@ -2158,13 +2165,16 @@ const TableData = ({ ...props }) => {
 
     setDocuments(_arrDocs);
     setIsDocumentLoaded(true);
+    setShowModalDoc(true);
     setGridColMDValue(10);
   };
+
 
   const HandleAfficherDocuments = async (presta) => {
     if (presta.IdDossierIntervention > 0 && presta.IdEtat === 96) {
       setGridColMDValue(10);
       setIsDocumentLoaded(false);
+      setShowModalDoc(true);
 
       await GetDocumentPrestation(
         tokenCt,
@@ -2178,73 +2188,135 @@ const TableData = ({ ...props }) => {
   };
 
   const ModalDocuments = () => {
-    let _DocZIP = {
-      title: "Tous les documents",
-      extension: "zip",
-      size: " ",
+    const PrestaCtx = useContext(PrestaContext);
+
+    const [gridColMDValue, setGridColMDValue] = useState(12);
+
+    const modalBodyRef = useRef(null);
+    const [isScrollable, setIsScrollable] = useState(false);
+    const [isAtTop, setIsAtTop] = useState(true);
+
+    useEffect(() => {
+      const checkScrollability = () => {
+        if (modalBodyRef.current) {
+          const { scrollHeight, clientHeight } = modalBodyRef.current;
+          setIsScrollable(scrollHeight > clientHeight);
+        }
+      };
+      const handleScroll = () => {
+        if (modalBodyRef.current) {
+          const { scrollTop } = modalBodyRef.current;
+          if (scrollTop > 0) {
+            modalBodyRef.current.classList.add("no-scroll-indicator");
+            setIsAtTop(false);
+          } else {
+            modalBodyRef.current.classList.remove("no-scroll-indicator");
+            setIsAtTop(true);
+          }
+        }
+      };
+
+      checkScrollability();
+      if (modalBodyRef.current) {
+        modalBodyRef.current.addEventListener("scroll", handleScroll);
+      }
+      window.addEventListener("resize", checkScrollability);
+
+      return () => {
+        if (modalBodyRef.current) {
+          modalBodyRef.current.removeEventListener("scroll", handleScroll);
+        }
+        window.removeEventListener("resize", checkScrollability);
+      };
+    }, [documents]);
+
+    const scrollToBottom = () => {
+      if (modalBodyRef.current) {
+        modalBodyRef.current.scrollTo({
+          top: modalBodyRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }
     };
 
-    const _arrayDocs = JSON.parse(JSON.stringify(documents));
+    const CardDocumentsBody = () => {
+      if (!isDocumentLoaded) {
+        return (
+          <>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+          </>
+        );
+      }
+      if (documents.length === 0) return <div>Aucun document.</div>;
+
+      return (
+        <div>
+          <RowDocument props={{ title: "Tous les documents", extension: "zip", size: " " }} />
+          {documents.map((doc, index) => (
+            <RowDocument key={index} props={doc} index={index} />
+          ))}
+        </div>
+      );
+    };
 
     return (
       <Modal
-        dialogClassName="modal-90w"
-        show={PrestaCtx.showModalDoc}
+        dialogClassName="modal-listing"
+        show={showModalDoc || PrestaCtx.showModalDoc}
         onHide={() => {
+          setShowModalDoc(false);
           PrestaCtx.setShowModalDoc(false);
         }}
         backdrop="static"
         keyboard={false}
         animation={false}
       >
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>
-            Documents
-            {isDocumentLoaded ? (
-              `(${_arrayDocs.length})`
-            ) : (
-              <Placeholder animation="glow">
-                <Placeholder xs={1} />
-              </Placeholder>
-            )}
+            <FontAwesomeIcon icon={faFile} />
+            Liste des documents
           </Modal.Title>
+          <Button
+            className="close-modal"
+            onClick={() => setShowModalDoc(false)}
+          ><FontAwesomeIcon icon={faXmark} />
+          </Button>
         </Modal.Header>
-        {isDocumentLoaded ? (
-          <Modal.Body>
-            <div id="collapse-listeDocuments">
-              {_arrayDocs.length > 0 ? (
-                <RowDocument props={_DocZIP} />
-              ) : (
-                "Aucun document"
-              )}
-
-              {_arrayDocs.map((doc, index) => {
-                return <RowDocument key={index} props={doc} index={index} />;
-              })}
-            </div>
-          </Modal.Body>
-        ) : (
-          <Modal.Body>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-          </Modal.Body>
-        )}
+        <Modal.Body ref={modalBodyRef} className={`modal-body ${isScrollable ? "scrollable" : ""}`}>
+          <CardDocumentsBody />
+          {isScrollable && (
+            <button onClick={scrollToBottom} className="scroll-modal">
+              <FontAwesomeIcon icon={faArrowDown} size="lg" />
+            </button>
+          )}
+        </Modal.Body>
       </Modal>
     );
   };
 
+  useEffect(() => {
+    if (PrestaCtx) {
+      if (PrestaCtx.showModalDoc) {
+        HandleAfficherDocuments(PrestaCtx.prestaSelected);
+      }
+    }
+    // eslint-disable-next-line
+  }, [PrestaCtx && PrestaCtx.showModalDoc]);
   //#endregion
 
   //#endregion
 
   //#region Factures
+
+  
   const HandleSelectorFacture = async () => {
     let _arrayOfFactures = [];
 
@@ -2288,6 +2360,131 @@ const TableData = ({ ...props }) => {
     // );
     // _targetWindow.close();
   };
+
+  const [showModalFacture, setShowModalFacture] = useState(false);
+
+
+  const ModalFactures = () => {
+    const PrestaCtx = useContext(PrestaContext);
+    // On utilise les états factures et isFactureLoaded définis ci-dessus (déclarés en haut de TableData.js)
+
+    const modalBodyRef = useRef(null);
+      const [isScrollable, setIsScrollable] = useState(false);
+      const [isAtTop, setIsAtTop] = useState(true);
+
+      useEffect(() => {
+        const checkScrollability = () => {
+          if (modalBodyRef.current) {
+            const { scrollHeight, clientHeight } = modalBodyRef.current;
+            setIsScrollable(scrollHeight > clientHeight);
+          }
+        };
+        const handleScroll = () => {
+          if (modalBodyRef.current) {
+            const { scrollTop } = modalBodyRef.current;
+            if (scrollTop > 0) {
+              modalBodyRef.current.classList.add("no-scroll-indicator");
+              setIsAtTop(false);
+            } else {
+              modalBodyRef.current.classList.remove("no-scroll-indicator");
+              setIsAtTop(true);
+            }
+          }
+        };
+
+      checkScrollability();
+      if (modalBodyRef.current) {
+        modalBodyRef.current.addEventListener("scroll", handleScroll);
+      }
+      window.addEventListener("resize", checkScrollability);
+
+      return () => {
+        if (modalBodyRef.current) {
+          modalBodyRef.current.removeEventListener("scroll", handleScroll);
+        }
+        window.removeEventListener("resize", checkScrollability);
+      };
+    }, [documents]);
+
+    const scrollToBottom = () => {
+      if (modalBodyRef.current) {
+        modalBodyRef.current.scrollTo({
+          top: modalBodyRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    };
+
+    const CardFacturesBody = () => {
+      if (!isDocumentLoaded) {
+        return (
+          <>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+          </>
+        );
+      }
+      if (documents.length === 0) return <div>Aucune facture.</div>;
+
+      return (
+        <div>
+          {documents.map((document, index) => (
+            <RowDocument key={index} props={document} index={index} />
+          ))}
+        </div>
+      );
+    };
+
+    return (
+      <Modal
+        dialogClassName="modal-listing"
+        show={showModalFacture || PrestaCtx.showModalFacture}
+        onHide={() => {
+          setShowModalFacture(false);
+        }}
+        backdrop="static"
+        keyboard={false}
+        animation={false}
+      >
+        <Modal.Header>
+          <Modal.Title>
+            <FontAwesomeIcon icon={faFile} />
+            Liste des factures
+          </Modal.Title>
+          <Button
+            className="close-modal"
+            onClick={() => setShowModalFacture(false)}
+          ><FontAwesomeIcon icon={faXmark} />
+          </Button>
+        </Modal.Header>
+        <Modal.Body ref={modalBodyRef} className={`modal-body ${isScrollable ? "scrollable" : ""}`}>
+          <CardFacturesBody />
+          {isScrollable && (
+            <button onClick={scrollToBottom} className="scroll-modal">
+              <FontAwesomeIcon icon={faArrowDown} size="lg" />
+            </button>
+          )}
+        </Modal.Body>
+      </Modal>
+    );
+  };
+
+  useEffect(() => {
+    if (PrestaCtx) {
+      if (PrestaCtx.showModalFacture) {
+        HandleAfficherFacture(PrestaCtx.prestaSelected);
+      }
+    }
+    // eslint-disable-next-line
+  }, [PrestaCtx && PrestaCtx.showModalFacture]);
+
 
   //#endregion
 
@@ -2481,6 +2678,7 @@ const TableData = ({ ...props }) => {
 
       setDocuments(_arrDocs);
       setIsDocumentLoaded(true);
+      setShowModalFacture(true);
     };
 
     //1 - Demande les FI
@@ -2502,8 +2700,10 @@ const TableData = ({ ...props }) => {
     if (inter) {
       setDocuments([]);
       setGridColMDValue(10);
-      //LoadFacture,AffichageFacture comme documeuent
+      // Charge les factures
       GetListeDocIntervention(inter.IdDossierInterventionSAV);
+      setShowModalFacture(true);
+      
     } else {
       setGridColMDValue(12);
     }
@@ -2535,7 +2735,7 @@ const TableData = ({ ...props }) => {
               </Table>
             </Col>
 
-            {gridColMDValue !== 12 && <Col md={"auto"}>{CardDocs()}</Col>}
+            {/* {gridColMDValue !== 12 && <Col md={"auto"}>{CardDocs()}</Col>} */}
           </Row>
         </Breakpoint>
 

@@ -35,7 +35,6 @@ import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions
 import { saveAs } from "file-saver";
 
 
-
 //#endregion
 
 //#endregion
@@ -155,8 +154,7 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
           console.log("Voir le devis cliqué pour", devis);
           Voir(devis);
         },
-        className: "action-view-devis",
-        icon: faFile
+        className: "action-view-devis icon-visualize",
       },
       {
         label: "Télécharger le devis",
@@ -169,12 +167,11 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
           }
           Telechargement(devis);
         },
-        className: "action-download-facture",
-        icon: faFilePdf
+        className: "action-download-facture icon-download",
       }
     ];
-    
-    
+
+
 
     _cells.push(
       // CreateNewCell("Action", false, true, false, (val, index, method) =>{
