@@ -87,7 +87,7 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
       CreateNewHeader(
         "DateDemandeDossierInterventionSAV",
         CreateFilter(true, false, false, false, true),
-        "Date Demande"
+        "Date"
       )
     );
     _headers.push(
