@@ -141,6 +141,7 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
         EditorMontant
       )
     );
+    _headers.push(CreateNewHeader("ResteDu",CreateFilter(true,true,true,true),"Reste dû",EditorMontant));
     _headers.push(
       CreateNewHeader(
         "Dossier",
@@ -177,6 +178,7 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
     _cells.push(CreateNewCell("Sujet", false, true, false));
     _cells.push(CreateNewCell("MontantHT", false, true, false, EditorMontant));
     _cells.push(CreateNewCell("MontantTTC", false, true, false, EditorMontant));
+    _cells.push(CreateNewCell("ResteDu",false,true,false,EditorMontant))
     _cells.push(CreateNewCell("Dossier", false, true, false));
     _cells.push(CreateNewCell("Type", false, true, false, EditorType));
 

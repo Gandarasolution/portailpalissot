@@ -1348,6 +1348,7 @@ tbody td:nth-child(1){
 .table-devis tbody td:nth-child(5),
 .table-facture tbody td:nth-child(2),
 .table-facture tbody td:nth-child(6),
+.table-facture tbody td:nth-child(8),
 .table-sites tbody td{
   font-weight: bold;
 }
@@ -1378,8 +1379,8 @@ thead th,
 .table-facture tbody td:nth-child(3),
 .table-facture tbody td:nth-child(4),
 .table-facture tbody td:nth-child(7),
-.table-facture tbody td:nth-child(8),
-.table-facture tbody td:nth-child(9){
+.table-facture tbody td:nth-child(9),
+.table-facture tbody td:nth-child(10){
   color: var(--color-grey);
 }
 
