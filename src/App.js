@@ -6,7 +6,6 @@ import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Navbar from "react-bootstrap/Navbar";
 
 //#endregion
 
@@ -36,7 +35,7 @@ import ScrollToTopButton from "./components/commun/ScrollToTopButton";
 //#endregion
 
 //#region React
-import React from "react";
+import React, { useEffect } from "react";
 import { createContext, useState } from "react";
 
 import { useCookies } from "react-cookie";
@@ -103,6 +102,14 @@ export const SetTitreContext = createContext(null);
 
 
 function App() {
+  useEffect(() => {
+
+    let _theme = localStorage.getItem("theme")
+
+    _theme = (_theme?.length || 0) > 5 ? _theme : "";
+    document.body.className = ` ${_theme} `;
+
+  }, [])
 
   //#region State
   const [listeSites, setListeSites] = useState([]);
@@ -113,35 +120,6 @@ function App() {
 
 
   //#region Cookies
-  //#region ClientSiteContrat
-
-  const clientSiteName = cyrb53("clientSiteHashed").toString();
-  const [clientSiteCookie, setClientSiteCookie, removeClientSiteCookie] =
-    useCookies([clientSiteName]);
-
-  function setClientSite(clientSite) {
-    setClientSiteCookie(clientSiteName, clientSite);
-    SetLastSite(tokenCookie[tokenName], clientSite.GUID);
-  }
-  const storedClientSite = clientSiteCookie[clientSiteName];
-
-  function removeclientSite() {
-    removeClientSiteCookie(clientSiteName);
-  }
-
-  //#endregion
-
-  //#region Parametres
-
-  const listParamName = cyrb53("listeParams").toString();
-  const [listeParamsCookie, setListeParamsCookie, removeListeParamsCookie] =
-    useCookies([listParamName]);
-
-  function setListeParamsViaCookies(listeParams) {
-    setListeParamsCookie(listParamName, listeParams);
-  }
-
-  //#endregion
 
   //#region Viewer
 
@@ -162,14 +140,25 @@ function App() {
 
   //#endregion
 
-  //#region Token
+  //#region ClientSiteContrat
 
-  const themeName = cyrb53("themeName").toString();
-  const [themeCookie, setThemeCookie, removeThemeCookie] = useCookies({ themeName });
+  const clientSiteName = cyrb53("clientSiteHashed").toString();
+  const [clientSiteCookie, setClientSiteCookie, removeClientSiteCookie] =
+    useCookies([clientSiteName]);
 
-  function setTheme(theme) {
-    setThemeCookie(themeName, theme);
+  function setClientSite(clientSite) {
+    setClientSiteCookie(clientSiteName, clientSite);
+    SetLastSite(tokenCookie[tokenName], clientSite.GUID);
   }
+  const storedClientSite = clientSiteCookie[clientSiteName];
+
+  function removeclientSite() {
+    removeClientSiteCookie(clientSiteName);
+  }
+
+  //#endregion
+
+  //#region Endpoint
 
   const wsEndpointName = cyrb53("wsEndpointName").toString();
   const [wsEndpointCookie, setWsEndpointCookie, removeWSEndpointCookie] = useCookies({ wsEndpointName });
@@ -178,23 +167,20 @@ function App() {
     setWsEndpointCookie(wsEndpointName, ws);
   }
 
+  //#endregion
 
+  //#region WSURL
   const wsEntrepriseName = cyrb53("wsEntrepriseNameHashed").toString();
   const [wsEntrepriseCookie, setWsEntrepriseCookie, removeWsEntrepriseCookie] = useCookies([wsEntrepriseName,]);
 
   function setWsEntrepriseURL(wsUrl) {
     setWsEntrepriseCookie(wsEntrepriseName, wsUrl);
   }
+  //#endregion
 
-  const accountName = cyrb53("accountNamedHashed").toString();
-  const [accountCookie, setAccountCookie, removeAccountCookie] = useCookies([
-    accountName,
-  ]);
-  function setAccountName(name) {
-    setAccountCookie(accountName, name);
-  }
+  //#region Token
 
-  const account = accountCookie[accountName];
+
 
   //Hashage du nom du token pour éviter une récupération mannuelle rapide
   const tokenName = cyrb53("tokenNameHashed").toString();
@@ -206,15 +192,14 @@ function App() {
   function setTokenViaCookies(token) {
     setTokenCookie(tokenName, token);
   }
+  //#endregion
 
   const handleDeconnexion = () => {
     removeTokenCookie(tokenName);
-    removeListeParamsCookie(listParamName);
     removeClientSiteCookie(clientSiteName);
-    removeAccountCookie(accountName);
     removeWsEntrepriseCookie(wsEntrepriseName);
     removeWSEndpointCookie(wsEndpointName);
-    removeThemeCookie(themeName);
+    localStorage.clear();
   };
 
   if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName]) && !window.location.href.toUpperCase().includes('changeMDP/'.toUpperCase())) {
@@ -222,20 +207,24 @@ function App() {
       <div className="App font-link background">
         <LoginPage
           setToken={setTokenViaCookies}
-          setParams={setListeParamsViaCookies}
-          setAccountName={setAccountName}
           setUrlWs={setWsEntrepriseURL}
           setWsEndpoint={setWsEndpoint}
           setTheme={setTheme}
+        // setParams={setListeParamsViaCookies}
+        // setAccountName={setAccountName}
         />
       </div>
     );
   }
 
-  //#endregion
 
   //#endregion
 
+  function setTheme(theme) {
+    localStorage.setItem("theme", theme)
+    let _theme = (theme?.length || 0) > 5 ? theme : "";
+    document.body.className = `${_theme}`;
+  }
   //#region ErrorBoundary
   class ErrorBoundaryMenu extends React.Component {
     constructor(props) {
@@ -314,7 +303,7 @@ function App() {
         <ErrorBoundaryMenu fallback={setIsErrorMenu}>
 
           <TopBarMenu
-            accountName={account}
+            // accountName={account}
             handleDeconnexion={handleDeconnexion}
             pageSubtitle={pageSubtitle}
             pageTitle={pageTitle}
@@ -442,23 +431,21 @@ function App() {
       <ClientSiteContratContext.Provider
         value={{ storedClientSite, setClientSite, removeclientSite, listeSites, setListeSites }}
       >
-        <ParametresContext.Provider value={listeParamsCookie[listParamName]}>
-          <ViewerContext.Provider
-            value={{ viewerURL, setViewer, removeViewer }}
-          >
+        <ViewerContext.Provider
+          value={{ viewerURL, setViewer, removeViewer }}
+        >
 
-            <Router>
+          <Router>
 
 
-              <BreakpointProvider>
-                <SmallDown />
-                <LargeUp />
-              </BreakpointProvider>
-            </Router>
-            <ScrollToTopButton />
+            <BreakpointProvider>
+              <SmallDown />
+              <LargeUp />
+            </BreakpointProvider>
+          </Router>
+          <ScrollToTopButton />
 
-          </ViewerContext.Provider>
-        </ParametresContext.Provider>
+        </ViewerContext.Provider>
       </ClientSiteContratContext.Provider>
 
     </TokenContext.Provider>

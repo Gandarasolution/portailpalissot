@@ -33,7 +33,6 @@ import { ParseKVAsArray } from "../../../functions";
 //#endregion
 
 const NouvelleInterventionPage = ({ setPageSubtitle, setPageTitle }) => {
-  const ParamsCt = useContext(ParametresContext);
   const TokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
 

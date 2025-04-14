@@ -126,9 +126,7 @@ const LoginPage = (props) => {
 
         //4 -> CallBack de GetListeParamètres : on enregistre les infos retournées
         const FetchSetListeParams = async (data) => {
-          props.setParams(data);
           props.setToken(response);
-          props.setAccountName(login);
           props.setTheme(_themeFromWS);
         };
 
