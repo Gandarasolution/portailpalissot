@@ -1499,6 +1499,28 @@ const TableData = ({ ...props }) => {
   };
 
   const GridCards = () => {
+    if (!props.CardModel) {
+      return (<Row>
+        <Col>
+          <Table className="table-presta">
+            <TableHeaders />
+            {props.IsLoaded ? (
+              <TableBody />
+            ) : (
+              <PlaceHolderTableLine
+                numberOfLines={
+                  props.placeholdeNbLine ? props.placeholdeNbLine : 5
+                }
+              />
+            )}
+          </Table>
+        </Col>
+      </Row>)
+
+
+    }
+
+
     if (!props.IsLoaded)
       return PlaceholderCardPrestation(
         props.placeholdeNbLine ? props.placeholdeNbLine : 5
@@ -1571,7 +1593,7 @@ const TableData = ({ ...props }) => {
       </>
     );
   };
-  
+
 
   const SwitchTagMethod = (tagMethod, item, index) => {
     switch (tagMethod) {
@@ -2316,7 +2338,7 @@ const TableData = ({ ...props }) => {
 
   //#region Factures
 
-  
+
   const HandleSelectorFacture = async () => {
     let _arrayOfFactures = [];
 
@@ -2369,28 +2391,28 @@ const TableData = ({ ...props }) => {
     // On utilise les états factures et isFactureLoaded définis ci-dessus (déclarés en haut de TableData.js)
 
     const modalBodyRef = useRef(null);
-      const [isScrollable, setIsScrollable] = useState(false);
-      const [isAtTop, setIsAtTop] = useState(true);
+    const [isScrollable, setIsScrollable] = useState(false);
+    const [isAtTop, setIsAtTop] = useState(true);
 
-      useEffect(() => {
-        const checkScrollability = () => {
-          if (modalBodyRef.current) {
-            const { scrollHeight, clientHeight } = modalBodyRef.current;
-            setIsScrollable(scrollHeight > clientHeight);
+    useEffect(() => {
+      const checkScrollability = () => {
+        if (modalBodyRef.current) {
+          const { scrollHeight, clientHeight } = modalBodyRef.current;
+          setIsScrollable(scrollHeight > clientHeight);
+        }
+      };
+      const handleScroll = () => {
+        if (modalBodyRef.current) {
+          const { scrollTop } = modalBodyRef.current;
+          if (scrollTop > 0) {
+            modalBodyRef.current.classList.add("no-scroll-indicator");
+            setIsAtTop(false);
+          } else {
+            modalBodyRef.current.classList.remove("no-scroll-indicator");
+            setIsAtTop(true);
           }
-        };
-        const handleScroll = () => {
-          if (modalBodyRef.current) {
-            const { scrollTop } = modalBodyRef.current;
-            if (scrollTop > 0) {
-              modalBodyRef.current.classList.add("no-scroll-indicator");
-              setIsAtTop(false);
-            } else {
-              modalBodyRef.current.classList.remove("no-scroll-indicator");
-              setIsAtTop(true);
-            }
-          }
-        };
+        }
+      };
 
       checkScrollability();
       if (modalBodyRef.current) {
@@ -2703,7 +2725,7 @@ const TableData = ({ ...props }) => {
       // Charge les factures
       GetListeDocIntervention(inter.IdDossierInterventionSAV);
       setShowModalFacture(true);
-      
+
     } else {
       setGridColMDValue(12);
     }
