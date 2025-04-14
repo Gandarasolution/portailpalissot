@@ -33,6 +33,7 @@ import { ClientSiteContratContext, TokenContext } from "../../App";
 import { ReactComponent as Rythme } from "../../image/coeur.svg";
 import { Placeholder, Spinner } from "react-bootstrap";
 import { GetRedirectionFromIdTypeDocument } from "../../functions";
+import { GetListeParametres } from "../../axios/WS_User";
 
 //#endregion
 
@@ -43,6 +44,9 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
   const [dashboardData, setDashboardData] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
+
+  const [mailTo, setMailTo] = useState("");
+  const [mailToLoaded, setMailToLoaded] = useState(false);
 
   const DashboardData = async () => {
     setDataLoaded(false);
@@ -57,14 +61,32 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     await GetDashboardData(tokenCt, ClientSiteContratCtx.storedClientSite.GUID, callBackData);
   }
 
+  const ParamsData = async () => {
+    const callBackData = (data) => {
+      if (data) {
+        let _paramMailTo;
+        if (Array.isArray(data)) {
+          _paramMailTo = (data.find((x) => x.k === "GMAO.Affichage.DemandeDepannage.MailTo")).v
+        } else {
+          _paramMailTo = data.v;
+        }
+
+        setMailTo(_paramMailTo);
+        setMailToLoaded(true);
+      }
+    }
+    await GetListeParametres(tokenCt, callBackData);
+
+  }
 
   useEffect(() => {
     document.title = `Portail client`;
     setPageTitle(`Portail client`);
     setPageSubtitle(null);
-    DashboardData();
+    ParamsData();
+    DashboardData()
     // eslint-disable-next-line
-  }, [])
+  }, []);
 
 
   const SpanLink = ({ title, to, img, kv, disable }) => {
@@ -342,9 +364,11 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
               Remplissez notre formulaire directement <br></br>
               depuis cette application.
             </p>
-            <a href="/nouvelleintervention" className="btn">
+            {/* <a href="/nouvelleintervention" className="btn"> */}
+            {mailToLoaded && <a href={`mailto:${mailTo}`} className="btn">
               Faire une demande maintenant &gt;
             </a>
+            }
           </div>
         </div>
 

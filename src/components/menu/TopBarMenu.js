@@ -45,7 +45,7 @@ import { GetDateFromStringDDMMYYY, GetNomMois } from "../../functions";
 
 //#endregion
 
-const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes,isError }) => {
+const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes,isError }) => {
 
   //#region Contexts
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
@@ -62,6 +62,8 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
   const [isSwitchSiteOpen, setIsSwitchSiteOpen] = useState(false);
   const [dropdownWidth, setDropdownWidth] = useState("auto");
 
+  const [listeSites, setListeSites] = useState([]); 
+
   const navbarRef = useRef(null);
   const titleDropdownRef = useRef(null);
   const dropdownButtonRef = useRef(null);
@@ -74,27 +76,18 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
   //Le titre et le soustitre de la page
   const { titre, soustitre } = getTitleAndSubtitle();
 
-  //Le site selectionné et la liste des sites selectionnables
-  const { siteActuel, listeSites } = getListSites();
 
   //#region Fonctions
   function getListSites() {
-
-    let _retourSiteActuel = ClientSiteContratCtx.storedClientSite &&
-      ClientSiteContratCtx.storedClientSite.NomCompletClientSite
-
 
     let _listeSites = ClientSiteContratCtx.listeSites;
     if (_listeSites.length <= 0) {
 
       const FetchSetClientSite = (data) => {
-        ClientSiteContratCtx.setListeSites(data);
-        _listeSites = data;
+        setListeSites(data);
       }
-
       GetClientSiteContrat(TokenCt, FetchSetClientSite);
     }
-    return { siteActuel: _retourSiteActuel, listeSites: _listeSites };
   }
 
   function getTitleAndSubtitle() {
@@ -352,9 +345,9 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
   const handleCloseMenu = () => setShowMenu(false);
 
 
-  const handleChangerClientsite = () => {
-    navigate("/sites");
-  }
+  // const handleChangerClientsite = () => {
+  //   navigate("/sites");
+  // }
 
 
   const AjouterUnAnPeriode = async () => {
@@ -400,7 +393,11 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
   //#endregion
 
 
+useEffect(()=> {
+  getListSites()
 
+      // eslint-disable-next-line
+},[])
 
   useEffect(() => {
     const pathname = window.location.pathname;
@@ -428,6 +425,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
     // eslint-disable-next-line
   }, [showDropdownPeriode])
 
+
   useEffect(() => {
     const handleScroll = () => {
       if (navbarRef.current) {
@@ -440,6 +438,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+
   useEffect(() => {
     if (isSwitchSiteOpen && titleDropdownRef.current && dropdownButtonRef.current) {
       const textWidth = titleDropdownRef.current.scrollWidth;
@@ -450,7 +449,7 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
     } else {
       setDropdownWidth("auto");
     }
-  }, [isSwitchSiteOpen, siteActuel]);
+  }, [isSwitchSiteOpen]);
 
   return (
     <Navbar expand="lg" className="top-bar-menu">
@@ -483,13 +482,13 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
             className={`d-flex align-items-start me-3 wrapper-site ${isSwitchSiteOpen ? "is-switching" : ""}`}
           >
             <div className="title-site me-2">
-              {siteActuel}
+              {ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
             </div>
 
             {(!isError) && ClientSiteContratCtx.storedClientSite && (
               <div className="dropdown-container d-flex flex-column align-items-start">
                 <div className="title-site-in-dropdown me-2 ms-3" ref={titleDropdownRef}>
-                  {siteActuel}
+                  {ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
                 </div>
                 <DropdownButton
                   ref={dropdownButtonRef}
@@ -502,7 +501,10 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
                   }}
                   style={{ width: dropdownWidth }}
                 >
-                  {listeSites && listeSites.length && listeSites.length >=1 && listeSites.map((site) => (
+                  {
+                  listeSites && listeSites.length && listeSites.length >=1 && listeSites.map((site) => (
+                    
+
                     site.GUID !== ClientSiteContratCtx.storedClientSite.GUID && (
                       <Dropdown.Item
                         key={site.GUID}
@@ -513,7 +515,8 @@ const TopBarMenu = ({ accountName, handleDeconnexion, pageSubtitle, pageTitle, p
                         {site.NomCompletClientSite}
                       </Dropdown.Item>
                     )
-                  ))}
+                  
+                ))}
                   <div className="dropdown-footer">
                     <Dropdown.Item
                       className="btn-see-all-sites"
