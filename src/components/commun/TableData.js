@@ -112,6 +112,7 @@ const TableData = ({ ...props }) => {
       element[TAGSELECTION] = arraySelector.includes(index);
     }
 
+
     //filtre par la barre de recherche
     if (String(search).length > 0) {
       _lData = _lData.filter((item) => FiltrerParSearchGlobal(item));
@@ -137,10 +138,14 @@ const TableData = ({ ...props }) => {
       });
     }
 
+
+
+
     //Filtres par la recherche par colonne
     if (arraySearch.length > 0) {
       _lData = FiltrerParSearch(_lData, arraySearch);
     }
+
 
     //Filtres par valeur min & max
     if (arrayFilterSeuis.length > 0) {
@@ -161,12 +166,42 @@ const TableData = ({ ...props }) => {
   const [search, setSearch] = useState("");
 
   const [arrayFilter, setArrayFilter] = useState([]);
-  const [arrayFilterSeuis, setArrayFilterSeuils] = useState([]);
+  const getArrayFilterStart = () => {
+    let _array = [];
+    const querryParameters = new URLSearchParams(window.location.search);
+    const _filterSeuil = querryParameters.get("seuil");
+
+    if (_filterSeuil) {
+      let _newFilterAuto = { fieldname: _filterSeuil, max: Number.MAX_VALUE, min: querryParameters.get("value") }
+      _array.push(_newFilterAuto);
+    }
+
+    return _array
+  }
+  const [arrayFilterSeuis, setArrayFilterSeuils] = useState(getArrayFilterStart);
   const [arrayFilterRangeDate, setArrayFilterRangeDate] = useState([]);
+
+
+
   const [arraySearch, setArraySearch] = useState([]);
 
+  const getButtonFilterActif = () => {
+    const querryParameters = new URLSearchParams(window.location.search);
+    const _filterOncol = querryParameters.get("filtre")
+
+    //Si il y a des filtres
+    if (props.ButtonFilters && _filterOncol) {
+      const _buttonFilterFind = props.ButtonFilters.find((bf) => bf.value.toString() === _filterOncol);
+      if (_buttonFilterFind) {
+        return _buttonFilterFind;
+      }
+    }
+
+    return props.FilterDefaultValue ? props.FilterDefaultValue : null
+  }
+
   const [btFilterActif, setBtFilterActif] = useState(
-    props.FilterDefaultValue ? props.FilterDefaultValue : null
+    getButtonFilterActif()
   );
 
   const [nbParPages, setNbParPages] = useState(10);
@@ -841,7 +876,7 @@ const TableData = ({ ...props }) => {
 
           <Tab
             title={
-              <span class="remove-filter">
+              <span className="remove-filter">
                 <FontAwesomeIcon
                   icon={faXmark}
                   onClick={ClosePopover}
@@ -1376,6 +1411,7 @@ const TableData = ({ ...props }) => {
   //#region TopPannel
 
   const TopPannel = () => {
+
     return (
       <Row className="mb-2 content-search">
         {props.TopPannelLeftToSearch && props.TopPannelLeftToSearch}

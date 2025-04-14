@@ -27,9 +27,9 @@ function FiltrerUnSearch(fieldname, _lData, arrayFilters) {
       return (
         _arColonne.filter((filter) => {
           return data[fieldname]
-            .toString()
-            .toLocaleUpperCase()
-            .includes(filter.text.toString().toLocaleUpperCase());
+            ?.toString()
+            ?.toLocaleUpperCase()
+            ?.includes(filter.text.toString().toLocaleUpperCase());
         }).length > 0
       );
     });
@@ -97,6 +97,7 @@ const ParseDateFormat = (text) => {
 
 function FiltrerParSeuil(_lData, arrayFilters) {
   let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
+  console.log(arrayFilters);
 
   for (let index = 0; index < _arFilters.length; index++) {
     const arrayGroup = _arFilters[index];
@@ -373,7 +374,7 @@ const GetRedirectionFromIdTypeDocument = (IdTypeDocument, IdEtat) => {
       _page = 'interventions';
       break;
     case 3://Factures
-      return "factures";
+      return `factures?seuil=ResteDu&value=${IdEtat}`;
       break;
     default:
       return '#';
