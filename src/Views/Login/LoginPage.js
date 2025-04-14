@@ -94,14 +94,17 @@ const LoginPage = (props) => {
 
     let _wsForToken = "";
     let _themeFromWS = "";
-     let _wsEndpoint = "";
+    let _wsEndpoint = "";
+    let _logoClient = "";
     const GetResponseURLWS = (data) => {
+      console.log(data);
       if (isNaN(data) && data.urlWSClient) {
         _wsForToken = data.urlWSClient;
         _wsEndpoint = data.urlWSEndpoint
         _themeFromWS = data?.themeClient;
+        _logoClient = data?.logoClient;
         props.setWsEndpoint(_wsEndpoint)
-
+        
       }
 
     }
@@ -128,6 +131,7 @@ const LoginPage = (props) => {
         const FetchSetListeParams = async (data) => {
           props.setToken(response);
           props.setTheme(_themeFromWS);
+          props.setImageClient(_logoClient);
         };
 
         //3 -> On récupère la liste des paramètres de l'application
@@ -358,11 +362,11 @@ const LoginPage = (props) => {
     let _isCannon = _responseURI === "1";
 
     if (_isCannon) {
-      let _wsForToken = "";
+      // let _wsForToken;
       let _b64Image = "";
       const GetResponseURLWS = (data) => {
         if (isNaN(data) && data.urlWSClient) {
-          _wsForToken = data.urlWSClient;
+          // _wsForToken = data.urlWSClient;
           _b64Image = data?.logoClient;
         }
         setCodeEntreprise(_curentHost);
@@ -481,7 +485,7 @@ const LoginPage = (props) => {
         <Col md={12} xl={3} className="d-flex align-items-center justify-content-around flex-column login-content-wrapper">
           {/* Logo au-dessus du formulaire */}
           <div className="container-login-content">
-          <img src={imageLogo} height={80} />
+          <img src={imageLogo} height={80} alt="logo entreprise" />
             {FormSubmit()}
           </div>
           {/* Image logo_noir en dessous du formulaire */}

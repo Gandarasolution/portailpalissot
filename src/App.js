@@ -210,6 +210,7 @@ function App() {
           setUrlWs={setWsEntrepriseURL}
           setWsEndpoint={setWsEndpoint}
           setTheme={setTheme}
+          setImageClient={setImageClient}
         // setParams={setListeParamsViaCookies}
         // setAccountName={setAccountName}
         />
@@ -220,11 +221,31 @@ function App() {
 
   //#endregion
 
+
+//#region Fonctions
+
   function setTheme(theme) {
     localStorage.setItem("theme", theme)
     let _theme = (theme?.length || 0) > 5 ? theme : "";
     document.body.className = `${_theme}`;
   }
+
+  function setImageClient(b64strImg){
+    localStorage.setItem("logoClient",b64strImg);
+  }
+
+  const consoleError = console.error;
+  const SUPPRESSED_ERRORS = ['Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.'];
+  console.error = function filterErrors(msg, ...args) {
+      if (!SUPPRESSED_ERRORS.some((entry) => msg.includes(entry))) {
+        consoleError(msg, ...args);
+      }
+      
+  };
+
+//#endregion
+
+
   //#region ErrorBoundary
   class ErrorBoundaryMenu extends React.Component {
     constructor(props) {
@@ -424,7 +445,6 @@ function App() {
   //#endregion
 
 
-
   return (
     <TokenContext.Provider value={tokenCookie[tokenName]}>
 
@@ -451,5 +471,7 @@ function App() {
     </TokenContext.Provider>
   );
 }
+
+
 
 export default App;

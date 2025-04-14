@@ -16,9 +16,6 @@ import {
 //#region Bootstrap
 
 import Container from "react-bootstrap/Container";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCookieBite } from "@fortawesome/free-solid-svg-icons";
 
 //#endregion
 
@@ -26,9 +23,11 @@ import { faCookieBite } from "@fortawesome/free-solid-svg-icons";
 
 import logo from "../../image/imageHome/logo_blanc.png";
 
-import { ClientSiteContratContext, TokenContext } from "../../App";
-import { GetListeParametres } from "../../axios/WS_User";
+import { ClientSiteContratContext } from "../../App";
+import { GetURLWs } from "../../axios/WS_User";
 import { ReactComponent as LogoNoir } from "../../image/imageLogin/login-gandara-propulsee-noir.svg";
+import { faCookieBite } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "react-bootstrap";
 
 //#endregion
 
@@ -38,7 +37,6 @@ import { ReactComponent as LogoNoir } from "../../image/imageLogin/login-gandara
 
 const SideBarMenuLeft = () => {
   const ClientSiteCt = useContext(ClientSiteContratContext);
-  const TokenCt = useContext(TokenContext);
 
   //#region States
   const [logoClient, setLogoClient] = useState(null);
@@ -52,16 +50,27 @@ const SideBarMenuLeft = () => {
 
   const GetLogo = async () => {
 
-    const FetchSetParams = (data) => {
-      if (data && data.length > 0 && data.find((p) => p.k === "GMAO.Logo.b64").v) {
-        let _b64Logo = data.find((p) => p.k === "GMAO.Logo.b64").v;
-        setLogoClient(`data:image/jpeg;base64,${_b64Logo}`);
-      } else {
-        setLogoClient(logo);
+    let _b64LocalStorage = localStorage.getItem("logoClient");
+    if (_b64LocalStorage) {
+      //Le logo est enregistré
+      setLogoClient(_b64LocalStorage);
+    } else {
+      //On va aller rechercher le logo via WS (si url cannonique)
+      const FetchSetLogoWS = (data) => {
+        if (data && data?.logoClient?.includes("data:image/png;base64,")) {
+          localStorage.setItem("logoClient", data.logoClient);
+          setLogoClient(data.logoClient);
+        } else {
+          //Impossible de récupérer le log : on affiche par defaut.
+          setLogoClient(logo);
+        }
+
       }
+
+      await GetURLWs(window.location.host, FetchSetLogoWS);
+
     }
 
-    await GetListeParametres(TokenCt, FetchSetParams);
 
   }
 
