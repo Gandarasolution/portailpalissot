@@ -482,7 +482,7 @@ useEffect(()=> {
             className={`d-flex align-items-start me-3 wrapper-site ${isSwitchSiteOpen ? "is-switching" : ""}`}
           >
             <div className="title-site me-2">
-              {ClientSiteContratCtx.storedClientSite.NomCompletClientSite}
+              {ClientSiteContratCtx.storedClientSite?.NomCompletClientSite}
             </div>
 
             {(!isError) && ClientSiteContratCtx.storedClientSite && (
