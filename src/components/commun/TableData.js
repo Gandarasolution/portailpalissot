@@ -31,9 +31,6 @@ import {
   faDownload,
   faEye,
   faFile,
-  faFilter,
-  faFilterCircleXmark,
-  //faList,
   faSearch,
   faTasks,
   faXmark
@@ -57,8 +54,6 @@ import RowDocument from "./RowDocument";
 import { ReactComponent as Filter } from "../../image/filtre.svg";
 import { ReactComponent as TooltipSvg } from "../../image/tooltip.svg";
 import { ReactComponent as FilterReset } from "../../image/filtre-effacer.svg";
-
-import { TelechargerZIP, } from "../../axios/WSGandara"
 
 import { VoirFactureDocument } from "../../axios/WS_Factures";
 import {
@@ -303,7 +298,7 @@ const TableData = ({ ...props }) => {
   };
 
   function ResetAffichage(pageActuelle) {
-    setGridColMDValue(12);
+    // setGridColMDValue(12);
     setDocuments([]);
     setPageActuelle(pageActuelle);
   }
@@ -1890,7 +1885,7 @@ const TableData = ({ ...props }) => {
 
   //#region Documents
 
-  const [gridColMDValue, setGridColMDValue] = useState(12);
+  // const [gridColMDValue, setGridColMDValue] = useState(12);
 
   const CardDocs = () => {
     // const _arrayDocs = JSON.parse(JSON.stringify(documents));
@@ -1917,7 +1912,7 @@ const TableData = ({ ...props }) => {
             <Col style={{ textAlign: "end" }}>
               <CloseButton
                 onClick={() => {
-                  setGridColMDValue(12);
+                  // setGridColMDValue(12);
                 }}
               // className="ms-4"
               />
@@ -2025,25 +2020,29 @@ const TableData = ({ ...props }) => {
     let targetWindow = window.open("/waiting");
 
     //On récupère le fichier en b64
-    // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
-    const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
+    try {
 
 
+      const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
-    //On transforme le fichier en blob
-    const blobData = base64toBlob(b64data.v);
+      //On transforme le fichier en blob
+      const blobData = base64toBlob(b64data.v);
 
-    //On créer l'URL utilisé par les viewers
-    const url = URL.createObjectURL(blobData);
+      //On créer l'URL utilisé par les viewers
+      const url = URL.createObjectURL(blobData);
 
-    //On l'enregistre dans le viewerContext
-    viewerCt.setViewer(url);
+      //On l'enregistre dans le viewerContext
+      viewerCt.setViewer(url);
 
-    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-    //Le bon viewer est déterminé par l'extension
-    targetWindow.location.href = GetURLLocationViewerFromExtension(
-      element.k.split(".").pop()
-    );
+      //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+      //Le bon viewer est déterminé par l'extension
+      targetWindow.location.href = GetURLLocationViewerFromExtension(
+        element.k.split(".").pop()
+      );
+    } catch (error) {
+      console.log("Erreur lors de la récupération des données : ", error)
+      targetWindow.close();
+    }
   };
 
 
@@ -2142,7 +2141,6 @@ const TableData = ({ ...props }) => {
     _obj.extension = "zip";
 
 
-
     const TelechargerZIPSup = async (presta) => {
       const zip = JSZip();
       let _arrDocs = [];
@@ -2151,7 +2149,7 @@ const TableData = ({ ...props }) => {
         const element = _arrDocT[index];
 
         let _data = await DocumentMaintenanceGetFile(element.data.v, false, true);
-        let _kv = JSON.parse(_data);
+        let _kv = JSON.parse(JSON.stringify(_data));
         if (_kv) {
           _arrDocs.push([_kv.v, _kv.k]);
         }
@@ -2170,7 +2168,7 @@ const TableData = ({ ...props }) => {
         }
       });
 
-      const _v = zip.generateAsync({ type: 'blob' })
+      const _v = await zip.generateAsync({ type: 'base64' })
       const _k = `Documents PC${presta.IdPrestationContrat}_${presta.DateInterventionPrestation}`;
 
       return { k: _k, v: _v };
@@ -2178,8 +2176,8 @@ const TableData = ({ ...props }) => {
     }
 
 
-    _obj.TelechargerDocumentSup = () => TelechargerZIPSup(presta);
-
+    _obj.TelechargerDocumentSup = async () => await TelechargerZIPSup(presta);
+    _obj.type = "application/zip";
     return _obj;
   };
 
@@ -2201,7 +2199,7 @@ const TableData = ({ ...props }) => {
       //Erreur
       setDocuments(_arrError);
       setIsDocumentLoaded(true);
-      setGridColMDValue(10);
+      // setGridColMDValue(10);
 
       return;
     }
@@ -2224,13 +2222,13 @@ const TableData = ({ ...props }) => {
     setDocuments(_arrDocs);
     setIsDocumentLoaded(true);
     setShowModalDoc(true);
-    setGridColMDValue(10);
+    // setGridColMDValue(10);
   };
 
 
   const HandleAfficherDocuments = async (presta) => {
     if (presta.IdDossierIntervention > 0 && presta.IdEtat === 96) {
-      setGridColMDValue(10);
+      // setGridColMDValue(10);
       setIsDocumentLoaded(false);
       setShowModalDoc(true);
 
@@ -2241,7 +2239,7 @@ const TableData = ({ ...props }) => {
         presta
       );
     } else {
-      setGridColMDValue(12);
+      // setGridColMDValue(12);
     }
   };
 
@@ -2317,7 +2315,7 @@ const TableData = ({ ...props }) => {
 
       return (
         <div>
-          <RowDocument props={{ title: "Tous les documents", extension: "zip", size: " " }} />
+          {/* <RowDocument props={{ title: "Tous les documents", extension: "zip", size: " " }} /> */}
           {documents.map((doc, index) => (
             <RowDocument key={index} props={doc} index={index} />
           ))}
@@ -2548,40 +2546,6 @@ const TableData = ({ ...props }) => {
 
   //#region Intervention
 
-  // const CreatePropsDocumentInterventionFI2 = (element) => {
-  //   const _obj = {};
-  //   _obj.title = `${element.k}`;
-  //   _obj.extension = "pdf";
-
-  //   _obj.VoirDocumentSup = () => {
-  //     GetDocumentFISAV(tokenCt, element.v);
-  //   };
-  //   _obj.TelechargerDocumentSup = () => {
-  //     GetDocumentFISAV(tokenCt, element.v, true);
-  //   };
-  //   _obj.data = element;
-  //   return _obj;
-  // };
-
-  // const CreatePropsDocumentInterventionFacture = (element) => {
-  //   const _obj = {};
-
-  //   _obj.title = `${element.k}`;
-  //   _obj.extension = "pdf";
-
-  //   _obj.VoirDocumentSup = () => {
-  //     VoirFactureDocument(tokenCt, element.v, "Facture SAV", false);
-  //   };
-
-  //   _obj.TelechargerDocumentSup = () => {
-  // TelechargerFactureDocument(tokenCt, element.v, "Facture SAV", false);
-  //   };
-  //   _obj.data = element;
-  //   return _obj;
-  // };
-
-
-
 
   /**
    *
@@ -2643,8 +2607,9 @@ const TableData = ({ ...props }) => {
     _obj.extension = "zip";
 
     const TelechargerZIPSup = async (IdDossierInterventionSAV) => {
+      const zip = JSZip();
       let _arrDocs = [];
-      let _targetWindow = window.open("/waiting");
+
 
       for (let index = 0; index < _arrDocsFI.length; index++) {
         const element = _arrDocsFI[index];
@@ -2671,17 +2636,57 @@ const TableData = ({ ...props }) => {
 
         _arrDocs.push(_arrDocFA);
       }
-      await TelechargerZIP(
-        _arrDocs,
-        `Intervention N° ${IdDossierInterventionSAV}`
-      );
-      _targetWindow.close();
+
+      _arrDocs.forEach((kv, i) => {
+        try {
+          let _b64 = kv[0];
+          let _blob = base64toBlob(_b64);
+          zip.file(kv[1], _blob);
+
+        } catch (error) {
+          console.log("Impossible de zipper")
+          console.log(kv[0]);
+          console.log(error);
+        }
+      });
+
+      const _v = await zip.generateAsync({ type: 'base64' })
+      const _k = `Tous les documents`;
+
+      return { k: _k, v: _v };
+
+
+      // await TelechargerZIP(
+      //   _arrDocs,
+      //   `Intervention N° ${IdDossierInterventionSAV}`
+      // );
     };
 
-    _obj.TelechargerDocumentSup = TelechargerZIPSup;
+    _obj.TelechargerDocumentSup = async () => await TelechargerZIPSup();
 
+    _obj.type = "application/zip";
     return _obj;
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const GetListeDocIntervention = async (IdDossierInterventionSAV) => {
     setIsDocumentLoaded(false);
@@ -2757,13 +2762,13 @@ const TableData = ({ ...props }) => {
   const HandleAfficherFacture = (inter) => {
     if (inter) {
       setDocuments([]);
-      setGridColMDValue(10);
+      // setGridColMDValue(10);
       // Charge les factures
       GetListeDocIntervention(inter.IdDossierInterventionSAV);
       setShowModalFacture(true);
 
     } else {
-      setGridColMDValue(12);
+      // setGridColMDValue(12);
     }
   };
 

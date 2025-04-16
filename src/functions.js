@@ -375,10 +375,8 @@ const GetRedirectionFromIdTypeDocument = (IdTypeDocument, IdEtat) => {
       break;
     case 3://Factures
       return `factures?seuil=ResteDu&value=${IdEtat}`;
-      break;
     default:
       return '#';
-      break;
   }
 
   return `${_page}?filtre=${IdEtat}`;

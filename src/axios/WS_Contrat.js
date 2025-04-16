@@ -126,7 +126,7 @@ const GetDocumentPrestation = async (
     presta
 ) => {
 
-    await CallEndpoint("GetDocumentsPrestation", { token: token, IdDossierIntervention: IdDossierIntervention }, setDocuments)
+    await CallEndpoint("GetDocumentsPrestation", { token: token, IdDossierIntervention: IdDossierIntervention }, (data) => setDocuments(data,presta))
     // $.ajax({
     //   type: "POST",
     //   url: getUrlFromCookie() + "GetDocumentsPrestation",
