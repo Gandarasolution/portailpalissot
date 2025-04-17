@@ -2163,7 +2163,6 @@ const TableData = ({ ...props }) => {
 
         } catch (error) {
           console.log("Impossible de zipper")
-          console.log(kv[0]);
           console.log(error);
         }
       });
@@ -2645,7 +2644,6 @@ const TableData = ({ ...props }) => {
 
         } catch (error) {
           console.log("Impossible de zipper")
-          console.log(kv[0]);
           console.log(error);
         }
       });

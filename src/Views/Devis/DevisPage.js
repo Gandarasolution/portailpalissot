@@ -151,7 +151,6 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
       {
         label: "Voir le devis",
         onClick: () => {
-          console.log("Voir le devis cliqué pour", devis);
           Voir(devis);
         },
         className: "action-view-devis icon-visualize",
@@ -159,11 +158,9 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
       {
         label: "Télécharger le devis",
         onClick: (e) => {
-          console.log("Télécharger le devis cliqué pour", devis);
           if (e && e.stopPropagation) {
             e.stopPropagation(); // On s'assure que l'événement est arrêté si présent
           } else {
-            console.log("Aucun événement transmis dans le onClick");
           }
           Telechargement(devis);
         },
@@ -176,7 +173,6 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
     _cells.push(
       // CreateNewCell("Action", false, true, false, (val, index, method) =>{
       CreateNewUnboundCell( false, true, false, (val) =>{
-        console.log("EditorActionsTooltip reçoit row:", val);
         return <EditorActionsTooltip actions={actionsForDevis(val)} />;
       })
     );
@@ -198,13 +194,10 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
   const Telechargement = async (e) => {
     //Affichage d'un toast
     // setShowToast(true);
-    console.log("Téléchargement lancé pour", e);
     const _kv = await methodTelecharger(e);
-    console.log("Données reçues :", _kv);
     try {
       const base64data = _kv.v;
       const _bblob = base64toBlob(base64data);
-      console.log("Blob créé :", _bblob);
       saveAs(_bblob, _kv.k);
     } catch (error) {
       console.error("Erreur lors du téléchargement :", error);

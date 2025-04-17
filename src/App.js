@@ -348,7 +348,7 @@ function App() {
             </Toast>
           </ToastContainer>
           <Routes>
-            <Route path="test" element={<PageTest />} />
+            {/* <Route path="test" element={<PageTest />} /> */}
             <Route path="/changemdp/:token" element={<ChangeMDPPage />} />
             <Route
               path="/"

@@ -97,7 +97,6 @@ const ParseDateFormat = (text) => {
 
 function FiltrerParSeuil(_lData, arrayFilters) {
   let _arFilters = Object.entries(groupBy(arrayFilters, "fieldname"));
-  console.log(arrayFilters);
 
   for (let index = 0; index < _arFilters.length; index++) {
     const arrayGroup = _arFilters[index];

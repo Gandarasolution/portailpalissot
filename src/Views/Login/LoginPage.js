@@ -97,7 +97,6 @@ const LoginPage = (props) => {
     let _wsEndpoint = "";
     let _logoClient = "";
     const GetResponseURLWS = (data) => {
-      console.log(data);
       if (isNaN(data) && data.urlWSClient) {
         _wsForToken = data.urlWSClient;
         _wsEndpoint = data.urlWSEndpoint

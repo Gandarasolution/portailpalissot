@@ -6,7 +6,6 @@ const viewerCt = useContext(ViewerContext);
 
 
 const url =  viewerCt.viewerURL;
-// console.log(url);
 // viewerCt.removeViewer();
 return (
     <div>

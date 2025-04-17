@@ -54,7 +54,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
       if (data) {
         setDashboardData(data);
         setDataLoaded(true);
-        console.log("Données Dashboard:", data);
+        // console.log("Données Dashboard:", data);
 
       }
     }

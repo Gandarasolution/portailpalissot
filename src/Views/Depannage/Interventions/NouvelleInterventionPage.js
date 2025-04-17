@@ -106,9 +106,6 @@ const NouvelleInterventionPage = ({ setPageSubtitle, setPageTitle }) => {
   const HandleSubmit = (event) => {
     const form = event.currentTarget;
 
-    console.log("secteur : ", secteurChoix);
-    console.log("objet : ", objetDemande);
-    console.log("tel : ", customTel.length > 0 ? customTel : telChoix);
 
     if (form.checkValidity() === false) {
       event.preventDefault();
