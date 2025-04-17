@@ -144,14 +144,14 @@ const SideBarMenuLeft = () => {
 
         {/* Bouton gestion des cookies */}
         <div className="sidebar-footer">
-          {/* <Button
+          <Button
             variant=""
             id="tarteaucitron"
             className="cookies-btn"
-            onClick={handleCookies}
+            // onClick={handleCookies}
           >
             <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
-          </Button> */}
+          </Button>
 
           <div className="container-powered-by">
             <p className="text-center text-powered-by">Application propulsée <br /> par</p>
