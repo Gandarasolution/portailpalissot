@@ -114,7 +114,7 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
       CreateNewHeader(
         "DateDemandeDossierInterventionSAV",
         CreateFilter(true, false, false, false, true),
-        "Date de la demande",
+        "Date",
         EditorDateFromDateTime
       )
     );
