@@ -313,13 +313,13 @@ function ParseKVAsArray(kv) {
 
 
 
-const base64toBlob = (data) => {
+const base64toBlob = (data,type) => {
   // Cut the prefix `data:application/pdf;base64` from the raw base 64
   // const base64WithoutPrefix = data.substr('data:application/pdf;base64,'.length);
 
 
   const bytes = Buffer.from(data, "base64");
-  return new Blob([bytes], { type: "application/pdf" });
+  return new Blob([bytes], { type: type?type:"application/pdf" });
 };
 
 

@@ -385,7 +385,7 @@ const GetDocumentPrestationTicket = async (
         }
 
         await CallEndpoint("GetDocumentPrestationTicket", { token: token, IdPJ: IdPJ }, callBackReturnData);
-        return JSON.parse(_return);
+        return JSON.parse(JSON.stringify(_return));
     }
 
     let targetWindow = window.open("/waiting");
