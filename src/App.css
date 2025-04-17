@@ -510,12 +510,18 @@ nav ul li:hover {
 .top-bar-menu .navbar-title-container .box-length{
   background: var(--color-primary);
   border-radius: 99px;
-  width: 25px;
-  height: 25px;
+  width: 27px;
+  height: 27px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 }
 
 .top-bar-menu .navbar-title-container .box-length span{
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  line-height: 27px;
+  font-family: var(--font-arial);
   color: #fff;
 }
 
@@ -1384,6 +1390,22 @@ thead th,
   color: var(--color-grey);
 }
 
+/* Même largeur pour les états */
+.table-depannage tbody td:nth-child(5) > div,
+.table-maintenance tbody td:nth-child(5) > span,
+.table-devis tbody td:nth-child(7) > span{
+  width: 100%;
+}
+
+.table-devis tbody td:nth-child(4) > {
+  max-width: 80%;
+}
+
+/* Déplacement colonne code */
+.table-depannage thead th:nth-child(3) > div{
+  margin-left: -10%;
+}
+
 .table-sites tbody tr:first-child{
   background: whitesmoke;
 }
@@ -2069,7 +2091,7 @@ thead th,
 }
 
 .icon-pdf::before{
-  content: url('image/pdf.svg');
+  content: url('image/imageDocuments/pdf.svg');
 }
 
 .icon-download::before{
