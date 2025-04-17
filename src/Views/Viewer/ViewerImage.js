@@ -8,10 +8,10 @@ const viewerCt = useContext(ViewerContext);
 
 const url =  viewerCt.viewerURL;
 
-viewerCt.removeViewer();
+// viewerCt.removeViewer();
 return (
     <div>
-      <Image src={url}/>
+      <Image width={1000} src={url}/>
     </div>
   );
 };

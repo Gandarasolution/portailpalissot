@@ -28,6 +28,7 @@ import { GetURLWs } from "../../axios/WS_User";
 import { ReactComponent as LogoNoir } from "../../image/imageLogin/login-gandara-propulsee-noir.svg";
 import { faCookieBite } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 //#endregion
 
