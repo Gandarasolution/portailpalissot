@@ -374,7 +374,7 @@ const GetRedirectionFromIdTypeDocument = (IdTypeDocument, IdEtat) => {
       _page = 'interventions';
       break;
     case 3://Factures
-      return `factures?seuil=ResteDu&value=${IdEtat}`;
+      return `factures?seuil=ResteDu&value=${IdEtat+0.01}`;
     default:
       return '#';
   }
