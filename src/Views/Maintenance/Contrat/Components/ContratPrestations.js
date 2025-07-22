@@ -12,15 +12,13 @@ import Tooltip from "react-bootstrap/Tooltip";
 
 //#region FontAwsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  // faCaretDown,
-  // faCaretUp,
-  faListCheck,
-  faList,
-  faFile,
-  faFileAlt,
-  faBan,
-} from "@fortawesome/free-solid-svg-icons";
+
+// Importer depuis FontAwesome Solid
+import { faListCheck, faList,faFileAlt, faBan } from "@fortawesome/free-solid-svg-icons";
+
+// Importer depuis FontAwesome Regular
+import { faFile as faFileRegular } from "@fortawesome/free-regular-svg-icons";
+
 
 //#endregion
 
@@ -34,9 +32,10 @@ import TableData, {
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
+  EditorActionsTooltip
 } from "../../../../components/commun/TableData";
+
 import { GetNomMois } from "../../../../functions";
-import TitreOfPage from "../../../../components/commun/TitreOfPage";
 
 //#endregion
 
@@ -46,7 +45,6 @@ export const PrestaContext = createContext(null);
 
 const ContratPrestation = ({
   Prestations,
-  ParentComponentPeriodeSelect,
   IsLoaded,
 }) => {
   const [showModalDoc, setShowModalDoc] = useState(false);
@@ -89,7 +87,6 @@ const ContratPrestation = ({
 
   const GetPrestationTrimmed = () => {
     let _lPrestation = Prestations;
-
     if (_lPrestation.length) {
       _lPrestation = _lPrestation.sort(
         (a, b) => a.DateInterventionPrestation - b.DateInterventionPrestation
@@ -122,7 +119,7 @@ const ContratPrestation = ({
     _headers.push(
       CreateNewHeader(
         "IdPrestationContrat",
-        CreateFilter(true, true, true, true),
+        CreateFilter(true, true, false, true),
         "N°"
       )
     );
@@ -143,7 +140,9 @@ const ContratPrestation = ({
         }
       )
     );
-    _headers.push(CreateNewUnboundHeader(CreateFilter(false), "Actions"));
+    _headers.push(
+      CreateNewUnboundHeader(CreateFilter(false), "Actions", "tagListeActions")
+    );
 
     return _headers;
   }
@@ -180,20 +179,33 @@ const ContratPrestation = ({
       CreateNewUnboundCell(
         false,
         false,
-        true,
-        EditorActionTaches,
-        "tagListeTaches"
+        false,
+        (item, i, _method) => (
+          <EditorActionsTooltip
+            actions={[
+              {
+                label: "Liste des documents",
+                icon: faFileRegular,
+                onClick: ()=>{
+                  _method('tagListeDocuments',item,i);
+                },
+                tagMethod : "tagListeDocuments",
+              },
+              {
+                label: "Liste des relevés de tâches",
+                icon: faList,
+                onClick: ()=>{
+                  _method('tagListeTaches',item,i);
+                },
+               
+              },
+            ]}
+          />
+        ),"tagAction"
       )
     );
-    _cells.push(
-      CreateNewUnboundCell(
-        false,
-        false,
-        true,
-        EditorActionDocuments,
-        "tagListeDocuments"
-      )
-    );
+    
+    
     return _cells;
   }
 
@@ -243,9 +255,8 @@ const ContratPrestation = ({
       <>
         <h6>{`Secteur : ${presta.Secteur}`}</h6>
         <Button
-          className={`m-2 p-2 noBorder ${
-            presta.IdEtat === 96 ? "bg-success" : "bg-secondary"
-          } `}
+          className={`m-2 p-2 noBorder ${presta.IdEtat === 96 ? "bg-success" : "bg-secondary"
+            } `}
           onClick={() => {
             if (presta.IdEtat === 96) {
               setShowModalDoc(true);
@@ -253,7 +264,7 @@ const ContratPrestation = ({
             }
           }}
         >
-          <FontAwesomeIcon icon={faFile} /> Liste des documents
+          <FontAwesomeIcon icon={faFileRegular} /> Liste des documents
         </Button>
         <Button
           className="m-2 p-2 noBorder bg-success"
@@ -289,43 +300,7 @@ const ContratPrestation = ({
     );
   };
 
-  const EditorActionDocuments = (presta) => {
-    return (
-      <Button className="ms-2">
-        <OverlayTrigger
-          placement="bottom"
-          overlay={<Tooltip>Liste des documents</Tooltip>}
-        >
-          {presta.IdEtat === 96 ? (
-            <FontAwesomeIcon
-              icon={faFileAlt}
-              // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
-            />
-          ) : (
-            <FontAwesomeIcon
-              icon={faBan}
-              // className={presta.IdEtat === 96 ? "bt-actif" : "bt-inactif"}
-            />
-          )}
-        </OverlayTrigger>
-      </Button>
-    );
-  };
 
-  const EditorActionTaches = () => {
-    return (
-      <Button>
-        <OverlayTrigger
-          placement="bottom"
-          overlay={<Tooltip>Relevés de tâches</Tooltip>}
-        >
-          <span>
-            <FontAwesomeIcon icon={faListCheck} />
-          </span>
-        </OverlayTrigger>
-      </Button>
-    );
-  };
 
   //#endregion
 
@@ -357,11 +332,6 @@ const ContratPrestation = ({
           Cells={_Cells}
           IsLoaded={IsLoaded}
           Pagination
-          TopPannelRightToSearch={
-            <Col md={"auto"} className="m-1">
-              {ParentComponentPeriodeSelect}
-            </Col>
-          }
           CardModel={_CardModel}
           ButtonFilters={_ButtonFilters}
         />
@@ -372,12 +342,7 @@ const ContratPrestation = ({
   //#endregion
 
   return (
-    <Container fluid>
-      <TitreOfPage
-        titre={"Plannification"}
-        soustitre={`${Prestations.length} prestations`}
-        isLoaded={IsLoaded}
-      />
+    <Container fluid className="table-maintenance">
       <TablePrestation />
     </Container>
   );

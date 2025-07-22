@@ -26,13 +26,14 @@ import Tooltip from "react-bootstrap/Tooltip";
 
 //#region fontAwsome
 import {
+  faArrowDown,
   faClose,
   faDownload,
   faEye,
-  faFilter,
-  faFilterCircleXmark,
-  faList,
+  faFile,
   faSearch,
+  faTasks,
+  faXmark
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
@@ -43,37 +44,33 @@ import {
   FiltrerParSearch,
   FiltrerParSeuil,
   FiltrerParSeuilDate,
+  GenerateUid,
   GetURLLocationViewerFromExtension,
   RegexTestAndReturnMatch,
   base64toBlob,
   groupBy,
 } from "../../functions";
 import RowDocument from "./RowDocument";
+import { ReactComponent as Filter } from "../../image/filtre.svg";
+import { ReactComponent as TooltipSvg } from "../../image/tooltip.svg";
+import { ReactComponent as FilterReset } from "../../image/filtre-effacer.svg";
 
+import { VoirFactureDocument } from "../../axios/WS_Factures";
 import {
-  GeTListeFactureIntervention,
-  GetDocumentFISAV,
-  GetDocumentPrestation,
-  GetDocumentPrestationCERFA,
-  GetDocumentPrestationExtranet,
-  GetDocumentPrestationRapport,
-  GetDocumentPrestationTicket,
-  GetListeFIIntervention,
-  GetPrestationReleveTache,
-  TelechargerFactureDocument,
-  TelechargerZIP,
-  VoirFactureDocument,
-} from "../../axios/WSGandara";
+  GetPrestationReleveTache, GetDocumentPrestation, GetDocumentPrestationCERFA, GetDocumentPrestationExtranet, GetDocumentPrestationRapport, GetDocumentPrestationTicket,
+} from "../../axios/WS_Contrat";
+import { GetListeFIIntervention, GetListeFactureIntervention, GetDocumentFISAV } from "../../axios/WS_Intervention";
+
 
 //#region Contexts
-import { TokenContext, ViewerContext } from "../../App";
+import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
 
 //#endregion
 
 //#endregion
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import { saveAs } from "file-saver";
@@ -83,13 +80,16 @@ const TAGSELECTION = "_xSelection";
 //#endregion
 
 /**
- * @param {*} {Data : [], Headers: [], Cells: [], CardModel:{},  IsLoaded: bool,  Pagination: bool, ?ButtonFilters: [], ?FilterDefaultValue: {}, ?TopPannelRightToSearch: <></>, ?TopPannelLeftToSearch: <></>  ,?placeholdeNbLine; int,  }
+ * @param {*} {Data : [], Headers: [], Cells: [], CardModel:{},  IsLoaded: bool,  Pagination: bool, ?ButtonFilters: [], ?FilterDefaultValue: {}, ?TopPannelRightToSearch: <></>, ?TopPannelLeftToSearch: <></>  ,?placeholdeNbLine; int,   }
  * @returns Une table
  */
 const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
   const viewerCt = useContext(ViewerContext);
+
+  const ClientSiteCt = useContext(ClientSiteContratContext);
+
 
   const Data = () => {
     let _lData = [];
@@ -106,6 +106,7 @@ const TableData = ({ ...props }) => {
       element.unboundColonne = _unboundColonne;
       element[TAGSELECTION] = arraySelector.includes(index);
     }
+
 
     //filtre par la barre de recherche
     if (String(search).length > 0) {
@@ -132,10 +133,14 @@ const TableData = ({ ...props }) => {
       });
     }
 
+
+
+
     //Filtres par la recherche par colonne
     if (arraySearch.length > 0) {
       _lData = FiltrerParSearch(_lData, arraySearch);
     }
+
 
     //Filtres par valeur min & max
     if (arrayFilterSeuis.length > 0) {
@@ -156,12 +161,42 @@ const TableData = ({ ...props }) => {
   const [search, setSearch] = useState("");
 
   const [arrayFilter, setArrayFilter] = useState([]);
-  const [arrayFilterSeuis, setArrayFilterSeuils] = useState([]);
+  const getArrayFilterStart = () => {
+    let _array = [];
+    const querryParameters = new URLSearchParams(window.location.search);
+    const _filterSeuil = querryParameters.get("seuil");
+
+    if (_filterSeuil) {
+      let _newFilterAuto = { fieldname: _filterSeuil, max: Number.MAX_VALUE, min: querryParameters.get("value") }
+      _array.push(_newFilterAuto);
+    }
+
+    return _array
+  }
+  const [arrayFilterSeuis, setArrayFilterSeuils] = useState(getArrayFilterStart);
   const [arrayFilterRangeDate, setArrayFilterRangeDate] = useState([]);
+
+
+
   const [arraySearch, setArraySearch] = useState([]);
 
+  const getButtonFilterActif = () => {
+    const querryParameters = new URLSearchParams(window.location.search);
+    const _filterOncol = querryParameters.get("filtre")
+
+    //Si il y a des filtres
+    if (props.ButtonFilters && _filterOncol) {
+      const _buttonFilterFind = props.ButtonFilters.find((bf) => bf.value.toString() === _filterOncol);
+      if (_buttonFilterFind) {
+        return _buttonFilterFind;
+      }
+    }
+
+    return props.FilterDefaultValue ? props.FilterDefaultValue : null
+  }
+
   const [btFilterActif, setBtFilterActif] = useState(
-    props.FilterDefaultValue ? props.FilterDefaultValue : null
+    getButtonFilterActif()
   );
 
   const [nbParPages, setNbParPages] = useState(10);
@@ -263,7 +298,7 @@ const TableData = ({ ...props }) => {
   };
 
   function ResetAffichage(pageActuelle) {
-    setGridColMDValue(12);
+    // setGridColMDValue(12);
     setDocuments([]);
     setPageActuelle(pageActuelle);
   }
@@ -404,29 +439,30 @@ const TableData = ({ ...props }) => {
   };
 
   const TableHeaderCellFilter = ({ header }) => {
+    const [showPopover, setShowPopover] = useState(false);
     return (
       <th key={header.fieldname}>
-        <div className="row-height">
+        <div className="row-height th-with-icon">
           {header.caption ? header.caption : header.fieldname}
           <OverlayTrigger
             trigger="click"
             rootClose
-            overlay={PopoverFilter(header.fieldname)}
+            show={showPopover}
+            onToggle={(isOpen) => setShowPopover(isOpen)}
+            overlay={PopoverFilter(header.fieldname, setShowPopover)}
             placement="bottom"
           >
-            <FontAwesomeIcon
-              icon={faFilter}
-              className={`icon-bt ${
-                IsButtonShouldBeCheck(header.fieldname) && "filter-actif"
-              } `}
+            <Filter
+              className={`icon-bt ${IsButtonShouldBeCheck(header.fieldname) ? "filter-actif" : ""} ${showPopover ? "filter-open" : ""}`}
             />
+
           </OverlayTrigger>
         </div>
       </th>
     );
   };
 
-  const PopoverFilter = (fieldname) => {
+  const PopoverFilter = (fieldname, setShowPopover) => {
     let _arFilters = [];
 
     _arFilters = Object.entries(groupBy(props.Data, fieldname));
@@ -655,7 +691,7 @@ const TableData = ({ ...props }) => {
 
     //#endregion
 
-    const SupprimerFiltreColonne = () => {
+    const ResetFilterCol = () => {
       function removeValue(array, setArray) {
         let _array = JSON.parse(JSON.stringify(array));
         _array = _array.filter((f) => f.fieldname !== fieldname);
@@ -665,9 +701,15 @@ const TableData = ({ ...props }) => {
       removeValue(arrayFilterRangeDate, setArrayFilterRangeDate);
       removeValue(arrayFilterSeuis, setArrayFilterSeuils);
       removeValue(arraySearch, setArraySearch);
+
     };
 
-    if (_headerToApply.filter.isCheckbox && _arFilters.length > 10) {
+    const ClosePopover = () => {
+      setShowPopover(false);
+    };
+
+
+    if (_headerToApply.filter.isCheckbox && _arFilters.length >= 20) {
       _headerToApply.filter.isCheckbox = false;
     }
     return (
@@ -688,6 +730,7 @@ const TableData = ({ ...props }) => {
                   if (item[0] === "undefined") return null;
                   return (
                     <Form.Check
+                      id={`ppvr-check-${index}`}
                       key={index}
                       type="checkbox"
                       checked={IsFiltercheckboxShouldBeCheck(
@@ -745,9 +788,17 @@ const TableData = ({ ...props }) => {
                     onChange={HandleMaxDateRangeValueChanged}
                   />
                 </Col>
-
-                <Button onClick={HandleFilterDateClick}>Appliquer</Button>
               </div>
+              <Button className="btn-filter" onClick={HandleFilterDateClick}>Valider</Button>
+              <Button
+                className="btn-filter cancel"
+                onClick={() => {
+                  ResetFilterCol();
+                }}
+              >Effacer
+                <FilterReset title="Réinitialiser les filtres" />
+              </Button>
+
             </Tab>
           )}
           {/* Num max min */}
@@ -782,9 +833,17 @@ const TableData = ({ ...props }) => {
                     onChange={(e) => setMaxValue(e.target.value)}
                   />
                 </Col>
-
-                <Button onClick={HandleFilterSeuilClick}>Appliquer</Button>
               </div>
+              <Button className="btn-filter validate" onClick={HandleFilterSeuilClick}>Valider</Button>
+              <Button
+                className="btn-filter cancel"
+                onClick={() => {
+                  ResetFilterCol();
+                }}
+              >Effacer
+                <FilterReset title="Réinitialiser les filtres" />
+              </Button>
+
             </Tab>
           )}
           {/* Recherche sur cette colonne */}
@@ -801,7 +860,6 @@ const TableData = ({ ...props }) => {
 
                   <Button
                     onClick={HandleSearchOnClick}
-                    variant="outline-secondary"
                     id="button-addon2"
                   >
                     <FontAwesomeIcon icon={faSearch} />
@@ -813,16 +871,11 @@ const TableData = ({ ...props }) => {
 
           <Tab
             title={
-              <span>
-                {" "}
-                <OverlayTrigger
-                  overlay={<Popover>Supprimer les filtres</Popover>}
-                >
-                  <FontAwesomeIcon
-                    onClick={SupprimerFiltreColonne}
-                    icon={faFilterCircleXmark}
-                  />
-                </OverlayTrigger>
+              <span className="remove-filter">
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  onClick={ClosePopover}
+                />
               </span>
             }
           />
@@ -877,7 +930,7 @@ const TableData = ({ ...props }) => {
     return (
       <tr
         className={
-          index === rowIndexSelected || arraySelector.includes(index)
+          index === rowIndexSelected || arraySelector.includes(index) || (ClientSiteCt.storedClientSite && item.GUID && item.GUID === ClientSiteCt.storedClientSite.GUID)
             ? "table-presta-row-selected"
             : ""
         }
@@ -935,7 +988,7 @@ const TableData = ({ ...props }) => {
 
     //Marquage par l'editor
     _textFinal = _cellToApply.editor
-      ? _cellToApply.editor(_textFinal)
+      ? _cellToApply.editor(_textFinal, index, SwitchTagMethod)
       : _textFinal;
 
     //Marquage en <mark></mark>
@@ -983,20 +1036,36 @@ const TableData = ({ ...props }) => {
   //#endregion
 
   //#region Pagination
+  const LeftArrow = () => (
+    <svg width="30" height="10" viewBox="0 0 30 10" fill="none">
+      <line x1="30" y1="5" x2="5" y2="5" stroke="#01B075" strokeWidth="1" />
+      <line x1="5" y1="5" x2="10" y2="2" stroke="#01B075" strokeWidth="1" />
+      <line x1="5" y1="5" x2="10" y2="8" stroke="#01B075" strokeWidth="1" />
+    </svg>
+  );
+  const RightArrow = () => (
+    <svg width="30" height="10" viewBox="0 0 30 10" fill="none">
+      <line x1="0" y1="5" x2="25" y2="5" stroke="#01B075" strokeWidth="1" />
+      <line x1="25" y1="5" x2="20" y2="2" stroke="#01B075" strokeWidth="1" />
+      <line x1="25" y1="5" x2="20" y2="8" stroke="#01B075" strokeWidth="1" />
+    </svg>
+  );
 
   const TablePagination = () => {
     let _items = [];
+
+    const totalData = Data().length;
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const pageName = pathSegments[pathSegments.length - 1] || "Accueil";
 
     let _lData = Data();
     let _limiter = _lData.length;
     let _isEllipsisNedded = _limiter / nbParPages + 1 > 10;
 
     _items.push(
-      <Pagination.Prev
-        key={0}
-        onClick={() => handlePagePrev()}
-        className="m-1"
-      />
+      <Pagination.Prev key="prev" onClick={() => handlePagePrev()} className="m-1">
+        <LeftArrow />
+      </Pagination.Prev>
     );
 
     const maxLoop = Math.ceil(_limiter / nbParPages);
@@ -1206,15 +1275,14 @@ const TableData = ({ ...props }) => {
     }
 
     _items.push(
-      <Pagination.Next
-        key={-1}
-        onClick={() => handlePageNext(_limiter / nbParPages)}
-        className="m-1"
-      />
+      <Pagination.Next key="next" onClick={() => handlePageNext(totalData / nbParPages)} className="m-1">
+        <RightArrow />
+      </Pagination.Next>
     );
 
     return (
-      <Stack direction="horizontal">
+      <Stack direction="horizontal" className="content-pagination">
+        <div className="total-data">{totalData} {pageName} au total</div>
         <Pagination className="m-2">{_items}</Pagination>
         <DrodpdownNbPages />
       </Stack>
@@ -1225,10 +1293,10 @@ const TableData = ({ ...props }) => {
     return (
       <DropdownButton
         variant=""
-        className="border button-periode"
+        className="button-periode"
         drop="down-centered"
         style={{ borderRadius: "10px" }}
-        title={`${nbParPages} / page`}
+        title={`Résultat par page : ${nbParPages}`}
       >
         <Dropdown.Item
           onClick={() => {
@@ -1271,6 +1339,32 @@ const TableData = ({ ...props }) => {
   //#region Selection
 
   const SelectionInfo = () => {
+    const containerRef = useRef(null);
+    const [isSticky, setIsSticky] = useState(false);
+
+    useEffect(() => {
+      const handleScroll = () => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          setIsSticky(window.scrollY > 100);
+        }
+      };
+
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    // Met à jour isSticky quand un document est sélectionné
+    useEffect(() => {
+      if (arraySelector.length > 0) {
+        if (window.scrollY > 100) {
+          setIsSticky(true);
+        }
+      } else {
+        setIsSticky(false);
+      }
+    }, [arraySelector.length]);
+
     const SwitchTagSelection = async (tagMethod) => {
       switch (tagMethod) {
         case "selection_factures":
@@ -1292,13 +1386,13 @@ const TableData = ({ ...props }) => {
 
     if (arraySelector.length > 0) {
       return (
-        <Container>
+        <Container ref={containerRef} className={`download-container ${isSticky ? "is-sticky" : ""}`}>
           <Button
             onClick={HandleTelechargerSelection}
-            variant="warning"
-            className="border"
+            className="btn-upload-file"
           >
-            Télecharger {arraySelector.length} document
+            <FontAwesomeIcon icon={faDownload} className="mr-2" />
+            Télécharger {arraySelector.length} document
             {arraySelector.length > 1 && "s"}
           </Button>
         </Container>
@@ -1312,12 +1406,25 @@ const TableData = ({ ...props }) => {
   //#region TopPannel
 
   const TopPannel = () => {
-    return (
-      <Row className="mb-2">
-        {props.TopPannelLeftToSearch && props.TopPannelLeftToSearch}
 
+    return (
+      <Row className="mb-2 content-search">
+        {props.TopPannelLeftToSearch && props.TopPannelLeftToSearch}
+        <Col className="m-1 search-bar">
+          <Form.Control
+            id="search-bar-table-data"
+            type="search"
+            placeholder="Rechercher dans la liste..."
+            aria-label="Search"
+            onChange={(e) => {
+              handleSearch(e);
+            }}
+            className="noBorder"
+            value={search}
+          />
+        </Col>
         {props.ButtonFilters && (
-          <Col className="m-1" md={"auto"}>
+          <Col className="m-1 status-bar" md={"auto"}>
             <div className="project-sort-nav">
               <nav>
                 <ul>
@@ -1330,25 +1437,13 @@ const TableData = ({ ...props }) => {
             </div>
           </Col>
         )}
-        <Col className="m-1">
-          <Form.Control
-            type="search"
-            placeholder="Rechercher"
-            aria-label="Search"
-            onChange={(e) => {
-              handleSearch(e);
-            }}
-            className="noBorder"
-            value={search}
-          />
-        </Col>
         {props.TopPannelRightToSearch && props.TopPannelRightToSearch}
         {props.Headers.findIndex((h) => h.fieldname.includes(TAGSELECTION)) >
           -1 && (
-          <Col md={"auto"} className="m-1">
-            <SelectionInfo />
-          </Col>
-        )}
+            <Col md={"auto"} className="m-1">
+              <SelectionInfo />
+            </Col>
+          )}
       </Row>
     );
   };
@@ -1358,12 +1453,15 @@ const TableData = ({ ...props }) => {
   const ButtonFilter = ({ filter }) => {
     if (!filter) {
       return (
-        <li
-          className={btFilterActif ? "li-inactif" : "li-actif"}
-          onClick={() => handleTousFilter()}
-        >
-          Tous
-        </li>
+        <>
+          <span className="filter-status-label">Etat :</span>
+          <li
+            className={btFilterActif ? "li-inactif" : "li-actif"}
+            onClick={() => handleTousFilter()}
+          >
+            Tous
+          </li>
+        </>
       );
     }
 
@@ -1432,6 +1530,28 @@ const TableData = ({ ...props }) => {
   };
 
   const GridCards = () => {
+    if (!props.CardModel) {
+      return (<Row>
+        <Col>
+          <Table className="table-presta">
+            <TableHeaders />
+            {props.IsLoaded ? (
+              <TableBody />
+            ) : (
+              <PlaceHolderTableLine
+                numberOfLines={
+                  props.placeholdeNbLine ? props.placeholdeNbLine : 5
+                }
+              />
+            )}
+          </Table>
+        </Col>
+      </Row>)
+
+
+    }
+
+
     if (!props.IsLoaded)
       return PlaceholderCardPrestation(
         props.placeholdeNbLine ? props.placeholdeNbLine : 5
@@ -1486,17 +1606,25 @@ const TableData = ({ ...props }) => {
   //#region Specifique
 
   const ModalList = () => {
+    const PrestaCtx = useContext(PrestaContext);
+    if (!PrestaCtx) return null;
+
+
+
     return (
-      <span>
-        {PrestaCtx && (
-          <span>
+      <>
+        {PrestaCtx.isInterventions ? (
+          <ModalFactures />
+        ) : (
+          <>
             <ModalListeTaches />
             <ModalDocuments />
-          </span>
+          </>
         )}
-      </span>
+      </>
     );
   };
+
 
   const SwitchTagMethod = (tagMethod, item, index) => {
     switch (tagMethod) {
@@ -1509,10 +1637,12 @@ const TableData = ({ ...props }) => {
       case "tagInterventionDocuments":
         HandleAfficherFacture(Data()[index]);
         break;
+      case "tagListeSite":
+        HandleChoixDuSite(Data()[index]);
+        break;
       default:
-        if (tagMethod.includes("selection_")) {
+        if (tagMethod && tagMethod.includes("selection_")) {
           let _arrSelector = JSON.parse(JSON.stringify(arraySelector));
-
           if (_arrSelector.includes(index)) {
             _arrSelector = _arrSelector.filter((s) => s !== index);
           } else {
@@ -1527,6 +1657,21 @@ const TableData = ({ ...props }) => {
     }
   };
 
+
+  //#region Liste des sites
+
+  const HandleChoixDuSite = (siteAChoisir) => {
+    //Pas de changement si même site
+    let _actualClientSite = ClientSiteCt.storedClientSite;
+    if (!(_actualClientSite) || (_actualClientSite.GUID !== siteAChoisir.GUID)) {
+      ClientSiteCt.setClientSite(siteAChoisir);
+    }
+  }
+
+
+  //#endregion
+
+
   //#region Prestation contrat
 
   const PrestaCtx = useContext(PrestaContext);
@@ -1535,10 +1680,12 @@ const TableData = ({ ...props }) => {
   const [showModalListeTaches, setShowModalListeTaches] = useState(false);
   const [isLoadingTaches, setIsLoadingTaches] = useState(false);
   const [listeTaches, setListeTaches] = useState([]);
+  const [prestaName, setPrestaName] = useState("");
 
   const HandleShowModalListeTaches = async (presta) => {
     //Récupère les données
     if (isLoadingTaches) return;
+    setPrestaName(presta.DescriptionPrestationContrat);
     setIsLoadingTaches(true);
     setShowModalListeTaches(true);
 
@@ -1550,7 +1697,6 @@ const TableData = ({ ...props }) => {
   };
 
   const FetchSetListeTache = (data) => {
-    // console.log(data);
     if (data.length) {
       const groups = data.reduce((groups, item) => {
         const k = groups[item.k] || [];
@@ -1579,6 +1725,61 @@ const TableData = ({ ...props }) => {
   };
 
   const ModalListeTaches = () => {
+    const modalBodyRef = useRef(null);
+    const [isScrollable, setIsScrollable] = useState(false);
+    const [isAtTop, setIsAtTop] = useState(true);
+
+    useEffect(() => {
+      const checkScrollability = () => {
+        if (modalBodyRef.current) {
+          const { scrollHeight, clientHeight } = modalBodyRef.current;
+
+          if (scrollHeight > clientHeight) {
+            setIsScrollable(true);
+          } else {
+            setIsScrollable(false);
+          }
+        }
+      };
+      const handleScroll = () => {
+        if (modalBodyRef.current) {
+          const { scrollTop } = modalBodyRef.current;
+
+          if (scrollTop > 0) {
+            modalBodyRef.current.classList.add("no-scroll-indicator");
+            setIsAtTop(false);
+          } else {
+            modalBodyRef.current.classList.remove("no-scroll-indicator");
+            setIsAtTop(true);
+          }
+        }
+      };
+
+      checkScrollability();
+
+      if (modalBodyRef.current) {
+        modalBodyRef.current.addEventListener("scroll", handleScroll);
+      }
+
+      window.addEventListener("resize", checkScrollability);
+
+      return () => {
+        if (modalBodyRef.current) {
+          modalBodyRef.current.removeEventListener("scroll", handleScroll);
+        }
+        window.removeEventListener("resize", checkScrollability);
+      };
+    }, [listeTaches]);
+
+    const scrollToBottom = () => {
+      if (modalBodyRef.current) {
+        modalBodyRef.current.scrollTo({
+          top: modalBodyRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    };
+
     const CardListeTachesBodyL = () => {
       if (isLoadingTaches)
         return (
@@ -1594,32 +1795,34 @@ const TableData = ({ ...props }) => {
             return (
               <span key={index} className="mb-2">
                 <Row>
-                  <Col>
-                    <FontAwesomeIcon icon={faList} /> {Relevetache.name}
+                  <Col className="task-statement">
+                    {Relevetache.name}
                   </Col>
                 </Row>
                 {true && Array.isArray(Relevetache.value) ? (
                   Relevetache.value.map((tache, indexT) => {
                     return (
                       <Row key={indexT}>
-                        <Col md={{ offset: 1 }}>
-                          <Form.Check
+                        <Col className="task">
+                          {/* <Form.Check
                             readOnly
                             checked={false}
                             label={tache.v}
-                          />
+                          /> */}
+                          {tache.v}
                         </Col>
                       </Row>
                     );
                   })
                 ) : (
                   <Row>
-                    <Col md={{ offset: 1 }}>
-                      <Form.Check
+                    <Col className="task">
+                      {/* { <Form.Check
                         readOnly
                         checked={false}
                         label={Relevetache.value}
-                      />
+                      />} */}
+                      {Relevetache.value}
                     </Col>
                   </Row>
                 )}
@@ -1634,7 +1837,7 @@ const TableData = ({ ...props }) => {
 
     return (
       <Modal
-        dialogClassName="modal-90w"
+        dialogClassName="modal-listing"
         show={showModalListeTaches || PrestaCtx.showModalTaches}
         onHide={() => {
           setShowModalListeTaches(false);
@@ -1645,17 +1848,24 @@ const TableData = ({ ...props }) => {
         animation={false}
       >
         <Modal.Header>
-          <Modal.Title> Liste des relevés de tâches </Modal.Title>
+          <Modal.Title>
+            <FontAwesomeIcon icon={faTasks} />
+            Liste des relevés de tâches
+            <div className="modal-title h6" > {prestaName} </div>
+          </Modal.Title>
           <Button
-            variant="danger"
+            className="close-modal"
             onClick={() => setShowModalListeTaches(false)}
-          >
-            {" "}
-            X{" "}
+          ><FontAwesomeIcon icon={faXmark} />
           </Button>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body ref={modalBodyRef} className={`modal-body ${isScrollable ? "scrollable" : ""}`}>
           <CardListeTachesBodyL />
+          {isScrollable && (
+            <button onClick={scrollToBottom} className="scroll-modal">
+              <FontAwesomeIcon icon={faArrowDown} size="lg" />
+            </button>
+          )}
         </Modal.Body>
       </Modal>
     );
@@ -1672,20 +1882,10 @@ const TableData = ({ ...props }) => {
     // eslint-disable-next-line
   }, [PrestaCtx && PrestaCtx.showModalTaches]);
 
-  useEffect(() => {
-    if (PrestaCtx) {
-      if (PrestaCtx.showModalDoc) {
-        HandleAfficherDocuments(PrestaCtx.prestaSelected);
-      }
-    }
-    // eslint-disable-next-line
-  }, [PrestaCtx && PrestaCtx.showModalDoc]);
 
   //#region Documents
 
-  const [documents, setDocuments] = useState([]);
-  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
-  const [gridColMDValue, setGridColMDValue] = useState(12);
+  // const [gridColMDValue, setGridColMDValue] = useState(12);
 
   const CardDocs = () => {
     // const _arrayDocs = JSON.parse(JSON.stringify(documents));
@@ -1698,10 +1898,9 @@ const TableData = ({ ...props }) => {
             <Col md={"auto"}>
               Documents{" "}
               {isDocumentLoaded ? (
-                `(${
-                  _arrayDocs.length > 1
-                    ? _arrayDocs.length - 1
-                    : _arrayDocs.length
+                `(${_arrayDocs.length > 1
+                  ? _arrayDocs.length - 1
+                  : _arrayDocs.length
                 })`
               ) : (
                 <Placeholder animation="glow">
@@ -1713,9 +1912,9 @@ const TableData = ({ ...props }) => {
             <Col style={{ textAlign: "end" }}>
               <CloseButton
                 onClick={() => {
-                  setGridColMDValue(12);
+                  // setGridColMDValue(12);
                 }}
-                // className="ms-4"
+              // className="ms-4"
               />
             </Col>
           </Row>
@@ -1725,10 +1924,10 @@ const TableData = ({ ...props }) => {
             <div id="collapse-listeDocuments">
               {_arrayDocs.length > 0
                 ? _arrayDocs.map((doc, index) => {
-                    return (
-                      <RowDocument key={index} props={doc} index={index} />
-                    );
-                  })
+                  return (
+                    <RowDocument key={index} props={doc} index={index} />
+                  );
+                })
                 : "Aucun document."}
             </div>
           </Card.Body>
@@ -1765,7 +1964,6 @@ const TableData = ({ ...props }) => {
    */
   const CreatePropsDocumentMaintenance = (element) => {
     const _obj = {};
-
     //le titre et l'extension
     _obj.title = element.k;
     _obj.extension = element.k.split(".").pop();
@@ -1805,7 +2003,7 @@ const TableData = ({ ...props }) => {
 
     //La fonction appelé lors de l'appuye du bouton télécharger
     _obj.TelechargerDocumentSup = async () => {
-      return await await GetDocumentFISAV(tokenCt, element.v,false,true);
+      return await GetDocumentFISAV(tokenCt, element.v, false, true);
     };
 
     _obj.data = element;
@@ -1813,35 +2011,39 @@ const TableData = ({ ...props }) => {
     return _obj;
   };
 
-/**
-   * La méthode appellé pour voir un document de maintenance
-   */
-const DocumentDepannageVoirDocumentSup = async (element) => {
+  /**
+     * La méthode appellé pour voir un document de maintenance
+     */
+  const DocumentDepannageVoirDocumentSup = async (element) => {
 
-  //On ouvre une nouvelle fenêtre d'attente
-  let targetWindow = window.open("/waiting");
+    //On ouvre une nouvelle fenêtre d'attente
+    let targetWindow = window.open("/waiting");
 
-  //On récupère le fichier en b64
-  // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
-  const b64data = await GetDocumentFISAV(tokenCt, element.v,false,true);
-
+    //On récupère le fichier en b64
+    try {
 
 
-  //On transforme le fichier en blob
-  const blobData = base64toBlob(b64data.v);
+      const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
-  //On créer l'URL utilisé par les viewers
-  const url = URL.createObjectURL(blobData);
+      //On transforme le fichier en blob
+      const blobData = base64toBlob(b64data.v);
 
-  //On l'enregistre dans le viewerContext
-  viewerCt.setViewer(url);
+      //On créer l'URL utilisé par les viewers
+      const url = URL.createObjectURL(blobData);
 
-  //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-  //Le bon viewer est déterminé par l'extension
-  targetWindow.location.href = GetURLLocationViewerFromExtension(
-    element.k.split(".").pop()
-  );
-};
+      //On l'enregistre dans le viewerContext
+      viewerCt.setViewer(url);
+
+      //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+      //Le bon viewer est déterminé par l'extension
+      targetWindow.location.href = GetURLLocationViewerFromExtension(
+        element.k.split(".").pop()
+      );
+    } catch (error) {
+      console.log("Erreur lors de la récupération des données : ", error)
+      targetWindow.close();
+    }
+  };
 
 
 
@@ -1939,58 +2141,64 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
     _obj.extension = "zip";
 
 
-
     const TelechargerZIPSup = async (presta) => {
       const zip = JSZip();
       let _arrDocs = [];
-      
+
       for (let index = 0; index < _arrDocT.length; index++) {
         const element = _arrDocT[index];
 
-        let _kv = await DocumentMaintenanceGetFile(element.data.v, false, true);
+        let _data = await DocumentMaintenanceGetFile(element.data.v, false, true);
+        let _kv = JSON.parse(JSON.stringify(_data));
         if (_kv) {
           _arrDocs.push([_kv.v, _kv.k]);
         }
       }
 
-      _arrDocs.forEach((kv,i)=> {
+      _arrDocs.forEach((kv, i) => {
         try {
           let _b64 = kv[0];
           let _blob = base64toBlob(_b64);
-          zip.file(kv[1],_blob);
-          
+          zip.file(kv[1], _blob);
+
         } catch (error) {
           console.log("Impossible de zipper")
-          console.log(kv[0]);
           console.log(error);
         }
       });
 
-      const _v = zip.generateAsync({type: 'blob'})
+      const _v = await zip.generateAsync({ type: 'base64' })
       const _k = `Documents PC${presta.IdPrestationContrat}_${presta.DateInterventionPrestation}`;
-      
-      return {k: _k, v: _v};
-      
+
+      return { k: _k, v: _v };
+
     }
 
- 
-    _obj.TelechargerDocumentSup = () => TelechargerZIPSup(presta);
 
+    _obj.TelechargerDocumentSup = async () => await TelechargerZIPSup(presta);
+    _obj.type = "application/zip";
     return _obj;
   };
 
   //#endregion
 
+  //#region Documents
+
+  const [documents, setDocuments] = useState([]);
+  const [showModalDoc, setShowModalDoc] = useState(false);
+  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
+
+
   const FetchSetDocuments = async (data, presta) => {
     let _arrDocs = [];
 
-    const arrData = JSON.parse(data);
+    const arrData = data;
     if (arrData === 500) {
       const _arrError = [CreatePropError()];
       //Erreur
       setDocuments(_arrError);
       setIsDocumentLoaded(true);
-      setGridColMDValue(10);
+      // setGridColMDValue(10);
 
       return;
     }
@@ -2012,13 +2220,16 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
 
     setDocuments(_arrDocs);
     setIsDocumentLoaded(true);
-    setGridColMDValue(10);
+    setShowModalDoc(true);
+    // setGridColMDValue(10);
   };
+
 
   const HandleAfficherDocuments = async (presta) => {
     if (presta.IdDossierIntervention > 0 && presta.IdEtat === 96) {
-      setGridColMDValue(10);
+      // setGridColMDValue(10);
       setIsDocumentLoaded(false);
+      setShowModalDoc(true);
 
       await GetDocumentPrestation(
         tokenCt,
@@ -2027,78 +2238,140 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
         presta
       );
     } else {
-      setGridColMDValue(12);
+      // setGridColMDValue(12);
     }
   };
 
   const ModalDocuments = () => {
-    let _DocZIP = {
-      title: "Tous les documents",
-      extension: "zip",
-      size: " ",
+    const PrestaCtx = useContext(PrestaContext);
+
+    const [gridColMDValue, setGridColMDValue] = useState(12);
+
+    const modalBodyRef = useRef(null);
+    const [isScrollable, setIsScrollable] = useState(false);
+    const [isAtTop, setIsAtTop] = useState(true);
+
+    useEffect(() => {
+      const checkScrollability = () => {
+        if (modalBodyRef.current) {
+          const { scrollHeight, clientHeight } = modalBodyRef.current;
+          setIsScrollable(scrollHeight > clientHeight);
+        }
+      };
+      const handleScroll = () => {
+        if (modalBodyRef.current) {
+          const { scrollTop } = modalBodyRef.current;
+          if (scrollTop > 0) {
+            modalBodyRef.current.classList.add("no-scroll-indicator");
+            setIsAtTop(false);
+          } else {
+            modalBodyRef.current.classList.remove("no-scroll-indicator");
+            setIsAtTop(true);
+          }
+        }
+      };
+
+      checkScrollability();
+      if (modalBodyRef.current) {
+        modalBodyRef.current.addEventListener("scroll", handleScroll);
+      }
+      window.addEventListener("resize", checkScrollability);
+
+      return () => {
+        if (modalBodyRef.current) {
+          modalBodyRef.current.removeEventListener("scroll", handleScroll);
+        }
+        window.removeEventListener("resize", checkScrollability);
+      };
+    }, [documents]);
+
+    const scrollToBottom = () => {
+      if (modalBodyRef.current) {
+        modalBodyRef.current.scrollTo({
+          top: modalBodyRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }
     };
 
-    const _arrayDocs = JSON.parse(JSON.stringify(documents));
+    const CardDocumentsBody = () => {
+      if (!isDocumentLoaded) {
+        return (
+          <>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+          </>
+        );
+      }
+      if (documents.length === 0) return <div>Aucun document.</div>;
+
+      return (
+        <div>
+          {/* <RowDocument props={{ title: "Tous les documents", extension: "zip", size: " " }} /> */}
+          {documents.map((doc, index) => (
+            <RowDocument key={index} props={doc} index={index} />
+          ))}
+        </div>
+      );
+    };
 
     return (
       <Modal
-        dialogClassName="modal-90w"
-        show={PrestaCtx.showModalDoc}
+        dialogClassName="modal-listing"
+        show={showModalDoc || PrestaCtx.showModalDoc}
         onHide={() => {
+          setShowModalDoc(false);
           PrestaCtx.setShowModalDoc(false);
         }}
         backdrop="static"
         keyboard={false}
         animation={false}
       >
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>
-            Documents
-            {isDocumentLoaded ? (
-              `(${_arrayDocs.length})`
-            ) : (
-              <Placeholder animation="glow">
-                <Placeholder xs={1} />
-              </Placeholder>
-            )}
+            <FontAwesomeIcon icon={faFile} />
+            Liste des documents
           </Modal.Title>
+          <Button
+            className="close-modal"
+            onClick={() => setShowModalDoc(false)}
+          ><FontAwesomeIcon icon={faXmark} />
+          </Button>
         </Modal.Header>
-        {isDocumentLoaded ? (
-          <Modal.Body>
-            <div id="collapse-listeDocuments">
-              {_arrayDocs.length > 0 ? (
-                <RowDocument props={_DocZIP} />
-              ) : (
-                "Aucun document"
-              )}
-
-              {_arrayDocs.map((doc, index) => {
-                return <RowDocument key={index} props={doc} index={index} />;
-              })}
-            </div>
-          </Modal.Body>
-        ) : (
-          <Modal.Body>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-          </Modal.Body>
-        )}
+        <Modal.Body ref={modalBodyRef} className={`modal-body ${isScrollable ? "scrollable" : ""}`}>
+          <CardDocumentsBody />
+          {isScrollable && (
+            <button onClick={scrollToBottom} className="scroll-modal">
+              <FontAwesomeIcon icon={faArrowDown} size="lg" />
+            </button>
+          )}
+        </Modal.Body>
       </Modal>
     );
   };
 
+  useEffect(() => {
+    if (PrestaCtx) {
+      if (PrestaCtx.showModalDoc) {
+        HandleAfficherDocuments(PrestaCtx.prestaSelected);
+      }
+    }
+    // eslint-disable-next-line
+  }, [PrestaCtx && PrestaCtx.showModalDoc]);
   //#endregion
 
   //#endregion
 
   //#region Factures
+
+
   const HandleSelectorFacture = async () => {
     let _arrayOfFactures = [];
 
@@ -2143,43 +2416,134 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
     // _targetWindow.close();
   };
 
+  const [showModalFacture, setShowModalFacture] = useState(false);
+
+
+  const ModalFactures = () => {
+    const PrestaCtx = useContext(PrestaContext);
+    // On utilise les états factures et isFactureLoaded définis ci-dessus (déclarés en haut de TableData.js)
+
+    const modalBodyRef = useRef(null);
+    const [isScrollable, setIsScrollable] = useState(false);
+    const [isAtTop, setIsAtTop] = useState(true);
+
+    useEffect(() => {
+      const checkScrollability = () => {
+        if (modalBodyRef.current) {
+          const { scrollHeight, clientHeight } = modalBodyRef.current;
+          setIsScrollable(scrollHeight > clientHeight);
+        }
+      };
+      const handleScroll = () => {
+        if (modalBodyRef.current) {
+          const { scrollTop } = modalBodyRef.current;
+          if (scrollTop > 0) {
+            modalBodyRef.current.classList.add("no-scroll-indicator");
+            setIsAtTop(false);
+          } else {
+            modalBodyRef.current.classList.remove("no-scroll-indicator");
+            setIsAtTop(true);
+          }
+        }
+      };
+
+      checkScrollability();
+      if (modalBodyRef.current) {
+        modalBodyRef.current.addEventListener("scroll", handleScroll);
+      }
+      window.addEventListener("resize", checkScrollability);
+
+      return () => {
+        if (modalBodyRef.current) {
+          modalBodyRef.current.removeEventListener("scroll", handleScroll);
+        }
+        window.removeEventListener("resize", checkScrollability);
+      };
+    }, [documents]);
+
+    const scrollToBottom = () => {
+      if (modalBodyRef.current) {
+        modalBodyRef.current.scrollTo({
+          top: modalBodyRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    };
+
+    const CardFacturesBody = () => {
+      if (!isDocumentLoaded) {
+        return (
+          <>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+            <Placeholder as="p" animation="glow">
+              <Placeholder xs={5} />
+            </Placeholder>
+          </>
+        );
+      }
+      if (documents.length === 0) return <div>Aucune facture.</div>;
+
+      return (
+        <div>
+          {documents.map((document, index) => (
+            <RowDocument key={index} props={document} index={index} />
+          ))}
+        </div>
+      );
+    };
+
+    return (
+      <Modal
+        dialogClassName="modal-listing"
+        show={showModalFacture || PrestaCtx.showModalFacture}
+        onHide={() => {
+          setShowModalFacture(false);
+        }}
+        backdrop="static"
+        keyboard={false}
+        animation={false}
+      >
+        <Modal.Header>
+          <Modal.Title>
+            <FontAwesomeIcon icon={faFile} />
+            Liste des factures
+          </Modal.Title>
+          <Button
+            className="close-modal"
+            onClick={() => setShowModalFacture(false)}
+          ><FontAwesomeIcon icon={faXmark} />
+          </Button>
+        </Modal.Header>
+        <Modal.Body ref={modalBodyRef} className={`modal-body ${isScrollable ? "scrollable" : ""}`}>
+          <CardFacturesBody />
+          {isScrollable && (
+            <button onClick={scrollToBottom} className="scroll-modal">
+              <FontAwesomeIcon icon={faArrowDown} size="lg" />
+            </button>
+          )}
+        </Modal.Body>
+      </Modal>
+    );
+  };
+
+  useEffect(() => {
+    if (PrestaCtx) {
+      if (PrestaCtx.showModalFacture) {
+        HandleAfficherFacture(PrestaCtx.prestaSelected);
+      }
+    }
+    // eslint-disable-next-line
+  }, [PrestaCtx && PrestaCtx.showModalFacture]);
+
+
   //#endregion
 
   //#region Intervention
-
-  // const CreatePropsDocumentInterventionFI2 = (element) => {
-  //   const _obj = {};
-  //   _obj.title = `${element.k}`;
-  //   _obj.extension = "pdf";
-
-  //   _obj.VoirDocumentSup = () => {
-  //     GetDocumentFISAV(tokenCt, element.v);
-  //   };
-  //   _obj.TelechargerDocumentSup = () => {
-  //     GetDocumentFISAV(tokenCt, element.v, true);
-  //   };
-  //   _obj.data = element;
-  //   return _obj;
-  // };
-
-  // const CreatePropsDocumentInterventionFacture = (element) => {
-  //   const _obj = {};
-
-  //   _obj.title = `${element.k}`;
-  //   _obj.extension = "pdf";
-
-  //   _obj.VoirDocumentSup = () => {
-  //     VoirFactureDocument(tokenCt, element.v, "Facture SAV", false);
-  //   };
-
-  //   _obj.TelechargerDocumentSup = () => {
-      // TelechargerFactureDocument(tokenCt, element.v, "Facture SAV", false);
-  //   };
-  //   _obj.data = element;
-  //   return _obj;
-  // };
-
-
 
 
   /**
@@ -2196,10 +2560,9 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
     //La fonction appelé lors de l'appuye du bouton 'Voir'
     _obj.VoirDocumentSup = () => FactureMaintenanceVoirDocumentSup(element);
 
-
     //La fonction appelé lors de l'appuye du bouton télécharger
     _obj.TelechargerDocumentSup = async () => {
-      return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false,true);
+      return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
     };
 
     _obj.data = element;
@@ -2209,31 +2572,31 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
 
 
 
- /**
-   * La méthode appellé pour voir un document de maintenance
-   */
- const FactureMaintenanceVoirDocumentSup = async (element) => {
-  //On ouvre une nouvelle fenêtre d'attente
-  let targetWindow = window.open("/waiting");
+  /**
+    * La méthode appellé pour voir un document de maintenance
+    */
+  const FactureMaintenanceVoirDocumentSup = async (element) => {
+    //On ouvre une nouvelle fenêtre d'attente
+    let targetWindow = window.open("/waiting");
 
-  //On récupère le fichier en b64
-  const b64data = await  VoirFactureDocument(tokenCt, element.v, "Facture SAV", false,true);
+    //On récupère le fichier en b64
+    const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
 
-  //On transforme le fichier en blob
-  const blobData = base64toBlob(b64data.v);
+    //On transforme le fichier en blob
+    const blobData = base64toBlob(b64data.v);
 
-  //On créer l'URL utilisé par les viewers
-  const url = URL.createObjectURL(blobData);
+    //On créer l'URL utilisé par les viewers
+    const url = URL.createObjectURL(blobData);
 
-  //On l'enregistre dans le viewerContext
-  viewerCt.setViewer(url);
+    //On l'enregistre dans le viewerContext
+    viewerCt.setViewer(url);
 
-  //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-  //Le bon viewer est déterminé par l'extension
-  targetWindow.location.href = GetURLLocationViewerFromExtension(
-    element.k.split(".").pop()
-  );
-};
+    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+    //Le bon viewer est déterminé par l'extension
+    targetWindow.location.href = GetURLLocationViewerFromExtension(
+      element.k.split(".").pop()
+    );
+  };
 
 
 
@@ -2243,8 +2606,9 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
     _obj.extension = "zip";
 
     const TelechargerZIPSup = async (IdDossierInterventionSAV) => {
+      const zip = JSZip();
       let _arrDocs = [];
-      let _targetWindow = window.open("/waiting");
+
 
       for (let index = 0; index < _arrDocsFI.length; index++) {
         const element = _arrDocsFI[index];
@@ -2271,17 +2635,56 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
 
         _arrDocs.push(_arrDocFA);
       }
-      await TelechargerZIP(
-        _arrDocs,
-        `Intervention N° ${IdDossierInterventionSAV}`
-      );
-      _targetWindow.close();
+
+      _arrDocs.forEach((kv, i) => {
+        try {
+          let _b64 = kv[0];
+          let _blob = base64toBlob(_b64);
+          zip.file(kv[1], _blob);
+
+        } catch (error) {
+          console.log("Impossible de zipper")
+          console.log(error);
+        }
+      });
+
+      const _v = await zip.generateAsync({ type: 'base64' })
+      const _k = `Tous les documents`;
+
+      return { k: _k, v: _v };
+
+
+      // await TelechargerZIP(
+      //   _arrDocs,
+      //   `Intervention N° ${IdDossierInterventionSAV}`
+      // );
     };
 
-    _obj.TelechargerDocumentSup = TelechargerZIPSup;
+    _obj.TelechargerDocumentSup = async () => await TelechargerZIPSup();
 
+    _obj.type = "application/zip";
     return _obj;
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const GetListeDocIntervention = async (IdDossierInterventionSAV) => {
     setIsDocumentLoaded(false);
@@ -2312,7 +2715,6 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
         //Il y a plusieurs factures
         for (let index = 0; index < data.length; index++) {
           const element = data[index];
-
           const _obj = CreatePropsDocumentInterventionFacture(element);
 
           _arrFA.push(_obj);
@@ -2337,6 +2739,7 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
 
       setDocuments(_arrDocs);
       setIsDocumentLoaded(true);
+      setShowModalFacture(true);
     };
 
     //1 - Demande les FI
@@ -2347,7 +2750,7 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
     );
 
     //3 - Demande les factures
-    GeTListeFactureIntervention(
+    GetListeFactureIntervention(
       tokenCt,
       IdDossierInterventionSAV,
       FetchSetDataFacturePart
@@ -2357,11 +2760,13 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
   const HandleAfficherFacture = (inter) => {
     if (inter) {
       setDocuments([]);
-      setGridColMDValue(10);
-      //LoadFacture,AffichageFacture comme documeuent
+      // setGridColMDValue(10);
+      // Charge les factures
       GetListeDocIntervention(inter.IdDossierInterventionSAV);
+      setShowModalFacture(true);
+
     } else {
-      setGridColMDValue(12);
+      // setGridColMDValue(12);
     }
   };
 
@@ -2372,7 +2777,7 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
   return (
     <BreakpointProvider>
       {TopPannel()}
-      <Container fluid className="container-table p-4 ">
+      <Container fluid className="container-table">
         <ModalList />
         <Breakpoint large up>
           <Row>
@@ -2391,7 +2796,7 @@ const DocumentDepannageVoirDocumentSup = async (element) => {
               </Table>
             </Col>
 
-            {gridColMDValue !== 12 && <Col md={"auto"}>{CardDocs()}</Col>}
+            {/* {gridColMDValue !== 12 && <Col md={"auto"}>{CardDocs()}</Col>} */}
           </Row>
         </Breakpoint>
 
@@ -2457,6 +2862,44 @@ export const EditorActionTelecharger = (e) => {
   );
 };
 
+export const EditorActionsTooltip = ({ actions }) => {
+  const [isActive, setIsActive] = useState(false);
+
+
+
+  const popover = (
+    <Popover className="editor-actions-tooltip">
+      <Popover.Body>
+        {actions.map((action, index) => (
+          <div
+            key={index}
+            className={`editor-action-item ${action.className || ""}`}
+            onClick={action.onClick}
+          >
+            <FontAwesomeIcon icon={action.icon} className="action-icon" />
+            <span>{action.label}</span>
+          </div>
+        ))}
+      </Popover.Body>
+    </Popover>
+  );
+
+  return (
+    <OverlayTrigger
+      placement="left"
+      overlay={popover}
+      trigger="click"
+      rootClose
+      container={document.body}
+      onToggle={(isOpen) => setIsActive(isOpen)}
+    >
+      <Button variant="link" className={`btn-tooltip ${isActive ? "active" : ""}`}>
+        <TooltipSvg />
+      </Button>
+    </OverlayTrigger>
+  );
+};
+
 const CreateEditorDocument = (
   methodTitle,
   extension,
@@ -2477,13 +2920,21 @@ const CreateEditorDocument = (
 };
 
 const EditorSelection = (e) => {
-  return <Form.Check defaultChecked={e} />;
+  let _uid = GenerateUid();
+  return <Form.Check id={`selector-check-${_uid}`} defaultChecked={e} />;
 };
 
 //#endregion
 
 //#region Helpers
-
+/**
+ * 
+ * @param {string} fieldname 
+ * @param {boolean} filter 
+ * @param {string} caption 
+ * @param {Function} editor 
+ * @returns 
+ */
 export const CreateNewHeader = (fieldname, filter, caption, editor) => {
   let _header = {
     fieldname: fieldname,
@@ -2494,6 +2945,15 @@ export const CreateNewHeader = (fieldname, filter, caption, editor) => {
   return _header;
 };
 
+/**
+ * 
+ * @param {boolean} isFilter 
+ * @param {boolean} isCheckbox 
+ * @param {boolean} isRange 
+ * @param {boolean} isSearchCol 
+ * @param {boolean} isRangeDate 
+ * @returns 
+ */
 export const CreateFilter = (
   isFilter,
   isCheckbox,
@@ -2510,6 +2970,16 @@ export const CreateFilter = (
   };
 };
 
+/**
+ * 
+ * @param {string} fieldname 
+ * @param {boolean} isH1 
+ * @param {boolean} isSearchable 
+ * @param {boolean} isSelectable 
+ * @param {Function} editor 
+ * @param {string} tagMethod 
+ * @returns 
+ */
 export const CreateNewCell = (
   fieldname,
   isH1,

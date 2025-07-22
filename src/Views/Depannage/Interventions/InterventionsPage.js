@@ -1,6 +1,6 @@
 //#region Imports
 
-import { useEffect, useState, useContext } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
@@ -21,24 +21,36 @@ import TableData, {
   CreateNewUnboundCell,
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
+  EditorActionsTooltip,
 } from "../../../components/commun/TableData";
+
+import {
+  faFile,
+  faFilePdf,
+} from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFile } from "@fortawesome/free-solid-svg-icons";
-import TitreOfPage from "../../../components/commun/TitreOfPage";
-import { GetListeInterventions } from "../../../axios/WSGandara";
+
+import { GetListeInterventions } from "../../../axios/WS_Intervention";
 import { ClientSiteContratContext, TokenContext } from "../../../App";
 import { Row } from "react-bootstrap";
+
+import { PrestaContext } from "../../Maintenance/Contrat/Components/ContratPrestations";
 //#endregion
 
 //#endregion
 
-const InterventionPage = () => {
+
+
+const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
   const TokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
+
   //#region States
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeInterventions, setListeInterventions] = useState([]);
+  const [showModalFacture, setShowModalFacture] = useState(false);
+  const [prestaSelected, setPrestaSelected] = useState(null);
 
   //#endregion
 
@@ -48,6 +60,8 @@ const InterventionPage = () => {
     setIsLoaded(false);
     const FetchSetData = (data) => {
       setListeInterventions(data);
+      setPageSubtitle(`${data.length} interventions`);
+
       setIsLoaded(true);
     };
 
@@ -100,7 +114,7 @@ const InterventionPage = () => {
       CreateNewHeader(
         "DateDemandeDossierInterventionSAV",
         CreateFilter(true, false, false, false, true),
-        "Date de la demande",
+        "Date",
         EditorDateFromDateTime
       )
     );
@@ -129,7 +143,9 @@ const InterventionPage = () => {
       CreateNewHeader("LibEtat", CreateFilter(true, true, false, false), "État")
     );
 
-    _headers.push(CreateNewUnboundHeader(false, "Action"));
+    _headers.push(
+      CreateNewHeader("Action", CreateFilter(), "Action")
+    );
     return _headers;
   }
 
@@ -150,13 +166,23 @@ const InterventionPage = () => {
       CreateNewCell("DescriptionDossierInterventionSAV", true, true, false)
     );
     _cells.push(CreateNewCell("LibEtat", false, false, false, EditorEtat));
+
+
+    const actionsForIntervention = (item, i, _method) => [
+      {
+        label: "Voir les documents",
+        onClick: () => {
+          _method('tagInterventionDocuments', item, i);
+        }
+        ,
+        className: "action-view-maintenance",
+        icon: faFile
+      }
+    ];
+
     _cells.push(
-      CreateNewUnboundCell(
-        false,
-        false,
-        true,
-        EditorActionDocuments,
-        "tagInterventionDocuments"
+      CreateNewCell("Action", false, true, false, (item, i, _method) =>
+        <EditorActionsTooltip actions={actionsForIntervention(item, i, _method)} />
       )
     );
 
@@ -181,6 +207,7 @@ const InterventionPage = () => {
 
   useEffect(() => {
     document.title = "Dépannage";
+    setPageTitle(`Dépannage`);
 
     GetData();
     // eslint-disable-next-line
@@ -237,11 +264,11 @@ const InterventionPage = () => {
   const EditorCardBody = (inter) => {
     return (
       <>
-      <h6>{`Secteur : ${inter.DescriptionSecteur}`}</h6>
-      <Button
+        <h6>{`Secteur : ${inter.DescriptionSecteur}`}</h6>
+        <Button
           className={`m-2 p-2 noBorder bg-success`}
           onClick={() => {
-            }
+          }
           }
         >
           <FontAwesomeIcon icon={faFile} /> Liste des documents
@@ -256,11 +283,11 @@ const InterventionPage = () => {
       <>
         <Row>
           <Col>
-           {EditorDateFromDateTime(inter.DateDemandeDossierInterventionSAV)}
+            {EditorDateFromDateTime(inter.DateDemandeDossierInterventionSAV)}
           </Col>
 
           <Col>
-          {EditorEtat(inter.LibEtat)}
+            {EditorEtat(inter.LibEtat)}
           </Col>
         </Row>
       </>
@@ -282,40 +309,43 @@ const InterventionPage = () => {
 
 
     return (
-      <TableData
-        Data={GetListeInterventionsTrimed()}
-        Headers={_Headers}
-        Cells={_Cells}
-        IsLoaded={isLoaded}
-        Pagination
-        ButtonFilters={_ButtonFilter}
-        // TopPannelRightToSearch={
-        //   <Col md={"auto"} className="m-1">
-        //     <Button
-        //       variant="danger"
-        //       onClick={() => (window.location.href = "/nouvelleintervention")}
-        //     >
-        //       Demander une nouvelle intervention
-        //     </Button>
-        //   </Col>
-        // }
+      <PrestaContext.Provider value={{
+        showModalFacture,
+        setShowModalFacture,
+        prestaSelected,
+        setPrestaSelected,
+        isInterventions: true,
+      }}>
+        <TableData
+          Data={GetListeInterventionsTrimed()}
+          Headers={_Headers}
+          Cells={_Cells}
+          IsLoaded={isLoaded}
+          Pagination
+          ButtonFilters={_ButtonFilter}
+          // TopPannelRightToSearch={
+          //   <Col md={"auto"} className="m-1">
+          //     <Button
+          //       variant="danger"
+          //       onClick={() => (window.location.href = "/nouvelleintervention")}
+          //     >
+          //       Demander une nouvelle intervention
+          //     </Button>
+          //   </Col>
+          // }
 
-        CardModel={_CardModel}
-      />
+          CardModel={_CardModel}
+        />
+      </PrestaContext.Provider>
     );
   };
 
   return (
-    <Container fluid>
-      <TitreOfPage
-        titre={"Interventions dépannage"}
-        soustitre={` ${listeInterventions.length} intervention${
-          listeInterventions.length > 1 ? "s" : ""
-        } `}
-        isLoaded={isLoaded}
-      />
+    <Container fluid className="table-depannage">
       <Container fluid>
+
         <TableInterventions />
+
       </Container>
     </Container>
   );

@@ -19,22 +19,20 @@ import Placeholder from "react-bootstrap/Placeholder";
 //#endregion
 
 //#region Components
-import TitreOfPage from "../../../components/commun/TitreOfPage";
 import {
   ClientSiteContratContext,
   ParametresContext,
   TokenContext,
 } from "../../../App";
 import { useEffect } from "react";
-import { GetListeSecteur, GetListeTels } from "../../../axios/WSGandara";
+import { GetListeSecteur, GetListeTels } from "../../../axios/WS_ClientSite";
 import { ParseKVAsArray } from "../../../functions";
 
 //#endregion
 
 //#endregion
 
-const NouvelleInterventionPage = () => {
-  const ParamsCt = useContext(ParametresContext);
+const NouvelleInterventionPage = ({ setPageSubtitle, setPageTitle }) => {
   const TokenCt = useContext(TokenContext);
   const ClientSiteCt = useContext(ClientSiteContratContext);
 
@@ -62,6 +60,7 @@ const NouvelleInterventionPage = () => {
   //#region Fonctions
 
   const GetData = () => {
+    setPageSubtitle("");
     const FetchSetSecteurs = (data) => {
       setListeSecteurs(data);
       setIsLoadedSecteurs(true);
@@ -107,9 +106,6 @@ const NouvelleInterventionPage = () => {
   const HandleSubmit = (event) => {
     const form = event.currentTarget;
 
-    console.log("secteur : ", secteurChoix);
-    console.log("objet : ", objetDemande);
-    console.log("tel : ", customTel.length > 0 ? customTel : telChoix);
 
     if (form.checkValidity() === false) {
       event.preventDefault();
@@ -123,17 +119,16 @@ const NouvelleInterventionPage = () => {
 
   useEffect(() => {
     document.title = "Demande de dépannage";
+    setPageTitle("Demande de dépannage");
     GetData();
     // eslint-disable-next-line
   }, [ClientSiteCt.storedClientSite.GUID]);
 
   return (
     <Container fluid>
-      <TitreOfPage titre={"Nouvelle intervention"} />
-      <Container fluid className="container-table ">
-        <Form noValidate validated={validated} onSubmit={HandleSubmit}>
-          <Row className="m-4">
-            <Col md={12} className="mt-2">
+      <Form noValidate validated={validated} onSubmit={HandleSubmit}>
+        <Row className="m-4">
+          {/* <Col md={12} className="mt-2">
               {isLoadedSecteurs ? (
                 <FloatingLabel label="Choix du secteur">
                   <Form.Select onChange={HandleSecteurChoix}>
@@ -152,84 +147,82 @@ const NouvelleInterventionPage = () => {
                   <Placeholder xs={12} />
                 </Placeholder>
               )}
-            </Col>
+            </Col> */}
 
-            <Col md={12} className="mt-4 mb-4">
-              <FloatingLabel
-                controlId="floatingTextarea2"
-                label="Objet de la demande"
-              >
-                <Form.Control
-                  required
-                  as={"textarea"}
-                  value={objetDemande}
-                  onChange={HandleObjetDemande}
-                  className="h-75"
-                />
-                <Form.Control.Feedback type="invalid">
-                  Merci de renseigner l'objet de votre demande.
-                </Form.Control.Feedback>
-              </FloatingLabel>
-            </Col>
+          <Col md={12} className="mt-4 mb-4">
+            <FloatingLabel
+              controlId="floatingTextarea2"
+              label="Objet de la demande"
+            >
+              <Form.Control
+                required
+                as={"textarea"}
+                value={objetDemande}
+                onChange={HandleObjetDemande}
+                className="h-75"
+              />
+              <Form.Control.Feedback type="invalid">
+                Merci de renseigner l'objet de votre demande.
+              </Form.Control.Feedback>
+            </FloatingLabel>
+          </Col>
 
-            <h4>Où vous rappeller</h4>
+          <h4>Où vous rappeller</h4>
 
-            <Col md={6} className="mt-2">
-              <FloatingLabel label="Chosissez un numéro enregistré">
-                <Form.Select onChange={HandleTelChoix}>
-                  {listeTels.map((tel, index) => {
-                    return (
-                      <option value={tel.v} key={index}>
-                        {`${tel.k} - ${tel.v}`}
-                      </option>
-                    );
-                  })}
-                </Form.Select>
-              </FloatingLabel>
-            </Col>
+          <Col md={6} className="mt-2">
+            <FloatingLabel label="Chosissez un numéro enregistré">
+              <Form.Select onChange={HandleTelChoix}>
+                {listeTels.map((tel, index) => {
+                  return (
+                    <option value={tel.v} key={index}>
+                      {`${tel.k} - ${tel.v}`}
+                    </option>
+                  );
+                })}
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
 
-            <Col md={6} className="mt-2">
-              <FloatingLabel
-                controlId="floatingTextarea2"
-                label="Ou renseignez un autre numéro"
-              >
-                <Form.Control
-                  type="tel"
-                  value={customTel}
-                  onChange={HandleCustomTelChoix}
-                />
-                <Form.Control.Feedback type="invalid">
-                  Le numéro n'est pas correct
-                </Form.Control.Feedback>
-              </FloatingLabel>
-            </Col>
+          <Col md={6} className="mt-2">
+            <FloatingLabel
+              controlId="floatingTextarea2"
+              label="Ou renseignez un autre numéro"
+            >
+              <Form.Control
+                type="tel"
+                value={customTel}
+                onChange={HandleCustomTelChoix}
+              />
+              <Form.Control.Feedback type="invalid">
+                Le numéro n'est pas correct
+              </Form.Control.Feedback>
+            </FloatingLabel>
+          </Col>
 
-            <Col md={2} className="mt-2">
-              <Button variant="success" className="mx-auto m-4" type="submit">
-                Envoyer
-              </Button>
-            </Col>
-            <Col md={10} className="mt-2 ">
-              <span className=" m-4">
-                <h3 style={{ color: "red" }}>
-                  <FontAwesomeIcon icon={faBell} className="me-2" />
-                  En cas d'urgence contactez le{" "}
-                  <a
-                    className="text-decoration-none"
-                    href={`tel:${
-                      ParamsCt.find((p) => p.k === "TelUrgenceIntervention").v
-                    }`}
-                  >
-                    {ParamsCt.find((p) => p.k === "TelUrgenceIntervention").v}
-                  </a>{" "}
-                  <FontAwesomeIcon icon={faBell} className="ms-2" />
-                </h3>
-              </span>
-            </Col>
-          </Row>
-        </Form>
-      </Container>
+          <Col md={2} className="mt-2">
+            <Button variant="success" className="mx-auto m-4" type="submit">
+              Envoyer
+            </Button>
+          </Col>
+          <Col md={10} className="mt-2 ">
+            <span className=" m-4">
+              <h3 style={{ color: "red" }}>
+                <FontAwesomeIcon icon={faBell} className="me-2" />
+                En cas d'urgence contactez le{" "}
+                <a
+                  className="text-decoration-none"
+                  href={`tel:`}
+                >
+                  00000
+                </a>{" "}
+                <FontAwesomeIcon icon={faBell} className="ms-2" />
+              </h3>
+            </span>
+          </Col>
+        </Row>
+      </Form>
     </Container>
+
   );
 };
 

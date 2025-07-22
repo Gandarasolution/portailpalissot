@@ -1,89 +1,88 @@
 import Image from "react-bootstrap/Image";
 
-const ImageExtension = ({ extension }) => {
+import ImgError from "../../image/error.png";
+import ImgNEUTRE from "../../image/imageDocuments/neutre.png";
+import ImgJPG from "../../image/imageDocuments/jpg.svg";
+import ImgPDF from "../../image/imageDocuments/pdf.svg";
+import ImgPNG from "../../image/imageDocuments/png.svg";
+import ImgDOC from "../../image/imageDocuments/doc.svg";
+import ImgZIP from "../../image/imageDocuments/zip.svg";
+import ImgXML from "../../image/imageDocuments/xml.svg";
+import ImgXLS from "../../image/imageDocuments/xls.png";
+import ImgTXT from "../../image/imageDocuments/txt.svg";
+import ImgGIF from "../../image/imageDocuments/gif.svg";
+import ImgMP3 from "../../image/imageDocuments/mp3.svg";
+import ImgSVG from "../../image/imageDocuments/svg.svg";
+import ImgBMP from "../../image/imageDocuments/bmp.svg";
 
-  const ImgError = require("../../image/error.png");
-  const ImgNEUTRE = require("../../image/imageDocuments/neutre.png");
-  const ImgJPG = require("../../image/imageDocuments/jpg.png");
-  const ImgPDF = require("../../image/imageDocuments/pdf.png");
-  const ImgPNG = require("../../image/imageDocuments/png.png");
-  const ImgDOC = require("../../image/imageDocuments/doc.png");
-  const ImgZIP = require("../../image/imageDocuments/zip.png");
-  const ImgXML = require("../../image/imageDocuments/xml.png");
-  const ImgXLS = require("../../image/imageDocuments/xls.png");
-  const ImgTXT = require("../../image/imageDocuments/txt.png");
-  const ImgGIF = require("../../image/imageDocuments/gif.png");
-  const ImgMP3 = require("../../image/imageDocuments/mp3.png");
-  const ImgSVG = require("../../image/imageDocuments/svg.png");
-  const ImgBMP = require("../../image/imageDocuments/bmp.png");
+import ImgDOCX from "../../image/imageDocuments/docx.png";
+import ImgDWG from "../../image/imageDocuments/dwg.png";
+import ImgPPTX from "../../image/imageDocuments/pptx.png";
+import ImgRAR from "../../image/imageDocuments/rar.png";
+import ImgXLSX from "../../image/imageDocuments/xlsx.png";
 
-  const ImgDOCX = require("../../image/imageDocuments/docx.png");
-  const ImgDWG = require("../../image/imageDocuments/dwg.png");
-  const ImgPPTX = require("../../image/imageDocuments/pptx.png");
-  const ImgRAR = require("../../image/imageDocuments/rar.png");
-  const ImgXLSX = require("../../image/imageDocuments/xlsx.png");
+import ImgAVI from "../../image/imageDocuments/avi.svg";
+import ImgMPG from "../../image/imageDocuments/mpg.svg";
+import ImgPPT from "../../image/imageDocuments/ppt.svg";
+import ImgMOV from "../../image/imageDocuments/mov.svg";
 
-  const ImgAVI = require("../../image/imageDocuments/avi.png");
-  const ImgMPG = require("../../image/imageDocuments/mpg.png");
-  const ImgPPT = require("../../image/imageDocuments/ppt.png");
-  const ImgMOV = require("../../image/imageDocuments/mov.png");
-
-  const GetImageExtension = (extension) => {
-    switch (extension.toString().toUpperCase()) {
-      case"ERROR":
+const GetImageExtension = (extension) => {
+  switch (extension.toString().toUpperCase()) {
+    case "ERROR":
       return ImgError;
-      case "JPG":
-        return ImgJPG;
-      case "PDF":
-        return ImgPDF;
-      case "PNG":
-        return ImgPNG;
-      case "ZIP":
-        return ImgZIP;
-      case "XML":
-        return ImgXML;
-      case "XLS":
-        return ImgXLS;
-      case "XLSX":
-        return ImgXLSX;
-      case "TXT":
-        return ImgTXT;
-      case "GIF":
-        return ImgGIF;
-      case "MP3":
-        return ImgMP3;
-      case "SVG":
-        return ImgSVG;
-      case "BMP":
-        return ImgBMP;
-      case "DOC":
-        return ImgDOC;
-      case "DOCX":
-        return ImgDOCX;
-      case "DWG":
-        return ImgDWG;
-      case "PPTX":
-        return ImgPPTX;
-      case "RAR":
-        return ImgRAR;
-      case "MOV":
-        return ImgMOV;
-      case "PPT":
-        return ImgPPT;
-      case "MPG":
-        return ImgMPG;
-      case "AVI":
-        return ImgAVI;
-      default:
-        return ImgNEUTRE;
-    }
-  };
+    case "JPG":
+      return ImgJPG;
+    case "PDF":
+      return ImgPDF;
+    case "PNG":
+      return ImgPNG;
+    case "ZIP":
+      return ImgZIP;
+    case "XML":
+      return ImgXML;
+    case "XLS":
+      return ImgXLS;
+    case "XLSX":
+      return ImgXLSX;
+    case "TXT":
+      return ImgTXT;
+    case "GIF":
+      return ImgGIF;
+    case "MP3":
+      return ImgMP3;
+    case "SVG":
+      return ImgSVG;
+    case "BMP":
+      return ImgBMP;
+    case "DOC":
+      return ImgDOC;
+    case "DOCX":
+      return ImgDOCX;
+    case "DWG":
+      return ImgDWG;
+    case "PPTX":
+      return ImgPPTX;
+    case "RAR":
+      return ImgRAR;
+    case "MOV":
+      return ImgMOV;
+    case "PPT":
+      return ImgPPT;
+    case "MPG":
+      return ImgMPG;
+    case "AVI":
+      return ImgAVI;
+    default:
+      return ImgNEUTRE;
+  }
+};
 
+const ImageExtension = ({ extension }) => {
   return (
     <Image
       src={GetImageExtension(extension)}
       height={42}
-      alt={`Icone ${extension} Crédit Dimitriy Morilubov`}
+      alt={`Icone ${extension}`}
     />
   );
 };

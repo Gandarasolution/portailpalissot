@@ -10,17 +10,35 @@ import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
 //#endregion
 
-//#region Components
+//#region fontAwsome
+import {
+  faFile,
+  faFilePdf,
+} from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//#endregion
+
+//#Region Components
+
+// import {
+//   // GetListeFactures,
+//   VoirFactureDocument,
+// } from "../../axios/OLD_WSGandara";
+
 import {
   GetListeFactures,
   VoirFactureDocument,
-} from "../../axios/WSGandara";
+} from "../../axios/WS_Factures";
+
+
+
 import { DateSOAP, base64toBlob } from "../../functions";
 import {
   ClientSiteContratContext,
   TokenContext,
   ViewerContext,
 } from "../../App";
+
 import TableData, {
   CreateFilter,
   CreateNewButtonFilter,
@@ -33,15 +51,19 @@ import TableData, {
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
   EditorMontant,
+  EditorActionsTooltip,
+  CreateNewUnboundCell
 } from "../../components/commun/TableData";
-import TitreOfPage from "../../components/commun/TitreOfPage";
+import { saveAs } from "file-saver";
+
+
 //#endregion
 
 //#endregion
 
 export const FactureContext = createContext(null);
 
-const FacturesPage = () => {
+const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
   const tokenCt = useContext(TokenContext);
   const clientSiteCt = useContext(ClientSiteContratContext);
   const viewerCt = useContext(ViewerContext);
@@ -119,6 +141,7 @@ const FacturesPage = () => {
         EditorMontant
       )
     );
+    _headers.push(CreateNewHeader("ResteDu",CreateFilter(true,true,true,true),"Reste dû",EditorMontant));
     _headers.push(
       CreateNewHeader(
         "Dossier",
@@ -135,11 +158,9 @@ const FacturesPage = () => {
       )
     );
     _headers.push(
-      CreateNewUnboundHeader(CreateFilter(), "Actions", [
-        "tagFactureVoir",
-        "tagFactureTelecharger",
-      ])
+      CreateNewUnboundHeader(CreateFilter(), "Action")
     );
+
 
     return _headers;
   }
@@ -157,6 +178,7 @@ const FacturesPage = () => {
     _cells.push(CreateNewCell("Sujet", false, true, false));
     _cells.push(CreateNewCell("MontantHT", false, true, false, EditorMontant));
     _cells.push(CreateNewCell("MontantTTC", false, true, false, EditorMontant));
+    _cells.push(CreateNewCell("ResteDu",false,true,false,EditorMontant))
     _cells.push(CreateNewCell("Dossier", false, true, false));
     _cells.push(CreateNewCell("Type", false, true, false, EditorType));
 
@@ -166,21 +188,19 @@ const FacturesPage = () => {
     };
 
     const methodTelecharger = async (facture) => {
-      // TelechargerFactureDocument(
-      //   tokenCt,
-      //   facture.IdFacture,
-      //   facture.Type,
-      //   facture.Avoir
-      // );
-      // setTelechargerFacture(false);
-
-      return await await VoirFactureDocument(
+      let _kv = await VoirFactureDocument(
         tokenCt,
         facture.IdFacture,
         facture.Type,
         facture.Avoir,
         true
       );
+
+      const base64data = _kv.v;
+      const _bblob = base64toBlob(base64data);
+      //Téléchargement
+      saveAs(_bblob, _kv.k);
+
     };
 
     const methodVoir = async (facture) => {
@@ -212,8 +232,24 @@ const FacturesPage = () => {
       setVoirFacture(false);
     };
 
+    // Créer les actions
+    const actionsForFacture = (facture) => [
+      {
+        label: "Voir la facture",
+        onClick: () => methodVoir(facture),
+        className: "action-view-facture icon-visualize",
+      },
+      {
+        label: "Télécharger la facture",
+        onClick: () => methodTelecharger(facture),
+        className: "action-download-facture icon-download",
+      }
+    ];
+
     _cells.push(
-      CreateNewDocumentCell(methodTitle, "PDF", methodTelecharger, methodVoir)
+      CreateNewUnboundCell(false, true, false, (facture, index) =>
+        <EditorActionsTooltip actions={actionsForFacture(facture)} />
+      )
     );
 
     return _cells;
@@ -359,7 +395,10 @@ const FacturesPage = () => {
     setIsFactureLoaded(false);
     const FetchSetData = (data) => {
       setListeFactures(data);
+
       setIsFactureLoaded(true);
+      let _trimmed = data.filter((fa) => fa.Type && fa.Type !== "Chantier");
+      setPageSubtitle(` ${_trimmed.length}`);
     };
     await GetListeFactures(
       tokenCt,
@@ -368,21 +407,20 @@ const FacturesPage = () => {
       DateSOAP(new Date()),
       FetchSetData
     );
+
+
   };
 
   useEffect(() => {
     document.title = "Factures";
+    setPageTitle("Factures");
+
     GetFactures();
     //eslint-disable-next-line
   }, [clientSiteCt.storedClientSite.GUID]);
 
   return (
-    <Container fluid>
-      <TitreOfPage
-        titre={"Factures"}
-        soustitre={` ${GetListeFactureTrimed().length} factures`}
-        isLoaded={isFacturesLoaded}
-      />
+    <Container fluid className="table-facture">
       <TableFactures />
     </Container>
   );

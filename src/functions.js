@@ -27,9 +27,9 @@ function FiltrerUnSearch(fieldname, _lData, arrayFilters) {
       return (
         _arColonne.filter((filter) => {
           return data[fieldname]
-            .toString()
-            .toLocaleUpperCase()
-            .includes(filter.text.toString().toLocaleUpperCase());
+            ?.toString()
+            ?.toLocaleUpperCase()
+            ?.includes(filter.text.toString().toLocaleUpperCase());
         }).length > 0
       );
     });
@@ -58,9 +58,9 @@ function FiltrerUnSeuilDate(fieldname, _lData, arrayFilters) {
         _arColonne.filter((filter) => {
           return (
             ParseDateFormat(data[fieldname]).getTime() <=
-              new Date(filter.max).getTime() &&
+            new Date(filter.max).getTime() &&
             ParseDateFormat(data[fieldname]).getTime() >=
-              new Date(filter.min).getTime()
+            new Date(filter.min).getTime()
           );
         }).length > 0
       );
@@ -257,12 +257,12 @@ function DateSOAP(date) {
 }
 
 
-function GetDateFromStringDDMMYYY(dateStr){
-  const Day = dateStr.substring(0,2);
-      const Month = dateStr.substring(3,5);
-      const Year = dateStr.substring(6,10);
+function GetDateFromStringDDMMYYY(dateStr) {
+  const Day = dateStr.substring(0, 2);
+  const Month = dateStr.substring(3, 5);
+  const Year = dateStr.substring(6, 10);
   return new Date(Year, Number(Month) - 1, Day);
- 
+
 }
 
 
@@ -312,13 +312,13 @@ function ParseKVAsArray(kv) {
 
 
 
-const base64toBlob = (data) => {
+const base64toBlob = (data,type) => {
   // Cut the prefix `data:application/pdf;base64` from the raw base 64
   // const base64WithoutPrefix = data.substr('data:application/pdf;base64,'.length);
 
 
   const bytes = Buffer.from(data, "base64");
-  return new Blob([bytes], { type: "application/pdf" });
+  return new Blob([bytes], { type: type?type:"application/pdf" });
 };
 
 
@@ -327,19 +327,60 @@ const GetURLLocationViewerFromExtension = (extension) => {
   switch (extension.toUpperCase()) {
     case "PDF":
       return "/viewerPDF";
-      case "DOCX":
-        case "DOC":
-          return "/viewerDOC";
-          case "PNG":
-            case "JPG":
-              return"/viewerIMG";
+    case "DOCX":
+    case "DOC":
+      return "/viewerDOC";
+    case "PNG":
+    case "JPG":
+      return "/viewerIMG";
     default:
       return "/";
-    
-    }
-  
+
   }
-  
+
+}
+
+//Fonction de hash : https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
+const cyrb53 = (str, seed = 0) => {
+  let h1 = 0xdeadbeef ^ seed,
+    h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+};
+
+
+const GenerateUid = () => {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+
+const GetRedirectionFromIdTypeDocument = (IdTypeDocument, IdEtat) => {
+  let _page = '';
+  switch (IdTypeDocument) {
+    case 0://Devis
+      _page = 'devis';
+      break;
+    case 25://DISAV
+      _page = 'interventions';
+      break;
+    case 3://Factures
+      return `factures?seuil=ResteDu&value=${IdEtat+0.01}`;
+    default:
+      return '#';
+  }
+
+  return `${_page}?filtre=${IdEtat}`;
+}
+
 
 export {
   FiltrerParSeuilDate,
@@ -360,4 +401,7 @@ export {
   GetDateFromStringDDMMYYY,
   base64toBlob,
   GetURLLocationViewerFromExtension,
+  cyrb53,
+  GenerateUid,
+  GetRedirectionFromIdTypeDocument,
 };

@@ -1,5 +1,5 @@
 //#region Imports
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 //#region Contrast
@@ -10,6 +10,7 @@ import {
   CDBSidebarMenu,
   CDBSidebarMenuItem,
 } from "cdbreact";
+
 //#endregion
 
 //#region Bootstrap
@@ -20,8 +21,14 @@ import Container from "react-bootstrap/Container";
 
 //#region Interne
 
-import logo from "../../image/favicon.ico";
+import logo from "../../image/imageHome/logo_blanc.png";
+
 import { ClientSiteContratContext } from "../../App";
+import { GetURLWs } from "../../axios/WS_User";
+import { ReactComponent as LogoNoir } from "../../image/imageLogin/login-gandara-propulsee-noir.svg";
+import { faCookieBite } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 //#endregion
 
@@ -30,11 +37,44 @@ import { ClientSiteContratContext } from "../../App";
 //#endregion
 
 const SideBarMenuLeft = () => {
-  //#region States
   const ClientSiteCt = useContext(ClientSiteContratContext);
+
+  //#region States
+  const [logoClient, setLogoClient] = useState(null);
   //#endregion
 
   //#region Fonctions
+  const handleCookies = () => {
+    alert("Gestion des cookies");
+  };
+
+
+  const GetLogo = async () => {
+
+    let _b64LocalStorage = localStorage.getItem("logoClient");
+    if (_b64LocalStorage) {
+      //Le logo est enregistré
+      setLogoClient(_b64LocalStorage);
+    } else {
+      //On va aller rechercher le logo via WS (si url cannonique)
+      const FetchSetLogoWS = (data) => {
+        if (data && data?.logoClient?.includes("data:image/png;base64,")) {
+          localStorage.setItem("logoClient", data.logoClient);
+          setLogoClient(data.logoClient);
+        } else {
+          //Impossible de récupérer le log : on affiche par defaut.
+          setLogoClient(logo);
+        }
+
+      }
+
+      await GetURLWs(window.location.host, FetchSetLogoWS);
+
+    }
+
+
+  }
+
 
   //#endregion
 
@@ -49,21 +89,19 @@ const SideBarMenuLeft = () => {
   const MenuNavLink = ({ href, text, icon }) => {
 
 
-    if(href === "/maintenance")
-    {
-      if(ClientSiteCt.storedClientSite.IdContrat <= 0 )
-      {
+    if (href === "/maintenance") {
+      if (ClientSiteCt.storedClientSite && ClientSiteCt.storedClientSite.IdContrat <= 0) {
         return;
       }
 
     }
 
-    
+
     return (
       <NavLink to={href}>
         <CDBSidebarMenuItem icon={icon} iconSize="xl">
           {text}
-          
+
         </CDBSidebarMenuItem>
       </NavLink>
     );
@@ -75,7 +113,7 @@ const SideBarMenuLeft = () => {
     return (
       <CDBSidebar
         className="sidebar-gmao "
-        backgroundColor={"#282c34"}
+        backgroundColor={"#fff"}
         breakpoint={992}
         fluid
       >
@@ -83,17 +121,14 @@ const SideBarMenuLeft = () => {
           <a
             href="/"
             className="text-decoration-none"
-            style={{ color: "inherit" }}
+            style={{ backgroundColor: "#ba1d59" }}
           >
             <Container>
               <img
                 alt=""
-                src={logo}
-                width="30"
-                height="30"
-                className="d-inline-block align-top"
+                src={logoClient}
+                className="d-inline-block align-top img-logo"
               />
-              GMAO
             </Container>
           </a>
         </CDBSidebarHeader>
@@ -101,26 +136,52 @@ const SideBarMenuLeft = () => {
         <CDBSidebarContent className="sidebar-content sidebar-gmao">
           <CDBSidebarMenu>
             <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
-           <MenuNavLink href={"/maintenance"} icon={"calendar"} text={"Maintenance"} />
-           
-           
+            <MenuNavLink href={"/maintenance"} icon={"calendar"} text={"Maintenance"} />
             <MenuNavLink
               href={"/interventions"}
               icon={"wrench"}
               text={"Dépannage"}
             />
-            <MenuNavLink
+            {/* <MenuNavLink
               href={"/appareils"}
               icon={"mobile"}
               text={"Appareils"}
-            />
+            /> */}
             <MenuNavLink href={"/devis"} icon={"book"} text={"Devis"} />
             <MenuNavLink href={"/factures"} icon={"file"} text={"Factures"} />
           </CDBSidebarMenu>
         </CDBSidebarContent>
+
+        {/* Bouton gestion des cookies */}
+        <div className="sidebar-footer">
+          <Button
+            variant=""
+            id="tarteaucitron"
+            className="cookies-btn"
+            // onClick={handleCookies}
+          >
+            <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
+          </Button>
+
+          <div className="container-powered-by">
+            <p className="text-center text-powered-by">Application propulsée <br /> par</p>
+            <LogoNoir className="d-inline-block align-top svg-powered-by" />
+          </div>
+        </div>
       </CDBSidebar>
     );
   };
+
+
+
+  useEffect(() => {
+
+
+    GetLogo();
+
+    //eslint-disable-next-line
+  }, [])
+
 
   return (
     <div className="container-sidebar">

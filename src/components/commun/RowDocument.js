@@ -5,16 +5,12 @@ import ToastContainer from "react-bootstrap/ToastContainer";
 import { Link } from "react-router-dom";
 import ImageExtension, { IsExtensionVisible } from "./ImageExtension";
 import { useState } from "react";
-import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";
+import { base64toBlob } from "../../functions";
 import { saveAs } from "file-saver";
-import { useContext } from "react";
-import { ViewerContext } from "../../App";
-
 
 
 const RowDocument = ({ props, index }) => {
-  const viewerCt = useContext(ViewerContext);
-  
+
   //#region States
   const [showToast, setShowToast] = useState(false);
   //#endregion
@@ -29,45 +25,49 @@ const RowDocument = ({ props, index }) => {
     const _kv = await props.TelechargerDocumentSup();
 
     try {
-    //Transformation en blob
-    const base64data = _kv.v;
-    const _bblob = base64toBlob(base64data);
-    //Téléchargement
-    // saveAs(_bblob, props.title);
-    saveAs(_bblob, _kv.k);
+      //Transformation en blob
+      const base64data = _kv.v;
 
-      
+      const _bblob = base64toBlob(base64data, props?.type);
+      //Téléchargement
+      saveAs(_bblob, _kv.k);
+
+
+    }
+    catch (error) {
+
+      console.log("Erreur lors du téléchargement")
     } finally {
-      
-          //Cacher le toast
-          setShowToast(false);
-      
+
+      //Cacher le toast
+      setShowToast(false);
+
     }
   };
 
-const Visualisation = async () => {
-  let targetWindow = window.open("/waiting");
+  // const Visualisation = async () => {
+  //   let targetWindow = window.open("/waiting");
 
-  const _kv = await props.VoirDocumentSup();
+  //   const _kv = await props.VoirDocumentSup();
 
-      //On récupère le fichier en b64
-  const b64data = _kv.v;
-  
-    //On transforme le fichier en blob
-    const blobData = base64toBlob(b64data.v);
+  //   //On récupère le fichier en b64
+  //   const b64data = _kv.v;
 
-    //On créer l'URL utilisé par les viewers
-    const url = URL.createObjectURL(blobData);
+  //   //On transforme le fichier en blob
+  //   const blobData = base64toBlob(b64data.v);
 
-    //On l'enregistre dans le viewerContext
-    viewerCt.setViewer(url);
+  //   //On créer l'URL utilisé par les viewers
+  //   const url = URL.createObjectURL(blobData);
 
-    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-    //Le bon viewer est déterminé par l'extension
-    targetWindow.location.href = GetURLLocationViewerFromExtension(
-      _kv.k.split(".").pop()
-    );
-}
+  //   //On l'enregistre dans le viewerContext
+  //   viewerCt.setViewer(url);
+
+  //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //   //Le bon viewer est déterminé par l'extension
+  //   targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //     _kv.k.split(".").pop()
+  //   );
+  // }
 
 
   //#endregion
@@ -79,7 +79,7 @@ const Visualisation = async () => {
       <ToastContainer
         className="p-3"
         position={"bottom-end"}
-        // style={{ zIndex: 1 }}
+      // style={{ zIndex: 1 }}
       >
         <Toast show={showToast}>
           <Toast.Header closeButton={false}></Toast.Header>

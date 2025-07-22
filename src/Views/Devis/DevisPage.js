@@ -5,9 +5,17 @@ import { useState, useEffect, useContext } from "react";
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
 //#endregion
+import { GetListeDevis, GetdocumentDevis } from "../../axios/WS_Devis";
+
+//#region fontAwsome
+import {
+  faFile,
+  faFilePdf,
+} from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//#endregion
 
 //#region Components
-import TitreOfPage from "../../components/commun/TitreOfPage";
 import TableData, {
   CreateFilter,
   CreateNewButtonFilter,
@@ -18,18 +26,20 @@ import TableData, {
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
   EditorMontant,
+  EditorActionsTooltip,
+  CreateNewUnboundCell
 } from "../../components/commun/TableData";
-import { GetListeDevis, GetdocumentDevis } from "../../axios/WSGandara";
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
 import { Button, Col, Row } from "react-bootstrap";
 import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";
 import { saveAs } from "file-saver";
 
-//#endregion
 
 //#endregion
 
-const DevisPage = () => {
+//#endregion
+
+const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
   const tokenCt = useContext(TokenContext);
   const clientSiteCt = useContext(ClientSiteContratContext);
   const viewerCt = useContext(ViewerContext);
@@ -42,11 +52,13 @@ const DevisPage = () => {
 
   //#region Fonctions
 
+  //#region Data
   const GetDevis = () => {
     setIsLoaded(false);
 
     const FetchSetDevis = (data) => {
       setListeDevis(data);
+      setPageSubtitle(`${data.length}`);
       setIsLoaded(true);
     };
 
@@ -64,13 +76,18 @@ const DevisPage = () => {
     return _lDevis;
   };
 
+  //#endregion
+
+
+  //#region Table
+
   function CreateHeaderForTable() {
     let _headers = [];
     _headers.push(
       CreateNewHeader(
         "DateDemandeDossierInterventionSAV",
         CreateFilter(true, false, false, false, true),
-        "Date Demande"
+        "Date"
       )
     );
     _headers.push(
@@ -99,7 +116,9 @@ const DevisPage = () => {
     _headers.push(
       CreateNewHeader("LibEtat", CreateFilter(true, true), "État", EditorEtat)
     );
-    _headers.push(CreateNewUnboundHeader(false, "Action"));
+    _headers.push(
+      CreateNewUnboundHeader(CreateFilter(),"Action")
+    );
 
     return _headers;
   }
@@ -128,14 +147,34 @@ const DevisPage = () => {
       return `${dateFR} Devis N°${e.IdDevis}.pdf`;
     };
 
+    const actionsForDevis = (devis) => [
+      {
+        label: "Voir le devis",
+        onClick: () => {
+          Voir(devis);
+        },
+        className: "action-view-devis icon-visualize",
+      },
+      {
+        label: "Télécharger le devis",
+        onClick: (e) => {
+          if (e && e.stopPropagation) {
+            e.stopPropagation(); // On s'assure que l'événement est arrêté si présent
+          } else {
+          }
+          Telechargement(devis);
+        },
+        className: "action-download-facture icon-download",
+      }
+    ];
+
+
 
     _cells.push(
-      CreateNewDocumentCell(
-        methodTitleDoc,
-        "PDF",
-        Telechargement,
-        Voir
-      )
+      // CreateNewCell("Action", false, true, false, (val, index, method) =>{
+      CreateNewUnboundCell( false, true, false, (val) =>{
+        return <EditorActionsTooltip actions={actionsForDevis(val)} />;
+      })
     );
     return _cells;
   }
@@ -144,61 +183,52 @@ const DevisPage = () => {
   const methodTelecharger = async (e) => {
 
 
-    return await GetdocumentDevis(tokenCt, e.IdDevis, true,true);
+    return await GetdocumentDevis(tokenCt, e.IdDevis, true, true);
 
 
   };
   const methodVoir = async (e) => {
-   return await GetdocumentDevis(tokenCt, e.IdDevis,false,true);
+    return await GetdocumentDevis(tokenCt, e.IdDevis, false, true);
   };
-  
+
   const Telechargement = async (e) => {
     //Affichage d'un toast
     // setShowToast(true);
     const _kv = await methodTelecharger(e);
-
     try {
-    //Transformation en blob
-    const base64data = _kv.v;
-    const _bblob = base64toBlob(base64data);
-    //Téléchargement
-    // saveAs(_bblob, props.title);
-    saveAs(_bblob, _kv.k);
-
-      
-    } finally {
-      
-          //Cacher le toast
-          // setShowToast(false);
-      
+      const base64data = _kv.v;
+      const _bblob = base64toBlob(base64data);
+      saveAs(_bblob, _kv.k);
+    } catch (error) {
+      console.error("Erreur lors du téléchargement :", error);
     }
   };
 
 
-const Voir = async (e) => {
-  //On ouvre une nouvelle fenêtre d'attente
-  let targetWindow = window.open("/waiting");
+  const Voir = async (e) => {
+    //On ouvre une nouvelle fenêtre d'attente
+    let targetWindow = window.open("/waiting");
 
-  //On récupère le fichier en b64
-  // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
-  const b64data = await methodVoir(e);
+    //On récupère le fichier en b64
+    // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+    const b64data = await methodVoir(e);
 
 
-  //On transforme le fichier en blob
-  const blobData = base64toBlob(b64data.v);
+    //On transforme le fichier en blob
+    const blobData = base64toBlob(b64data.v);
 
-  //On créer l'URL utilisé par les viewers
-  const url = URL.createObjectURL(blobData);
+    //On créer l'URL utilisé par les viewers
+    const url = URL.createObjectURL(blobData);
 
-  //On l'enregistre dans le viewerContext
-  viewerCt.setViewer(url);
+    //On l'enregistre dans le viewerContext
+    viewerCt.setViewer(url);
 
-  //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-  //Le bon viewer est déterminé par l'extension
-  targetWindow.location.href = GetURLLocationViewerFromExtension(
-    b64data.k.split(".").pop()
-  );
-}
+    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+    //Le bon viewer est déterminé par l'extension
+    targetWindow.location.href = GetURLLocationViewerFromExtension(
+      b64data.k.split(".").pop()
+    );
+  }
 
 
 
@@ -211,7 +241,14 @@ const Voir = async (e) => {
 
   //#endregion
 
+
+
+  //#endregion
+
   //#region Composant
+
+  //#region Table
+
 
   //#region Editors
 
@@ -240,13 +277,11 @@ const Voir = async (e) => {
     return "En attente";
   };
 
-  //#endregion
   const EditorCardBody = (devis) => {
-    // console.log(devis)
     return (
       <>
-      <h6>{`Secteur : ${devis.DescriptionSecteur}`}</h6>
-      <Row>
+        <h6>{`Secteur : ${devis.DescriptionSecteur}`}</h6>
+        <Row>
           <Col>
             <h3>Montant Hors taxe : {EditorMontant(devis.TotalHT)}</h3>
           </Col>
@@ -254,12 +289,12 @@ const Voir = async (e) => {
             <h3>Montant TTC : {EditorMontant(devis.TotalTTC)}</h3>{" "}
           </Col>
         </Row>
-      <Row>
+        <Row>
           <Col className="p-4">
             <Button
               className="m-2"
               onClick={() => {
-              
+
               }}
             >
               Voir le devis
@@ -267,7 +302,7 @@ const Voir = async (e) => {
             <Button
               className="m-2"
               onClick={() => {
-               
+
               }}
             >
               Télécharger le devis
@@ -284,11 +319,11 @@ const Voir = async (e) => {
       <>
         <Row>
           <Col>
-           {EditorDateFromDateTime(devis.DateDemandeDossierInterventionSAV)}
+            {EditorDateFromDateTime(devis.DateDemandeDossierInterventionSAV)}
           </Col>
 
           <Col>
-          {EditorEtat(devis.LibEtat)}
+            {EditorEtat(devis.LibEtat)}
           </Col>
         </Row>
       </>
@@ -299,6 +334,7 @@ const Voir = async (e) => {
     return `${devis.IdDevis} - ${devis.DescriptionDevis}`;
   };
 
+  //#endregion
 
 
   const TableDevis = () => {
@@ -331,21 +367,21 @@ const Voir = async (e) => {
 
   //#endregion
 
+  //#endregion
+
   useEffect(() => {
     document.title = "Devis";
+    setPageTitle("Liste des devis");
     GetDevis();
     // eslint-disable-next-line
   }, [clientSiteCt.storedClientSite]);
 
   return (
-    <Container fluid>
-      <TitreOfPage
-        titre={"Liste des devis"}
-        soustitre={` ${listeDevis.length} devis`}
-        isLoaded={isLoaded}
-      />
-      <TableDevis />
-    </Container>
+    <>
+      <Container fluid className="table-devis">
+        <TableDevis />
+      </Container>
+    </>
   );
 };
 

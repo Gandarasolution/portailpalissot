@@ -24,7 +24,7 @@
     "jquery": "^3.7.0",
     "jszip": "^3.10.1",
     "moment": "^2.29.4",
-    "pdfjs-dist": "^3.4.120",
+    "pdfjs-dist": "3.4.120",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
     "react-bootstrap-sidebar-menu": "^2.0.3",
@@ -33,6 +33,7 @@
     "react-router-dom": "^6.9.0",
     "react-socks": "^2.2.0",
     "react-string-replace": "^1.1.0",
+    "recharts": "^2.15.1",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {

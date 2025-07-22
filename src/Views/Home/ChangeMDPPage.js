@@ -3,7 +3,7 @@ import { Alert, Container } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChangeMDP } from "../../axios/WSGandara";
+import { ChangeMDP } from "../../axios/WS_User";
 
 const ChangeMDPPage = () => {
 
