@@ -204,13 +204,11 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
             icon={faWrench}
             text={"Dépannage"}
           />
-          <MenuNavLink href={"/appareils"} icon={faMobile} text={"Appareils"} />
           <MenuNavLink href={"/devis"} icon={faBook} text={"Devis"} />
           <MenuNavLink href={"/factures"} icon={faFile} text={"Factures"} />
           <br />
           <hr />
 
-          <MenuNavLink href={"/account"} icon={faUser} text={"Mon compte"} />
           <MenuNavLink icon={faRightFromBracket} text={"Se déconnecter"} onClick={handleDeconnexion} />
           <MenuNavLink href={"/"} icon={faCookieBite} text={"Cookies"} />
           {/* 
