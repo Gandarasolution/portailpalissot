@@ -96,6 +96,7 @@ const LoginPage = (props) => {
     let _themeFromWS = "";
     let _wsEndpoint = "";
     let _logoClient = "";
+    let _isUser = !isNaN(login);
     const GetResponseURLWS = (data) => {
       if (isNaN(data) && data.urlWSClient) {
         _wsForToken = data.urlWSClient;
@@ -131,6 +132,7 @@ const LoginPage = (props) => {
           props.setToken(response);
           props.setTheme(_themeFromWS);
           props.setImageClient(_logoClient);
+          props.setIsUser(_isUser);
         };
 
         //3 -> On récupère la liste des paramètres de l'application

@@ -6,15 +6,15 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
+// import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+// import Tooltip from "react-bootstrap/Tooltip";
 //#endregion
 
 //#region FontAwsome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // Importer depuis FontAwesome Solid
-import { faListCheck, faList,faFileAlt, faBan } from "@fortawesome/free-solid-svg-icons";
+import { faList } from "@fortawesome/free-solid-svg-icons";
 
 // Importer depuis FontAwesome Regular
 import { faFile as faFileRegular } from "@fortawesome/free-regular-svg-icons";
@@ -186,26 +186,26 @@ const ContratPrestation = ({
               {
                 label: "Liste des documents",
                 icon: faFileRegular,
-                onClick: ()=>{
-                  _method('tagListeDocuments',item,i);
+                onClick: () => {
+                  _method('tagListeDocuments', item, i);
                 },
-                tagMethod : "tagListeDocuments",
+                tagMethod: "tagListeDocuments",
               },
               {
                 label: "Liste des relevés de tâches",
                 icon: faList,
-                onClick: ()=>{
-                  _method('tagListeTaches',item,i);
+                onClick: () => {
+                  _method('tagListeTaches', item, i);
                 },
-               
+
               },
             ]}
           />
-        ),"tagAction"
+        ), "tagAction"
       )
     );
-    
-    
+
+
     return _cells;
   }
 

@@ -128,6 +128,20 @@ const GetClientSiteContrat = async (token, setData) => {
   await CallEndpoint("GetClientSiteContrat", { token: token }, setData);
 };
 
+
+
+/**
+ * 
+ * @param {string} token 
+ * @param {string} search 
+ * @param {Function} setData 
+ */
+const GetClientSiteBySearch = async (token, search ,setData) => {
+ 
+  await CallEndpoint("GetClientSiteBySearch", {token: token, search: search}, setData);
+}
+
+
 //#endregion
 
 export {
@@ -142,6 +156,7 @@ export {
   //Infos
   , GetListeParametres
   , GetClientSiteContrat
+  ,GetClientSiteBySearch
 }
 
 

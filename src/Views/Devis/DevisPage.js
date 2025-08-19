@@ -8,11 +8,11 @@ import Container from "react-bootstrap/Container";
 import { GetListeDevis, GetdocumentDevis } from "../../axios/WS_Devis";
 
 //#region fontAwsome
-import {
-  faFile,
-  faFilePdf,
-} from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faFile,
+//   faFilePdf,
+// } from "@fortawesome/free-regular-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
 //#region Components
@@ -21,7 +21,6 @@ import TableData, {
   CreateNewButtonFilter,
   CreateNewCardModel,
   CreateNewCell,
-  CreateNewDocumentCell,
   CreateNewHeader,
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
@@ -117,7 +116,7 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
       CreateNewHeader("LibEtat", CreateFilter(true, true), "État", EditorEtat)
     );
     _headers.push(
-      CreateNewUnboundHeader(CreateFilter(),"Action")
+      CreateNewUnboundHeader(CreateFilter(), "Action")
     );
 
     return _headers;
@@ -142,10 +141,10 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
     _cells.push(CreateNewCell("TotalTTC", false, true, false, EditorMontant));
     _cells.push(CreateNewCell("LibEtat", false, false, false, EditorEtat));
 
-    const methodTitleDoc = (e) => {
-      const dateFR = new Date().toLocaleDateString("fr-FR");
-      return `${dateFR} Devis N°${e.IdDevis}.pdf`;
-    };
+    // const methodTitleDoc = (e) => {
+    //   const dateFR = new Date().toLocaleDateString("fr-FR");
+    //   return `${dateFR} Devis N°${e.IdDevis}.pdf`;
+    // };
 
     const actionsForDevis = (devis) => [
       {
@@ -172,7 +171,7 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
 
     _cells.push(
       // CreateNewCell("Action", false, true, false, (val, index, method) =>{
-      CreateNewUnboundCell( false, true, false, (val) =>{
+      CreateNewUnboundCell(false, true, false, (val) => {
         return <EditorActionsTooltip actions={actionsForDevis(val)} />;
       })
     );
@@ -348,7 +347,8 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
       EditorCardSubtitle
     );
 
-    return (
+
+    return (_Data.length > 0 &&
       <TableData
         Data={_Data}
         Headers={_Headers}

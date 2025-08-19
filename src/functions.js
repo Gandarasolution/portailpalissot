@@ -382,6 +382,19 @@ const GetRedirectionFromIdTypeDocument = (IdTypeDocument, IdEtat) => {
 }
 
 
+
+const IsUserFromToken = (token) => {
+  if(token)
+  {
+    if(token.length > 3)
+    {
+      return token.substring(0,2) === "**";
+    }
+  }
+  return false;
+}
+
+
 export {
   FiltrerParSeuilDate,
   FiltrerParSearch,
@@ -404,4 +417,5 @@ export {
   cyrb53,
   GenerateUid,
   GetRedirectionFromIdTypeDocument,
+  IsUserFromToken,
 };
