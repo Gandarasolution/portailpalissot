@@ -70,6 +70,7 @@ import ViewerImagePage from "./Views/Viewer/ViewerImage";
 import { addOneYear, cyrb53, DateSOAP } from "./functions";
 import { Toast, ToastContainer } from "react-bootstrap";
 import { SetLastSite } from "./axios/WS_ClientSite";
+import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
 // import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
 // import AccountPage from "./Views/Home/AccountPage";
 
@@ -217,19 +218,56 @@ function App() {
     localStorage.clear();
   };
 
-  if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName]) && !window.location.href.toUpperCase().includes('changeMDP/'.toUpperCase())) {
+  // //Si pas de token ET change mdp
+  // if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName]) && window.location.href.toUpperCase().includes('changemdp/'.toUpperCase())) {
+  //   return (
+  //     <div className="App font-link background">
+  //       <Router>
+
+  //         <Routes>
+  //           <Route path="changemdp/:token" element={<ChangeMDPPage />} />
+  //         </Routes>
+
+  //       </Router>
+  //     </div>
+
+  //   );
+  // }
+
+
+  // if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName]) && !window.location.href.toUpperCase().includes('changemdp/'.toUpperCase())) {
+  if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName])) {
     return (
       <div className="App font-link background">
-        <LoginPage
-          setToken={setTokenViaCookies}
-          setUrlWs={setWsEntrepriseURL}
-          setWsEndpoint={setWsEndpoint}
-          setTheme={setTheme}
-          setImageClient={setImageClient}
-          setIsUser={setIsUserViaCookies}
-        // setParams={setListeParamsViaCookies}
-        // setAccountName={setAccountName}
-        />
+
+        <Router>
+          <Routes>
+
+            <Route path="changemdp/:token" element={<ChangeMDPPage />} />
+            <Route path="/" element={
+              <LoginPage
+                setToken={setTokenViaCookies}
+                setUrlWs={setWsEntrepriseURL}
+                setWsEndpoint={setWsEndpoint}
+                setTheme={setTheme}
+                setImageClient={setImageClient}
+                setIsUser={setIsUserViaCookies}
+              />
+            } />
+            <Route path="/forget" element={
+              <LoginPage
+                setToken={setTokenViaCookies}
+                setUrlWs={setWsEntrepriseURL}
+                setWsEndpoint={setWsEndpoint}
+                setTheme={setTheme}
+                setImageClient={setImageClient}
+                setIsUser={setIsUserViaCookies}
+                forget={true}
+              />
+            } />
+
+          </Routes>
+        </Router>
       </div>
     );
   }
@@ -334,6 +372,7 @@ function App() {
       let _DateRetour = new Date(_year, _monthI, _day);
       return _DateRetour;
     }
+    console.log("ejfjfjef");
     return (
       <>
         <ErrorBoundaryMenu fallback={setIsErrorMenu}>
@@ -371,6 +410,7 @@ function App() {
               />
 
               <Route path="*" element={<Navigate to="/" replace />} />
+
               <Route path="waiting" element={<WaiterPage />} />
               <Route path="error" element={<ErrorPage />} />
 
@@ -415,7 +455,6 @@ function App() {
 
               <Route path="viewerWord" element={<ViewerWord />} />
             </Route>
-
           </Routes>
 
 
