@@ -202,7 +202,7 @@ function App() {
     setTokenCookie(tokenName, token);
   }
 
-  const storedToken = (isUserCookie[isUserName] === true ? "**" : "") + tokenCookie[tokenName];
+  const storedToken = (isUserCookie[isUserName] === "1" ? "**" : "") + tokenCookie[tokenName];
 
 
   //#endregion
@@ -216,6 +216,8 @@ function App() {
     removeIsUserCookie(isUserName);
 
     localStorage.clear();
+    window.location.href = "/";
+
   };
 
   // //Si pas de token ET change mdp
@@ -372,7 +374,6 @@ function App() {
       let _DateRetour = new Date(_year, _monthI, _day);
       return _DateRetour;
     }
-    console.log("ejfjfjef");
     return (
       <>
         <ErrorBoundaryMenu fallback={setIsErrorMenu}>

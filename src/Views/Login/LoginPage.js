@@ -96,7 +96,7 @@ const LoginPage = (props) => {
     let _themeFromWS = "";
     let _wsEndpoint = "";
     let _logoClient = "";
-    let _isUser = !isNaN(login);
+    let _isUser = isNaN(login) ? 0 : 1;
     const GetResponseURLWS = (data) => {
       if (isNaN(data) && data.urlWSClient) {
         _wsForToken = data.urlWSClient;
