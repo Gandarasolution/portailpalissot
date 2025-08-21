@@ -216,6 +216,8 @@ function App() {
     removeIsUserCookie(isUserName);
 
     localStorage.clear();
+    window.location.href = "/";
+
   };
 
   // //Si pas de token ET change mdp
