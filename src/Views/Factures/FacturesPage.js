@@ -11,11 +11,11 @@ import Row from "react-bootstrap/Row";
 //#endregion
 
 //#region fontAwsome
-import {
-  faFile,
-  faFilePdf,
-} from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faFile,
+//   faFilePdf,
+// } from "@fortawesome/free-regular-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
 //#Region Components
@@ -45,7 +45,6 @@ import TableData, {
   CreateNewCardModel,
   CreateNewCell,
   CreateNewCellSelector,
-  CreateNewDocumentCell,
   CreateNewHeader,
   CreateNewHeaderSelector,
   CreateNewUnboundHeader,
@@ -141,7 +140,7 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
         EditorMontant
       )
     );
-    _headers.push(CreateNewHeader("ResteDu",CreateFilter(true,true,true,true),"Reste dû",EditorMontant));
+    _headers.push(CreateNewHeader("ResteDu", CreateFilter(true, true, true, true), "Reste dû", EditorMontant));
     _headers.push(
       CreateNewHeader(
         "Dossier",
@@ -178,14 +177,14 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
     _cells.push(CreateNewCell("Sujet", false, true, false));
     _cells.push(CreateNewCell("MontantHT", false, true, false, EditorMontant));
     _cells.push(CreateNewCell("MontantTTC", false, true, false, EditorMontant));
-    _cells.push(CreateNewCell("ResteDu",false,true,false,EditorMontant))
+    _cells.push(CreateNewCell("ResteDu", false, true, false, EditorMontant))
     _cells.push(CreateNewCell("Dossier", false, true, false));
     _cells.push(CreateNewCell("Type", false, true, false, EditorType));
 
-    const methodTitle = (e) => {
-      const dateFR = new Date().toLocaleDateString("fr-FR");
-      return `${dateFR} Facture N°${e.IdFacture}.pdf`;
-    };
+    // const methodTitle = (e) => {
+    //   const dateFR = new Date().toLocaleDateString("fr-FR");
+    //   return `${dateFR} Facture N°${e.IdFacture}.pdf`;
+    // };
 
     const methodTelecharger = async (facture) => {
       let _kv = await VoirFactureDocument(
@@ -394,6 +393,10 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
   const GetFactures = async () => {
     setIsFactureLoaded(false);
     const FetchSetData = (data) => {
+      if (Object.prototype.toString.call(data) === Object.prototype.toString.call(new Error("")))//Tableau vierge si pas de données
+      {
+        data = [];
+      }
       setListeFactures(data);
 
       setIsFactureLoaded(true);

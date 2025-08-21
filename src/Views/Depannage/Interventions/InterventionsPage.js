@@ -1,14 +1,11 @@
 //#region Imports
 
-import { createContext, useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 
 //#region Bootstrap
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
-
 //#endregion
 
 //#region Components
@@ -18,15 +15,12 @@ import TableData, {
   CreateNewCardModel,
   CreateNewCell,
   CreateNewHeader,
-  CreateNewUnboundCell,
-  CreateNewUnboundHeader,
   EditorDateFromDateTime,
   EditorActionsTooltip,
 } from "../../../components/commun/TableData";
 
 import {
   faFile,
-  faFilePdf,
 } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -238,18 +232,18 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
     return <span>{_text}</span>;
   };
 
-  const EditorActionDocuments = (inter) => {
-    return (
-      <Button>
-        <OverlayTrigger
-          placement="bottom"
-          overlay={<Tooltip>Voir les documents</Tooltip>}
-        >
-          <FontAwesomeIcon icon={faFile} />
-        </OverlayTrigger>
-      </Button>
-    );
-  };
+  // const EditorActionDocuments = (inter) => {
+  //   return (
+  //     <Button>
+  //       <OverlayTrigger
+  //         placement="bottom"
+  //         overlay={<Tooltip>Voir les documents</Tooltip>}
+  //       >
+  //         <FontAwesomeIcon icon={faFile} />
+  //       </OverlayTrigger>
+  //     </Button>
+  //   );
+  // };
 
   const EditorEtat = (Etat) => {
     return (

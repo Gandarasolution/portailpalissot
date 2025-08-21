@@ -39,15 +39,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const SideBarMenuLeft = () => {
   const ClientSiteCt = useContext(ClientSiteContratContext);
 
+  const _maintenance = ClientSiteCt.storedClientSite.DroitAccesMaintenance;
+  const _sav = ClientSiteCt.storedClientSite.DroitAccesDepannage;
+  const _devis = ClientSiteCt.storedClientSite.DroitAccesDevis;
+  const _facture = ClientSiteCt.storedClientSite.DroitAccesFactures;
+
+
   //#region States
   const [logoClient, setLogoClient] = useState(null);
   //#endregion
 
   //#region Fonctions
-  const handleCookies = () => {
-    alert("Gestion des cookies");
-  };
-
 
   const GetLogo = async () => {
 
@@ -85,18 +87,13 @@ const SideBarMenuLeft = () => {
   //#region Components
 
 
-
   const MenuNavLink = ({ href, text, icon }) => {
-
-
     if (href === "/maintenance") {
       if (ClientSiteCt.storedClientSite && ClientSiteCt.storedClientSite.IdContrat <= 0) {
         return;
       }
 
     }
-
-
     return (
       <NavLink to={href}>
         <CDBSidebarMenuItem icon={icon} iconSize="xl">
@@ -136,19 +133,15 @@ const SideBarMenuLeft = () => {
         <CDBSidebarContent className="sidebar-content sidebar-gmao">
           <CDBSidebarMenu>
             <MenuNavLink href={"/"} icon={"home"} text={"Accueil"} />
-            <MenuNavLink href={"/maintenance"} icon={"calendar"} text={"Maintenance"} />
-            <MenuNavLink
+            {(_maintenance) ? <MenuNavLink href={"/maintenance"} icon={"calendar"} text={"Maintenance"} /> : <></>}
+            {(_sav) ? <MenuNavLink
               href={"/interventions"}
               icon={"wrench"}
               text={"Dépannage"}
-            />
-            {/* <MenuNavLink
-              href={"/appareils"}
-              icon={"mobile"}
-              text={"Appareils"}
-            /> */}
-            <MenuNavLink href={"/devis"} icon={"book"} text={"Devis"} />
-            <MenuNavLink href={"/factures"} icon={"file"} text={"Factures"} />
+            /> : <></>}
+
+            {(_devis) ? <MenuNavLink href={"/devis"} icon={"book"} text={"Devis"} /> : <></>}
+            {(_facture) ? <MenuNavLink href={"/factures"} icon={"file"} text={"Factures"} /> : <></>}
           </CDBSidebarMenu>
         </CDBSidebarContent>
 
@@ -158,7 +151,6 @@ const SideBarMenuLeft = () => {
             variant=""
             id="tarteaucitron"
             className="cookies-btn"
-            // onClick={handleCookies}
           >
             <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
           </Button>
@@ -175,7 +167,6 @@ const SideBarMenuLeft = () => {
 
 
   useEffect(() => {
-
 
     GetLogo();
 

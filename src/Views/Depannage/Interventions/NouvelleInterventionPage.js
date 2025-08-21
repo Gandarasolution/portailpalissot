@@ -14,14 +14,11 @@ import Container from "react-bootstrap/Container";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import Placeholder from "react-bootstrap/Placeholder";
-
 //#endregion
 
 //#region Components
 import {
   ClientSiteContratContext,
-  ParametresContext,
   TokenContext,
 } from "../../../App";
 import { useEffect } from "react";
@@ -41,7 +38,6 @@ const NouvelleInterventionPage = ({ setPageSubtitle, setPageTitle }) => {
 
   const [listeSecteurs, setListeSecteurs] = useState([]);
 
-  const [secteurChoix, setSecteurChoix] = useState(listeSecteurs[0]);
 
   const [objetDemande, setObjetDemande] = useState("");
 
@@ -49,6 +45,9 @@ const NouvelleInterventionPage = ({ setPageSubtitle, setPageTitle }) => {
     // { k: "Portable", v: "06 05 04 03 02" },
     // { k: "Domicile", v: "03 04 05 06 07" },
   ]);
+  //eslint-disable-next-line
+  const [secteurChoix, setSecteurChoix] = useState(listeSecteurs[0]);
+  //eslint-disable-next-line
   const [telChoix, setTelChoix] = useState();
   const [customTel, setCustomTel] = useState("");
 
@@ -84,12 +83,12 @@ const NouvelleInterventionPage = ({ setPageSubtitle, setPageTitle }) => {
 
   //#region Evenements
 
-  const HandleSecteurChoix = (e) => {
-    let _choix = listeSecteurs.find((secteur) => {
-      return Number(secteur.k) === Number(e.target.value);
-    });
-    setSecteurChoix(_choix);
-  };
+  // const HandleSecteurChoix = (e) => {
+  //   let _choix = listeSecteurs.find((secteur) => {
+  //     return Number(secteur.k) === Number(e.target.value);
+  //   });
+  //   setSecteurChoix(_choix);
+  // };
 
   const HandleObjetDemande = (e) => {
     e.preventDefault();
@@ -128,26 +127,7 @@ const NouvelleInterventionPage = ({ setPageSubtitle, setPageTitle }) => {
     <Container fluid>
       <Form noValidate validated={validated} onSubmit={HandleSubmit}>
         <Row className="m-4">
-          {/* <Col md={12} className="mt-2">
-              {isLoadedSecteurs ? (
-                <FloatingLabel label="Choix du secteur">
-                  <Form.Select onChange={HandleSecteurChoix}>
-                    {listeSecteurs.map((secteur) => {
-                      return (
-                        <option value={secteur.k} key={secteur.k}>
-                          {secteur.v}
-                        </option>
-                      );
-                    })}
-                  </Form.Select>
-                </FloatingLabel>
-              ) : (
-                <Placeholder as="p" animation="glow">
-                  Choix du secteur
-                  <Placeholder xs={12} />
-                </Placeholder>
-              )}
-            </Col> */}
+
 
           <Col md={12} className="mt-4 mb-4">
             <FloatingLabel
@@ -222,7 +202,6 @@ const NouvelleInterventionPage = ({ setPageSubtitle, setPageTitle }) => {
         </Row>
       </Form>
     </Container>
-
   );
 };
 

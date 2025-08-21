@@ -1093,9 +1093,11 @@ sup {
 /* ---- HOMEPAGE ---- */
 .shortcut-link{
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  justify-content: space-evenly;
   flex-wrap: wrap;
-  width: 80%;
+  /* width: 80%; */
+  width: 100%;
 }
 
 .shortcut-link .nav-item{
@@ -2165,7 +2167,8 @@ thead th,
 
 /* Page dashboard */
 .dashboard-stats > div{
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  justify-content: space-evenly;
 }
 
 .dashboard-stats .stats-card{

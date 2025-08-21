@@ -8,19 +8,17 @@ import NavLink from "react-bootstrap/NavLink";
 //#region fontAwsome
 import {
   faCalendar,
-  faCalendarAlt,
   faWrench,
   faArrowDown,
   faBook,
   faFile,
   faBell,
-  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
 //#region recharts
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
 //#endregion
 
 //#region Components
@@ -41,6 +39,13 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
   const tokenCt = useContext(TokenContext);
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
+
+  const _maintenance = ClientSiteContratCtx.storedClientSite.DroitAccesMaintenance;
+  const _sav = ClientSiteContratCtx.storedClientSite.DroitAccesDepannage;
+  const _devis = ClientSiteContratCtx.storedClientSite.DroitAccesDevis;
+  const _facture = ClientSiteContratCtx.storedClientSite.DroitAccesFactures;
+
+
 
   const [dashboardData, setDashboardData] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -129,6 +134,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
 
   // Récupération des données du timeline (activités récentes)
+  //eslint-disable-next-line
   const timelineData =
     dashboardData?.WidgetTimeline?.Activites?.GMAO_WidgetTimeline_Data || [];
 
@@ -164,16 +170,31 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     }
   };
 
+
+  const GetDroitStats = (IdTypeDocument) => {
+    switch (IdTypeDocument) {
+      case 0://Devis
+        return _devis;
+      case 25://DISAV
+        return _sav;
+      case 3://Factures
+        return _facture;
+      default:
+        return false;
+    }
+  }
+
   return (
     <Container fluid className="h- p-0">
-      <Container fluid className="container-table">
+      <Container fluid className="container-table ">
         <div>
           <h2>Raccourcis</h2>
         </div>
 
-        <span className="m-2">
+        {/* <span className="m-2"> */}
+        <div className="d-flex mt-4 flex-wrap">
           <Nav className="shortcut-link">
-            <Nav.Item>
+            {(_maintenance) && (roueData.length > 0 && <Nav.Item>
               <FontAwesomeIcon
                 icon={faCalendar}
               />
@@ -181,17 +202,19 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                 title={"Maintenances"}
                 to={"/maintenance"}
               />
-            </Nav.Item>
-            <Nav.Item>
-              <FontAwesomeIcon
-                icon={faWrench}
-              />
-              <SpanLink
-                title={"Dépannages"}
-                to={"/interventions"}
-              />
-            </Nav.Item>
-            <Nav.Item>
+            </Nav.Item>)}
+            {(_sav) &&
+              <Nav.Item>
+                <FontAwesomeIcon
+                  icon={faWrench}
+                />
+                <SpanLink
+                  title={"Dépannages"}
+                  to={"/interventions"}
+                />
+              </Nav.Item>}
+
+            {(_devis) && <Nav.Item>
               <FontAwesomeIcon
                 icon={faBook}
               />
@@ -199,8 +222,9 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                 title={"Devis"}
                 to={"/devis"}
               />
-            </Nav.Item>
-            <Nav.Item>
+            </Nav.Item>}
+
+            {(_facture) && <Nav.Item>
               <FontAwesomeIcon
                 icon={faFile}
               />
@@ -210,9 +234,10 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
               />
 
               <NavLink></NavLink>
-            </Nav.Item>
+            </Nav.Item>}
           </Nav>
-        </span>
+        </div>
+        {/* </span> */}
       </Container>
 
 
@@ -222,7 +247,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
         <div className="d-flex mt-4 flex-wrap">
           {/* Bloc Maintenance séparé */}
 
-          {dataLoaded ? (
+          {(_maintenance) && (dataLoaded ? (
             roueData.length > 0 && (
               <div className="mb-3 stats-maintenance">
                 <div className="stats-card p-3">
@@ -244,11 +269,10 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                         data={maintenanceChartData}
                         dataKey="value"
                         nameKey="name"
-                        cx="50%"
-                        cy="50%"
+                        // cx="50%"
+                        // cy="50%"
                         innerRadius={55}
                         outerRadius={85}
-                        paddingAngle={2}
                         isAnimationActive={true}
                       >
                         {maintenanceChartData.map((entry, index) => (
@@ -291,7 +315,9 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                 <a disabled className="stats-link">Voir le détail &gt;</a>
               </div>
             </div>
-          )}
+          )
+          )
+          }
 
 
           {/* Autres stats : Devis, Dépannages, États des paiements */}
@@ -301,26 +327,26 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
               const formattedTitle = item.Titre?.toLowerCase().replace(/\s+/g, "-") || item.Texte?.toLowerCase().replace(/\s+/g, "-") || "inconnu";
               const nombreAffiche = item.NombreAffiche ?? 0;
               const sousTitre = item.SousTitre?.trim() || "Aucune donnée";
+              return (GetDroitStats(item.IdTypeDocument)) &&
+                (
+                  <div className={`mb-3 stats-other stats-${formattedTitle}`} key={idx}>
+                    <div className="stats-card p-3">
+                      <h5 className="stats-title">{item.Titre}</h5>
 
-              return (
-                <div className={`mb-3 stats-other stats-${formattedTitle}`} key={idx}>
-                  <div className="stats-card p-3">
-                    <h5 className="stats-title">{item.Titre}</h5>
+                      <div className="stats-data">
+                        <p className="stats-number">
+                          <span>{nombreAffiche}{formattedTitle === "états-des-paiements" && " €"}</span>
+                        </p>
+                        <p className="stats-number-title">
+                          <span>{sousTitre}</span>
+                        </p>
+                      </div>
 
-                    <div className="stats-data">
-                      <p className="stats-number">
-                        <span>{nombreAffiche}{formattedTitle === "états-des-paiements" && " €"}</span>
-                      </p>
-                      <p className="stats-number-title">
-                        <span>{sousTitre}</span>
-                      </p>
+                      <a href={GetRedirectionFromIdTypeDocument(item.IdTypeDocument, item.IdEtat)} className="stats-link">Voir le détail &gt;</a>
+
                     </div>
-
-                    <a href={GetRedirectionFromIdTypeDocument(item.IdTypeDocument, item.IdEtat)} className="stats-link">Voir le détail &gt;</a>
-
                   </div>
-                </div>
-              );
+                );
             })
           ) : (
             // Affichage temporaire de 3 cartes avec Placeholder

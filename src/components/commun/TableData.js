@@ -15,13 +15,13 @@ import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-import CloseButton from "react-bootstrap/CloseButton";
 import InputGroup from "react-bootstrap/InputGroup";
 import Modal from "react-bootstrap/Modal";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Card from "react-bootstrap/Card";
 import Tooltip from "react-bootstrap/Tooltip";
+// import CloseButton from "react-bootstrap/CloseButton";
 //#endregion
 
 //#region fontAwsome
@@ -75,6 +75,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
+import { GetClientSiteBySearch } from "../../axios/WS_User";
 
 const TAGSELECTION = "_xSelection";
 //#endregion
@@ -159,7 +160,6 @@ const TableData = ({ ...props }) => {
 
   //#region States
   const [search, setSearch] = useState("");
-
   const [arrayFilter, setArrayFilter] = useState([]);
   const getArrayFilterStart = () => {
     let _array = [];
@@ -309,10 +309,27 @@ const TableData = ({ ...props }) => {
 
   //#region Events
 
+  const _interval3seconde = (value) => {
+    var _myInterval = setInterval(function () {
+      var _search = document.getElementById("search-bar-table-data").value;
+      if (value === _search) {
+        clearInterval(_myInterval);
+        GetClientSiteBySearch(tokenCt, _search, props.UserClientSite);
+      } else {
+        clearInterval(_myInterval);
+      }
+    }, 3000)
+  }
+
   const handleSearch = (e) => {
-    e.preventDefault();
-    ResetAffichage(1);
     setSearch(e.target.value);
+
+    if (props.IsUser) {
+      _interval3seconde(e.target.value);
+    } else {
+      e.preventDefault();
+      ResetAffichage(1);
+    }
   };
 
   const HandleCheckfilterChange = (checked, key, value) => {
@@ -464,8 +481,13 @@ const TableData = ({ ...props }) => {
 
   const PopoverFilter = (fieldname, setShowPopover) => {
     let _arFilters = [];
+    // console.log(props.Data.Count)
+    if ((props.Data) || (props.Data && props.Data.Count === 0)) {
+      _arFilters = [];
+    } else {
 
-    _arFilters = Object.entries(groupBy(props.Data, fieldname));
+      _arFilters = Object.entries(groupBy(props.Data, fieldname));
+    }
     const _arrayVal = _arFilters.map((x) => x[0]);
 
     const _headerToApply = props.Headers.find((h) => h.fieldname === fieldname);
@@ -899,7 +921,7 @@ const TableData = ({ ...props }) => {
       return (
         <tbody>
           <tr>
-            <td colSpan={props.Headers.length}>Aucune données.</td>
+            <td colSpan={props.Headers.length}>{props.IsUser ? "Utilisez la barre de recherche." : "Aucune données"}</td>
           </tr>
         </tbody>
       );
@@ -1345,7 +1367,7 @@ const TableData = ({ ...props }) => {
     useEffect(() => {
       const handleScroll = () => {
         if (containerRef.current) {
-          const rect = containerRef.current.getBoundingClientRect();
+          // const rect = containerRef.current.getBoundingClientRect();
           setIsSticky(window.scrollY > 100);
         }
       };
@@ -1363,6 +1385,7 @@ const TableData = ({ ...props }) => {
       } else {
         setIsSticky(false);
       }
+      //eslint-disable-next-line
     }, [arraySelector.length]);
 
     const SwitchTagSelection = async (tagMethod) => {
@@ -1727,6 +1750,7 @@ const TableData = ({ ...props }) => {
   const ModalListeTaches = () => {
     const modalBodyRef = useRef(null);
     const [isScrollable, setIsScrollable] = useState(false);
+    //eslint-disable-next-line
     const [isAtTop, setIsAtTop] = useState(true);
 
     useEffect(() => {
@@ -1765,10 +1789,12 @@ const TableData = ({ ...props }) => {
 
       return () => {
         if (modalBodyRef.current) {
+          // eslint-disable-next-line
           modalBodyRef.current.removeEventListener("scroll", handleScroll);
         }
         window.removeEventListener("resize", checkScrollability);
       };
+      // eslint-disable-next-line
     }, [listeTaches]);
 
     const scrollToBottom = () => {
@@ -1799,7 +1825,7 @@ const TableData = ({ ...props }) => {
                     {Relevetache.name}
                   </Col>
                 </Row>
-                {true && Array.isArray(Relevetache.value) ? (
+                {ClientSiteCt.storedClientSite.DroitMaintenanceReleveTache && (Array.isArray(Relevetache.value) ? (
                   Relevetache.value.map((tache, indexT) => {
                     return (
                       <Row key={indexT}>
@@ -1825,7 +1851,7 @@ const TableData = ({ ...props }) => {
                       {Relevetache.value}
                     </Col>
                   </Row>
-                )}
+                ))}
               </span>
             );
           })}
@@ -1886,67 +1912,66 @@ const TableData = ({ ...props }) => {
   //#region Documents
 
   // const [gridColMDValue, setGridColMDValue] = useState(12);
+  // const CardDocs = () => {
+  //   // const _arrayDocs = JSON.parse(JSON.stringify(documents));
+  //   const _arrayDocs = documents;
 
-  const CardDocs = () => {
-    // const _arrayDocs = JSON.parse(JSON.stringify(documents));
-    const _arrayDocs = documents;
+  //   return (
+  //     <Card className="mb-2">
+  //       <Card.Header className="card-document">
+  //         <Row>
+  //           <Col md={"auto"}>
+  //             Documents{" "}
+  //             {isDocumentLoaded ? (
+  //               `(${_arrayDocs.length > 1
+  //                 ? _arrayDocs.length - 1
+  //                 : _arrayDocs.length
+  //               })`
+  //             ) : (
+  //               <Placeholder animation="glow">
+  //                 <Placeholder xs={1} />
+  //               </Placeholder>
+  //             )}
+  //           </Col>
 
-    return (
-      <Card className="mb-2">
-        <Card.Header className="card-document">
-          <Row>
-            <Col md={"auto"}>
-              Documents{" "}
-              {isDocumentLoaded ? (
-                `(${_arrayDocs.length > 1
-                  ? _arrayDocs.length - 1
-                  : _arrayDocs.length
-                })`
-              ) : (
-                <Placeholder animation="glow">
-                  <Placeholder xs={1} />
-                </Placeholder>
-              )}
-            </Col>
-
-            <Col style={{ textAlign: "end" }}>
-              <CloseButton
-                onClick={() => {
-                  // setGridColMDValue(12);
-                }}
-              // className="ms-4"
-              />
-            </Col>
-          </Row>
-        </Card.Header>
-        {isDocumentLoaded ? (
-          <Card.Body>
-            <div id="collapse-listeDocuments">
-              {_arrayDocs.length > 0
-                ? _arrayDocs.map((doc, index) => {
-                  return (
-                    <RowDocument key={index} props={doc} index={index} />
-                  );
-                })
-                : "Aucun document."}
-            </div>
-          </Card.Body>
-        ) : (
-          <Card.Body>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-          </Card.Body>
-        )}
-      </Card>
-    );
-  };
+  //           <Col style={{ textAlign: "end" }}>
+  //             <CloseButton
+  //               onClick={() => {
+  //                 // setGridColMDValue(12);
+  //               }}
+  //             // className="ms-4"
+  //             />
+  //           </Col>
+  //         </Row>
+  //       </Card.Header>
+  //       {isDocumentLoaded ? (
+  //         <Card.Body>
+  //           <div id="collapse-listeDocuments">
+  //             {_arrayDocs.length > 0
+  //               ? _arrayDocs.map((doc, index) => {
+  //                 return (
+  //                   <RowDocument key={index} props={doc} index={index} />
+  //                 );
+  //               })
+  //               : "Aucun document."}
+  //           </div>
+  //         </Card.Body>
+  //       ) : (
+  //         <Card.Body>
+  //           <Placeholder as="p" animation="glow">
+  //             <Placeholder xs={5} />
+  //           </Placeholder>
+  //           <Placeholder as="p" animation="glow">
+  //             <Placeholder xs={5} />
+  //           </Placeholder>
+  //           <Placeholder as="p" animation="glow">
+  //             <Placeholder xs={5} />
+  //           </Placeholder>
+  //         </Card.Body>
+  //       )}
+  //     </Card>
+  //   );
+  // };
 
   const CreatePropError = () => {
     const _obj = {
@@ -2245,10 +2270,11 @@ const TableData = ({ ...props }) => {
   const ModalDocuments = () => {
     const PrestaCtx = useContext(PrestaContext);
 
-    const [gridColMDValue, setGridColMDValue] = useState(12);
+    // const [gridColMDValue, setGridColMDValue] = useState(12);
 
     const modalBodyRef = useRef(null);
     const [isScrollable, setIsScrollable] = useState(false);
+    // eslint-disable-next-line
     const [isAtTop, setIsAtTop] = useState(true);
 
     useEffect(() => {
@@ -2279,10 +2305,12 @@ const TableData = ({ ...props }) => {
 
       return () => {
         if (modalBodyRef.current) {
+          // eslint-disable-next-line
           modalBodyRef.current.removeEventListener("scroll", handleScroll);
         }
         window.removeEventListener("resize", checkScrollability);
       };
+      // eslint-disable-next-line
     }, [documents]);
 
     const scrollToBottom = () => {
@@ -2425,6 +2453,7 @@ const TableData = ({ ...props }) => {
 
     const modalBodyRef = useRef(null);
     const [isScrollable, setIsScrollable] = useState(false);
+    // eslint-disable-next-line
     const [isAtTop, setIsAtTop] = useState(true);
 
     useEffect(() => {
@@ -2455,10 +2484,12 @@ const TableData = ({ ...props }) => {
 
       return () => {
         if (modalBodyRef.current) {
+          // eslint-disable-next-line
           modalBodyRef.current.removeEventListener("scroll", handleScroll);
         }
         window.removeEventListener("resize", checkScrollability);
       };
+      // eslint-disable-next-line
     }, [documents]);
 
     const scrollToBottom = () => {

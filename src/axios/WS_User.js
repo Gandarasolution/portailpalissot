@@ -70,8 +70,8 @@ const Connexion = async (login, pass, wsForToken, setToken) => {
  * @param {string} mail 
  * @param {Function} setData 
  */
-const CreateTokenMDP = async (mail, setData) => {
-  await CallEndpoint("CreateTokenMDP", { mail: mail }, setData);
+const CreateTokenMDP = async (mail, setData, _wsForToken, _wsEndpoint) => {
+  await CallEndpoint("CreateTokenMDP", { mail: mail }, setData, false, _wsForToken, _wsEndpoint);
 }
 
 
@@ -81,11 +81,12 @@ const CreateTokenMDP = async (mail, setData) => {
  * @param {string} newMdp 
  * @param {Function} setData 
  */
-const ChangeMDP = async (token, newMdp, setData) => {
+const ChangeMDP = async (token, newMdp, setData, _urlToUse, _wsToUse) => {
+  console.log(_urlToUse);
   await CallEndpoint("ChangeMDP", {
     token: token,
     newMDP: newMdp,
-  }, setData);
+  }, setData, false, _urlToUse, _wsToUse);
 }
 
 
@@ -128,6 +129,20 @@ const GetClientSiteContrat = async (token, setData) => {
   await CallEndpoint("GetClientSiteContrat", { token: token }, setData);
 };
 
+
+
+/**
+ * 
+ * @param {string} token 
+ * @param {string} search 
+ * @param {Function} setData 
+ */
+const GetClientSiteBySearch = async (token, search, setData) => {
+
+  await CallEndpoint("GetClientSiteBySearch", { token: token, search: search }, setData);
+}
+
+
 //#endregion
 
 export {
@@ -142,6 +157,7 @@ export {
   //Infos
   , GetListeParametres
   , GetClientSiteContrat
+  , GetClientSiteBySearch
 }
 
 
