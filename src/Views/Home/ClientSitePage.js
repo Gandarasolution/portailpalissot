@@ -100,8 +100,7 @@ const ClientSitePage = ({ setPageSubtitle, setPageTitle }) => {
     setIsLoaded(false);
 
     const FetchSetClientSite = (data) => {
-      if(data && data === "user")
-      {
+      if (data && data === "user") {
         setIsUser(true);
         data = [];
       }
@@ -124,10 +123,10 @@ const ClientSitePage = ({ setPageSubtitle, setPageTitle }) => {
 
     };
 
-    if(IsUserFromToken(tokenCt))
-    {
+    if (IsUserFromToken(tokenCt)) {
+
       FetchSetClientSite("user");
-    }else {
+    } else {
       GetClientSiteContrat(tokenCt, FetchSetClientSite);
     }
 
@@ -184,13 +183,13 @@ const ClientSitePage = ({ setPageSubtitle, setPageTitle }) => {
     const _Cells = CreateCellsForTable();
 
 
-  const FetchSetUserClientSite = (data) => {
-    setListeClientSite(data);
-    if (!Array.isArray(data)) {
-      ClientSiteCt.setClientSite(data);
-      navigate("/");
+    const FetchSetUserClientSite = (data) => {
+      setListeClientSite(data);
+      if (!Array.isArray(data)) {
+        ClientSiteCt.setClientSite(data);
+        navigate("/");
+      }
     }
-  }
 
     return (
       <TableData
