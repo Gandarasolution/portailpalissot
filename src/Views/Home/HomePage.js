@@ -39,7 +39,6 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
   const tokenCt = useContext(TokenContext);
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
-
   const _maintenance = ClientSiteContratCtx.storedClientSite.DroitAccesMaintenance;
   const _sav = ClientSiteContratCtx.storedClientSite.DroitAccesDepannage;
   const _devis = ClientSiteContratCtx.storedClientSite.DroitAccesDevis;
@@ -193,7 +192,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
         {/* <span className="m-2"> */}
         <div className="d-flex mt-4 flex-wrap">
           <Nav className="shortcut-link">
-            {(_maintenance) && (roueData.length > 0 && <Nav.Item>
+            {(_maintenance) && <Nav.Item>
               <FontAwesomeIcon
                 icon={faCalendar}
               />
@@ -201,7 +200,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                 title={"Maintenances"}
                 to={"/maintenance"}
               />
-            </Nav.Item>)}
+            </Nav.Item>}
             {(_sav) &&
               <Nav.Item>
                 <FontAwesomeIcon
@@ -247,13 +246,13 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
           {/* Bloc Maintenance séparé */}
 
           {(_maintenance) && (dataLoaded ? (
-            roueData.length > 0 && (
+            
               <div className="mb-3 stats-maintenance">
                 <div className="stats-card p-3">
                   <h5 className="stats-title">
                     Maintenance
                   </h5>
-
+ {                 roueData.length > 0 ? (
                   <div className="stats-data stats-wheel">
                     <ul>
                       {maintenanceChartData.map((item, idx) => (
@@ -280,11 +279,13 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                       </Pie>
                       <Tooltip />
                     </PieChart>
-                  </div>
+                  </div>) : (<div>Aucune donnée.</div>)}
+
+
                   <a href="/maintenance" className="stats-link">Voir le détail &gt;</a>
                 </div>
               </div>
-            )
+             
           ) : (
             <div className="mb-3 stats-maintenance">
               <div className="stats-card p-3">

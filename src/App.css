@@ -2222,7 +2222,7 @@ thead th,
 }
 
 .dashboard-stats .stats-other::after{
-  content: "\f0ad";
+  /* content: "\f0ad"; */
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;

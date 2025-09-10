@@ -203,9 +203,6 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
     };
 
     const methodVoir = async (facture) => {
-      //On ouvre une nouvelle fenêtre d'attente
-      let targetWindow = window.open("/waiting");
-
       //On récupère le fichier en b64
       const b64data = await VoirFactureDocument(
         tokenCt,
@@ -214,22 +211,53 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
         facture.Avoir,
         true
       );
-
-      //On transforme le fichier en blob
+      //Transformation en blob
       const blobData = base64toBlob(b64data.v);
 
-      //On créer l'URL utilisé par les viewers
+      //Création de l'URL du fichier
       const url = URL.createObjectURL(blobData);
 
-      //On l'enregistre dans le viewerContext
-      viewerCt.setViewer(url);
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
 
-      //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-      //Le bon viewer est déterminé par l'extension
-      targetWindow.location.href = "/viewerPDF";
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+    }
 
-      setVoirFacture(false);
-    };
+
+    // const methodVoirViewer = async (facture) => {
+    //   //On ouvre une nouvelle fenêtre d'attente
+    //   let targetWindow = window.open("/waiting");
+
+    //   //On récupère le fichier en b64
+    //   const b64data = await VoirFactureDocument(
+    //     tokenCt,
+    //     facture.IdFacture,
+    //     facture.Type,
+    //     facture.Avoir,
+    //     true
+    //   );
+
+    //   //On transforme le fichier en blob
+    //   const blobData = base64toBlob(b64data.v);
+
+    //   //On créer l'URL utilisé par les viewers
+    //   const url = URL.createObjectURL(blobData);
+
+    //   //On l'enregistre dans le viewerContext
+    //   viewerCt.setViewer(url);
+
+    //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+    //   //Le bon viewer est déterminé par l'extension
+    //   targetWindow.location.href = "/viewerPDF";
+
+    //   setVoirFacture(false);
+    // };
+
+
 
     // Créer les actions
     const actionsForFacture = (facture) => [

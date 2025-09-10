@@ -923,7 +923,7 @@ const TableData = ({ ...props }) => {
       return (
         <tbody>
           <tr>
-            <td colSpan={props.Headers.length}>{props.IsUser ? "Utilisez la barre de recherche." : "Aucune données"}</td>
+            <td colSpan={props.Headers.length}>{props.IsUser ? "Utilisez la barre de recherche." : "Aucune donnée"}</td>
           </tr>
         </tbody>
       );
@@ -1998,7 +1998,7 @@ const TableData = ({ ...props }) => {
 
     //La fonction appelé lors de l'appuye du bouton 'Voir'
     _obj.VoirDocumentSup = () => DocumentMaintenanceVoirDocumentSup(element);
-
+    
     //La fonction appelé lors de l'appuye du bouton télécharger
     _obj.TelechargerDocumentSup = async () => {
       return await DocumentMaintenanceGetFile(element.v, true, true);
@@ -2008,10 +2008,6 @@ const TableData = ({ ...props }) => {
 
     return _obj;
   };
-
-
-
-
 
 
 
@@ -2039,76 +2035,113 @@ const TableData = ({ ...props }) => {
     return _obj;
   };
 
-  /**
-     * La méthode appellé pour voir un document de maintenance
-     */
-  const DocumentDepannageVoirDocumentSup = async (element) => {
 
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
-
-    //On récupère le fichier en b64
-    try {
-
-
+const DocumentDepannageVoirDocumentSup = async (element) => {
+      //On récupère le fichier en b64
       const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
-      //On transforme le fichier en blob
+      //Transformation en blob
       const blobData = base64toBlob(b64data.v);
-
-      //On créer l'URL utilisé par les viewers
+  
+      //Création de l'URL du fichier
       const url = URL.createObjectURL(blobData);
+  
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
+  
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+}
 
-      //On l'enregistre dans le viewerContext
-      viewerCt.setViewer(url);
+  // /**
+  //    * La méthode appellé pour voir un document de maintenance dans un viewer
+  //    */
+  // const DocumentDepannageVoirDocumentSupViewer = async (element) => {
 
-      //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-      //Le bon viewer est déterminé par l'extension
-      targetWindow.location.href = GetURLLocationViewerFromExtension(
-        element.k.split(".").pop()
-      );
-    } catch (error) {
-      console.log("Erreur lors de la récupération des données : ", error)
-      targetWindow.close();
-    }
-  };
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   try {
 
 
+  //     const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
+  //     //On transforme le fichier en blob
+  //     const blobData = base64toBlob(b64data.v);
 
+  //     //On créer l'URL utilisé par les viewers
+  //     const url = URL.createObjectURL(blobData);
 
+  //     //On l'enregistre dans le viewerContext
+  //     viewerCt.setViewer(url);
 
-
-
-
+  //     //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //     //Le bon viewer est déterminé par l'extension
+  //     targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //       element.k.split(".").pop()
+  //     );
+  //   } catch (error) {
+  //     console.log("Erreur lors de la récupération des données : ", error)
+  //     targetWindow.close();
+  //   }
+  // };
 
 
 
   /**
-   * La méthode appellé pour voir un document de maintenance
+   * La méthode appellé pour voir un document de maintenance dans une autre fenêtre
    */
   const DocumentMaintenanceVoirDocumentSup = async (element) => {
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
-
     //On récupère le fichier en b64
     const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
 
-    //On transforme le fichier en blob
+    //Transformation en blob
     const blobData = base64toBlob(b64data.v);
 
-    //On créer l'URL utilisé par les viewers
+    //Création de l'URL du fichier
     const url = URL.createObjectURL(blobData);
 
-    //On l'enregistre dans le viewerContext
-    viewerCt.setViewer(url);
+    //Création du lien
+    const aLink = document.createElement('a');
+    aLink.href = url;
+    aLink.target = "_blank";
+    aLink.click();
 
-    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-    //Le bon viewer est déterminé par l'extension
-    targetWindow.location.href = GetURLLocationViewerFromExtension(
-      element.k.split(".").pop()
-    );
-  };
+    //Suppression de l'URL
+    URL.revokeObjectURL(url);
+
+  }
+
+
+  // /**
+  //  * La méthode appellé pour voir un document de maintenance via un viewer
+  //  */
+  // const DocumentMaintenanceVoirDocumentSupViewer = async (element) => {
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+
+  //   //On transforme le fichier en blob
+  //   const blobData = base64toBlob(b64data.v);
+
+  //   //On créer l'URL utilisé par les viewers
+  //   const url = URL.createObjectURL(blobData);
+
+  //   //On l'enregistre dans le viewerContext
+  //   viewerCt.setViewer(url);
+
+  //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //   //Le bon viewer est déterminé par l'extension
+  //   targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //     element.k.split(".").pop()
+  //   );
+  // };
 
   const DocumentMaintenanceGetFile = async (v, telecharger, returnData) => {
     const splitPop = v.split("|").pop();
@@ -2436,15 +2469,7 @@ const TableData = ({ ...props }) => {
     };
 
     await CreateArrayZIP();
-    // const _date = new Date();
-
-    // await TelechargerZIP(
-    //   _arrDocs,
-    //   `${_date.toLocaleDateString("fr-FR").replace(/\//g, "-")}_${
-    //     _arrDocs.length
-    //   }_factures`
-    // );
-    // _targetWindow.close();
+   
   };
 
   const [showModalFacture, setShowModalFacture] = useState(false);
@@ -2605,32 +2630,54 @@ const TableData = ({ ...props }) => {
   };
 
 
-
-  /**
-    * La méthode appellé pour voir un document de maintenance
-    */
   const FactureMaintenanceVoirDocumentSup = async (element) => {
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
-
     //On récupère le fichier en b64
     const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
 
-    //On transforme le fichier en blob
+    //Transformation en blob
     const blobData = base64toBlob(b64data.v);
 
-    //On créer l'URL utilisé par les viewers
+    //Création de l'URL du fichier
     const url = URL.createObjectURL(blobData);
 
-    //On l'enregistre dans le viewerContext
-    viewerCt.setViewer(url);
+    //Création du lien
+    const aLink = document.createElement('a');
+    aLink.href = url;
+    aLink.target = "_blank";
+    aLink.click();
 
-    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-    //Le bon viewer est déterminé par l'extension
-    targetWindow.location.href = GetURLLocationViewerFromExtension(
-      element.k.split(".").pop()
-    );
-  };
+    //Suppression de l'URL
+    URL.revokeObjectURL(url);
+
+  }
+
+
+  
+  // /**
+  //   * La méthode appellé pour voir un document de maintenance dans un viewer
+  //   */
+  // const FactureMaintenanceVoirDocumentSupViewer = async (element) => {
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
+
+  //   //On transforme le fichier en blob
+  //   const blobData = base64toBlob(b64data.v);
+
+  //   //On créer l'URL utilisé par les viewers
+  //   const url = URL.createObjectURL(blobData);
+
+  //   //On l'enregistre dans le viewerContext
+  //   viewerCt.setViewer(url);
+
+  //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //   //Le bon viewer est déterminé par l'extension
+  //   targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //     element.k.split(".").pop()
+  //   );
+  // };
 
 
 
