@@ -76,6 +76,7 @@ import { Breakpoint, BreakpointProvider } from "react-socks";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { GetClientSiteBySearch } from "../../axios/WS_User";
+import { useNavigate } from "react-router-dom";
 
 const TAGSELECTION = "_xSelection";
 //#endregion
@@ -91,6 +92,7 @@ const TableData = ({ ...props }) => {
 
   const ClientSiteCt = useContext(ClientSiteContratContext);
 
+  const navigate = useNavigate();
 
   const Data = () => {
     let _lData = [];
@@ -1688,6 +1690,7 @@ const TableData = ({ ...props }) => {
     let _actualClientSite = ClientSiteCt.storedClientSite;
     if (!(_actualClientSite) || (_actualClientSite.GUID !== siteAChoisir.GUID)) {
       ClientSiteCt.setClientSite(siteAChoisir);
+      navigate("/");
     }
   }
 

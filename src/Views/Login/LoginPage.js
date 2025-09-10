@@ -180,12 +180,8 @@ const LoginPage = (props) => {
       let _wsEndpoint = "";
       const GetResponseURLWS = (data) => {
         if (isNaN(data) && data.urlWSClient) {
-          console.log(data);
           _wsForToken = data.urlWSClient;
           _wsEndpoint = data.urlWSEndpoint
-          // _themeFromWS = data?.themeClient;
-          // _logoClient = data?.logoClient;
-          // props.setWsEndpoint(data.urlWSEndpoint)
         }
 
       }

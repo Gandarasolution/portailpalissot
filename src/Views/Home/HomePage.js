@@ -60,7 +60,6 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
         setDashboardData(data);
         setDataLoaded(true);
         // console.log("Données Dashboard:", data);
-
       }
     }
     await GetDashboardData(tokenCt, ClientSiteContratCtx.storedClientSite.GUID, callBackData);
