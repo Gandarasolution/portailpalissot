@@ -103,6 +103,34 @@ input.form-control:focus{
   padding-right: 0.2rem;
 }
 
+.btn.button-password {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  margin-top: 20px;
+  margin-bottom: 30px;
+  padding: 12px;
+  font-family: var(--font-arial);
+  font-weight: bold;
+  font-size: 1.4em;
+  color: var(--color-white);
+  width: 100%;
+  border-radius: 14px;
+}
+
+.btn.button-password:hover {
+  border: 1px solid var(--color-primary);
+  background: var(--color-action);
+  margin-top: 20px;
+  margin-bottom: 30px;
+  padding: 12px;
+  font-family: var(--font-arial);
+  font-weight: bold;
+  font-size: 1.4em;
+  color: var(--color-white);
+  width: 100%;
+  border-radius: 14px;
+}
+
 /* General */
 .search-bar input,
 .status-bar nav,

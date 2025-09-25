@@ -149,6 +149,14 @@ function App() {
     useCookies([clientSiteName]);
 
   function setClientSite(clientSite) {
+
+    clientSite.DroitAccesDepannage = true;
+    clientSite.DroitAccesDevis = true;
+    clientSite.DroitAccesFactures = true;
+    clientSite.DroitAccesMaintenance = true;
+    clientSite.DroitAccesDepannage = true;
+
+console.log(clientSite)
     setClientSiteCookie(clientSiteName, clientSite);
     SetLastSite(tokenCookie[tokenName], clientSite.GUID);
   }
@@ -400,7 +408,7 @@ function App() {
 
               <Route path="sites" element={<ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />} />
 
-              {(storedClientSite && storedClientSite.DroitAccesMaintenance) && <Route
+              {(storedClientSite && storedClientSite.DroitAccesMaintenance)  && <Route
                 path="maintenance"
                 element={storedClientSite ? <ContratPage IsSetPeriode={isSetPeriode} periodeEnCours={periodeEnCours} setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
               />}

@@ -205,13 +205,14 @@ const LoginPage = (props) => {
             de passe.</span>
         </p>
 
-        <Form className="m-4" onSubmit={() => handleForgotPassword()}>
+        <Form className="m-4" onSubmit={(e) => {e.preventDefault(); handleForgotPassword()}}>
           <Form.Control
             type="email"
             required
             placeholder="Tapez votre adresse email"
             value={mailRecup}
             onChange={(e) => setMailRecup(e.target.value)}
+            onVal
           />
 
           <div>
