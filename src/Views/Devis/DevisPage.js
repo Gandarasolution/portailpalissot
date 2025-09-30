@@ -29,7 +29,7 @@ import TableData, {
   CreateNewUnboundCell
 } from "../../components/commun/TableData";
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
-import { Button, Col, Row } from "react-bootstrap";
+import { Button, Col, Row, Toast, ToastContainer } from "react-bootstrap";
 import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";
 import { saveAs } from "file-saver";
 
@@ -47,6 +47,10 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeDevis, setListeDevis] = useState([]);
 
+  const [showToast, setShowToast] = useState(false);
+  const [variantToast, setVariantToast] = useState("info");
+  const [messageToast, setMessageToast] = useState("Téléchargement en cours");
+  const [titleToast, setTitleToast] = useState("Téléchargement")
   //#endregion
 
   //#region Fonctions
@@ -182,6 +186,7 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
   const methodTelecharger = async (e) => {
 
 
+
     return await GetdocumentDevis(tokenCt, e.IdDevis, true, true);
 
 
@@ -192,14 +197,21 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
 
   const Telechargement = async (e) => {
     //Affichage d'un toast
-    // setShowToast(true);
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast("Téléchargement en cours...");
+    setTitleToast("Téléchargement");
     const _kv = await methodTelecharger(e);
     try {
       const base64data = _kv.v;
       const _bblob = base64toBlob(base64data);
       saveAs(_bblob, _kv.k);
+      setVariantToast("success");
+      setMessageToast("Téléchargement terminé !");
     } catch (error) {
-      console.error("Erreur lors du téléchargement :", error);
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+      // console.error("Erreur lors du téléchargement :", error);
     }
   };
 
@@ -207,22 +219,35 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
 
   const Voir = async (e) => {
     //On récupère le fichier en b64
-    const b64data = await methodVoir(e);
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast("Récupération du document en cours...");
+    setTitleToast("Document");
+    try {
 
-    //Transformation en blob
-    const blobData = base64toBlob(b64data.v);
+      const b64data = await methodVoir(e);
 
-    //Création de l'URL du fichier
-    const url = URL.createObjectURL(blobData);
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
 
-    //Création du lien
-    const aLink = document.createElement('a');
-    aLink.href = url;
-    aLink.target = "_blank";
-    aLink.click();
+      //Création de l'URL du fichier
+      const url = URL.createObjectURL(blobData);
 
-    //Suppression de l'URL
-    URL.revokeObjectURL(url);
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
+
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+      setVariantToast("success");
+      setMessageToast(false);
+
+    } catch (ex) {
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
   }
 
   // const VoirViewer = async (e) => {
@@ -401,6 +426,19 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
     <>
       <Container fluid className="table-devis">
         <TableDevis />
+        <ToastContainer
+          className="p-3"
+          position={"bottom-end"}
+        // style={{ zIndex: 1 }}
+        >
+          <Toast show={showToast} bg={variantToast} onClose={() => setShowToast(false)}>
+            <Toast.Header> <strong className="me-auto">{titleToast}</strong>
+            </Toast.Header>
+            <Toast.Body>
+              <div>{messageToast}</div>
+            </Toast.Body>
+          </Toast>
+        </ToastContainer>
       </Container>
     </>
   );

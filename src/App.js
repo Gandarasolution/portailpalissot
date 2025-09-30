@@ -156,7 +156,6 @@ function App() {
     clientSite.DroitAccesMaintenance = true;
     clientSite.DroitAccesDepannage = true;
 
-console.log(clientSite)
     setClientSiteCookie(clientSiteName, clientSite);
     SetLastSite(tokenCookie[tokenName], clientSite.GUID);
   }
