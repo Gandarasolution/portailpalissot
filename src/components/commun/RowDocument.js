@@ -1,10 +1,7 @@
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Toast from "react-bootstrap/Toast";
-import ToastContainer from "react-bootstrap/ToastContainer";
 import { Link } from "react-router-dom";
 import ImageExtension, { IsExtensionVisible } from "./ImageExtension";
-import { useState } from "react";
 import { base64toBlob } from "../../functions";
 import { saveAs } from "file-saver";
 
@@ -12,7 +9,8 @@ import { saveAs } from "file-saver";
 const RowDocument = ({ props, index }) => {
 
   //#region States
-  const [showToast, setShowToast] = useState(false);
+
+
   //#endregion
 
 
@@ -20,8 +18,9 @@ const RowDocument = ({ props, index }) => {
 
   //#region Evenements
   const Telechargement = async () => {
+
+
     //Affichage d'un toast
-    setShowToast(true);
     const _kv = await props.TelechargerDocumentSup();
 
     try {
@@ -40,7 +39,7 @@ const RowDocument = ({ props, index }) => {
     } finally {
 
       //Cacher le toast
-      setShowToast(false);
+      // setShowToast(false);
 
     }
   };
@@ -74,30 +73,14 @@ const RowDocument = ({ props, index }) => {
 
   //#region Component
 
-  const ToastTelechargement = () => {
-    return (
-      <ToastContainer
-        className="p-3"
-        position={"bottom-end"}
-      // style={{ zIndex: 1 }}
-      >
-        <Toast show={showToast}>
-          <Toast.Header closeButton={false}></Toast.Header>
-          <Toast.Body>
-            <div>Téléchargement en cours</div>
-            <div>{props.title}</div>
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>
-    );
-  };
 
   //#endregion
 
   return (
     <>
-      <ToastTelechargement />
+
       <Row key={index}>
+
         <Col md={"auto"}>
           <ImageExtension extension={props.extension} />
         </Col>
@@ -119,7 +102,7 @@ const RowDocument = ({ props, index }) => {
                 )}
 
               {props.TelechargerDocumentSup && (
-                <Link onClick={Telechargement}>Télécharger</Link>
+                <Link onClick={() => Telechargement()}>Télécharger</Link>
               )}
             </div>
           </div>

@@ -54,6 +54,7 @@ import TableData, {
   CreateNewUnboundCell
 } from "../../components/commun/TableData";
 import { saveAs } from "file-saver";
+import { Toast, ToastContainer } from "react-bootstrap";
 
 
 //#endregion
@@ -74,6 +75,13 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
   const [factureSelected, setFactureSelected] = useState(null);
   const [voirFacture, setVoirFacture] = useState(false);
   const [TelechargerFacture, setTelechargerFacture] = useState(false);
+
+
+  const [showToast, setShowToast] = useState(false);
+  const [variantToast, setVariantToast] = useState("info");
+  const [messageToast, setMessageToast] = useState("Téléchargement en cours");
+  const [titleToast, setTitleToast] = useState("Téléchargement")
+
 
   //#endregion
 
@@ -187,6 +195,11 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
     // };
 
     const methodTelecharger = async (facture) => {
+
+      setShowToast(true);
+      setVariantToast("info");
+      setMessageToast("Téléchargement en cours...");
+      setTitleToast("Téléchargement");
       let _kv = await VoirFactureDocument(
         tokenCt,
         facture.IdFacture,
@@ -194,17 +207,36 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
         facture.Avoir,
         true
       );
+      if (_kv === 500 || (!_kv.v)) {
+        //Erreur lors de la récupération du fichier
+        setVariantToast("danger");
+        setMessageToast("Un problème est survenu. Réessayez plus tard.");
+      } else {
 
-      const base64data = _kv.v;
-      const _bblob = base64toBlob(base64data);
-      //Téléchargement
-      saveAs(_bblob, _kv.k);
+
+        try {
+
+          const base64data = _kv.v;
+          const _bblob = base64toBlob(base64data);
+          saveAs(_bblob, _kv.k);
+          setVariantToast("success");
+          setMessageToast("Téléchargement terminé !");
+
+        } catch (error) {
+          setVariantToast("danger");
+          setMessageToast("Un problème est survenu. Réessayez plus tard.");
+        }
+        //Téléchargement
+      }
 
     };
 
     const methodVoir = async (facture) => {
-      //On ouvre une nouvelle fenêtre d'attente
-      let targetWindow = window.open("/waiting");
+      setShowToast(true);
+      setVariantToast("info");
+      setMessageToast("Récupération du document en cours...");
+      setTitleToast("Document");
+
 
       //On récupère le fichier en b64
       const b64data = await VoirFactureDocument(
@@ -214,22 +246,63 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
         facture.Avoir,
         true
       );
+      if (b64data === 500 || (!b64data.v)) {
+        setVariantToast("danger");
+        setMessageToast("Un problème est survenu. Réessayez plus tard.");
+      } else {
 
-      //On transforme le fichier en blob
-      const blobData = base64toBlob(b64data.v);
 
-      //On créer l'URL utilisé par les viewers
-      const url = URL.createObjectURL(blobData);
+        //Transformation en blob
+        const blobData = base64toBlob(b64data.v);
 
-      //On l'enregistre dans le viewerContext
-      viewerCt.setViewer(url);
+        //Création de l'URL du fichier
+        const url = URL.createObjectURL(blobData);
 
-      //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-      //Le bon viewer est déterminé par l'extension
-      targetWindow.location.href = "/viewerPDF";
+        //Création du lien
+        const aLink = document.createElement('a');
+        aLink.href = url;
+        aLink.target = "_blank";
+        aLink.click();
 
-      setVoirFacture(false);
-    };
+        //Suppression de l'URL
+        URL.revokeObjectURL(url);
+        setVariantToast("success");
+        setMessageToast(false);
+      }
+
+    }
+
+
+    // const methodVoirViewer = async (facture) => {
+    //   //On ouvre une nouvelle fenêtre d'attente
+    //   let targetWindow = window.open("/waiting");
+
+    //   //On récupère le fichier en b64
+    //   const b64data = await VoirFactureDocument(
+    //     tokenCt,
+    //     facture.IdFacture,
+    //     facture.Type,
+    //     facture.Avoir,
+    //     true
+    //   );
+
+    //   //On transforme le fichier en blob
+    //   const blobData = base64toBlob(b64data.v);
+
+    //   //On créer l'URL utilisé par les viewers
+    //   const url = URL.createObjectURL(blobData);
+
+    //   //On l'enregistre dans le viewerContext
+    //   viewerCt.setViewer(url);
+
+    //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+    //   //Le bon viewer est déterminé par l'extension
+    //   targetWindow.location.href = "/viewerPDF";
+
+    //   setVoirFacture(false);
+    // };
+
+
 
     // Créer les actions
     const actionsForFacture = (facture) => [
@@ -400,7 +473,17 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
       setListeFactures(data);
 
       setIsFactureLoaded(true);
-      let _trimmed = data.filter((fa) => fa.Type && fa.Type !== "Chantier");
+      let _trimmed = [];
+      if (data.length > 0) {
+        _trimmed = data.filter((fa) => fa.Type && fa.Type !== "Chantier");
+
+      } else {
+
+        if (data.Type !== "Chantier") {
+          _trimmed[0] = data;
+        }
+
+      }
       setPageSubtitle(` ${_trimmed.length}`);
     };
     await GetListeFactures(
@@ -425,6 +508,19 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
   return (
     <Container fluid className="table-facture">
       <TableFactures />
+      <ToastContainer
+        className="p-3"
+        position={"bottom-end"}
+      // style={{ zIndex: 1 }}
+      >
+        <Toast show={showToast} bg={variantToast} onClose={() => setShowToast(false)}>
+          <Toast.Header> <strong className="me-auto">{titleToast}</strong>
+          </Toast.Header>
+          <Toast.Body>
+            <div>{messageToast}</div>
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
     </Container>
   );
 };

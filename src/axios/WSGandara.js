@@ -39,6 +39,7 @@ const getWsFromCookie = () => {
  * @param {?string} urlToUse L'url à utiliser (autre que celle stocké en cookie)
  */
 const CallEndpoint = async (endpoint, data, callbackResponseSuccess, mustReturnResponse, urlToUse, wsToUse) => {
+    // console.log("CallEndpoint : "+ endpoint);
     let _return;
     //Récupération de l'URL 
     let _url = "";

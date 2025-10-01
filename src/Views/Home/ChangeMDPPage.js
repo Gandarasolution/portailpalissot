@@ -80,7 +80,7 @@ const ChangeMDPPage = () => {
           setTextAlert("La demande n'est plus valide. Veuillez recommencer votre demande");
           setAlertVisible(true);
         } else {
-          setTextAlert("Une erreur s'est produite. Veuillez recommencer votre demande ultérieurement.");
+          setTextAlert("Une erreur est survenue lors de la tentative de changement de mot de passe. Veuillez vérifier votre connexion ou réessayer dans quelques minutes. Si le problème persiste, contactez le support.");
           setAlertVisible(true);
 
         }
@@ -123,9 +123,10 @@ const ChangeMDPPage = () => {
 
 
   return (
-    <Container>
+    <Container >
 
-      <Form  >
+      <h1>Définir un nouveau mot de passe</h1>
+      <Form className="m-5">
         {
           isValidGUID(token) && showCodeEntreprise &&
           <Form.Group className="mb-4" controlId="formCodeEntreprise">
@@ -146,7 +147,7 @@ const ChangeMDPPage = () => {
 
         {isValidGUID(token) && <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Nouveau mot de passe</Form.Label>
-          <Form.Control type="password" value={newMdp} onChange={(e) => setNewMdp(e.target.value)} required />
+          <Form.Control type="password" placeholder="Veuillez renseigner votre nouveau mot de passe" value={newMdp} onChange={(e) => setNewMdp(e.target.value)} required />
           {/* <Form.Text className="text-muted">
           Merci de renseigner votre nouveau mot de passe
         </Form.Text> */}
@@ -154,7 +155,7 @@ const ChangeMDPPage = () => {
 
         {isValidGUID(token) && <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Confirmer votre nouveau mot de passe</Form.Label>
-          <Form.Control type="password" value={newMdp2} onChange={(e) => setNewMdp2(e.target.value)} required />
+          <Form.Control type="password" placeholder="Veuillez confirmer votre nouveau mot de passe" value={newMdp2} onChange={(e) => setNewMdp2(e.target.value)} required />
           {/* <Form.Text className="text-muted">
           Merci de renseigner votre nouveau mot de passe
         </Form.Text> */}
@@ -178,11 +179,12 @@ const ChangeMDPPage = () => {
 
         <div className=" d-flex justify-content-center m-4">
         </div>
-        {isValidGUID(token) && <Button variant="primary" type="button" onClick={() => SubmitNewMDP()}>
+        {isValidGUID(token) && <Button variant="" className="button-password mt-10" onClick={() => SubmitNewMDP()}>
           Changer de mot de passe
         </Button>}
       </Form>
     </Container>
+
   );
 };
 

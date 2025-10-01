@@ -149,6 +149,13 @@ function App() {
     useCookies([clientSiteName]);
 
   function setClientSite(clientSite) {
+
+    clientSite.DroitAccesDepannage = true;
+    clientSite.DroitAccesDevis = true;
+    clientSite.DroitAccesFactures = true;
+    clientSite.DroitAccesMaintenance = true;
+    clientSite.DroitAccesDepannage = true;
+
     setClientSiteCookie(clientSiteName, clientSite);
     SetLastSite(tokenCookie[tokenName], clientSite.GUID);
   }
@@ -220,24 +227,7 @@ function App() {
 
   };
 
-  // //Si pas de token ET change mdp
-  // if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName]) && window.location.href.toUpperCase().includes('changemdp/'.toUpperCase())) {
-  //   return (
-  //     <div className="App font-link background">
-  //       <Router>
-
-  //         <Routes>
-  //           <Route path="changemdp/:token" element={<ChangeMDPPage />} />
-  //         </Routes>
-
-  //       </Router>
-  //     </div>
-
-  //   );
-  // }
-
-
-  // if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName]) && !window.location.href.toUpperCase().includes('changemdp/'.toUpperCase())) {
+ 
   if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName])) {
     return (
       <div className="App font-link background">
@@ -417,8 +407,7 @@ function App() {
 
               <Route path="sites" element={<ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />} />
 
-              {/* {true || (storedClientSite && storedClientSite.DroitAccesMaintenance) && <Route */}
-              {(storedClientSite && storedClientSite.DroitAccesMaintenance) && <Route
+              {(storedClientSite && storedClientSite.DroitAccesMaintenance)  && <Route
                 path="maintenance"
                 element={storedClientSite ? <ContratPage IsSetPeriode={isSetPeriode} periodeEnCours={periodeEnCours} setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
               />}

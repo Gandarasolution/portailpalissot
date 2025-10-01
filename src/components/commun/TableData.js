@@ -20,6 +20,7 @@ import Modal from "react-bootstrap/Modal";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Card from "react-bootstrap/Card";
+
 import Tooltip from "react-bootstrap/Tooltip";
 // import CloseButton from "react-bootstrap/CloseButton";
 //#endregion
@@ -45,7 +46,7 @@ import {
   FiltrerParSeuil,
   FiltrerParSeuilDate,
   GenerateUid,
-  GetURLLocationViewerFromExtension,
+  // GetURLLocationViewerFromExtension,
   RegexTestAndReturnMatch,
   base64toBlob,
   groupBy,
@@ -63,7 +64,10 @@ import { GetListeFIIntervention, GetListeFactureIntervention, GetDocumentFISAV }
 
 
 //#region Contexts
-import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
+import {
+  ClientSiteContratContext, TokenContext,
+  //  ViewerContext
+} from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
 
 //#endregion
@@ -76,6 +80,8 @@ import { Breakpoint, BreakpointProvider } from "react-socks";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { GetClientSiteBySearch } from "../../axios/WS_User";
+import { useNavigate } from "react-router-dom";
+import { Toast, ToastContainer } from "react-bootstrap";
 
 const TAGSELECTION = "_xSelection";
 //#endregion
@@ -87,9 +93,15 @@ const TAGSELECTION = "_xSelection";
 const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
-  const viewerCt = useContext(ViewerContext);
+  // const viewerCt = useContext(ViewerContext);
 
   const ClientSiteCt = useContext(ClientSiteContratContext);
+
+  const navigate = useNavigate();
+  const [showToast, setShowToast] = useState(false);
+  const [variantToast, setVariantToast] = useState("info");
+  const [messageToast, setMessageToast] = useState("Téléchargement en cours");
+  const [titleToast, setTitleToast] = useState("Téléchargement")
 
 
   const Data = () => {
@@ -921,7 +933,7 @@ const TableData = ({ ...props }) => {
       return (
         <tbody>
           <tr>
-            <td colSpan={props.Headers.length}>{props.IsUser ? "Utilisez la barre de recherche." : "Aucune données"}</td>
+            <td colSpan={props.Headers.length}>{props.IsUser ? "Utilisez la barre de recherche." : "Aucune donnée"}</td>
           </tr>
         </tbody>
       );
@@ -1688,6 +1700,7 @@ const TableData = ({ ...props }) => {
     let _actualClientSite = ClientSiteCt.storedClientSite;
     if (!(_actualClientSite) || (_actualClientSite.GUID !== siteAChoisir.GUID)) {
       ClientSiteCt.setClientSite(siteAChoisir);
+      navigate("/");
     }
   }
 
@@ -1992,23 +2005,24 @@ const TableData = ({ ...props }) => {
     //le titre et l'extension
     _obj.title = element.k;
     _obj.extension = element.k.split(".").pop();
+    try {
 
-    //La fonction appelé lors de l'appuye du bouton 'Voir'
-    _obj.VoirDocumentSup = () => DocumentMaintenanceVoirDocumentSup(element);
+      //La fonction appelé lors de l'appuye du bouton 'Voir'
+      _obj.VoirDocumentSup = () => DocumentMaintenanceVoirDocumentSup(element);
 
-    //La fonction appelé lors de l'appuye du bouton télécharger
-    _obj.TelechargerDocumentSup = async () => {
-      return await DocumentMaintenanceGetFile(element.v, true, true);
-    };
+      //La fonction appelé lors de l'appuye du bouton télécharger
+      _obj.TelechargerDocumentSup = async () => {
+        return await DocumentMaintenanceGetFile(element.v, true, true);
+      };
 
-    _obj.data = element;
+      _obj.data = element;
 
+    } catch (ex) {
+
+
+    }
     return _obj;
   };
-
-
-
-
 
 
 
@@ -2022,90 +2036,163 @@ const TableData = ({ ...props }) => {
     //le titre et l'extension
     _obj.title = element.k;
     _obj.extension = element.k.split(".").pop();
+    try {
 
-    //La fonction appelé lors de l'appuye du bouton 'Voir'
-    _obj.VoirDocumentSup = () => DocumentDepannageVoirDocumentSup(element);
+      //La fonction appelé lors de l'appuye du bouton 'Voir'
+      _obj.VoirDocumentSup = () => DocumentDepannageVoirDocumentSup(element);
 
-    //La fonction appelé lors de l'appuye du bouton télécharger
-    _obj.TelechargerDocumentSup = async () => {
-      return await GetDocumentFISAV(tokenCt, element.v, false, true);
-    };
+      //La fonction appelé lors de l'appuye du bouton télécharger
+      _obj.TelechargerDocumentSup = async () => {
+        return await GetDocumentFISAV(tokenCt, element.v, false, true);
+      };
 
-    _obj.data = element;
+      _obj.data = element;
 
+    } catch (ex) {
+      console.log("Erreur lors de la récupération de document : " + ex)
+    }
     return _obj;
   };
 
-  /**
-     * La méthode appellé pour voir un document de maintenance
-     */
+
   const DocumentDepannageVoirDocumentSup = async (element) => {
-
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
-
-    //On récupère le fichier en b64
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Récupération du document... `);
+    setTitleToast(`Document`);
     try {
 
 
+      //On récupère le fichier en b64
       const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
-      //On transforme le fichier en blob
+      //Transformation en blob
       const blobData = base64toBlob(b64data.v);
 
-      //On créer l'URL utilisé par les viewers
+      //Création de l'URL du fichier
       const url = URL.createObjectURL(blobData);
 
-      //On l'enregistre dans le viewerContext
-      viewerCt.setViewer(url);
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
 
-      //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-      //Le bon viewer est déterminé par l'extension
-      targetWindow.location.href = GetURLLocationViewerFromExtension(
-        element.k.split(".").pop()
-      );
-    } catch (error) {
-      console.log("Erreur lors de la récupération des données : ", error)
-      targetWindow.close();
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+      setVariantToast("success");
+
+      setShowToast(false);
+
+    } catch (ex) {
+      console.log("Erreur lors de la récupération de document : " + ex)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
     }
-  };
 
 
+  }
+
+  // /**
+  //    * La méthode appellé pour voir un document de maintenance dans un viewer
+  //    */
+  // const DocumentDepannageVoirDocumentSupViewer = async (element) => {
+
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   try {
 
 
+  //     const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
+  //     //On transforme le fichier en blob
+  //     const blobData = base64toBlob(b64data.v);
 
+  //     //On créer l'URL utilisé par les viewers
+  //     const url = URL.createObjectURL(blobData);
 
+  //     //On l'enregistre dans le viewerContext
+  //     viewerCt.setViewer(url);
 
-
+  //     //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //     //Le bon viewer est déterminé par l'extension
+  //     targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //       element.k.split(".").pop()
+  //     );
+  //   } catch (error) {
+  //     console.log("Erreur lors de la récupération des données : ", error)
+  //     targetWindow.close();
+  //   }
+  // };
 
 
 
   /**
-   * La méthode appellé pour voir un document de maintenance
+   * La méthode appellé pour voir un document de maintenance dans une autre fenêtre
    */
   const DocumentMaintenanceVoirDocumentSup = async (element) => {
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
-
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Récupération du document... `);
+    setTitleToast(`Document`);
     //On récupère le fichier en b64
-    const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+    try {
+      const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
 
-    //On transforme le fichier en blob
-    const blobData = base64toBlob(b64data.v);
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
 
-    //On créer l'URL utilisé par les viewers
-    const url = URL.createObjectURL(blobData);
+      //Création de l'URL du fichier
+      const url = URL.createObjectURL(blobData);
 
-    //On l'enregistre dans le viewerContext
-    viewerCt.setViewer(url);
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
 
-    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-    //Le bon viewer est déterminé par l'extension
-    targetWindow.location.href = GetURLLocationViewerFromExtension(
-      element.k.split(".").pop()
-    );
-  };
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+      setVariantToast("success");
+
+      setShowToast(false);
+
+
+    } catch (ex) {
+      console.log("Erreur lors de la récupération de document : " + ex)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
+  }
+
+
+  // /**
+  //  * La méthode appellé pour voir un document de maintenance via un viewer
+  //  */
+  // const DocumentMaintenanceVoirDocumentSupViewer = async (element) => {
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+
+  //   //On transforme le fichier en blob
+  //   const blobData = base64toBlob(b64data.v);
+
+  //   //On créer l'URL utilisé par les viewers
+  //   const url = URL.createObjectURL(blobData);
+
+  //   //On l'enregistre dans le viewerContext
+  //   viewerCt.setViewer(url);
+
+  //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //   //Le bon viewer est déterminé par l'extension
+  //   targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //     element.k.split(".").pop()
+  //   );
+  // };
 
   const DocumentMaintenanceGetFile = async (v, telecharger, returnData) => {
     const splitPop = v.split("|").pop();
@@ -2410,8 +2497,16 @@ const TableData = ({ ...props }) => {
 
     //Création du fichier ZIP
     // let _targetWindow = window.open("/waiting");
+    let _NbErreur = 0;
 
     const CreateArrayZIP = async () => {
+
+      setShowToast(true);
+      setVariantToast("info");
+      setMessageToast(`Téléchargement en cours... (0/${_arrayOfFactures.length}) `);
+      setTitleToast(`Téléchargement de ${_arrayOfFactures.length} fichiers`);
+
+
       for (let index = 0; index < _arrayOfFactures.length; index++) {
         const facture = _arrayOfFactures[index];
         let _kv = await VoirFactureDocument(
@@ -2422,26 +2517,36 @@ const TableData = ({ ...props }) => {
           true
         );
 
+        setMessageToast(`Téléchargement en cours... (${index + 1}/${_arrayOfFactures.length}) `);
+
         //Transformation en blob
         const base64data = _kv.v;
-        const _bblob = base64toBlob(base64data);
-        //Téléchargement
-        saveAs(_bblob, _kv.k);
+        if (_kv === 500 || (!_kv.v)) {
+          _NbErreur += 1
+        } else {
+          const _bblob = base64toBlob(base64data);
+          // Téléchargement
+          saveAs(_bblob, _kv.k);
+        }
+
+
       }
 
       // return _arrDocs;
     };
 
     await CreateArrayZIP();
-    // const _date = new Date();
-
-    // await TelechargerZIP(
-    //   _arrDocs,
-    //   `${_date.toLocaleDateString("fr-FR").replace(/\//g, "-")}_${
-    //     _arrDocs.length
-    //   }_factures`
-    // );
-    // _targetWindow.close();
+    if (_NbErreur === 0) {
+      setVariantToast("success");
+      setMessageToast(`Téléchargement terminé`);
+      setTitleToast(`Téléchargement de ${_arrayOfFactures.length} fichiers`);
+    } else if (_NbErreur === _arrayOfFactures.length) {
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    } else {
+      setVariantToast("warning");
+      setMessageToast(`${_NbErreur} document(s) n'ont pas pu être téléchargé. Réessayez plus tard.`);
+    }
   };
 
   const [showModalFacture, setShowModalFacture] = useState(false);
@@ -2602,32 +2707,54 @@ const TableData = ({ ...props }) => {
   };
 
 
-
-  /**
-    * La méthode appellé pour voir un document de maintenance
-    */
   const FactureMaintenanceVoirDocumentSup = async (element) => {
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
-
     //On récupère le fichier en b64
     const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
 
-    //On transforme le fichier en blob
+    //Transformation en blob
     const blobData = base64toBlob(b64data.v);
 
-    //On créer l'URL utilisé par les viewers
+    //Création de l'URL du fichier
     const url = URL.createObjectURL(blobData);
 
-    //On l'enregistre dans le viewerContext
-    viewerCt.setViewer(url);
+    //Création du lien
+    const aLink = document.createElement('a');
+    aLink.href = url;
+    aLink.target = "_blank";
+    aLink.click();
 
-    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-    //Le bon viewer est déterminé par l'extension
-    targetWindow.location.href = GetURLLocationViewerFromExtension(
-      element.k.split(".").pop()
-    );
-  };
+    //Suppression de l'URL
+    URL.revokeObjectURL(url);
+
+  }
+
+
+
+  // /**
+  //   * La méthode appellé pour voir un document de maintenance dans un viewer
+  //   */
+  // const FactureMaintenanceVoirDocumentSupViewer = async (element) => {
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
+
+  //   //On transforme le fichier en blob
+  //   const blobData = base64toBlob(b64data.v);
+
+  //   //On créer l'URL utilisé par les viewers
+  //   const url = URL.createObjectURL(blobData);
+
+  //   //On l'enregistre dans le viewerContext
+  //   viewerCt.setViewer(url);
+
+  //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //   //Le bon viewer est déterminé par l'extension
+  //   targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //     element.k.split(".").pop()
+  //   );
+  // };
 
 
 
@@ -2835,6 +2962,19 @@ const TableData = ({ ...props }) => {
           <GridCards />
         </Breakpoint>
         <Row>{props.Pagination && <Col>{TablePagination()}</Col>}</Row>
+        <ToastContainer
+          className="p-3"
+          position={"bottom-end"}
+        // style={{ zIndex: 1 }}
+        >
+          <Toast show={showToast} bg={variantToast} onClose={() => setShowToast(false)}>
+            <Toast.Header> <strong className="me-auto">{titleToast}</strong>
+            </Toast.Header>
+            <Toast.Body>
+              <div>{messageToast}</div>
+            </Toast.Body>
+          </Toast>
+        </ToastContainer>
       </Container>
     </BreakpointProvider>
   );

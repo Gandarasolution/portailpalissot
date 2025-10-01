@@ -9,7 +9,7 @@ import NavLink from "react-bootstrap/NavLink";
 import {
   faCalendar,
   faWrench,
-  faArrowDown,
+  // faArrowDown,
   faBook,
   faFile,
   faBell,
@@ -28,7 +28,7 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { GetDashboardData } from "../../axios/WS_ClientSite";
 import { ClientSiteContratContext, TokenContext } from "../../App";
-import { ReactComponent as Rythme } from "../../image/coeur.svg";
+// import { ReactComponent as Rythme } from "../../image/coeur.svg";
 import { Placeholder, Spinner } from "react-bootstrap";
 import { GetRedirectionFromIdTypeDocument } from "../../functions";
 import { GetListeParametres } from "../../axios/WS_User";
@@ -39,7 +39,6 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
   const tokenCt = useContext(TokenContext);
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
-
   const _maintenance = ClientSiteContratCtx.storedClientSite.DroitAccesMaintenance;
   const _sav = ClientSiteContratCtx.storedClientSite.DroitAccesDepannage;
   const _devis = ClientSiteContratCtx.storedClientSite.DroitAccesDevis;
@@ -60,7 +59,6 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
         setDashboardData(data);
         setDataLoaded(true);
         // console.log("Données Dashboard:", data);
-
       }
     }
     await GetDashboardData(tokenCt, ClientSiteContratCtx.storedClientSite.GUID, callBackData);
@@ -194,7 +192,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
         {/* <span className="m-2"> */}
         <div className="d-flex mt-4 flex-wrap">
           <Nav className="shortcut-link">
-            {(_maintenance) && (roueData.length > 0 && <Nav.Item>
+            {(_maintenance) && <Nav.Item>
               <FontAwesomeIcon
                 icon={faCalendar}
               />
@@ -202,7 +200,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                 title={"Maintenances"}
                 to={"/maintenance"}
               />
-            </Nav.Item>)}
+            </Nav.Item>}
             {(_sav) &&
               <Nav.Item>
                 <FontAwesomeIcon
@@ -248,13 +246,13 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
           {/* Bloc Maintenance séparé */}
 
           {(_maintenance) && (dataLoaded ? (
-            roueData.length > 0 && (
-              <div className="mb-3 stats-maintenance">
-                <div className="stats-card p-3">
-                  <h5 className="stats-title">
-                    Maintenance
-                  </h5>
 
+            <div className="mb-3 stats-maintenance">
+              <div className="stats-card p-3">
+                <h5 className="stats-title">
+                  Maintenance
+                </h5>
+                {roueData.length > 0 ? (
                   <div className="stats-data stats-wheel">
                     <ul>
                       {maintenanceChartData.map((item, idx) => (
@@ -281,11 +279,13 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                       </Pie>
                       <Tooltip />
                     </PieChart>
-                  </div>
-                  <a href="/maintenance" className="stats-link">Voir le détail &gt;</a>
-                </div>
+                  </div>) : (<div>Aucune donnée.</div>)}
+
+
+                <a href="/maintenance" className="stats-link">Voir le détail &gt;</a>
               </div>
-            )
+            </div>
+
           ) : (
             <div className="mb-3 stats-maintenance">
               <div className="stats-card p-3">
@@ -398,7 +398,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
           </div>
         </div>
 
-        <div className="dashboard-last-activities">
+        {/* <div className="dashboard-last-activities">
           <h2 className="mt-4">
             Activités récentes <span className="last-activities-subtitle">( 30 derniers jours )</span>
           </h2>
@@ -472,7 +472,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
 
           </div>
-        </div>
+        </div> */}
 
 
 

@@ -180,12 +180,8 @@ const LoginPage = (props) => {
       let _wsEndpoint = "";
       const GetResponseURLWS = (data) => {
         if (isNaN(data) && data.urlWSClient) {
-          console.log(data);
           _wsForToken = data.urlWSClient;
           _wsEndpoint = data.urlWSEndpoint
-          // _themeFromWS = data?.themeClient;
-          // _logoClient = data?.logoClient;
-          // props.setWsEndpoint(data.urlWSEndpoint)
         }
 
       }
@@ -209,13 +205,14 @@ const LoginPage = (props) => {
             de passe.</span>
         </p>
 
-        <Form className="m-4" onSubmit={() => handleForgotPassword()}>
+        <Form className="m-4" onSubmit={(e) => {e.preventDefault(); handleForgotPassword()}}>
           <Form.Control
             type="email"
             required
             placeholder="Tapez votre adresse email"
             value={mailRecup}
             onChange={(e) => setMailRecup(e.target.value)}
+            onVal
           />
 
           <div>
