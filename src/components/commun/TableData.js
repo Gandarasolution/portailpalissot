@@ -46,7 +46,7 @@ import {
   FiltrerParSeuil,
   FiltrerParSeuilDate,
   GenerateUid,
-  GetURLLocationViewerFromExtension,
+  // GetURLLocationViewerFromExtension,
   RegexTestAndReturnMatch,
   base64toBlob,
   groupBy,
@@ -64,7 +64,10 @@ import { GetListeFIIntervention, GetListeFactureIntervention, GetDocumentFISAV }
 
 
 //#region Contexts
-import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
+import {
+  ClientSiteContratContext, TokenContext,
+  //  ViewerContext
+} from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
 
 //#endregion
@@ -90,7 +93,7 @@ const TAGSELECTION = "_xSelection";
 const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
-  const viewerCt = useContext(ViewerContext);
+  // const viewerCt = useContext(ViewerContext);
 
   const ClientSiteCt = useContext(ClientSiteContratContext);
 

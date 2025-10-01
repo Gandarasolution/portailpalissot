@@ -9,7 +9,7 @@ import NavLink from "react-bootstrap/NavLink";
 import {
   faCalendar,
   faWrench,
-  faArrowDown,
+  // faArrowDown,
   faBook,
   faFile,
   faBell,
@@ -28,7 +28,7 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { GetDashboardData } from "../../axios/WS_ClientSite";
 import { ClientSiteContratContext, TokenContext } from "../../App";
-import { ReactComponent as Rythme } from "../../image/coeur.svg";
+// import { ReactComponent as Rythme } from "../../image/coeur.svg";
 import { Placeholder, Spinner } from "react-bootstrap";
 import { GetRedirectionFromIdTypeDocument } from "../../functions";
 import { GetListeParametres } from "../../axios/WS_User";
@@ -246,13 +246,13 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
           {/* Bloc Maintenance séparé */}
 
           {(_maintenance) && (dataLoaded ? (
-            
-              <div className="mb-3 stats-maintenance">
-                <div className="stats-card p-3">
-                  <h5 className="stats-title">
-                    Maintenance
-                  </h5>
- {                 roueData.length > 0 ? (
+
+            <div className="mb-3 stats-maintenance">
+              <div className="stats-card p-3">
+                <h5 className="stats-title">
+                  Maintenance
+                </h5>
+                {roueData.length > 0 ? (
                   <div className="stats-data stats-wheel">
                     <ul>
                       {maintenanceChartData.map((item, idx) => (
@@ -282,10 +282,10 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
                   </div>) : (<div>Aucune donnée.</div>)}
 
 
-                  <a href="/maintenance" className="stats-link">Voir le détail &gt;</a>
-                </div>
+                <a href="/maintenance" className="stats-link">Voir le détail &gt;</a>
               </div>
-             
+            </div>
+
           ) : (
             <div className="mb-3 stats-maintenance">
               <div className="stats-card p-3">
@@ -398,7 +398,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
           </div>
         </div>
 
-        <div className="dashboard-last-activities">
+        {/* <div className="dashboard-last-activities">
           <h2 className="mt-4">
             Activités récentes <span className="last-activities-subtitle">( 30 derniers jours )</span>
           </h2>
@@ -472,7 +472,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
 
           </div>
-        </div>
+        </div> */}
 
 
 

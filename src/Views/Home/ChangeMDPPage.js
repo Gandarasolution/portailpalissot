@@ -125,8 +125,8 @@ const ChangeMDPPage = () => {
   return (
     <Container >
 
-<h1>Définir un nouveau mot de passe</h1>
-      <Form  className="m-5">
+      <h1>Définir un nouveau mot de passe</h1>
+      <Form className="m-5">
         {
           isValidGUID(token) && showCodeEntreprise &&
           <Form.Group className="mb-4" controlId="formCodeEntreprise">
@@ -183,7 +183,7 @@ const ChangeMDPPage = () => {
           Changer de mot de passe
         </Button>}
       </Form>
-      </Container>
+    </Container>
 
   );
 };

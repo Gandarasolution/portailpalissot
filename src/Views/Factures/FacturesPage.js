@@ -473,7 +473,17 @@ const FacturesPage = ({ setPageSubtitle, setPageTitle }) => {
       setListeFactures(data);
 
       setIsFactureLoaded(true);
-      let _trimmed = data.filter((fa) => fa.Type && fa.Type !== "Chantier");
+      let _trimmed = [];
+      if (data.length > 0) {
+        _trimmed = data.filter((fa) => fa.Type && fa.Type !== "Chantier");
+
+      } else {
+
+        if (data.Type !== "Chantier") {
+          _trimmed[0] = data;
+        }
+
+      }
       setPageSubtitle(` ${_trimmed.length}`);
     };
     await GetListeFactures(

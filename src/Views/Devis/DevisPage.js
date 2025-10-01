@@ -394,15 +394,15 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
     );
 
 
-    return (_Data.length > 0 &&
-      <TableData
+    // return (_Data.length > 0 &&
+      return (<TableData
         Data={_Data}
         Headers={_Headers}
         Cells={_Cells}
         IsLoaded={isLoaded}
         ButtonFilters={_ButtonFilters}
         FilterDefaultValue={
-          _Data.find((d) => d.Etat.IdEtat === 9) &&
+          _Data.length > 0 && _Data.find((d) => d.Etat.IdEtat === 9) &&
           CreateNewButtonFilter("IdEtat", 9, EditorFilter)
         }
         Pagination
