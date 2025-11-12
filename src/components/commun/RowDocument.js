@@ -17,32 +17,32 @@ const RowDocument = ({ props, index }) => {
 
 
   //#region Evenements
-  const Telechargement = async () => {
+  // const Telechargement = async () => {
 
 
-    //Affichage d'un toast
-    const _kv = await props.TelechargerDocumentSup();
+  //   //Affichage d'un toast
+  //   const _kv = await props.TelechargerDocumentSup();
+    
+  //   try {
+  //     //Transformation en blob
+  //     const base64data = _kv.v;
 
-    try {
-      //Transformation en blob
-      const base64data = _kv.v;
-
-      const _bblob = base64toBlob(base64data, props?.type);
-      //Téléchargement
-      saveAs(_bblob, _kv.k);
+  //     const _bblob = base64toBlob(base64data, props?.type);
+  //     //Téléchargement
+  //     saveAs(_bblob, _kv.k);
 
 
-    }
-    catch (error) {
+  //   }
+  //   catch (error) {
 
-      console.log("Erreur lors du téléchargement")
-    } finally {
+  //     console.log("Erreur lors du téléchargement")
+  //   } finally {
 
-      //Cacher le toast
-      // setShowToast(false);
+  //     //Cacher le toast
+  //     // setShowToast(false);
 
-    }
-  };
+  //   }
+  // };
 
   // const Visualisation = async () => {
   //   let targetWindow = window.open("/waiting");
@@ -102,7 +102,8 @@ const RowDocument = ({ props, index }) => {
                 )}
 
               {props.TelechargerDocumentSup && (
-                <Link onClick={() => Telechargement()}>Télécharger</Link>
+                // <Link onClick={() => Telechargement()}>Télécharger</Link>
+                <Link onClick={() => props.TelechargerDocumentSup()}>Télécharger</Link>
               )}
             </div>
           </div>
