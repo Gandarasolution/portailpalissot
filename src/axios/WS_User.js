@@ -82,7 +82,7 @@ const CreateTokenMDP = async (mail, setData, _wsForToken, _wsEndpoint) => {
  * @param {Function} setData 
  */
 const ChangeMDP = async (token, newMdp, setData, _urlToUse, _wsToUse) => {
-  console.log(_urlToUse);
+  // console.log(_urlToUse);
   await CallEndpoint("ChangeMDP", {
     token: token,
     newMDP: newMdp,
