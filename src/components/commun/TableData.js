@@ -120,14 +120,13 @@ const TableData = ({ ...props }) => {
       element[TAGSELECTION] = arraySelector.includes(index);
     }
 
-
     //filtre par la barre de recherche
-    if (String(search).length > 0) {
+    if (String(search).length > 0  && _lData.length > 0) {
       _lData = _lData.filter((item) => FiltrerParSearchGlobal(item));
     }
 
     //Filtre par les boutons
-    if (props.ButtonFilters && btFilterActif) {
+    if (props.ButtonFilters && btFilterActif && _lData.length > 0) {
       let _filteractif = JSON.parse(JSON.stringify(btFilterActif));
 
       _lData = _lData.filter((data) => {
@@ -2208,6 +2207,8 @@ const TableData = ({ ...props }) => {
     setTitleToast(`Document`);
 
     try {
+
+      
       const b64data = await DocumentMaintenanceGetFile(element.v, true, true);
 
       //Transformation en blob
@@ -2392,7 +2393,7 @@ const TableData = ({ ...props }) => {
 
       return;
     }
-    if (arrData.length) {
+    if (arrData.length && arrData.length > 0) {
       for (let index = 0; index < arrData.length; index++) {
         const element = arrData[index];
         _arrDocs.push(CreatePropsDocumentMaintenance(element));
@@ -3027,14 +3028,14 @@ const TableData = ({ ...props }) => {
     };
 
     //1 - Demande les FI
-    GetListeFIIntervention(
+    await GetListeFIIntervention(
       tokenCt,
       IdDossierInterventionSAV,
       FetchSetDataFIPart
     );
 
     //3 - Demande les factures
-    GetListeFactureIntervention(
+    await GetListeFactureIntervention(
       tokenCt,
       IdDossierInterventionSAV,
       FetchSetDataFacturePart
