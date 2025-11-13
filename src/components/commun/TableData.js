@@ -2891,23 +2891,37 @@ const TableData = ({ ...props }) => {
     _obj.extension = "zip";
 
     const TelechargerZIPSup = async (IdDossierInterventionSAV) => {
+      setShowToast(true);
+      setVariantToast("info");
+      setMessageToast(`Téléchargement en cours... (0/${_arrDocsFI.length + _arrDocsFA.length}) `);
+
       const zip = JSZip();
       let _arrDocs = [];
 
 
       for (let index = 0; index < _arrDocsFI.length; index++) {
-        const element = _arrDocsFI[index];
-        const _kv = await GetDocumentFISAV(
-          tokenCt,
-          element.data.v,
-          false,
-          true
-        );
-        const _arrDocFI = [_kv.v, _kv.k];
-        _arrDocs.push(_arrDocFI);
+        try {
+          setMessageToast(`Téléchargement en cours... (${index + 1}/${_arrDocsFI.length + _arrDocsFA.length}) `);
+          const element = _arrDocsFI[index];
+          const _kv = await GetDocumentFISAV(
+            tokenCt,
+            element.data.v,
+            false,
+            true
+          );
+          const _arrDocFI = [_kv.v, _kv.k];
+          _arrDocs.push(_arrDocFI);
+          
+        } catch (error) {
+          
+        }
       }
 
       for (let index = 0; index < _arrDocsFA.length; index++) {
+        try {
+
+        setMessageToast(`Téléchargement en cours... (${_arrDocsFI.length + index + 1}/${_arrDocsFI.length + _arrDocsFA.length}) `);
+
         const element = _arrDocsFA[index];
         const _kv = await VoirFactureDocument(
           tokenCt,
@@ -2919,23 +2933,39 @@ const TableData = ({ ...props }) => {
         const _arrDocFA = [_kv.v, _kv.k];
 
         _arrDocs.push(_arrDocFA);
+          
+        } catch (error) {
+          
+        }
       }
 
+
+      let _error = 0;
       _arrDocs.forEach((kv, i) => {
         try {
           let _b64 = kv[0];
           let _blob = base64toBlob(_b64);
           zip.file(kv[1], _blob);
 
+
         } catch (error) {
           console.log("Impossible de zipper")
           console.log(error);
+          setVariantToast("danger");
+          setMessageToast("Un problème est survenu. Réessayez plus tard.");
+          _error = 1;
         }
       });
 
       const _v = await zip.generateAsync({ type: 'base64' })
       const _k = `Tous les documents`;
+      if (_error = 0)
+      {
 
+        setVariantToast("success");
+        setMessageToast(`Téléchargement terminé`);
+        setTitleToast(`Téléchargement de ${_arrDocs.length} fichiers`);
+      }
       return { k: _k, v: _v };
 
 
@@ -2945,7 +2975,8 @@ const TableData = ({ ...props }) => {
       // );
     };
 
-    _obj.TelechargerDocumentSup = async () => await TelechargerZIPSup();
+    // _obj.TelechargerDocumentSup = async () => await TelechargerZIPSup();
+    _obj.TelechargerDocumentSup =  () =>  TelechargerZIPSup();
 
     _obj.type = "application/zip";
     return _obj;
