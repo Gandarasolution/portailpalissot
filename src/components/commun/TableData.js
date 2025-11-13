@@ -2207,6 +2207,8 @@ const TableData = ({ ...props }) => {
     setTitleToast(`Document`);
 
     try {
+
+      
       const b64data = await DocumentMaintenanceGetFile(element.v, true, true);
 
       //Transformation en blob
@@ -2391,7 +2393,7 @@ const TableData = ({ ...props }) => {
 
       return;
     }
-    if (arrData.length) {
+    if (arrData.length && arrData.length > 0) {
       for (let index = 0; index < arrData.length; index++) {
         const element = arrData[index];
         _arrDocs.push(CreatePropsDocumentMaintenance(element));
@@ -3026,14 +3028,14 @@ const TableData = ({ ...props }) => {
     };
 
     //1 - Demande les FI
-    GetListeFIIntervention(
+    await GetListeFIIntervention(
       tokenCt,
       IdDossierInterventionSAV,
       FetchSetDataFIPart
     );
 
     //3 - Demande les factures
-    GetListeFactureIntervention(
+    await GetListeFactureIntervention(
       tokenCt,
       IdDossierInterventionSAV,
       FetchSetDataFacturePart
