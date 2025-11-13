@@ -52,7 +52,9 @@ const GetURLWs = async (codeOrURL, setResponse) => {
 const Connexion = async (login, pass, wsForToken, setToken) => {
 
   const callbackSet = (data) => {
-    if (data === "Erreur de connexion") { setToken(500); }
+    var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+
+    if (data === "Erreur de connexion" || !base64regex.test(data)) { setToken(500); }
     else {
       setToken(data);
     }

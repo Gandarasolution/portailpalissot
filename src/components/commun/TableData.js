@@ -120,14 +120,13 @@ const TableData = ({ ...props }) => {
       element[TAGSELECTION] = arraySelector.includes(index);
     }
 
-
     //filtre par la barre de recherche
-    if (String(search).length > 0) {
+    if (String(search).length > 0  && _lData.length > 0) {
       _lData = _lData.filter((item) => FiltrerParSearchGlobal(item));
     }
 
     //Filtre par les boutons
-    if (props.ButtonFilters && btFilterActif) {
+    if (props.ButtonFilters && btFilterActif && _lData.length > 0) {
       let _filteractif = JSON.parse(JSON.stringify(btFilterActif));
 
       _lData = _lData.filter((data) => {

@@ -183,7 +183,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
   }
 
   return (
-    <Container fluid className="h- p-0">
+    <Container fluid className="h- p-0 m-2">
       <Container fluid className="container-table ">
         <div>
           <h2>Raccourcis</h2>
@@ -239,9 +239,9 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
       </Container>
 
 
-      <Container fluid className="container-table dashboard-stats">
-        <h2>Statistiques du moment</h2>
+      <Container fluid className="container-table dashboard-stats pt-3">
 
+        <h2>Statistiques du moment</h2>
         <div className="d-flex mt-4 flex-wrap">
           {/* Bloc Maintenance séparé */}
 
@@ -380,7 +380,7 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
       </Container>
 
 
-      <Container fluid className="container-table d-flex mb-4" >
+      <Container fluid className="container-table d-flex m-3" >
         <div className="p-4 d-flex align-items-center justify-content-center dashboard-request-intervention">
           <div className="d-flex flex-column align-items-center justify-content-center">
             <FontAwesomeIcon icon={faBell} size="2x" />
