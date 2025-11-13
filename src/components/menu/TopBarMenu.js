@@ -252,8 +252,21 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
 
       _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
     }
-    return (
 
+
+    const GetDPTitle = () => {
+
+      let _deDate = GetDateFromStringDDMMYYY(statePeriodes.periodeEnCours.k)
+      let _aDate = GetDateFromStringDDMMYYY(statePeriodes.periodeEnCours.v)
+
+      let _debutStr = isNaN(_deDate) ? "Aucun contrat de maintenance" : `Contrat de maintenance de : ${GetNomMois(1,false)} ${_deDate.getFullYear()} `;
+      let _finStr = isNaN(_aDate) ? "" : `à ${GetNomMois(12,false)} ${_aDate.getFullYear()}`; 
+
+      return `${_debutStr}${_finStr}`;
+
+    }
+
+    return (
       <>
         <Button variant="" className="button-periode" onClick={() => SoustraireUnAnPeriode()} >
           <FontAwesomeIcon icon={faArrowLeft} />
@@ -265,11 +278,15 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
           }}
 
 
-          title={`Contrat de maintenance de : ${GetNomMois(1, false)} ${GetDateFromStringDDMMYYY(
-            statePeriodes.periodeEnCours.k
-          ).getFullYear()} à ${GetNomMois(12, false)} ${GetDateFromStringDDMMYYY(
-            statePeriodes.periodeEnCours.v
-          ).getFullYear()}`}>
+          title={GetDPTitle()}
+          // title={`Contrat de maintenance de : ${GetNomMois(1, false)}  ${GetDateFromStringDDMMYYY(
+          //   statePeriodes.periodeEnCours.k
+          // ).getFullYear()} à ${GetNomMois(12, false)} ${GetDateFromStringDDMMYYY(
+          //   statePeriodes.periodeEnCours.v
+          // ).getFullYear()}`}
+          
+          
+          >
 
 
           {_arrayPeriodes.map((periode, index) => {

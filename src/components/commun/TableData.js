@@ -46,7 +46,6 @@ import {
   FiltrerParSeuil,
   FiltrerParSeuilDate,
   GenerateUid,
-  // GetURLLocationViewerFromExtension,
   RegexTestAndReturnMatch,
   base64toBlob,
   groupBy,
@@ -82,6 +81,7 @@ import JSZip from "jszip";
 import { GetClientSiteBySearch } from "../../axios/WS_User";
 import { useNavigate } from "react-router-dom";
 import { Toast, ToastContainer } from "react-bootstrap";
+import { error } from "jquery";
 
 const TAGSELECTION = "_xSelection";
 //#endregion
@@ -2011,9 +2011,12 @@ const TableData = ({ ...props }) => {
       _obj.VoirDocumentSup = () => DocumentMaintenanceVoirDocumentSup(element);
 
       //La fonction appelé lors de l'appuye du bouton télécharger
-      _obj.TelechargerDocumentSup = async () => {
-        return await DocumentMaintenanceGetFile(element.v, true, true);
-      };
+      // _obj.TelechargerDocumentSup = async () => {
+      //   return await DocumentMaintenanceGetFile(element.v, true, true);
+      // };
+
+
+      _obj.TelechargerDocumentSup = () => DocumentMaintenanceTelechargerDocumentSup(element);
 
       _obj.data = element;
 
@@ -2042,9 +2045,10 @@ const TableData = ({ ...props }) => {
       _obj.VoirDocumentSup = () => DocumentDepannageVoirDocumentSup(element);
 
       //La fonction appelé lors de l'appuye du bouton télécharger
-      _obj.TelechargerDocumentSup = async () => {
-        return await GetDocumentFISAV(tokenCt, element.v, false, true);
-      };
+      _obj.TelechargerDocumentSup = () => DocumentDepannageTelechargerDocumentSup(element);
+      // _obj.TelechargerDocumentSup = async () => {
+      //   return await GetDocumentFISAV(tokenCt, element.v, false, true);
+      // };
 
       _obj.data = element;
 
@@ -2093,6 +2097,36 @@ const TableData = ({ ...props }) => {
 
   }
 
+
+  const DocumentDepannageTelechargerDocumentSup = async (element) => {
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Téléchargement du document... `);
+    setTitleToast(`Document`);
+    try {
+
+      //On récupère le fichier en b64
+      const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
+
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
+
+      saveAs(blobData, element.k);
+      setVariantToast("success");
+
+      setShowToast(false);
+
+    } catch (ex) {
+      console.log("Erreur lors du téléchargement de document : " + ex)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
+
+
+  }
+
+
+
   // /**
   //    * La méthode appellé pour voir un document de maintenance dans un viewer
   //    */
@@ -2139,8 +2173,7 @@ const TableData = ({ ...props }) => {
     setTitleToast(`Document`);
     //On récupère le fichier en b64
     try {
-      const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
-
+      const b64data = await DocumentMaintenanceGetFile(element.v, true, true);
       //Transformation en blob
       const blobData = base64toBlob(b64data.v);
 
@@ -2166,6 +2199,36 @@ const TableData = ({ ...props }) => {
       setMessageToast("Un problème est survenu. Réessayez plus tard.");
     }
   }
+
+
+  const DocumentMaintenanceTelechargerDocumentSup = async (element) => {
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Téléchargement du document... `);
+    setTitleToast(`Document`);
+
+    try {
+      const b64data = await DocumentMaintenanceGetFile(element.v, true, true);
+
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
+
+      saveAs(blobData, element.k);
+
+      setVariantToast("success");
+      setShowToast(false);
+
+
+    } catch (ex) {
+      console.log("Erreur lors du téléchargement du document : " + ex)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
+
+
+  }
+
+
 
 
   // /**
@@ -2254,10 +2317,16 @@ const TableData = ({ ...props }) => {
 
 
     const TelechargerZIPSup = async (presta) => {
+      setTitleToast(`Téléchargement de ${_arrDocT.length} documents`)
+      setMessageToast("");
+      setVariantToast("info")
+      setShowToast(true);
+
       const zip = JSZip();
       let _arrDocs = [];
 
       for (let index = 0; index < _arrDocT.length; index++) {
+        setMessageToast(`Téléchargement du document ${index + 1} / ${_arrDocT.length}`)
         const element = _arrDocT[index];
 
         let _data = await DocumentMaintenanceGetFile(element.data.v, false, true);
@@ -2267,6 +2336,7 @@ const TableData = ({ ...props }) => {
         }
       }
 
+      var _errors = 0;
       _arrDocs.forEach((kv, i) => {
         try {
           let _b64 = kv[0];
@@ -2276,12 +2346,20 @@ const TableData = ({ ...props }) => {
         } catch (error) {
           console.log("Impossible de zipper")
           console.log(error);
+          setVariantToast("danger")
+          setMessageToast("Une erreur est survenue. Merci de rééssayer plus tard.")
+          _errors += 1;
         }
       });
 
       const _v = await zip.generateAsync({ type: 'base64' })
       const _k = `Documents PC${presta.IdPrestationContrat}_${presta.DateInterventionPrestation}`;
 
+
+      if (_errors == 0) {
+        setVariantToast("success");
+        setMessageToast("Téléchargement terminé")
+      }
       return { k: _k, v: _v };
 
     }
@@ -2303,9 +2381,9 @@ const TableData = ({ ...props }) => {
 
   const FetchSetDocuments = async (data, presta) => {
     let _arrDocs = [];
-
     const arrData = data;
-    if (arrData === 500) {
+
+    if (data instanceof Error) {
       const _arrError = [CreatePropError()];
       //Erreur
       setDocuments(_arrError);
@@ -2314,7 +2392,6 @@ const TableData = ({ ...props }) => {
 
       return;
     }
-
     if (arrData.length) {
       for (let index = 0; index < arrData.length; index++) {
         const element = arrData[index];
@@ -2696,10 +2773,11 @@ const TableData = ({ ...props }) => {
     //La fonction appelé lors de l'appuye du bouton 'Voir'
     _obj.VoirDocumentSup = () => FactureMaintenanceVoirDocumentSup(element);
 
+    _obj.TelechargerDocumentSup = () => FactureMaintenanceTelechargerDocumentSup(element);
     //La fonction appelé lors de l'appuye du bouton télécharger
-    _obj.TelechargerDocumentSup = async () => {
-      return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
-    };
+    // _obj.TelechargerDocumentSup = async () => {
+    //   return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
+    // };
 
     _obj.data = element;
 
@@ -2708,25 +2786,73 @@ const TableData = ({ ...props }) => {
 
 
   const FactureMaintenanceVoirDocumentSup = async (element) => {
-    //On récupère le fichier en b64
-    const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Récupération du document... `);
+    setTitleToast(`Document`);
 
-    //Transformation en blob
-    const blobData = base64toBlob(b64data.v);
+    try {
 
-    //Création de l'URL du fichier
-    const url = URL.createObjectURL(blobData);
 
-    //Création du lien
-    const aLink = document.createElement('a');
-    aLink.href = url;
-    aLink.target = "_blank";
-    aLink.click();
+      //On récupère le fichier en b64
+      const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
 
-    //Suppression de l'URL
-    URL.revokeObjectURL(url);
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
+
+      //Création de l'URL du fichier
+      const url = URL.createObjectURL(blobData);
+
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
+
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+
+      setVariantToast("success")
+      setMessageToast("Document récupéré.")
+
+    } catch (error) {
+
+      console.log("Erreur lors de la récupération du document : " + error)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
+  }
+
+
+  const FactureMaintenanceTelechargerDocumentSup = async (element) => {
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Téléchargement du document... `);
+    setTitleToast(`Document`);
+
+    try {
+
+
+      //On récupère le fichier en b64
+      const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
+
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
+
+      saveAs(blobData, element.k)
+
+      setVariantToast("success")
+      setMessageToast("Document téléchargé.")
+
+    } catch (error) {
+
+      console.log("Erreur lors de la récupération du document : " + error)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
 
   }
+
 
 
 
