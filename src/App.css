@@ -27,6 +27,10 @@
   --color-blue-icone-site: #518097;
   --color-blue-grey:  ;
   --color-grey-icone-site: #F4F5F7;
+  --color-pastel-blue: #cce9ff;
+  --color-pastel-blue-text: #2968aa;
+
+
   --font-bold: 'BorisBlackBloxx', sans-serif;
   --font-text: 'Corbel', sans-serif;
   --font-arial: 'ArialMT', sans-serif;
@@ -1626,10 +1630,15 @@ thead th,
   font-size: 0.9rem !important;
 }
 
-.badge-bg-success,
+.badge-bg-success{
+   background-color: var(--color-pastel-green) !important;
+  color: var(--color-pastel-green-text) !important; 
+}
+
 .badge-bg-primary{
-  background-color: var(--color-pastel-green) !important;
-  color: var(--color-pastel-green-text) !important;
+
+    background-color: var(--color-pastel-blue) !important;
+  color: var(--color-pastel-blue-text) !important;
 }
 
 .badge-bg-warning,

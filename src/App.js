@@ -150,11 +150,11 @@ function App() {
 
   function setClientSite(clientSite) {
 
-    clientSite.DroitAccesDepannage = true;
-    clientSite.DroitAccesDevis = true;
-    clientSite.DroitAccesFactures = true;
-    clientSite.DroitAccesMaintenance = true;
-    clientSite.DroitAccesDepannage = true;
+    // clientSite.DroitAccesDepannage = true;
+    // clientSite.DroitAccesDevis = true;
+    // clientSite.DroitAccesFactures = true;
+    // clientSite.DroitAccesMaintenance = true;
+    // clientSite.DroitAccesDepannage = true;
 
     setClientSiteCookie(clientSiteName, clientSite);
     SetLastSite(tokenCookie[tokenName], clientSite.GUID);
