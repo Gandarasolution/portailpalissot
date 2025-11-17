@@ -306,7 +306,11 @@ if (!isset($_GET["endpoint"])) {
 			if (isset($result["GMAOGetDocumentsPrestationResult"]["KV"])) {
 				return json_encode($result["GMAOGetDocumentsPrestationResult"]["KV"]);
 
-			} else {
+			} 
+			elseif(isset($result["GMAOGetDocumentsPrestationResult"])){
+				return json_encode($result["GMAOGetDocumentsPrestationResult"]);
+			}
+			else {
 				return "500";
 			}
 		}

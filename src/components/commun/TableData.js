@@ -2440,9 +2440,13 @@ const TableData = ({ ...props }) => {
         const element = arrData[index];
         _arrDocs.push(CreatePropsDocumentMaintenance(element));
       }
-    } else {
-      _arrDocs.push(CreatePropsDocumentMaintenance(arrData));
     }
+    else if(arrData.length && arrData.length > 0)
+    {
+      _arrDocs.push(CreatePropsDocumentMaintenance(arrData));
+
+    }
+
 
     if (_arrDocs.length > 1) {
       let tempDocs = [];
@@ -2752,7 +2756,6 @@ const TableData = ({ ...props }) => {
         </div>
       );
     };
-
     return (
       <Modal
         dialogClassName="modal-listing"
@@ -3235,8 +3238,6 @@ export const EditorActionTelecharger = (e) => {
 
 export const EditorActionsTooltip = ({ actions }) => {
   const [isActive, setIsActive] = useState(false);
-
-
 
   const popover = (
     <Popover className="editor-actions-tooltip">

@@ -175,6 +175,7 @@ const ContratPrestation = ({
     _cells.push(
       CreateNewCell("IdEtat", false, false, false, EditorColonneEtat)
     );
+
     _cells.push(
       CreateNewUnboundCell(
         false,
@@ -182,8 +183,8 @@ const ContratPrestation = ({
         false,
         (item, i, _method) => (
           <EditorActionsTooltip
-            actions={[
-              {
+            actions={  item.IdEtat === 96 ? [
+             {
                 label: "Liste des documents",
                 icon: faFileRegular,
                 onClick: () => {
@@ -199,7 +200,15 @@ const ContratPrestation = ({
                 },
 
               },
-            ]}
+            ] :[{
+                label: "Liste des relevés de tâches",
+                icon: faList,
+                onClick: () => {
+                  _method('tagListeTaches', item, i);
+                },
+
+              },]
+              }
           />
         ), "tagAction"
       )
