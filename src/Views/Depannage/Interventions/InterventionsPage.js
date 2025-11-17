@@ -164,7 +164,7 @@ const InterventionPage = ({ setPageSubtitle, setPageTitle }) => {
 
     const actionsForIntervention = (item, i, _method) => [
       {
-        label: "Voir les documents",
+        label: "Liste des documents",
         onClick: () => {
           _method('tagInterventionDocuments', item, i);
         }
