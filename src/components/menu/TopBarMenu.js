@@ -453,7 +453,8 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
 
         <Navbar.Text className="d-flex align-items-center site-container">
           <div
-            className={`d-flex align-items-start me-3 wrapper-site ${isSwitchSiteOpen ? "is-switching" : ""}`}
+            // className={`d-flex align-items-start me-3 wrapper-site ${isSwitchSiteOpen ? "is-switching" : ""}`}
+            className={`d-flex align-items-start me-3 wrapper-site ${isSwitchSiteOpen ? "" : ""}`}
           >
             <div className="title-site me-2">
               {ClientSiteContratCtx.storedClientSite?.NomCompletClientSite}
@@ -476,15 +477,14 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
                   style={{ width: dropdownWidth }}
                 >
                   {
-                    listeSites && listeSites.length && listeSites.length >= 1 && listeSites.map((site) => (
+                    listeSites && listeSites.length && listeSites.length >= 1 && listeSites.map((site, index) => (
 
 
-                      site.GUID !== ClientSiteContratCtx.storedClientSite.GUID && (
+                      site.GUID !== ClientSiteContratCtx.storedClientSite.GUID && index <= 3 && (
                         <Dropdown.Item
                           key={site.GUID}
                           onClick={() => ClientSiteContratCtx.setClientSite(site)}
-                          className="ms-3"
-
+                          className={index = 0 ? "ms-3" : "ms-3 mt-1"}
                         >
                           {site.NomCompletClientSite}
                         </Dropdown.Item>

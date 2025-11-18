@@ -729,7 +729,8 @@ button.switch-site {
 }
 
 .top-bar-menu .navbar-text .wrapper-site .dropdown-menu {
-  position: relative;
+  /* position: relative; */
+  z-index: 1000;
   border-width: 0;
   padding-bottom: 0;
 }
