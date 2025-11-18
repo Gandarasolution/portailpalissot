@@ -490,24 +490,18 @@ const TableData = ({ ...props }) => {
 
     //#region check
 
-  const [arrayFilterIn, setArrayFilterIn] = useState([]);
+  const [arrayFilterIn, setArrayFilterIn] = useState(JSON.parse(JSON.stringify(arrayFilter)));
 
-  function IsFiltercheckboxShouldBeCheck(fieldname, item) {
-    // if (
-    //   arrayFilter.findIndex(
-    //     (filter) => filter.fieldname === fieldname && filter.item === item
-    //   ) > -1
-    // )
-    //   return true;
-    // return false;
-     if (
-      arrayFilterIn.findIndex(
-        (filter) => filter.fieldname === fieldname && filter.item === item
-      ) > -1
-    )
-      return true;
-    return false;
-  }
+    function IsFiltercheckboxShouldBeCheck(fieldname, item) {
+
+      if (
+        arrayFilterIn.findIndex(
+          (filter) => filter.fieldname === fieldname && filter.item === item
+        ) > -1
+      )
+        return true;
+      return false;
+    }
 
     const HandleCheckfilterChange = (checked, key, value) => {
       // let _arrTemp = JSON.parse(JSON.stringify(arrayFilter));
