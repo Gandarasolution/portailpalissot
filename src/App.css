@@ -76,13 +76,13 @@ TABLE DES MATIÈRES
 body.theme-color-1 {
   --color-primary: #2968aa;
   --color-action: #4892cc;
-  --color-pastel: #4892cc;
+  --color-pastel: #cce9ff;
 }
 
 body.theme-color-2 {
   --color-primary: #422a66;
   --color-action: #633282;
-  --color-pastel: #633282;
+  --color-pastel: #e2bef8;
 }
 
 body.theme-color-3 {
@@ -100,7 +100,7 @@ body.theme-color-4 {
 body.theme-color-5 {
   --color-primary: #3c7b3e;
   --color-action: #6daf74;
-  --color-pastel: #6daf74;
+  --color-pastel: #D9F3EA;
 }
 
 /* ==========================================================================

@@ -259,15 +259,15 @@ const TableData = ({ ...props }) => {
     return false;
   }
 
-  function IsFiltercheckboxShouldBeCheck(fieldname, item) {
-    if (
-      arrayFilter.findIndex(
-        (filter) => filter.fieldname === fieldname && filter.item === item
-      ) > -1
-    )
-      return true;
-    return false;
-  }
+  // function IsFiltercheckboxShouldBeCheck(fieldname, item) {
+  //   if (
+  //     arrayFilter.findIndex(
+  //       (filter) => filter.fieldname === fieldname && filter.item === item
+  //     ) > -1
+  //   )
+  //     return true;
+  //   return false;
+  // }
 
   function IsButtonShouldBeCheck(fieldname) {
     if (
@@ -343,22 +343,6 @@ const TableData = ({ ...props }) => {
     }
   };
 
-  const HandleCheckfilterChange = (checked, key, value) => {
-    let _arrTemp = JSON.parse(JSON.stringify(arrayFilter));
-
-    if (checked) {
-      _arrTemp.push({ fieldname: key, item: value });
-      setArrayFilter(_arrTemp);
-    } else {
-      const index = _arrTemp.findIndex(
-        (filter) => filter.fieldname === key && filter.item === value
-      );
-      if (index > -1) {
-        _arrTemp.splice(index, 1);
-        setArrayFilter(_arrTemp);
-      }
-    }
-  };
 
   const handleTousFilter = () => {
     setBtFilterActif(null);
@@ -493,7 +477,8 @@ const TableData = ({ ...props }) => {
   const PopoverFilter = (fieldname, setShowPopover) => {
     let _arFilters = [];
     // console.log(props.Data.Count)
-    if ((props.Data) || (props.Data && props.Data.Count === 0)) {
+    // if ((props.Data) || (props.Data && props.Data.Count === 0)) {
+    if ((props.Data && props.Data.Count === 0)) {
       _arFilters = [];
     } else {
 
@@ -502,6 +487,54 @@ const TableData = ({ ...props }) => {
     const _arrayVal = _arFilters.map((x) => x[0]);
 
     const _headerToApply = props.Headers.find((h) => h.fieldname === fieldname);
+
+    //#region check
+
+  const [arrayFilterIn, setArrayFilterIn] = useState([]);
+
+  function IsFiltercheckboxShouldBeCheck(fieldname, item) {
+    // if (
+    //   arrayFilter.findIndex(
+    //     (filter) => filter.fieldname === fieldname && filter.item === item
+    //   ) > -1
+    // )
+    //   return true;
+    // return false;
+     if (
+      arrayFilterIn.findIndex(
+        (filter) => filter.fieldname === fieldname && filter.item === item
+      ) > -1
+    )
+      return true;
+    return false;
+  }
+
+    const HandleCheckfilterChange = (checked, key, value) => {
+      // let _arrTemp = JSON.parse(JSON.stringify(arrayFilter));
+      let _arrTemp = JSON.parse(JSON.stringify(arrayFilterIn));
+
+      if (checked) {
+        _arrTemp.push({ fieldname: key, item: value });
+        // setArrayFilter(_arrTemp);
+        setArrayFilterIn(_arrTemp);
+      } else {
+        const index = _arrTemp.findIndex(
+          (filter) => filter.fieldname === key && filter.item === value
+        );
+        if (index > -1) {
+          _arrTemp.splice(index, 1);
+          // setArrayFilter(_arrTemp);
+          setArrayFilterIn(_arrTemp);
+        }
+      }
+    };
+
+  const HandleCheckFilterClick=e => {
+    let _arrTemp = JSON.parse(JSON.stringify(arrayFilterIn));
+    setArrayFilter(_arrTemp);
+  }
+
+    //#endregion
 
     //#region RangeDate
 
@@ -724,6 +757,7 @@ const TableData = ({ ...props }) => {
 
     //#endregion
 
+
     const ResetFilterCol = () => {
       function removeValue(array, setArray) {
         let _array = JSON.parse(JSON.stringify(array));
@@ -740,7 +774,6 @@ const TableData = ({ ...props }) => {
     const ClosePopover = () => {
       setShowPopover(false);
     };
-
 
     if (_headerToApply.filter.isCheckbox && _arFilters.length >= 20) {
       _headerToApply.filter.isCheckbox = false;
@@ -785,6 +818,15 @@ const TableData = ({ ...props }) => {
                     />
                   );
                 })}
+                 <Button className="btn-filter" onClick={HandleCheckFilterClick}>Valider</Button>
+              <Button
+                className="btn-filter cancel"
+                onClick={() => {
+                  ResetFilterCol();
+                }}
+              >Effacer
+              </Button>
+
               </div>
             </Tab>
           )}
@@ -2398,9 +2440,13 @@ const TableData = ({ ...props }) => {
         const element = arrData[index];
         _arrDocs.push(CreatePropsDocumentMaintenance(element));
       }
-    } else {
-      _arrDocs.push(CreatePropsDocumentMaintenance(arrData));
     }
+    else if(arrData.length && arrData.length > 0)
+    {
+      _arrDocs.push(CreatePropsDocumentMaintenance(arrData));
+
+    }
+
 
     if (_arrDocs.length > 1) {
       let tempDocs = [];
@@ -2710,7 +2756,6 @@ const TableData = ({ ...props }) => {
         </div>
       );
     };
-
     return (
       <Modal
         dialogClassName="modal-listing"
@@ -2725,7 +2770,7 @@ const TableData = ({ ...props }) => {
         <Modal.Header>
           <Modal.Title>
             <FontAwesomeIcon icon={faFile} />
-            Liste des factures
+            Liste des documents
           </Modal.Title>
           <Button
             className="close-modal"
@@ -3193,8 +3238,6 @@ export const EditorActionTelecharger = (e) => {
 
 export const EditorActionsTooltip = ({ actions }) => {
   const [isActive, setIsActive] = useState(false);
-
-
 
   const popover = (
     <Popover className="editor-actions-tooltip">
