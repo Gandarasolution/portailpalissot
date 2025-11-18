@@ -15,13 +15,14 @@ import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-import CloseButton from "react-bootstrap/CloseButton";
 import InputGroup from "react-bootstrap/InputGroup";
 import Modal from "react-bootstrap/Modal";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Card from "react-bootstrap/Card";
+
 import Tooltip from "react-bootstrap/Tooltip";
+// import CloseButton from "react-bootstrap/CloseButton";
 //#endregion
 
 //#region fontAwsome
@@ -45,7 +46,6 @@ import {
   FiltrerParSeuil,
   FiltrerParSeuilDate,
   GenerateUid,
-  GetURLLocationViewerFromExtension,
   RegexTestAndReturnMatch,
   base64toBlob,
   groupBy,
@@ -63,7 +63,10 @@ import { GetListeFIIntervention, GetListeFactureIntervention, GetDocumentFISAV }
 
 
 //#region Contexts
-import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
+import {
+  ClientSiteContratContext, TokenContext,
+  //  ViewerContext
+} from "../../App";
 import { PrestaContext } from "../../Views/Maintenance/Contrat/Components/ContratPrestations";
 
 //#endregion
@@ -75,6 +78,10 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
+import { GetClientSiteBySearch } from "../../axios/WS_User";
+import { useNavigate } from "react-router-dom";
+import { Toast, ToastContainer } from "react-bootstrap";
+import { error } from "jquery";
 
 const TAGSELECTION = "_xSelection";
 //#endregion
@@ -86,9 +93,15 @@ const TAGSELECTION = "_xSelection";
 const TableData = ({ ...props }) => {
   const tokenCt = useContext(TokenContext);
 
-  const viewerCt = useContext(ViewerContext);
+  // const viewerCt = useContext(ViewerContext);
 
   const ClientSiteCt = useContext(ClientSiteContratContext);
+
+  const navigate = useNavigate();
+  const [showToast, setShowToast] = useState(false);
+  const [variantToast, setVariantToast] = useState("info");
+  const [messageToast, setMessageToast] = useState("Téléchargement en cours");
+  const [titleToast, setTitleToast] = useState("Téléchargement")
 
 
   const Data = () => {
@@ -107,14 +120,13 @@ const TableData = ({ ...props }) => {
       element[TAGSELECTION] = arraySelector.includes(index);
     }
 
-
     //filtre par la barre de recherche
-    if (String(search).length > 0) {
+    if (String(search).length > 0  && _lData.length > 0) {
       _lData = _lData.filter((item) => FiltrerParSearchGlobal(item));
     }
 
     //Filtre par les boutons
-    if (props.ButtonFilters && btFilterActif) {
+    if (props.ButtonFilters && btFilterActif && _lData.length > 0) {
       let _filteractif = JSON.parse(JSON.stringify(btFilterActif));
 
       _lData = _lData.filter((data) => {
@@ -159,7 +171,6 @@ const TableData = ({ ...props }) => {
 
   //#region States
   const [search, setSearch] = useState("");
-
   const [arrayFilter, setArrayFilter] = useState([]);
   const getArrayFilterStart = () => {
     let _array = [];
@@ -309,10 +320,27 @@ const TableData = ({ ...props }) => {
 
   //#region Events
 
+  const _interval3seconde = (value) => {
+    var _myInterval = setInterval(function () {
+      var _search = document.getElementById("search-bar-table-data").value;
+      if (value === _search) {
+        clearInterval(_myInterval);
+        GetClientSiteBySearch(tokenCt, _search, props.UserClientSite);
+      } else {
+        clearInterval(_myInterval);
+      }
+    }, 3000)
+  }
+
   const handleSearch = (e) => {
-    e.preventDefault();
-    ResetAffichage(1);
     setSearch(e.target.value);
+
+    if (props.IsUser) {
+      _interval3seconde(e.target.value);
+    } else {
+      e.preventDefault();
+      ResetAffichage(1);
+    }
   };
 
   const HandleCheckfilterChange = (checked, key, value) => {
@@ -464,8 +492,13 @@ const TableData = ({ ...props }) => {
 
   const PopoverFilter = (fieldname, setShowPopover) => {
     let _arFilters = [];
+    // console.log(props.Data.Count)
+    if ((props.Data) || (props.Data && props.Data.Count === 0)) {
+      _arFilters = [];
+    } else {
 
-    _arFilters = Object.entries(groupBy(props.Data, fieldname));
+      _arFilters = Object.entries(groupBy(props.Data, fieldname));
+    }
     const _arrayVal = _arFilters.map((x) => x[0]);
 
     const _headerToApply = props.Headers.find((h) => h.fieldname === fieldname);
@@ -899,7 +932,7 @@ const TableData = ({ ...props }) => {
       return (
         <tbody>
           <tr>
-            <td colSpan={props.Headers.length}>Aucune données.</td>
+            <td colSpan={props.Headers.length}>{props.IsUser ? "Utilisez la barre de recherche." : "Aucune donnée"}</td>
           </tr>
         </tbody>
       );
@@ -1345,7 +1378,7 @@ const TableData = ({ ...props }) => {
     useEffect(() => {
       const handleScroll = () => {
         if (containerRef.current) {
-          const rect = containerRef.current.getBoundingClientRect();
+          // const rect = containerRef.current.getBoundingClientRect();
           setIsSticky(window.scrollY > 100);
         }
       };
@@ -1363,6 +1396,7 @@ const TableData = ({ ...props }) => {
       } else {
         setIsSticky(false);
       }
+      //eslint-disable-next-line
     }, [arraySelector.length]);
 
     const SwitchTagSelection = async (tagMethod) => {
@@ -1665,6 +1699,7 @@ const TableData = ({ ...props }) => {
     let _actualClientSite = ClientSiteCt.storedClientSite;
     if (!(_actualClientSite) || (_actualClientSite.GUID !== siteAChoisir.GUID)) {
       ClientSiteCt.setClientSite(siteAChoisir);
+      navigate("/");
     }
   }
 
@@ -1727,6 +1762,7 @@ const TableData = ({ ...props }) => {
   const ModalListeTaches = () => {
     const modalBodyRef = useRef(null);
     const [isScrollable, setIsScrollable] = useState(false);
+    //eslint-disable-next-line
     const [isAtTop, setIsAtTop] = useState(true);
 
     useEffect(() => {
@@ -1765,10 +1801,12 @@ const TableData = ({ ...props }) => {
 
       return () => {
         if (modalBodyRef.current) {
+          // eslint-disable-next-line
           modalBodyRef.current.removeEventListener("scroll", handleScroll);
         }
         window.removeEventListener("resize", checkScrollability);
       };
+      // eslint-disable-next-line
     }, [listeTaches]);
 
     const scrollToBottom = () => {
@@ -1799,7 +1837,7 @@ const TableData = ({ ...props }) => {
                     {Relevetache.name}
                   </Col>
                 </Row>
-                {true && Array.isArray(Relevetache.value) ? (
+                {ClientSiteCt.storedClientSite.DroitMaintenanceReleveTache && (Array.isArray(Relevetache.value) ? (
                   Relevetache.value.map((tache, indexT) => {
                     return (
                       <Row key={indexT}>
@@ -1825,7 +1863,7 @@ const TableData = ({ ...props }) => {
                       {Relevetache.value}
                     </Col>
                   </Row>
-                )}
+                ))}
               </span>
             );
           })}
@@ -1886,67 +1924,66 @@ const TableData = ({ ...props }) => {
   //#region Documents
 
   // const [gridColMDValue, setGridColMDValue] = useState(12);
+  // const CardDocs = () => {
+  //   // const _arrayDocs = JSON.parse(JSON.stringify(documents));
+  //   const _arrayDocs = documents;
 
-  const CardDocs = () => {
-    // const _arrayDocs = JSON.parse(JSON.stringify(documents));
-    const _arrayDocs = documents;
+  //   return (
+  //     <Card className="mb-2">
+  //       <Card.Header className="card-document">
+  //         <Row>
+  //           <Col md={"auto"}>
+  //             Documents{" "}
+  //             {isDocumentLoaded ? (
+  //               `(${_arrayDocs.length > 1
+  //                 ? _arrayDocs.length - 1
+  //                 : _arrayDocs.length
+  //               })`
+  //             ) : (
+  //               <Placeholder animation="glow">
+  //                 <Placeholder xs={1} />
+  //               </Placeholder>
+  //             )}
+  //           </Col>
 
-    return (
-      <Card className="mb-2">
-        <Card.Header className="card-document">
-          <Row>
-            <Col md={"auto"}>
-              Documents{" "}
-              {isDocumentLoaded ? (
-                `(${_arrayDocs.length > 1
-                  ? _arrayDocs.length - 1
-                  : _arrayDocs.length
-                })`
-              ) : (
-                <Placeholder animation="glow">
-                  <Placeholder xs={1} />
-                </Placeholder>
-              )}
-            </Col>
-
-            <Col style={{ textAlign: "end" }}>
-              <CloseButton
-                onClick={() => {
-                  // setGridColMDValue(12);
-                }}
-              // className="ms-4"
-              />
-            </Col>
-          </Row>
-        </Card.Header>
-        {isDocumentLoaded ? (
-          <Card.Body>
-            <div id="collapse-listeDocuments">
-              {_arrayDocs.length > 0
-                ? _arrayDocs.map((doc, index) => {
-                  return (
-                    <RowDocument key={index} props={doc} index={index} />
-                  );
-                })
-                : "Aucun document."}
-            </div>
-          </Card.Body>
-        ) : (
-          <Card.Body>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-            <Placeholder as="p" animation="glow">
-              <Placeholder xs={5} />
-            </Placeholder>
-          </Card.Body>
-        )}
-      </Card>
-    );
-  };
+  //           <Col style={{ textAlign: "end" }}>
+  //             <CloseButton
+  //               onClick={() => {
+  //                 // setGridColMDValue(12);
+  //               }}
+  //             // className="ms-4"
+  //             />
+  //           </Col>
+  //         </Row>
+  //       </Card.Header>
+  //       {isDocumentLoaded ? (
+  //         <Card.Body>
+  //           <div id="collapse-listeDocuments">
+  //             {_arrayDocs.length > 0
+  //               ? _arrayDocs.map((doc, index) => {
+  //                 return (
+  //                   <RowDocument key={index} props={doc} index={index} />
+  //                 );
+  //               })
+  //               : "Aucun document."}
+  //           </div>
+  //         </Card.Body>
+  //       ) : (
+  //         <Card.Body>
+  //           <Placeholder as="p" animation="glow">
+  //             <Placeholder xs={5} />
+  //           </Placeholder>
+  //           <Placeholder as="p" animation="glow">
+  //             <Placeholder xs={5} />
+  //           </Placeholder>
+  //           <Placeholder as="p" animation="glow">
+  //             <Placeholder xs={5} />
+  //           </Placeholder>
+  //         </Card.Body>
+  //       )}
+  //     </Card>
+  //   );
+  // };
 
   const CreatePropError = () => {
     const _obj = {
@@ -1967,23 +2004,27 @@ const TableData = ({ ...props }) => {
     //le titre et l'extension
     _obj.title = element.k;
     _obj.extension = element.k.split(".").pop();
+    try {
 
-    //La fonction appelé lors de l'appuye du bouton 'Voir'
-    _obj.VoirDocumentSup = () => DocumentMaintenanceVoirDocumentSup(element);
+      //La fonction appelé lors de l'appuye du bouton 'Voir'
+      _obj.VoirDocumentSup = () => DocumentMaintenanceVoirDocumentSup(element);
 
-    //La fonction appelé lors de l'appuye du bouton télécharger
-    _obj.TelechargerDocumentSup = async () => {
-      return await DocumentMaintenanceGetFile(element.v, true, true);
-    };
+      //La fonction appelé lors de l'appuye du bouton télécharger
+      // _obj.TelechargerDocumentSup = async () => {
+      //   return await DocumentMaintenanceGetFile(element.v, true, true);
+      // };
 
-    _obj.data = element;
 
+      _obj.TelechargerDocumentSup = () => DocumentMaintenanceTelechargerDocumentSup(element);
+
+      _obj.data = element;
+
+    } catch (ex) {
+
+
+    }
     return _obj;
   };
-
-
-
-
 
 
 
@@ -1997,90 +2038,225 @@ const TableData = ({ ...props }) => {
     //le titre et l'extension
     _obj.title = element.k;
     _obj.extension = element.k.split(".").pop();
+    try {
 
-    //La fonction appelé lors de l'appuye du bouton 'Voir'
-    _obj.VoirDocumentSup = () => DocumentDepannageVoirDocumentSup(element);
+      //La fonction appelé lors de l'appuye du bouton 'Voir'
+      _obj.VoirDocumentSup = () => DocumentDepannageVoirDocumentSup(element);
 
-    //La fonction appelé lors de l'appuye du bouton télécharger
-    _obj.TelechargerDocumentSup = async () => {
-      return await GetDocumentFISAV(tokenCt, element.v, false, true);
-    };
+      //La fonction appelé lors de l'appuye du bouton télécharger
+      _obj.TelechargerDocumentSup = () => DocumentDepannageTelechargerDocumentSup(element);
+      // _obj.TelechargerDocumentSup = async () => {
+      //   return await GetDocumentFISAV(tokenCt, element.v, false, true);
+      // };
 
-    _obj.data = element;
+      _obj.data = element;
 
+    } catch (ex) {
+      console.log("Erreur lors de la récupération de document : " + ex)
+    }
     return _obj;
   };
 
-  /**
-     * La méthode appellé pour voir un document de maintenance
-     */
+
   const DocumentDepannageVoirDocumentSup = async (element) => {
-
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
-
-    //On récupère le fichier en b64
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Récupération du document... `);
+    setTitleToast(`Document`);
     try {
 
 
+      //On récupère le fichier en b64
       const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
-      //On transforme le fichier en blob
+      //Transformation en blob
       const blobData = base64toBlob(b64data.v);
 
-      //On créer l'URL utilisé par les viewers
+      //Création de l'URL du fichier
       const url = URL.createObjectURL(blobData);
 
-      //On l'enregistre dans le viewerContext
-      viewerCt.setViewer(url);
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
 
-      //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-      //Le bon viewer est déterminé par l'extension
-      targetWindow.location.href = GetURLLocationViewerFromExtension(
-        element.k.split(".").pop()
-      );
-    } catch (error) {
-      console.log("Erreur lors de la récupération des données : ", error)
-      targetWindow.close();
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+      setVariantToast("success");
+
+      setShowToast(false);
+
+    } catch (ex) {
+      console.log("Erreur lors de la récupération de document : " + ex)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
     }
-  };
+
+
+  }
+
+
+  const DocumentDepannageTelechargerDocumentSup = async (element) => {
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Téléchargement du document... `);
+    setTitleToast(`Document`);
+    try {
+
+      //On récupère le fichier en b64
+      const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
+
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
+
+      saveAs(blobData, element.k);
+      setVariantToast("success");
+
+      setShowToast(false);
+
+    } catch (ex) {
+      console.log("Erreur lors du téléchargement de document : " + ex)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
+
+
+  }
 
 
 
+  // /**
+  //    * La méthode appellé pour voir un document de maintenance dans un viewer
+  //    */
+  // const DocumentDepannageVoirDocumentSupViewer = async (element) => {
+
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   try {
 
 
+  //     const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
+  //     //On transforme le fichier en blob
+  //     const blobData = base64toBlob(b64data.v);
 
+  //     //On créer l'URL utilisé par les viewers
+  //     const url = URL.createObjectURL(blobData);
 
+  //     //On l'enregistre dans le viewerContext
+  //     viewerCt.setViewer(url);
 
+  //     //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //     //Le bon viewer est déterminé par l'extension
+  //     targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //       element.k.split(".").pop()
+  //     );
+  //   } catch (error) {
+  //     console.log("Erreur lors de la récupération des données : ", error)
+  //     targetWindow.close();
+  //   }
+  // };
 
 
 
   /**
-   * La méthode appellé pour voir un document de maintenance
+   * La méthode appellé pour voir un document de maintenance dans une autre fenêtre
    */
   const DocumentMaintenanceVoirDocumentSup = async (element) => {
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
-
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Récupération du document... `);
+    setTitleToast(`Document`);
     //On récupère le fichier en b64
-    const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+    try {
+      const b64data = await DocumentMaintenanceGetFile(element.v, true, true);
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
 
-    //On transforme le fichier en blob
-    const blobData = base64toBlob(b64data.v);
+      //Création de l'URL du fichier
+      const url = URL.createObjectURL(blobData);
 
-    //On créer l'URL utilisé par les viewers
-    const url = URL.createObjectURL(blobData);
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
 
-    //On l'enregistre dans le viewerContext
-    viewerCt.setViewer(url);
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+      setVariantToast("success");
 
-    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-    //Le bon viewer est déterminé par l'extension
-    targetWindow.location.href = GetURLLocationViewerFromExtension(
-      element.k.split(".").pop()
-    );
-  };
+      setShowToast(false);
+
+
+    } catch (ex) {
+      console.log("Erreur lors de la récupération de document : " + ex)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
+  }
+
+
+  const DocumentMaintenanceTelechargerDocumentSup = async (element) => {
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Téléchargement du document... `);
+    setTitleToast(`Document`);
+
+    try {
+
+      
+      const b64data = await DocumentMaintenanceGetFile(element.v, true, true);
+
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
+
+      saveAs(blobData, element.k);
+
+      setVariantToast("success");
+      setShowToast(false);
+
+
+    } catch (ex) {
+      console.log("Erreur lors du téléchargement du document : " + ex)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
+
+
+  }
+
+
+
+
+  // /**
+  //  * La méthode appellé pour voir un document de maintenance via un viewer
+  //  */
+  // const DocumentMaintenanceVoirDocumentSupViewer = async (element) => {
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+
+  //   //On transforme le fichier en blob
+  //   const blobData = base64toBlob(b64data.v);
+
+  //   //On créer l'URL utilisé par les viewers
+  //   const url = URL.createObjectURL(blobData);
+
+  //   //On l'enregistre dans le viewerContext
+  //   viewerCt.setViewer(url);
+
+  //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //   //Le bon viewer est déterminé par l'extension
+  //   targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //     element.k.split(".").pop()
+  //   );
+  // };
 
   const DocumentMaintenanceGetFile = async (v, telecharger, returnData) => {
     const splitPop = v.split("|").pop();
@@ -2142,10 +2318,16 @@ const TableData = ({ ...props }) => {
 
 
     const TelechargerZIPSup = async (presta) => {
+      setTitleToast(`Téléchargement de ${_arrDocT.length} documents`)
+      setMessageToast("");
+      setVariantToast("info")
+      setShowToast(true);
+
       const zip = JSZip();
       let _arrDocs = [];
 
       for (let index = 0; index < _arrDocT.length; index++) {
+        setMessageToast(`Téléchargement du document ${index + 1} / ${_arrDocT.length}`)
         const element = _arrDocT[index];
 
         let _data = await DocumentMaintenanceGetFile(element.data.v, false, true);
@@ -2155,6 +2337,7 @@ const TableData = ({ ...props }) => {
         }
       }
 
+      var _errors = 0;
       _arrDocs.forEach((kv, i) => {
         try {
           let _b64 = kv[0];
@@ -2164,12 +2347,20 @@ const TableData = ({ ...props }) => {
         } catch (error) {
           console.log("Impossible de zipper")
           console.log(error);
+          setVariantToast("danger")
+          setMessageToast("Une erreur est survenue. Merci de rééssayer plus tard.")
+          _errors += 1;
         }
       });
 
       const _v = await zip.generateAsync({ type: 'base64' })
       const _k = `Documents PC${presta.IdPrestationContrat}_${presta.DateInterventionPrestation}`;
 
+
+      if (_errors == 0) {
+        setVariantToast("success");
+        setMessageToast("Téléchargement terminé")
+      }
       return { k: _k, v: _v };
 
     }
@@ -2191,9 +2382,9 @@ const TableData = ({ ...props }) => {
 
   const FetchSetDocuments = async (data, presta) => {
     let _arrDocs = [];
-
     const arrData = data;
-    if (arrData === 500) {
+
+    if (data instanceof Error) {
       const _arrError = [CreatePropError()];
       //Erreur
       setDocuments(_arrError);
@@ -2202,8 +2393,7 @@ const TableData = ({ ...props }) => {
 
       return;
     }
-
-    if (arrData.length) {
+    if (arrData.length && arrData.length > 0) {
       for (let index = 0; index < arrData.length; index++) {
         const element = arrData[index];
         _arrDocs.push(CreatePropsDocumentMaintenance(element));
@@ -2245,10 +2435,11 @@ const TableData = ({ ...props }) => {
   const ModalDocuments = () => {
     const PrestaCtx = useContext(PrestaContext);
 
-    const [gridColMDValue, setGridColMDValue] = useState(12);
+    // const [gridColMDValue, setGridColMDValue] = useState(12);
 
     const modalBodyRef = useRef(null);
     const [isScrollable, setIsScrollable] = useState(false);
+    // eslint-disable-next-line
     const [isAtTop, setIsAtTop] = useState(true);
 
     useEffect(() => {
@@ -2279,10 +2470,12 @@ const TableData = ({ ...props }) => {
 
       return () => {
         if (modalBodyRef.current) {
+          // eslint-disable-next-line
           modalBodyRef.current.removeEventListener("scroll", handleScroll);
         }
         window.removeEventListener("resize", checkScrollability);
       };
+      // eslint-disable-next-line
     }, [documents]);
 
     const scrollToBottom = () => {
@@ -2382,8 +2575,16 @@ const TableData = ({ ...props }) => {
 
     //Création du fichier ZIP
     // let _targetWindow = window.open("/waiting");
+    let _NbErreur = 0;
 
     const CreateArrayZIP = async () => {
+
+      setShowToast(true);
+      setVariantToast("info");
+      setMessageToast(`Téléchargement en cours... (0/${_arrayOfFactures.length}) `);
+      setTitleToast(`Téléchargement de ${_arrayOfFactures.length} fichiers`);
+
+
       for (let index = 0; index < _arrayOfFactures.length; index++) {
         const facture = _arrayOfFactures[index];
         let _kv = await VoirFactureDocument(
@@ -2394,26 +2595,36 @@ const TableData = ({ ...props }) => {
           true
         );
 
+        setMessageToast(`Téléchargement en cours... (${index + 1}/${_arrayOfFactures.length}) `);
+
         //Transformation en blob
         const base64data = _kv.v;
-        const _bblob = base64toBlob(base64data);
-        //Téléchargement
-        saveAs(_bblob, _kv.k);
+        if (_kv === 500 || (!_kv.v)) {
+          _NbErreur += 1
+        } else {
+          const _bblob = base64toBlob(base64data);
+          // Téléchargement
+          saveAs(_bblob, _kv.k);
+        }
+
+
       }
 
       // return _arrDocs;
     };
 
     await CreateArrayZIP();
-    // const _date = new Date();
-
-    // await TelechargerZIP(
-    //   _arrDocs,
-    //   `${_date.toLocaleDateString("fr-FR").replace(/\//g, "-")}_${
-    //     _arrDocs.length
-    //   }_factures`
-    // );
-    // _targetWindow.close();
+    if (_NbErreur === 0) {
+      setVariantToast("success");
+      setMessageToast(`Téléchargement terminé`);
+      setTitleToast(`Téléchargement de ${_arrayOfFactures.length} fichiers`);
+    } else if (_NbErreur === _arrayOfFactures.length) {
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    } else {
+      setVariantToast("warning");
+      setMessageToast(`${_NbErreur} document(s) n'ont pas pu être téléchargé. Réessayez plus tard.`);
+    }
   };
 
   const [showModalFacture, setShowModalFacture] = useState(false);
@@ -2425,6 +2636,7 @@ const TableData = ({ ...props }) => {
 
     const modalBodyRef = useRef(null);
     const [isScrollable, setIsScrollable] = useState(false);
+    // eslint-disable-next-line
     const [isAtTop, setIsAtTop] = useState(true);
 
     useEffect(() => {
@@ -2455,10 +2667,12 @@ const TableData = ({ ...props }) => {
 
       return () => {
         if (modalBodyRef.current) {
+          // eslint-disable-next-line
           modalBodyRef.current.removeEventListener("scroll", handleScroll);
         }
         window.removeEventListener("resize", checkScrollability);
       };
+      // eslint-disable-next-line
     }, [documents]);
 
     const scrollToBottom = () => {
@@ -2560,10 +2774,11 @@ const TableData = ({ ...props }) => {
     //La fonction appelé lors de l'appuye du bouton 'Voir'
     _obj.VoirDocumentSup = () => FactureMaintenanceVoirDocumentSup(element);
 
+    _obj.TelechargerDocumentSup = () => FactureMaintenanceTelechargerDocumentSup(element);
     //La fonction appelé lors de l'appuye du bouton télécharger
-    _obj.TelechargerDocumentSup = async () => {
-      return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
-    };
+    // _obj.TelechargerDocumentSup = async () => {
+    //   return await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
+    // };
 
     _obj.data = element;
 
@@ -2571,32 +2786,102 @@ const TableData = ({ ...props }) => {
   };
 
 
-
-  /**
-    * La méthode appellé pour voir un document de maintenance
-    */
   const FactureMaintenanceVoirDocumentSup = async (element) => {
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Récupération du document... `);
+    setTitleToast(`Document`);
 
-    //On récupère le fichier en b64
-    const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
+    try {
 
-    //On transforme le fichier en blob
-    const blobData = base64toBlob(b64data.v);
 
-    //On créer l'URL utilisé par les viewers
-    const url = URL.createObjectURL(blobData);
+      //On récupère le fichier en b64
+      const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
 
-    //On l'enregistre dans le viewerContext
-    viewerCt.setViewer(url);
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
 
-    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-    //Le bon viewer est déterminé par l'extension
-    targetWindow.location.href = GetURLLocationViewerFromExtension(
-      element.k.split(".").pop()
-    );
-  };
+      //Création de l'URL du fichier
+      const url = URL.createObjectURL(blobData);
+
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
+
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+
+      setVariantToast("success")
+      setMessageToast("Document récupéré.")
+
+    } catch (error) {
+
+      console.log("Erreur lors de la récupération du document : " + error)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
+  }
+
+
+  const FactureMaintenanceTelechargerDocumentSup = async (element) => {
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast(`Téléchargement du document... `);
+    setTitleToast(`Document`);
+
+    try {
+
+
+      //On récupère le fichier en b64
+      const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
+
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
+
+      saveAs(blobData, element.k)
+
+      setVariantToast("success")
+      setMessageToast("Document téléchargé.")
+
+    } catch (error) {
+
+      console.log("Erreur lors de la récupération du document : " + error)
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
+
+  }
+
+
+
+
+  // /**
+  //   * La méthode appellé pour voir un document de maintenance dans un viewer
+  //   */
+  // const FactureMaintenanceVoirDocumentSupViewer = async (element) => {
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   const b64data = await VoirFactureDocument(tokenCt, element.v, "Facture SAV", false, true);
+
+  //   //On transforme le fichier en blob
+  //   const blobData = base64toBlob(b64data.v);
+
+  //   //On créer l'URL utilisé par les viewers
+  //   const url = URL.createObjectURL(blobData);
+
+  //   //On l'enregistre dans le viewerContext
+  //   viewerCt.setViewer(url);
+
+  //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //   //Le bon viewer est déterminé par l'extension
+  //   targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //     element.k.split(".").pop()
+  //   );
+  // };
 
 
 
@@ -2606,23 +2891,37 @@ const TableData = ({ ...props }) => {
     _obj.extension = "zip";
 
     const TelechargerZIPSup = async (IdDossierInterventionSAV) => {
+      setShowToast(true);
+      setVariantToast("info");
+      setMessageToast(`Téléchargement en cours... (0/${_arrDocsFI.length + _arrDocsFA.length}) `);
+
       const zip = JSZip();
       let _arrDocs = [];
 
 
       for (let index = 0; index < _arrDocsFI.length; index++) {
-        const element = _arrDocsFI[index];
-        const _kv = await GetDocumentFISAV(
-          tokenCt,
-          element.data.v,
-          false,
-          true
-        );
-        const _arrDocFI = [_kv.v, _kv.k];
-        _arrDocs.push(_arrDocFI);
+        try {
+          setMessageToast(`Téléchargement en cours... (${index + 1}/${_arrDocsFI.length + _arrDocsFA.length}) `);
+          const element = _arrDocsFI[index];
+          const _kv = await GetDocumentFISAV(
+            tokenCt,
+            element.data.v,
+            false,
+            true
+          );
+          const _arrDocFI = [_kv.v, _kv.k];
+          _arrDocs.push(_arrDocFI);
+          
+        } catch (error) {
+          
+        }
       }
 
       for (let index = 0; index < _arrDocsFA.length; index++) {
+        try {
+
+        setMessageToast(`Téléchargement en cours... (${_arrDocsFI.length + index + 1}/${_arrDocsFI.length + _arrDocsFA.length}) `);
+
         const element = _arrDocsFA[index];
         const _kv = await VoirFactureDocument(
           tokenCt,
@@ -2634,23 +2933,39 @@ const TableData = ({ ...props }) => {
         const _arrDocFA = [_kv.v, _kv.k];
 
         _arrDocs.push(_arrDocFA);
+          
+        } catch (error) {
+          
+        }
       }
 
+
+      let _error = 0;
       _arrDocs.forEach((kv, i) => {
         try {
           let _b64 = kv[0];
           let _blob = base64toBlob(_b64);
           zip.file(kv[1], _blob);
 
+
         } catch (error) {
           console.log("Impossible de zipper")
           console.log(error);
+          setVariantToast("danger");
+          setMessageToast("Un problème est survenu. Réessayez plus tard.");
+          _error = 1;
         }
       });
 
       const _v = await zip.generateAsync({ type: 'base64' })
       const _k = `Tous les documents`;
+      if (_error = 0)
+      {
 
+        setVariantToast("success");
+        setMessageToast(`Téléchargement terminé`);
+        setTitleToast(`Téléchargement de ${_arrDocs.length} fichiers`);
+      }
       return { k: _k, v: _v };
 
 
@@ -2660,7 +2975,8 @@ const TableData = ({ ...props }) => {
       // );
     };
 
-    _obj.TelechargerDocumentSup = async () => await TelechargerZIPSup();
+    // _obj.TelechargerDocumentSup = async () => await TelechargerZIPSup();
+    _obj.TelechargerDocumentSup =  () =>  TelechargerZIPSup();
 
     _obj.type = "application/zip";
     return _obj;
@@ -2743,14 +3059,14 @@ const TableData = ({ ...props }) => {
     };
 
     //1 - Demande les FI
-    GetListeFIIntervention(
+    await GetListeFIIntervention(
       tokenCt,
       IdDossierInterventionSAV,
       FetchSetDataFIPart
     );
 
     //3 - Demande les factures
-    GetListeFactureIntervention(
+    await GetListeFactureIntervention(
       tokenCt,
       IdDossierInterventionSAV,
       FetchSetDataFacturePart
@@ -2804,6 +3120,19 @@ const TableData = ({ ...props }) => {
           <GridCards />
         </Breakpoint>
         <Row>{props.Pagination && <Col>{TablePagination()}</Col>}</Row>
+        <ToastContainer
+          className="p-3"
+          position={"bottom-end"}
+        // style={{ zIndex: 1 }}
+        >
+          <Toast show={showToast} bg={variantToast} onClose={() => setShowToast(false)}>
+            <Toast.Header> <strong className="me-auto">{titleToast}</strong>
+            </Toast.Header>
+            <Toast.Body>
+              <div>{messageToast}</div>
+            </Toast.Body>
+          </Toast>
+        </ToastContainer>
       </Container>
     </BreakpointProvider>
   );

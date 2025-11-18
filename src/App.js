@@ -16,12 +16,12 @@ import Col from "react-bootstrap/Col";
 import LoginPage from "./Views/Login/LoginPage";
 import ClientSitePage from "./Views/Home/ClientSitePage";
 import ContratPage from "./Views/Maintenance/Contrat/ContratPage";
-import AppareilsPage from "./Views/Maintenance/Appareils/AppareilsPage";
 import InterventionPage from "./Views/Depannage/Interventions/InterventionsPage";
-import NouvelleInterventionPage from "./Views/Depannage/Interventions/NouvelleInterventionPage";
 import FacturesPage from "./Views/Factures/FacturesPage";
 import WaiterPage from "./Views/ErrorHandling/Waiter";
 import ErrorPage from "./Views/ErrorHandling/Error";
+// import AppareilsPage from "./Views/Maintenance/Appareils/AppareilsPage";
+// import NouvelleInterventionPage from "./Views/Depannage/Interventions/NouvelleInterventionPage";
 
 //#endregion
 
@@ -40,11 +40,12 @@ import { createContext, useState } from "react";
 
 import { useCookies } from "react-cookie";
 
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { Breakpoint, BreakpointProvider } from "react-socks";
 
 //#endregion
 
+//eslint-disable-next-line
 import PageTest from "./Views/Home/Test";
 import ViewerWord from "./Views/Viewer/ViewerWord";
 import DevisPage from "./Views/Devis/DevisPage";
@@ -66,10 +67,11 @@ import HomePage from "./Views/Home/HomePage";
 import ViewerPDFPage from "./Views/Viewer/ViewerPDF";
 import ViewerWordPage from "./Views/Viewer/ViewerWord";
 import ViewerImagePage from "./Views/Viewer/ViewerImage";
-import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
 import { addOneYear, cyrb53, DateSOAP } from "./functions";
 import { Toast, ToastContainer } from "react-bootstrap";
 import { SetLastSite } from "./axios/WS_ClientSite";
+import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
+// import ChangeMDPPage from "./Views/Home/ChangeMDPPage";
 // import AccountPage from "./Views/Home/AccountPage";
 
 library.add(
@@ -147,6 +149,13 @@ function App() {
     useCookies([clientSiteName]);
 
   function setClientSite(clientSite) {
+
+    // clientSite.DroitAccesDepannage = true;
+    // clientSite.DroitAccesDevis = true;
+    // clientSite.DroitAccesFactures = true;
+    // clientSite.DroitAccesMaintenance = true;
+    // clientSite.DroitAccesDepannage = true;
+
     setClientSiteCookie(clientSiteName, clientSite);
     SetLastSite(tokenCookie[tokenName], clientSite.GUID);
   }
@@ -161,6 +170,7 @@ function App() {
   //#region Endpoint
 
   const wsEndpointName = cyrb53("wsEndpointName").toString();
+  //eslint-disable-next-line
   const [wsEndpointCookie, setWsEndpointCookie, removeWSEndpointCookie] = useCookies({ wsEndpointName });
 
   function setWsEndpoint(ws) {
@@ -180,11 +190,17 @@ function App() {
 
   //#region Token
 
+  const isUserName = cyrb53("isUserNameHAshed").toString();
+
+  const [isUserCookie, setIsUserCookie, removeIsUserCookie] = useCookies([isUserName,]);
+
+  function setIsUserViaCookies(value) {
+    setIsUserCookie(isUserName, value);
+  }
 
 
   //Hashage du nom du token pour éviter une récupération mannuelle rapide
   const tokenName = cyrb53("tokenNameHashed").toString();
-
   const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies([
     tokenName,
   ]);
@@ -192,6 +208,10 @@ function App() {
   function setTokenViaCookies(token) {
     setTokenCookie(tokenName, token);
   }
+
+  const storedToken = (isUserCookie[isUserName] === "1" ? "**" : "") + tokenCookie[tokenName];
+
+
   //#endregion
 
   const handleDeconnexion = () => {
@@ -199,21 +219,47 @@ function App() {
     removeClientSiteCookie(clientSiteName);
     removeWsEntrepriseCookie(wsEntrepriseName);
     removeWSEndpointCookie(wsEndpointName);
+
+    removeIsUserCookie(isUserName);
+
     localStorage.clear();
+    window.location.href = "/";
+
   };
 
-  if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName]) && !window.location.href.toUpperCase().includes('changeMDP/'.toUpperCase())) {
+ 
+  if (!(tokenCookie[tokenName] && wsEntrepriseCookie[wsEntrepriseName])) {
     return (
       <div className="App font-link background">
-        <LoginPage
-          setToken={setTokenViaCookies}
-          setUrlWs={setWsEntrepriseURL}
-          setWsEndpoint={setWsEndpoint}
-          setTheme={setTheme}
-          setImageClient={setImageClient}
-        // setParams={setListeParamsViaCookies}
-        // setAccountName={setAccountName}
-        />
+
+        <Router>
+          <Routes>
+
+            <Route path="changemdp/:token" element={<ChangeMDPPage />} />
+            <Route path="/" element={
+              <LoginPage
+                setToken={setTokenViaCookies}
+                setUrlWs={setWsEntrepriseURL}
+                setWsEndpoint={setWsEndpoint}
+                setTheme={setTheme}
+                setImageClient={setImageClient}
+                setIsUser={setIsUserViaCookies}
+              />
+            } />
+            <Route path="/forget" element={
+              <LoginPage
+                setToken={setTokenViaCookies}
+                setUrlWs={setWsEntrepriseURL}
+                setWsEndpoint={setWsEndpoint}
+                setTheme={setTheme}
+                setImageClient={setImageClient}
+                setIsUser={setIsUserViaCookies}
+                forget={true}
+              />
+            } />
+
+          </Routes>
+        </Router>
       </div>
     );
   }
@@ -222,7 +268,7 @@ function App() {
   //#endregion
 
 
-//#region Fonctions
+  //#region Fonctions
 
   function setTheme(theme) {
     localStorage.setItem("theme", theme)
@@ -230,20 +276,20 @@ function App() {
     document.body.className = `${_theme}`;
   }
 
-  function setImageClient(b64strImg){
-    localStorage.setItem("logoClient",b64strImg);
+  function setImageClient(b64strImg) {
+    localStorage.setItem("logoClient", b64strImg);
   }
 
   const consoleError = console.error;
   const SUPPRESSED_ERRORS = ['Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.'];
   console.error = function filterErrors(msg, ...args) {
-      if (!SUPPRESSED_ERRORS.some((entry) => msg.includes(entry))) {
-        consoleError(msg, ...args);
-      }
-      
+    if (!SUPPRESSED_ERRORS.some((entry) => msg.includes(entry))) {
+      consoleError(msg, ...args);
+    }
+
   };
 
-//#endregion
+  //#endregion
 
 
   //#region ErrorBoundary
@@ -318,7 +364,6 @@ function App() {
       let _DateRetour = new Date(_year, _monthI, _day);
       return _DateRetour;
     }
-
     return (
       <>
         <ErrorBoundaryMenu fallback={setIsErrorMenu}>
@@ -348,62 +393,62 @@ function App() {
             </Toast>
           </ToastContainer>
           <Routes>
-            {/* <Route path="test" element={<PageTest />} /> */}
-            <Route path="/changemdp/:token" element={<ChangeMDPPage />} />
-            <Route
-              path="/"
-              element={storedClientSite ? <HomePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-            />
-            <Route path="waiting" element={<WaiterPage />} />
-            <Route path="error" element={<ErrorPage />} />
 
-            <Route path="/sites" element={<ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />} />
-            {/* <Route path="account" element={<AccountPage accountName={account} />} /> */}
-            <Route
-              path="maintenance"
-              element={storedClientSite ? <ContratPage IsSetPeriode={isSetPeriode} periodeEnCours={periodeEnCours} setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-            />
-            <Route
-              path="appareils"
-              element={storedClientSite ? <AppareilsPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-            />
-            <Route
-              path="interventions"
-              exact
-              element={storedClientSite ? <InterventionPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-            />
-            {/* <Route
-              path="nouvelleintervention"
-              element={
-                storedClientSite ? <NouvelleInterventionPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />
-              }
-            /> */}
-            <Route
-              path="devis"
-              element={storedClientSite ? <DevisPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+            <Route path="/"
+            >
+              <Route index
+                element={storedClientSite && storedClientSite.GUID ? <HomePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+              />
 
-            />
-            <Route
-              path="factures"
-              element={storedClientSite ? <FacturesPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-            />
-            <Route
-              path="viewerPDF"
-              element={storedClientSite ? <ViewerPDFPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-            />{" "}
-            <Route
-              path="viewerDOC"
-              element={storedClientSite ? <ViewerWordPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-            />
-            <Route
-              path="viewerIMG"
-              element={storedClientSite ? <ViewerImagePage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
-            />
-            <Route path="viewerWord" element={<ViewerWord />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+
+              <Route path="waiting" element={<WaiterPage />} />
+              <Route path="error" element={<ErrorPage />} />
+
+              <Route path="sites" element={<ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />} />
+
+              {(storedClientSite && storedClientSite.DroitAccesMaintenance)  && <Route
+                path="maintenance"
+                element={storedClientSite ? <ContratPage IsSetPeriode={isSetPeriode} periodeEnCours={periodeEnCours} setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+              />}
+              {(storedClientSite && storedClientSite.DroitAccesDepannage) && <Route
+                path="interventions"
+                exact
+                element={storedClientSite ? <InterventionPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+              />}
+
+              {(storedClientSite && storedClientSite.DroitAccesDevis) && <Route
+                path="devis"
+                element={storedClientSite ? <DevisPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+
+              />}
+              {(storedClientSite && storedClientSite.DroitAccesFactures) && <Route
+                path="factures"
+                element={storedClientSite ? <FacturesPage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+              />}
+
+
+              <Route
+                path="viewerPDF"
+                element={storedClientSite ? <ViewerPDFPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+              />
+
+              <Route
+                path="viewerDOC"
+                element={storedClientSite ? <ViewerWordPage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+              />
+
+              <Route
+                path="viewerIMG"
+                element={storedClientSite ? <ViewerImagePage /> : <ClientSitePage setPageSubtitle={setPageSubtitle} setPageTitle={setPageTitle} />}
+              />
+
+              <Route path="viewerWord" element={<ViewerWord />} />
+            </Route>
           </Routes>
 
 
-        </ErrorBoundaryData>
+        </ErrorBoundaryData >
       </>
 
     );
@@ -446,7 +491,9 @@ function App() {
 
 
   return (
-    <TokenContext.Provider value={tokenCookie[tokenName]}>
+    // <TokenContext.Provider value={{storedToken}}>
+    // <TokenContext.Provider value={tokenCookie[tokenName]  }>
+    <TokenContext.Provider value={storedToken}>
 
       <ClientSiteContratContext.Provider
         value={{ storedClientSite, setClientSite, removeclientSite, listeSites, setListeSites }}

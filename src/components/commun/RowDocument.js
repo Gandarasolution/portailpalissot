@@ -1,10 +1,7 @@
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Toast from "react-bootstrap/Toast";
-import ToastContainer from "react-bootstrap/ToastContainer";
 import { Link } from "react-router-dom";
 import ImageExtension, { IsExtensionVisible } from "./ImageExtension";
-import { useState } from "react";
 import { base64toBlob } from "../../functions";
 import { saveAs } from "file-saver";
 
@@ -12,38 +9,40 @@ import { saveAs } from "file-saver";
 const RowDocument = ({ props, index }) => {
 
   //#region States
-  const [showToast, setShowToast] = useState(false);
+
+
   //#endregion
 
 
 
 
   //#region Evenements
-  const Telechargement = async () => {
-    //Affichage d'un toast
-    setShowToast(true);
-    const _kv = await props.TelechargerDocumentSup();
-
-    try {
-      //Transformation en blob
-      const base64data = _kv.v;
-
-      const _bblob = base64toBlob(base64data, props?.type);
-      //Téléchargement
-      saveAs(_bblob, _kv.k);
+  // const Telechargement = async () => {
 
 
-    }
-    catch (error) {
+  //   //Affichage d'un toast
+  //   const _kv = await props.TelechargerDocumentSup();
+    
+  //   try {
+  //     //Transformation en blob
+  //     const base64data = _kv.v;
 
-      console.log("Erreur lors du téléchargement")
-    } finally {
+  //     const _bblob = base64toBlob(base64data, props?.type);
+  //     //Téléchargement
+  //     saveAs(_bblob, _kv.k);
 
-      //Cacher le toast
-      setShowToast(false);
 
-    }
-  };
+  //   }
+  //   catch (error) {
+
+  //     console.log("Erreur lors du téléchargement")
+  //   } finally {
+
+  //     //Cacher le toast
+  //     // setShowToast(false);
+
+  //   }
+  // };
 
   // const Visualisation = async () => {
   //   let targetWindow = window.open("/waiting");
@@ -74,30 +73,14 @@ const RowDocument = ({ props, index }) => {
 
   //#region Component
 
-  const ToastTelechargement = () => {
-    return (
-      <ToastContainer
-        className="p-3"
-        position={"bottom-end"}
-      // style={{ zIndex: 1 }}
-      >
-        <Toast show={showToast}>
-          <Toast.Header closeButton={false}></Toast.Header>
-          <Toast.Body>
-            <div>Téléchargement en cours</div>
-            <div>{props.title}</div>
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>
-    );
-  };
 
   //#endregion
 
   return (
     <>
-      <ToastTelechargement />
+
       <Row key={index}>
+
         <Col md={"auto"}>
           <ImageExtension extension={props.extension} />
         </Col>
@@ -119,7 +102,8 @@ const RowDocument = ({ props, index }) => {
                 )}
 
               {props.TelechargerDocumentSup && (
-                <Link onClick={Telechargement}>Télécharger</Link>
+                // <Link onClick={() => Telechargement()}>Télécharger</Link>
+                <Link onClick={() => props.TelechargerDocumentSup()}>Télécharger</Link>
               )}
             </div>
           </div>

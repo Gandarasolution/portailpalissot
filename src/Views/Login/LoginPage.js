@@ -18,7 +18,7 @@ import Spinner from "react-bootstrap/Spinner";
 //#endregion
 
 //#region Components
-import {  CreateTokenMDP, IsURICanonnical,Connexion,  GetListeParametres, GetURLWs } from "../../axios/WS_User";
+import { CreateTokenMDP, IsURICanonnical, Connexion, GetListeParametres, GetURLWs } from "../../axios/WS_User";
 
 //#endregion
 
@@ -96,6 +96,7 @@ const LoginPage = (props) => {
     let _themeFromWS = "";
     let _wsEndpoint = "";
     let _logoClient = "";
+    let _isUser = isNaN(login) ? 0 : 1;
     const GetResponseURLWS = (data) => {
       if (isNaN(data) && data.urlWSClient) {
         _wsForToken = data.urlWSClient;
@@ -103,7 +104,7 @@ const LoginPage = (props) => {
         _themeFromWS = data?.themeClient;
         _logoClient = data?.logoClient;
         props.setWsEndpoint(_wsEndpoint)
-        
+
       }
 
     }
@@ -131,6 +132,7 @@ const LoginPage = (props) => {
           props.setToken(response);
           props.setTheme(_themeFromWS);
           props.setImageClient(_logoClient);
+          props.setIsUser(_isUser);
         };
 
         //3 -> On récupère la liste des paramètres de l'application
@@ -155,7 +157,7 @@ const LoginPage = (props) => {
 
   //#region Forgot password
 
-  const handleForgotPassword = () => {
+  const handleForgotPassword = async () => {
     if (mailRecup.length > 0) {
 
       const FetchSetRecup = (data) => {
@@ -174,8 +176,19 @@ const LoginPage = (props) => {
         setRecupAlerteVisible(true)
       }
 
-      CreateTokenMDP(mailRecup, FetchSetRecup)
+      let _wsForToken = "";
+      let _wsEndpoint = "";
+      const GetResponseURLWS = (data) => {
+        if (isNaN(data) && data.urlWSClient) {
+          _wsForToken = data.urlWSClient;
+          _wsEndpoint = data.urlWSEndpoint
+        }
 
+      }
+
+      await GetURLWs(codeEntreprise, GetResponseURLWS);
+
+      CreateTokenMDP(mailRecup, FetchSetRecup, _wsForToken, _wsEndpoint)
     }
   };
 
@@ -192,13 +205,14 @@ const LoginPage = (props) => {
             de passe.</span>
         </p>
 
-        <Form className="m-4" onSubmit={() => handleForgotPassword()}>
+        <Form className="m-4" onSubmit={(e) => {e.preventDefault(); handleForgotPassword()}}>
           <Form.Control
             type="email"
             required
             placeholder="Tapez votre adresse email"
             value={mailRecup}
             onChange={(e) => setMailRecup(e.target.value)}
+            onVal
           />
 
           <div>
@@ -235,11 +249,19 @@ const LoginPage = (props) => {
     )
   }
 
+  const handleModaleClose = () => {
+    if (props.forget) {
+      window.location.href = "/"
+    } else {
+      setShowModal(false);
+    }
+  }
+
   const ModalForgotPassword = () => {
     return (
       <Modal
         show={showModal}
-        onHide={() => setShowModal(false)}
+        onHide={handleModaleClose}
         backdrop="static"
         keyboard={false}
         dialogClassName="modal-password"
@@ -249,7 +271,7 @@ const LoginPage = (props) => {
           <Button
             className="close-modal"
             variant=""
-          ><FontAwesomeIcon icon={faXmark} onClick={() => setShowModal(false)} />
+          ><FontAwesomeIcon icon={faXmark} onClick={handleModaleClose} />
           </Button>
         </Modal.Header>
 
@@ -372,7 +394,7 @@ const LoginPage = (props) => {
         setShowCodeEntreprise(false);
         setImageLogo(_b64Image);
       }
-  
+
       await GetURLWs(_curentHost, GetResponseURLWS);
 
     } else {
@@ -384,6 +406,9 @@ const LoginPage = (props) => {
   useEffect(() => {
     document.title = "Connexion";
     CanonicalURICodeEntreprise();
+    if (props.forget) {
+      setShowModal(true);
+    }
   }, [login]);
 
   const FormSubmit = () => {
@@ -484,14 +509,14 @@ const LoginPage = (props) => {
         <Col md={12} xl={3} className="d-flex align-items-center justify-content-around flex-column login-content-wrapper">
           {/* Logo au-dessus du formulaire */}
           <div className="container-login-content">
-          <img src={imageLogo} height={80} alt="logo entreprise" />
+            <img src={imageLogo} height={80} alt="logo entreprise" />
             {FormSubmit()}
           </div>
           {/* Image logo_noir en dessous du formulaire */}
           <div className="container-powered-by">
             <p className="text-center text-powered-by">Application propulsée <br></br>par</p>
-              <LogoNoir className="d-inline-block align-top svg-powered-by" />
-          </div> 
+            <LogoNoir className="d-inline-block align-top svg-powered-by" />
+          </div>
         </Col>
       </Row>
       {ModalForgotPassword()}

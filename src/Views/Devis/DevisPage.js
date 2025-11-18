@@ -8,11 +8,11 @@ import Container from "react-bootstrap/Container";
 import { GetListeDevis, GetdocumentDevis } from "../../axios/WS_Devis";
 
 //#region fontAwsome
-import {
-  faFile,
-  faFilePdf,
-} from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faFile,
+//   faFilePdf,
+// } from "@fortawesome/free-regular-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //#endregion
 
 //#region Components
@@ -21,7 +21,6 @@ import TableData, {
   CreateNewButtonFilter,
   CreateNewCardModel,
   CreateNewCell,
-  CreateNewDocumentCell,
   CreateNewHeader,
   CreateNewUnboundHeader,
   EditorDateFromDateTime,
@@ -30,7 +29,7 @@ import TableData, {
   CreateNewUnboundCell
 } from "../../components/commun/TableData";
 import { ClientSiteContratContext, TokenContext, ViewerContext } from "../../App";
-import { Button, Col, Row } from "react-bootstrap";
+import { Button, Col, Row, Toast, ToastContainer } from "react-bootstrap";
 import { GetURLLocationViewerFromExtension, base64toBlob } from "../../functions";
 import { saveAs } from "file-saver";
 
@@ -48,6 +47,10 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [listeDevis, setListeDevis] = useState([]);
 
+  const [showToast, setShowToast] = useState(false);
+  const [variantToast, setVariantToast] = useState("info");
+  const [messageToast, setMessageToast] = useState("Téléchargement en cours");
+  const [titleToast, setTitleToast] = useState("Téléchargement")
   //#endregion
 
   //#region Fonctions
@@ -117,7 +120,7 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
       CreateNewHeader("LibEtat", CreateFilter(true, true), "État", EditorEtat)
     );
     _headers.push(
-      CreateNewUnboundHeader(CreateFilter(),"Action")
+      CreateNewUnboundHeader(CreateFilter(), "Action")
     );
 
     return _headers;
@@ -142,10 +145,10 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
     _cells.push(CreateNewCell("TotalTTC", false, true, false, EditorMontant));
     _cells.push(CreateNewCell("LibEtat", false, false, false, EditorEtat));
 
-    const methodTitleDoc = (e) => {
-      const dateFR = new Date().toLocaleDateString("fr-FR");
-      return `${dateFR} Devis N°${e.IdDevis}.pdf`;
-    };
+    // const methodTitleDoc = (e) => {
+    //   const dateFR = new Date().toLocaleDateString("fr-FR");
+    //   return `${dateFR} Devis N°${e.IdDevis}.pdf`;
+    // };
 
     const actionsForDevis = (devis) => [
       {
@@ -172,7 +175,7 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
 
     _cells.push(
       // CreateNewCell("Action", false, true, false, (val, index, method) =>{
-      CreateNewUnboundCell( false, true, false, (val) =>{
+      CreateNewUnboundCell(false, true, false, (val) => {
         return <EditorActionsTooltip actions={actionsForDevis(val)} />;
       })
     );
@@ -181,6 +184,7 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
 
 
   const methodTelecharger = async (e) => {
+
 
 
     return await GetdocumentDevis(tokenCt, e.IdDevis, true, true);
@@ -193,42 +197,83 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
 
   const Telechargement = async (e) => {
     //Affichage d'un toast
-    // setShowToast(true);
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast("Téléchargement en cours...");
+    setTitleToast("Téléchargement");
     const _kv = await methodTelecharger(e);
     try {
       const base64data = _kv.v;
       const _bblob = base64toBlob(base64data);
       saveAs(_bblob, _kv.k);
+      setVariantToast("success");
+      setMessageToast("Téléchargement terminé !");
     } catch (error) {
-      console.error("Erreur lors du téléchargement :", error);
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+      // console.error("Erreur lors du téléchargement :", error);
     }
   };
 
 
+
   const Voir = async (e) => {
-    //On ouvre une nouvelle fenêtre d'attente
-    let targetWindow = window.open("/waiting");
-
     //On récupère le fichier en b64
-    // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
-    const b64data = await methodVoir(e);
+    setShowToast(true);
+    setVariantToast("info");
+    setMessageToast("Récupération du document en cours...");
+    setTitleToast("Document");
+    try {
 
+      const b64data = await methodVoir(e);
 
-    //On transforme le fichier en blob
-    const blobData = base64toBlob(b64data.v);
+      //Transformation en blob
+      const blobData = base64toBlob(b64data.v);
 
-    //On créer l'URL utilisé par les viewers
-    const url = URL.createObjectURL(blobData);
+      //Création de l'URL du fichier
+      const url = URL.createObjectURL(blobData);
 
-    //On l'enregistre dans le viewerContext
-    viewerCt.setViewer(url);
+      //Création du lien
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.target = "_blank";
+      aLink.click();
 
-    //On navigue la page d'attente au viewer qui chargera l'URL du fichier
-    //Le bon viewer est déterminé par l'extension
-    targetWindow.location.href = GetURLLocationViewerFromExtension(
-      b64data.k.split(".").pop()
-    );
+      //Suppression de l'URL
+      URL.revokeObjectURL(url);
+      setVariantToast("success");
+      setMessageToast(false);
+
+    } catch (ex) {
+      setVariantToast("danger");
+      setMessageToast("Un problème est survenu. Réessayez plus tard.");
+    }
   }
+
+  // const VoirViewer = async (e) => {
+  //   //On ouvre une nouvelle fenêtre d'attente
+  //   let targetWindow = window.open("/waiting");
+
+  //   //On récupère le fichier en b64
+  //   // const b64data = await DocumentMaintenanceGetFile(element.v, false, true);
+  //   const b64data = await methodVoir(e);
+
+
+  //   //On transforme le fichier en blob
+  //   const blobData = base64toBlob(b64data.v);
+
+  //   //On créer l'URL utilisé par les viewers
+  //   const url = URL.createObjectURL(blobData);
+
+  //   //On l'enregistre dans le viewerContext
+  //   viewerCt.setViewer(url);
+
+  //   //On navigue la page d'attente au viewer qui chargera l'URL du fichier
+  //   //Le bon viewer est déterminé par l'extension
+  //   targetWindow.location.href = GetURLLocationViewerFromExtension(
+  //     b64data.k.split(".").pop()
+  //   );
+  // }
 
 
 
@@ -348,15 +393,16 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
       EditorCardSubtitle
     );
 
-    return (
-      <TableData
+
+    // return (_Data.length > 0 &&
+      return (<TableData
         Data={_Data}
         Headers={_Headers}
         Cells={_Cells}
         IsLoaded={isLoaded}
         ButtonFilters={_ButtonFilters}
         FilterDefaultValue={
-          _Data.find((d) => d.Etat.IdEtat === 9) &&
+          _Data.length > 0 && _Data.find((d) => d.Etat.IdEtat === 9) &&
           CreateNewButtonFilter("IdEtat", 9, EditorFilter)
         }
         Pagination
@@ -380,6 +426,19 @@ const DevisPage = ({ setPageSubtitle, setPageTitle }) => {
     <>
       <Container fluid className="table-devis">
         <TableDevis />
+        <ToastContainer
+          className="p-3"
+          position={"bottom-end"}
+        // style={{ zIndex: 1 }}
+        >
+          <Toast show={showToast} bg={variantToast} onClose={() => setShowToast(false)}>
+            <Toast.Header> <strong className="me-auto">{titleToast}</strong>
+            </Toast.Header>
+            <Toast.Body>
+              <div>{messageToast}</div>
+            </Toast.Body>
+          </Toast>
+        </ToastContainer>
       </Container>
     </>
   );

@@ -261,8 +261,7 @@ function GetDateFromStringDDMMYYY(dateStr) {
   const Day = dateStr.substring(0, 2);
   const Month = dateStr.substring(3, 5);
   const Year = dateStr.substring(6, 10);
-  return new Date(Year, Number(Month) - 1, Day);
-
+  return  new Date(Year, Number(Month) - 1, Day);
 }
 
 
@@ -382,6 +381,19 @@ const GetRedirectionFromIdTypeDocument = (IdTypeDocument, IdEtat) => {
 }
 
 
+
+const IsUserFromToken = (token) => {
+  if(token)
+  {
+    if(token.length > 3)
+    {
+      return token.substring(0,2) === "**";
+    }
+  }
+  return false;
+}
+
+
 export {
   FiltrerParSeuilDate,
   FiltrerParSearch,
@@ -404,4 +416,5 @@ export {
   cyrb53,
   GenerateUid,
   GetRedirectionFromIdTypeDocument,
+  IsUserFromToken,
 };

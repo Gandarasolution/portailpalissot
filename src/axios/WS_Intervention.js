@@ -1,6 +1,6 @@
 //Ce fichier rassemble toutes les fonctions d'appel utilisée en rapport avec les interventions SAV
 
-import { error } from "jquery";
+// import { error } from "jquery";
 import { HTMLEncode } from "../functions";
 import { CallEndpoint, TelechargerDocument, VoirDocument } from "./WSGandara";
 

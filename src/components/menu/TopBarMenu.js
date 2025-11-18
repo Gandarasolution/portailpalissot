@@ -45,7 +45,7 @@ import { GetDateFromStringDDMMYYY, GetNomMois } from "../../functions";
 
 //#endregion
 
-const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes,isError }) => {
+const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLoaded, statePeriodes, isError }) => {
 
   //#region Contexts
   const ClientSiteContratCtx = useContext(ClientSiteContratContext);
@@ -62,7 +62,7 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
   const [isSwitchSiteOpen, setIsSwitchSiteOpen] = useState(false);
   const [dropdownWidth, setDropdownWidth] = useState("auto");
 
-  const [listeSites, setListeSites] = useState([]); 
+  const [listeSites, setListeSites] = useState([]);
 
   const navbarRef = useRef(null);
   const titleDropdownRef = useRef(null);
@@ -94,13 +94,13 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
     const titre = pageTitle;
     // Si pageSubtitle est null, on lui assigne une chaîne vide
     const soustitreRaw = pageSubtitleLoaded ? "x" : (pageSubtitle || "");
-    
+
     const numberMatch = soustitreRaw.match(/\d+/);
     const soustitreNumber = numberMatch ? numberMatch[0] : "";
-    
+
     return { titre, soustitre: soustitreNumber };
   }
-  
+
 
 
 
@@ -141,7 +141,7 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
 
     await GetContratPrestationPeriodes(
       TokenCt,
-      ClientSiteContratCtx.storedClientSite.GUID,
+      ClientSiteContratCtx.storedClientSite?.GUID,
       FetchSetDataPeriode
     );
   };
@@ -211,31 +211,6 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
 
           <MenuNavLink icon={faRightFromBracket} text={"Se déconnecter"} onClick={handleDeconnexion} />
           <MenuNavLink href={"/"} icon={faCookieBite} text={"Cookies"} />
-          {/* 
-          <Row>
-          <Button variant="" className="border mb-2" onClick={handleAccount}>
-            <FontAwesomeIcon icon={faUser} /> Mon compte
-          </Button>
-        </Row>
-        <Row>
-          <Button
-            variant=""
-            className="border mb-2"
-            onClick={handleDeconnexion}
-          >
-            <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
-          </Button>
-        </Row>
-        <Row>
-          <Button variant="" className="border mb-2" onClick={handleCookies}>
-            <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
-          </Button>
-        </Row> */}
-
-
-
-
-
 
         </Offcanvas.Body>
       </Offcanvas>
@@ -245,15 +220,6 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
 
   const PopoverAccount = (
     <Popover aria-label="Menu déconnexion" className="popover-menu">
-      {/* <Popover.Header>{accountName}
-      </Popover.Header> */}
-      {/* <Popover.Body> */}
-      {/* <Row>
-          <Button variant="" className="border mb-2" onClick={handleAccount}>
-            <FontAwesomeIcon icon={faUser} /> Mon compte
-          </Button>
-        </Row> */}
-      {/* <Row> */}
       <Button
         variant=""
         className="popover-btn"
@@ -261,13 +227,6 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
       >
         <FontAwesomeIcon icon={faRightFromBracket} /> Se déconnecter
       </Button>
-      {/* </Row> */}
-      {/* <Row>
-          <Button variant="" className="border mb-2" onClick={handleCookies}>
-            <FontAwesomeIcon icon={faCookieBite} /> Gestion des cookies
-          </Button>
-        </Row> */}
-      {/* </Popover.Body> */}
     </Popover>
   );
 
@@ -291,8 +250,21 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
 
       _arrayPeriodes.push({ dateStart: _dateStart, dateEnd: _dateEnd });
     }
-    return (
 
+
+    const GetDPTitle = () => {
+
+      let _deDate = GetDateFromStringDDMMYYY(statePeriodes.periodeEnCours.k)
+      let _aDate = GetDateFromStringDDMMYYY(statePeriodes.periodeEnCours.v)
+
+      let _debutStr = isNaN(_deDate) ? "Aucun contrat de maintenance" : `Contrat de maintenance de : ${GetNomMois(1,false)} ${_deDate.getFullYear()} `;
+      let _finStr = isNaN(_aDate) ? "" : `à ${GetNomMois(12,false)} ${_aDate.getFullYear()}`; 
+
+      return `${_debutStr}${_finStr}`;
+
+    }
+
+    return (
       <>
         <Button variant="" className="button-periode" onClick={() => SoustraireUnAnPeriode()} >
           <FontAwesomeIcon icon={faArrowLeft} />
@@ -304,11 +276,15 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
           }}
 
 
-          title={`Contrat de maintenance de : ${GetNomMois(1, false)} ${GetDateFromStringDDMMYYY(
-            statePeriodes.periodeEnCours.k
-          ).getFullYear()} à ${GetNomMois(12, false)} ${GetDateFromStringDDMMYYY(
-            statePeriodes.periodeEnCours.v
-          ).getFullYear()}`}>
+          title={GetDPTitle()}
+          // title={`Contrat de maintenance de : ${GetNomMois(1, false)}  ${GetDateFromStringDDMMYYY(
+          //   statePeriodes.periodeEnCours.k
+          // ).getFullYear()} à ${GetNomMois(12, false)} ${GetDateFromStringDDMMYYY(
+          //   statePeriodes.periodeEnCours.v
+          // ).getFullYear()}`}
+          
+          
+          >
 
 
           {_arrayPeriodes.map((periode, index) => {
@@ -391,15 +367,15 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
   //#endregion
 
 
-useEffect(()=> {
-  getListSites()
+  useEffect(() => {
+    getListSites()
 
-      // eslint-disable-next-line
-},[])
+    // eslint-disable-next-line
+  }, [])
 
   useEffect(() => {
     const pathname = window.location.pathname;
-    if(isError)return;
+    if (isError) return;
     statePeriodes.setIsSetPeriode(false);
 
     let _isdropdownShown = false;
@@ -415,7 +391,7 @@ useEffect(()=> {
 
 
   useEffect(() => {
-    if(isError)return;
+    if (isError) return;
 
     if (showDropdownPeriode) {
       GetPeriodes();
@@ -427,7 +403,7 @@ useEffect(()=> {
   useEffect(() => {
     const handleScroll = () => {
       if (navbarRef.current) {
-        const rect = navbarRef.current.getBoundingClientRect();
+        // const rect = navbarRef.current.getBoundingClientRect();
         setIsSticky(window.scrollY > 100);
       }
     };
@@ -470,7 +446,7 @@ useEffect(()=> {
 
         <Navbar.Text className="d-flex align-item" >
           {
-           (!isError) && showDropdownPeriode &&
+            (!isError) && showDropdownPeriode &&
             <DropdownPeriode />
           }
         </Navbar.Text>
@@ -500,21 +476,21 @@ useEffect(()=> {
                   style={{ width: dropdownWidth }}
                 >
                   {
-                  listeSites && listeSites.length && listeSites.length >=1 && listeSites.map((site) => (
-                    
+                    listeSites && listeSites.length && listeSites.length >= 1 && listeSites.map((site) => (
 
-                    site.GUID !== ClientSiteContratCtx.storedClientSite.GUID && (
-                      <Dropdown.Item
-                        key={site.GUID}
-                        onClick={() => ClientSiteContratCtx.setClientSite(site)}
-                         className="ms-3"
 
-                      >
-                        {site.NomCompletClientSite}
-                      </Dropdown.Item>
-                    )
-                  
-                ))}
+                      site.GUID !== ClientSiteContratCtx.storedClientSite.GUID && (
+                        <Dropdown.Item
+                          key={site.GUID}
+                          onClick={() => ClientSiteContratCtx.setClientSite(site)}
+                          className="ms-3"
+
+                        >
+                          {site.NomCompletClientSite}
+                        </Dropdown.Item>
+                      )
+
+                    ))}
                   <div className="dropdown-footer">
                     <Dropdown.Item
                       className="btn-see-all-sites"
