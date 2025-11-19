@@ -235,7 +235,30 @@ function App() {
         <Router>
           <Routes>
 
-            <Route path="changemdp/:token" element={<ChangeMDPPage />} />
+            {/* <Route path="changemdp/:token" element={<ChangeMDPPage />} /> */}
+             <Route path="newmdp/:token" element={<LoginPage
+                setToken={setTokenViaCookies}
+                setUrlWs={setWsEntrepriseURL}
+                setWsEndpoint={setWsEndpoint}
+                setTheme={setTheme}
+                setImageClient={setImageClient}
+                setIsUser={setIsUserViaCookies}
+                forget={false}
+                changeMdp={true}
+                newMdp={true}
+              />} />
+            <Route path="changemdp/:token" element={<LoginPage
+                setToken={setTokenViaCookies}
+                setUrlWs={setWsEntrepriseURL}
+                setWsEndpoint={setWsEndpoint}
+                setTheme={setTheme}
+                setImageClient={setImageClient}
+                setIsUser={setIsUserViaCookies}
+                forget={false}
+                changeMdp={true}
+                newMdp={false}
+
+              />} />
             <Route path="/" element={
               <LoginPage
                 setToken={setTokenViaCookies}
@@ -256,8 +279,21 @@ function App() {
                 setIsUser={setIsUserViaCookies}
                 forget={true}
               />
+              
             } />
-
+            <Route path="/forget/:token" element={
+              <LoginPage
+                setToken={setTokenViaCookies}
+                setUrlWs={setWsEntrepriseURL}
+                setWsEndpoint={setWsEndpoint}
+                setTheme={setTheme}
+                setImageClient={setImageClient}
+                setIsUser={setIsUserViaCookies}
+                forget={true}
+                newMdp={true}
+              />
+              
+            } />
           </Routes>
         </Router>
       </div>

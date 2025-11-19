@@ -3,6 +3,9 @@
 // require_once($AbsPath.'extranet/inc_include/header_ajax_json.inc.php');
 
 header('Access-Control-Allow-Origin: *');
+// header("Access-Control-Allow-Origin: https://cloud.gandarasolution.fr");
+// header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
 //exit(phpinfo());
 if (!isset($_GET["endpoint"])) {
@@ -159,7 +162,7 @@ if (!isset($_GET["endpoint"])) {
 		$mysqlClient = new PDO('mysql:host=localhost:3306;dbname=extranet;charset=utf8', 'palissot', 'loi2WfsBTAgRob2H');
 
 		$params = [];
-		if (strpos($codeEntreprise, 'gandarasolution') || strpos($codeEntreprise, ':')) {
+		if (strpos($codeEntreprise, 'gandarasolution') || strpos($codeEntreprise, ':') || strpos($codeEntreprise, '.')) {
 			//URL
 			$sqlQuery = 'SELECT * FROM config_client WHERE urlCannoniqueGMAO = :url';
 
@@ -178,7 +181,9 @@ if (!isset($_GET["endpoint"])) {
 		$response = $sth->fetchAll();
 		if ($response[0]["urlCannoniqueGMAO"] === $codeEntreprise || $response[0]["codeEntrepriseGMAO"] === $codeEntreprise) {
 
-			$g_uploadLogo = '/data/Extranet/tmp/logoClient/';
+			// $g_uploadLogo = '/data/Extranet/tmp/logoClient/';
+			$g_uploadLogo = "/var/www/palissot/data/Extranet/tmp/logoClient/";
+
 			$logoGMAO = $response[0]["cheminLogoGMAO"];
 			$path = $g_uploadLogo . '/' . $logoGMAO;
 			$type = pathinfo($path, PATHINFO_EXTENSION);
@@ -306,11 +311,9 @@ if (!isset($_GET["endpoint"])) {
 			if (isset($result["GMAOGetDocumentsPrestationResult"]["KV"])) {
 				return json_encode($result["GMAOGetDocumentsPrestationResult"]["KV"]);
 
-			} 
-			elseif(isset($result["GMAOGetDocumentsPrestationResult"])){
+			} elseif (isset($result["GMAOGetDocumentsPrestationResult"])) {
 				return json_encode($result["GMAOGetDocumentsPrestationResult"]);
-			}
-			else {
+			} else {
 				return "500";
 			}
 		}
@@ -1391,6 +1394,36 @@ if (!isset($_GET["endpoint"])) {
 	}
 
 
+	function CheckTokenMDP($token, $isFirst, $ws)
+	{
+		global $URL_API_CCS, $g_useSoapClientV2;
+		$request = array("token" => $token, "isFirst" => $isFirst);
+
+		if ($g_useSoapClientV2) {
+			$client = new MSSoapClient($ws, array('compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP));
+			$result = $client->__soapCall("GMAOPassCheckToken", array("parameters" => $request));
+
+			if (is_object($result)) {
+				$result = json_decode(json_encode($result), true);
+			}
+		} else {
+			$client = new nusoap_client($ws, true);
+			$client->soap_defencoding = 'UTF-8';
+			$client->decode_utf8 = false;
+			$result = $client->call("GMAOPassCheckToken", $request, "http://tempuri.org/IWSGandara/", "", false, false);
+		}
+
+		$error = $client->getError();
+
+
+		if ($error) {
+			error_log($error);
+			return $error;
+		} else {
+			return json_encode($result["GMAOPassCheckTokenResult"]);
+		}
+	}
+
 
 	function UpdateMdp($token, $newMdp, $ws)
 	{
@@ -1523,6 +1556,10 @@ if (!isset($_GET["endpoint"])) {
 
 			case "GMAOChangeMDP":
 				echo (ChangeMDP($_POST['token'], $_POST['newMDP'], $url));
+				break;
+
+			case "GMAOCheckTokenMDP":
+				echo (CheckTokenMDP($_POST['token'], $_POST['isFirst'], $url));
 				break;
 
 			case "GMAO_UpdateMdp":

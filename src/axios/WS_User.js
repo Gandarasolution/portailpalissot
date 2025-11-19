@@ -54,10 +54,26 @@ const Connexion = async (login, pass, wsForToken, setToken) => {
   const callbackSet = (data) => {
     var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
 
-    if (data === "Erreur de connexion" || !base64regex.test(data)) { setToken(500); }
-    else {
+//Si la réponse est b64 (le token) ou un chiffre (erreur) on retourne, sinon on retourne 500 (erreur)
+    if (base64regex.test(data) || !isNaN(data))
+    {
       setToken(data);
+    }else{
+      setToken(500);
     }
+
+
+    // if (data === "Erreur de connexion" || !base64regex.test(data)) {
+    //   if(isNaN)
+    //   {
+    //     setToken(500);
+    //   }else{
+    //     setToken(data);
+    //   }
+    //    }
+    // else {
+    //   setToken(data);
+    // }
   }
   await CallEndpoint("Connexion", { login: login, pass_clear: pass }, callbackSet, false, wsForToken);
 };
@@ -92,18 +108,28 @@ const ChangeMDP = async (token, newMdp, setData, _urlToUse, _wsToUse) => {
 }
 
 
-/**
- * 
- * @param {string} token 
- * @param {string} newMdp 
- * @param {Function} setData 
- */
-const UpdateMDP = async (token, newMdp, setData) => {
-  await CallEndpoint("_UpdateMdp", {
+
+const CheckTokenMDP = async(token,isFirst, setData, _urlToUse, _wsToUse) => {
+  await CallEndpoint("CheckTokenMDP",{
     token: token,
-    newMdp: newMdp,
-  }, setData);
+    isFirst: isFirst,
+  },setData, false,_urlToUse,_wsToUse);
 }
+
+
+
+// /**
+//  * 
+//  * @param {string} token 
+//  * @param {string} newMdp 
+//  * @param {Function} setData 
+//  */
+// const UpdateMDP = async (token, newMdp, setData) => {
+//   await CallEndpoint("_UpdateMdp", {
+//     token: token,
+//     newMdp: newMdp,
+//   }, setData);
+// }
 
 //#endregion
 
@@ -155,11 +181,12 @@ export {
   //Gestion MDP
   , CreateTokenMDP
   , ChangeMDP
-  , UpdateMDP
+  // , UpdateMDP
   //Infos
   , GetListeParametres
   , GetClientSiteContrat
   , GetClientSiteBySearch
+  ,CheckTokenMDP
 }
 
 
