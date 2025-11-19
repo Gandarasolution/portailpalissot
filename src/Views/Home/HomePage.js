@@ -51,6 +51,8 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
 
   const [mailTo, setMailTo] = useState("");
   const [mailToLoaded, setMailToLoaded] = useState(false);
+  const [subjectTo,setSubjectTo] = useState("");
+
 
   const DashboardData = async () => {
     setDataLoaded(false);
@@ -68,13 +70,20 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
     const callBackData = (data) => {
       if (data) {
         let _paramMailTo;
+        let _paramSubjectTo;
         if (Array.isArray(data)) {
           _paramMailTo = (data.find((x) => x.k === "GMAO.Affichage.DemandeDepannage.MailTo")).v
+          _paramSubjectTo = (data.find((x) => x.k === "GMAO.Affichage.DemandeDepannage.MailSubject")).v
         } else {
           _paramMailTo = data.v;
         }
 
         setMailTo(_paramMailTo);
+        if(_paramSubjectTo)
+        {
+          setSubjectTo(`?subject=${_paramSubjectTo.replace('${SITE}',ClientSiteContratCtx.storedClientSite.NomCompletClientSite)}`)
+        }
+
         setMailToLoaded(true);
       }
     }
@@ -386,12 +395,15 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
             <FontAwesomeIcon icon={faBell} size="2x" />
 
             <h5>Demande d’intervention</h5>
-            <p>
+            {/* <p>
               Remplissez notre formulaire directement <br></br>
               depuis cette application.
+            </p> */}
+            <p>
+              Effectuez une demande d'intervention.
             </p>
             {/* <a href="/nouvelleintervention" className="btn"> */}
-            {mailToLoaded && <a href={`mailto:${mailTo}`} className="btn">
+            {mailToLoaded && <a href={`mailto:${mailTo}${subjectTo}`} className="btn">
               Faire une demande maintenant &gt;
             </a>
             }
