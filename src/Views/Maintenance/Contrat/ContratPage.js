@@ -48,6 +48,7 @@ const ContratPage = ({ setPageSubtitle, setPageTitle, periodeEnCours, IsSetPerio
 
     SetPrestations([]);
 
+
     GetPrestationContrat(
       tokenCt,
       DateSOAP(GetDateFromStringDDMMYYY(periodeEnCours.k)),

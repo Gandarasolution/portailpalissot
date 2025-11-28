@@ -389,8 +389,8 @@ const HomePage = ({ setPageSubtitle, setPageTitle }) => {
       </Container>
 
 
-      <Container fluid className="container-table d-flex m-3" >
-        <div className="p-4 d-flex align-items-center justify-content-center dashboard-request-intervention">
+      <Container fluid className="container-table d-flex" >
+        <div className="d-flex align-items-center justify-content-center dashboard-request-intervention">
           <div className="d-flex flex-column align-items-center justify-content-center">
             <FontAwesomeIcon icon={faBell} size="2x" />
 

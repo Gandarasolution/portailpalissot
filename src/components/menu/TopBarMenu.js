@@ -124,6 +124,8 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
 
       setListePeriodes(data);
       const PeriodeInitial = GetDatePeriodeInitial();
+
+      console.log(PeriodeInitial);
       let _indexPeriode = data.findIndex((p) => {
         return (
           GetDateFromStringDDMMYYY(p.k).getTime() <= PeriodeInitial.getTime() &&
@@ -253,6 +255,7 @@ const TopBarMenu = ({ handleDeconnexion, pageSubtitle, pageTitle, pageSubtitleLo
 
 
     const GetDPTitle = () => {
+
 
       let _deDate = GetDateFromStringDDMMYYY(statePeriodes.periodeEnCours.k)
       let _aDate = GetDateFromStringDDMMYYY(statePeriodes.periodeEnCours.v)

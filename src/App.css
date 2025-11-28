@@ -1228,8 +1228,8 @@ sup {
 
 .shortcut-link {
   display: flex;
-  /* justify-content: space-between; */
-  justify-content: space-evenly;
+  justify-content: space-between;
+  /* justify-content: space-evenly; */
   flex-wrap: wrap;
   /* width: 80%; */
   width: 100%;
@@ -2322,8 +2322,8 @@ thead th,
 ========================================================================== */
 
 .content-pagination {
-  margin-top: 20px;
-  margin-bottom: 40px;
+  /* margin-top: 20px;
+  margin-bottom: 40px; */
   justify-content: space-between;
   padding: 0 2%;
 }
@@ -2536,7 +2536,7 @@ thead th,
   border-radius: 16px;
   overflow: hidden;
   margin-right: 2%;
-  margin-top: 75px;
+  /* margin-top: 75px; */
 }
 
 .dashboard-request-intervention::before {
