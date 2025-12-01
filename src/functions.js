@@ -394,6 +394,29 @@ const IsUserFromToken = (token) => {
 }
 
 
+
+  /**
+   * Ensures the value is a valid GUID
+   * @param value string value
+   */
+  function isValidGUID(value) {
+    if (value.length > 0) {
+      if (!(/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/).test(value)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+const isValidEmail = (email) => {
+  return String(email)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+};
+
 export {
   FiltrerParSeuilDate,
   FiltrerParSearch,
@@ -417,4 +440,6 @@ export {
   GenerateUid,
   GetRedirectionFromIdTypeDocument,
   IsUserFromToken,
+  isValidGUID,
+  isValidEmail,
 };

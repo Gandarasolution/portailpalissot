@@ -19,7 +19,7 @@ import Modal from "react-bootstrap/Modal";
 import TitreOfPage from "../../components/commun/TitreOfPage";
 import { useContext, useState } from "react";
 import { TokenContext } from "../../App";
-import { UpdateMDP } from "../../axios/WSGandara";
+// import { UpdateMDP } from "../../axios/WSGandara";
 
 //#endregion
 
@@ -65,7 +65,7 @@ const AccountPage = ({ accountName }) => {
           const SetData = (data) => {
             setShow(false)
           }
-          UpdateMDP(tokenCt, newMdp,SetData);
+          // UpdateMDP(tokenCt, newMdp,SetData);
         }
       }
     }
