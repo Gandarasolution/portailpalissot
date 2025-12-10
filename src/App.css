@@ -913,10 +913,21 @@ button.switch-site {
 
 /* ---- Propulsée ---- par */
 /* Concerne seulement le propulsé par de la page login */
-.container-login-content+.container-powered-by {
+@media screen and (height <= 550) {
+  .container-login-content+.container-powered-by {
+  position: relative;
+  bottom: 0;
+}
+}
+
+
+@media screen and (height > 550) {
+  .container-login-content+.container-powered-by {
   position: absolute;
   bottom: 0;
 }
+}
+
 
 .container-powered-by .text-powered-by {
   color: #83949E;
