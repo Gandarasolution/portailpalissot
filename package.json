@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "react-lorem-ipsum": "^1.4.10",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
