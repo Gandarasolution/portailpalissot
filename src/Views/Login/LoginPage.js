@@ -220,6 +220,7 @@ const LoginPage = (props) => {
     const handleForgotPassword = async () => {
       if (mailRecup.length > 0 && isValidEmail(mailRecup)) {
 
+
         const FetchSetRecup = (data) => {
           setRecupAlertVariant("danger");
           if (data === 1) {
@@ -268,6 +269,9 @@ const LoginPage = (props) => {
 
         <Form className="m-4" onSubmit={(e) => { e.preventDefault(); handleForgotPassword() }}>
           {EmailModalForgotPassword()}
+          <Alert variant={recupAlertVariant} show={recupAlertVisible} >
+            {recupAlertText}
+          </Alert>
           <SubmitButtonModalForgotPassword />
         </Form>
       </div>
@@ -453,11 +457,29 @@ const LoginPage = (props) => {
             {/* <Form.Label>Nouveau mot de passe</Form.Label> */}
             <Form.Control type={showPass1 ? '' : "password"} placeholder={`Veuillez renseigner votre${props.newMdp ? "" : " nouveau"} mot de passe`} value={newMdp} onChange={(e) => setNewMdp(e.target.value)} required />
           </Form.Group>
+          <Alert variant="warning" show={!(newMdp.length >= 8 && /[A-Z]/.test(newMdp) && /[a-z]/.test(newMdp) && /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(newMdp))}>
+            Votre mot de passe doit contenir :
+            <ul>
+              {newMdp.length < 8 && <li>
+                Au moins 8 caractères
+              </li>}
+              {! /[A-Z]/.test(newMdp) && <li>
+                Au moins une majuscule
+              </li>}
+              {! /[a-z]/.test(newMdp) && <li>
+                Au moins une minuscule
+              </li>}
+              {! /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(newMdp) && <li>
+                Au moins un caractère spécial
+              </li>}
+            </ul>
+          </Alert>
 
           <Form.Group controlId="formBasicPassword">
             {/* <Form.Label>Nouveau mot de passe</Form.Label> */}
             <Form.Control type={showPass2 ? '' : "password"} placeholder={`Veuillez confirmer votre${props.newMdp ? "" : " nouveau"} mot de passe`} value={newMdp2} onChange={(e) => setNewMdp2(e.target.value)} required />
           </Form.Group>
+
         </>
 
       )
@@ -498,6 +520,8 @@ const LoginPage = (props) => {
           setAlertPassVisible(true);
           return;
         }
+
+
 
         //Réinit mot de passe
         const FetchSetData = (data) => {
@@ -556,10 +580,18 @@ const LoginPage = (props) => {
         </Alert>
       }
 
+      const isButtonDisabled = () => {
+        //
+        let _disabled = false;
+        if (newMdp.length < 8) { _disabled = true; }
+
+        if (!(newMdp.length >= 8 && /[A-Z]/.test(newMdp) && /[a-z]/.test(newMdp) && /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(newMdp))) { _disabled = true; }
+        return _disabled;
+      }
 
       return (//seulement si le token est potentiellement valide.
         <>
-          {(validiteToken === 0 || validiteToken === 1) && <Button type="submit" className="btn-modal" variant="" onClick={ButtonSubmited}>
+          {(validiteToken === 0 || validiteToken === 1) && <Button type="submit" className="btn-modal" variant="" disabled={isButtonDisabled()} onClick={ButtonSubmited}>
             {props.newMdp ? "Finaliser mon accès" : "Changer de mot de passe"}
           </Button>}
           <AlertPass />
@@ -872,7 +904,7 @@ const LoginPage = (props) => {
       </Row>
       {ModalForgotPassword()}
       {ModalChangePassword()}
-      {ModalAlerte()}
+      {/* {ModalAlerte()} */}
     </Container>
   );
 };
