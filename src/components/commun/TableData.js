@@ -48,6 +48,7 @@ import {
   GenerateUid,
   RegexTestAndReturnMatch,
   base64toBlob,
+  getMimeTypeFromExtension,
   groupBy,
 } from "../../functions";
 import RowDocument from "./RowDocument";
@@ -2105,8 +2106,13 @@ const TableData = ({ ...props }) => {
       //On récupère le fichier en b64
       const b64data = await GetDocumentFISAV(tokenCt, element.v, false, true);
 
+
+      var re = /(?:\.([^.]+))?$/;
+      var ext = re.exec(element.k);
+
       //Transformation en blob
-      const blobData = base64toBlob(b64data.v);
+      const blobData = base64toBlob(b64data.v, getMimeTypeFromExtension(ext[0]) );
+
 
       //Création de l'URL du fichier
       const url = URL.createObjectURL(blobData);
@@ -2209,8 +2215,12 @@ const TableData = ({ ...props }) => {
     //On récupère le fichier en b64
     try {
       const b64data = await DocumentMaintenanceGetFile(element.v, true, true);
+      
+      var re = /(?:\.([^.]+))?$/;
+      var ext = re.exec(element.k);
+
       //Transformation en blob
-      const blobData = base64toBlob(b64data.v);
+      const blobData = base64toBlob(b64data.v, getMimeTypeFromExtension(ext[0]) );
 
       //Création de l'URL du fichier
       const url = URL.createObjectURL(blobData);
