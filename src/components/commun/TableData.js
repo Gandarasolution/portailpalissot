@@ -479,11 +479,15 @@ const TableData = ({ ...props }) => {
     let _arFilters = [];
     // console.log(props.Data.Count)
     // if ((props.Data) || (props.Data && props.Data.Count === 0)) {
-    if ((props.Data && props.Data.Count === 0)) {
+    // console.log(props.Data);
+    if ((props.Data && props.Data.length === 0)) {
       _arFilters = [];
     } else {
+      if(props.Data.length > 1)
+      {
+        _arFilters = Object.entries(groupBy(props.Data, fieldname));
+      }
 
-      _arFilters = Object.entries(groupBy(props.Data, fieldname));
     }
     const _arrayVal = _arFilters.map((x) => x[0]);
 
