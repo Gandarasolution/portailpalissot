@@ -2443,13 +2443,15 @@ const TableData = ({ ...props }) => {
 
       return;
     }
+
+
     if (arrData.length && arrData.length > 0) {
       for (let index = 0; index < arrData.length; index++) {
         const element = arrData[index];
         _arrDocs.push(CreatePropsDocumentMaintenance(element));
       }
     }
-    else if(arrData.length && arrData.length > 0)
+    else if(arrData)
     {
       _arrDocs.push(CreatePropsDocumentMaintenance(arrData));
 
@@ -2458,6 +2460,7 @@ const TableData = ({ ...props }) => {
 
     if (_arrDocs.length > 1) {
       let tempDocs = [];
+
       tempDocs.push(await CreatePropsDocPrestaZIP(_arrDocs, presta));
       _arrDocs = [...tempDocs, ..._arrDocs];
     }
