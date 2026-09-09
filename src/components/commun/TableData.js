@@ -479,11 +479,15 @@ const TableData = ({ ...props }) => {
     let _arFilters = [];
     // console.log(props.Data.Count)
     // if ((props.Data) || (props.Data && props.Data.Count === 0)) {
-    if ((props.Data && props.Data.Count === 0)) {
+    // console.log(props.Data);
+    if ((props.Data && props.Data.length === 0)) {
       _arFilters = [];
     } else {
+      if(props.Data.length > 1)
+      {
+        _arFilters = Object.entries(groupBy(props.Data, fieldname));
+      }
 
-      _arFilters = Object.entries(groupBy(props.Data, fieldname));
     }
     const _arrayVal = _arFilters.map((x) => x[0]);
 
@@ -2439,13 +2443,15 @@ const TableData = ({ ...props }) => {
 
       return;
     }
+
+
     if (arrData.length && arrData.length > 0) {
       for (let index = 0; index < arrData.length; index++) {
         const element = arrData[index];
         _arrDocs.push(CreatePropsDocumentMaintenance(element));
       }
     }
-    else if(arrData.length && arrData.length > 0)
+    else if(arrData)
     {
       _arrDocs.push(CreatePropsDocumentMaintenance(arrData));
 
@@ -2454,6 +2460,7 @@ const TableData = ({ ...props }) => {
 
     if (_arrDocs.length > 1) {
       let tempDocs = [];
+
       tempDocs.push(await CreatePropsDocPrestaZIP(_arrDocs, presta));
       _arrDocs = [...tempDocs, ..._arrDocs];
     }

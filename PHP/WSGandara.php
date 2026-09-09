@@ -891,7 +891,8 @@ if (!isset($_GET["endpoint"])) {
 
 			if (isset($result["GMAOGetListeInterventionsResult"]["DossierInterventionSAV"])) {
 				return json_encode($result["GMAOGetListeInterventionsResult"]["DossierInterventionSAV"]);
-
+			} else if (isset($result["GMAOGetListeInterventionsResult"])) {
+				return json_encode($result["GMAOGetListeInterventionsResult"]);
 			} else {
 				return "500";
 			}
@@ -1171,6 +1172,8 @@ if (!isset($_GET["endpoint"])) {
 
 			if (isset($result["GMAOGetListeDevisResult"]["Devis"])) {
 				return json_encode($result["GMAOGetListeDevisResult"]["Devis"]);
+			} elseif (isset($result["GMAOGetListeDevisResult"])) {
+				return json_encode($result["GMAOGetListeDevisResult"]);
 			} else {
 				return "500";
 			}
